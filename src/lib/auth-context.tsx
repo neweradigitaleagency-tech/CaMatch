@@ -22,7 +22,7 @@ interface AuthContextType {
   login: (phone: string) => Promise<boolean>;
   verifyOtp: (phone: string, token: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  switchRole: (role: UserRole) => void;
+  switchRole: (role: UserRole) => Promise<void>;
   otpSent: boolean;
   setOtpSent: (v: boolean) => void;
   supabaseUser: User | null;
@@ -118,10 +118,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setOtpSent(false);
   }, [supabase]);
 
-  const switchRole = useCallback((newRole: UserRole) => {
-    // Role switching is handled by logout → login with different role
-    if (newRole === "visitor") logout();
-  }, [logout]);
+  const switchRole = useCallback(async (newRole: UserRole) => {
+    if (newRole === "visitor") {
+      logout();
+      return;
+    }
+    if (!user) return;
+    try {
+      const res = await fetch("/api/auth/switch-role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id, role: newRole }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data.user as AuthUser);
+      }
+    } catch {
+      // silent
+    }
+  }, [user, logout]);
 
   const role: UserRole = !user ? "visitor" : user.role === "CLIENT" ? "client" : "pro";
 
