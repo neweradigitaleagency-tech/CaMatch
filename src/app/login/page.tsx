@@ -2,169 +2,264 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Phone, ChevronLeft, ShieldCheck, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Phone, Mail, Loader2, ChevronLeft, CheckCircle2 } from "lucide-react";
+import toast from "react-hot-toast";
 import { useUser } from "@/lib/auth-context";
+
+type AuthMode = "phone" | "email";
+type Step = "method" | "otp" | "role";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login: demoLogin } = useUser();
-  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const { login, verifyOtp } = useUser();
+  const [mode, setMode] = useState<AuthMode>("phone");
+  const [step, setStep] = useState<Step>("method");
   const [phone, setPhone] = useState("");
-  const [otp, setOtp] = useState(["", "", "", ""]);
+  const [otp, setOtp] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [role, setRole] = useState<"client" | "pro">("client");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [sending, setSending] = useState(false);
 
-  const handleSendOTP = async () => {
-    setLoading(true);
-    setError(null);
-    // Demo: bypass OTP and go directly to verification
-    const ok = await demoLogin(`+225${phone}`, role);
-    if (ok) {
-      router.push("/");
-    } else {
-      setError("Erreur de connexion");
+  const handleSendOtp = async () => {
+    const cleaned = phone.replace(/\D/g, "");
+    if (cleaned.length < 8) {
+      toast.error("Numéro invalide. Ex: 05 64 14 81 72");
+      return;
     }
-    setLoading(false);
+    setSending(true);
+    const ok = await login(cleaned);
+    setSending(false);
+    if (ok) {
+      setStep("otp");
+      toast.success("Code envoyé par SMS !");
+    } else {
+      toast.error("Erreur d'envoi du code");
+    }
   };
 
-  const handleVerifyOTP = async () => {
-    // In production, this would verify the OTP with Supabase
-    const ok = await demoLogin(`+225${phone}`, role);
-    if (ok) router.push("/");
+  const handleVerifyOtp = async () => {
+    if (otp.length < 4) {
+      toast.error("Entrez le code reçu par SMS");
+      return;
+    }
+    setSending(true);
+    const ok = await verifyOtp(phone, otp);
+    setSending(false);
+    if (ok) {
+      setStep("role");
+      toast.success("Connecté !");
+      setTimeout(() => router.push(role === "pro" ? "/onboarding" : "/"), 400);
+    } else {
+      toast.error("Code invalide. Vérifiez et réessayez.");
+    }
   };
 
-  const handleOtpChange = (index: number, value: string) => {
-    if (value.length <= 1) {
-      const newOtp = [...otp];
-      newOtp[index] = value;
-      setOtp(newOtp);
-      if (value && index < 3) {
-        document.getElementById(`otp-${index + 1}`)?.focus();
-      }
+  const handleEmailAuth = async () => {
+    if (!email || !password) {
+      toast.error("Remplissez tous les champs");
+      return;
+    }
+    setSending(true);
+    const fullPhone = phone ? (phone.startsWith("+") ? phone : `+225${phone}`) : "";
+    const ok = await login(fullPhone || email);
+    setSending(false);
+    if (ok) {
+      toast.success("Connecté !");
+      setTimeout(() => router.push(role === "pro" ? "/onboarding" : "/"), 400);
+    } else {
+      toast.error("Erreur de connexion");
     }
   };
 
   return (
-    <main className="min-h-screen bg-white flex flex-col -mx-4 -mt-6 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-      <div className="flex-1 flex flex-col justify-center px-6 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-10"
-        >
-          <div className="w-20 h-20 bg-brand-orange/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <ShieldCheck className="w-10 h-10 text-brand-orange" />
-          </div>
-          <h1 className="text-2xl font-extrabold text-text-primary mb-2">
-            {step === "phone" ? "Bienvenue sur Ça Match" : "Code de vérification"}
-          </h1>
-          <p className="text-sm text-text-secondary">
-            {step === "phone"
-              ? "Entrez votre numéro pour commencer"
-              : `Entrez le code envoyé au ${phone}`}
+    <div className="min-h-screen bg-[#F7F4EE] flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-sm"
+      >
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-[#1A1A2E] font-heading">Ça Match</h1>
+          <p className="text-[#1A1A2E]/60 mt-2 text-sm">
+            Le marché de confiance des services à Abidjan
           </p>
-        </motion.div>
+        </div>
 
-        {error && (
-          <div className="bg-danger-50 border border-danger-200 rounded-2xl px-4 py-3 mb-4">
-            <p className="text-sm text-danger font-medium">{error}</p>
-          </div>
-        )}
+        <div className="bg-white rounded-3xl shadow-soft p-6">
+          <AnimatePresence mode="wait">
+            {step === "method" && (
+              <motion.div key="method" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <h2 className="text-lg font-bold text-[#1A1A2E] mb-4">Connexion</h2>
 
-        {step === "phone" ? (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3 border border-gray-100">
-              <Phone className="w-5 h-5 text-text-tertiary" />
-              <span className="text-text-secondary font-medium">+225</span>
-              <div className="w-px h-6 bg-gray-200" />
-              <input
-                type="tel"
-                placeholder="01 02 03 04 05"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                className="flex-1 bg-transparent outline-none text-text-primary text-lg"
-                maxLength={10}
-              />
-            </div>
-            <div className="flex gap-2">
-              {["client", "pro"].map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setRole(r as typeof role)}
-                  className={`flex-1 py-3 rounded-xl text-sm font-medium border transition-all ${
-                    role === r
-                      ? "bg-brand-orange text-white border-brand-orange"
-                      : "bg-white text-text-secondary border-gray-200"
-                  }`}
-                >
-                  {r === "client" ? "Je suis Client" : "Je suis Pro"}
+                {/* Role Toggle */}
+                <div className="grid grid-cols-2 gap-2 mb-6">
+                  <button
+                    onClick={() => setRole("client")}
+                    className={`p-3 rounded-xl border-2 text-center transition-all ${
+                      role === "client"
+                        ? "border-[#FF6B35] bg-[#FF6B35]/5 text-[#FF6B35]"
+                        : "border-gray-100 text-text-secondary hover:border-gray-200"
+                    }`}
+                  >
+                    <p className="text-xs font-bold">Client</p>
+                    <p className="text-2xs opacity-70">Je cherche un pro</p>
+                  </button>
+                  <button
+                    onClick={() => setRole("pro")}
+                    className={`p-3 rounded-xl border-2 text-center transition-all ${
+                      role === "pro"
+                        ? "border-[#FF6B35] bg-[#FF6B35]/5 text-[#FF6B35]"
+                        : "border-gray-100 text-text-secondary hover:border-gray-200"
+                    }`}
+                  >
+                    <p className="text-xs font-bold">Prestataire</p>
+                    <p className="text-2xs opacity-70">J&apos;offre un service</p>
+                  </button>
+                </div>
+
+                {/* Auth Method Toggle */}
+                <div className="flex bg-gray-100 rounded-xl p-1 mb-5">
+                  <button
+                    onClick={() => setMode("phone")}
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                      mode === "phone" ? "bg-white text-[#FF6B35] shadow-sm" : "text-text-secondary"
+                    }`}
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    Téléphone
+                  </button>
+                  <button
+                    onClick={() => setMode("email")}
+                    className={`flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition ${
+                      mode === "email" ? "bg-white text-[#FF6B35] shadow-sm" : "text-text-secondary"
+                    }`}
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    Email
+                  </button>
+                </div>
+
+                {mode === "phone" ? (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-medium text-text-secondary mb-1.5 block">
+                        Numéro de téléphone
+                      </label>
+                      <div className="flex gap-2">
+                        <span className="flex items-center px-3 bg-gray-100 rounded-xl text-sm font-medium text-text-secondary shrink-0">
+                          +225
+                        </span>
+                        <input
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                          placeholder="05 64 14 81 72"
+                          className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-all"
+                        />
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleSendOtp}
+                      disabled={sending || phone.length < 8}
+                      className="w-full bg-[#FF6B35] text-white font-bold py-3.5 rounded-xl active:scale-[0.98] transition-all duration-200 disabled:opacity-40 flex items-center justify-center gap-2 shadow-cta"
+                    >
+                      {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                      {sending ? "Envoi..." : "Recevoir le code"}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-xs font-medium text-text-secondary mb-1.5 block">Email</label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="jean@example.com"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-text-secondary mb-1.5 block">Mot de passe</label>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-all"
+                      />
+                    </div>
+                    <button
+                      onClick={handleEmailAuth}
+                      disabled={sending || !email || !password}
+                      className="w-full bg-[#FF6B35] text-white font-bold py-3.5 rounded-xl active:scale-[0.98] transition-all duration-200 disabled:opacity-40 flex items-center justify-center gap-2 shadow-cta"
+                    >
+                      {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                      {sending ? "Connexion..." : "Se connecter"}
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {step === "otp" && (
+              <motion.div key="otp" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                <button onClick={() => setStep("method")} className="flex items-center gap-1 text-xs text-text-secondary mb-4">
+                  <ChevronLeft className="w-4 h-4" />
+                  Modifier le numéro
                 </button>
-              ))}
-            </div>
-            <button
-              onClick={handleSendOTP}
-              disabled={phone.length < 10 || loading}
-              className="w-full bg-brand-orange text-white font-bold rounded-2xl py-4 text-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-cta flex items-center justify-center gap-2"
-            >
-              {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-              {loading ? "Envoi..." : "Envoyer le code"}
-            </button>
-            <p className="text-xs text-text-tertiary text-center">
-              En continuant, vous acceptez nos conditions d&apos;utilisation
-            </p>
-          </motion.div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div className="flex justify-center gap-3">
-              {otp.map((digit, index) => (
+
+                <h2 className="text-lg font-bold text-[#1A1A2E] mb-1">Code de vérification</h2>
+                <p className="text-xs text-text-secondary mb-6">
+                  Entrez le code reçu par SMS au <span className="font-semibold">+225 {phone}</span>
+                </p>
+
                 <input
-                  key={index}
-                  id={`otp-${index}`}
                   type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  className="w-16 h-16 bg-gray-50 border border-gray-200 rounded-2xl text-center text-2xl font-bold text-text-primary outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  placeholder="0 0 0 0 0 0"
+                  className="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-xl text-2xl text-center tracking-[0.5em] font-bold focus:outline-none focus:ring-2 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] transition-all"
+                  maxLength={6}
                 />
-              ))}
-            </div>
-            <button
-              onClick={handleVerifyOTP}
-              disabled={otp.some((d) => !d) || loading}
-              className="w-full bg-brand-orange text-white font-bold rounded-2xl py-4 text-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-cta flex items-center justify-center gap-2"
-            >
-              {loading && <Loader2 className="w-5 h-5 animate-spin" />}
-              {loading ? "Vérification..." : "Vérifier"}
-            </button>
-            <div className="text-center space-y-2">
-              <button
-                onClick={() => setStep("phone")}
-                className="text-sm text-brand-orange font-medium flex items-center justify-center gap-1 mx-auto"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Modifier le numéro
-              </button>
-              <p className="text-xs text-text-tertiary">
-                Code non reçu ?{" "}
-                <button onClick={handleSendOTP} className="text-brand-orange font-medium">
-                  Renvoyer
+
+                <button
+                  onClick={handleVerifyOtp}
+                  disabled={sending || otp.length < 4}
+                  className="w-full bg-[#FF6B35] text-white font-bold py-3.5 rounded-xl mt-5 active:scale-[0.98] transition-all duration-200 disabled:opacity-40 flex items-center justify-center gap-2 shadow-cta"
+                >
+                  {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                  {sending ? "Vérification..." : "Vérifier"}
                 </button>
-              </p>
-            </div>
-          </motion.div>
-        )}
-      </div>
-    </main>
+
+                <button onClick={handleSendOtp} disabled={sending} className="w-full text-xs text-[#FF6B35] font-medium mt-3">
+                  Renvoyer le code
+                </button>
+              </motion.div>
+            )}
+
+            {step === "role" && (
+              <motion.div key="role" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-8">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle2 className="w-8 h-8 text-green-600" />
+                </div>
+                <h2 className="text-lg font-bold text-[#1A1A2E] mb-1">Connecté !</h2>
+                <p className="text-xs text-text-secondary mb-6">Redirection en cours...</p>
+                <div className="flex justify-center">
+                  <Loader2 className="w-6 h-6 animate-spin text-[#FF6B35]" />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <p className="text-center text-2xs text-text-secondary mt-4">
+          En continuant, vous acceptez nos{" "}
+          <span className="text-[#FF6B35] font-medium">Conditions d&apos;utilisation</span>
+        </p>
+      </motion.div>
+    </div>
   );
 }

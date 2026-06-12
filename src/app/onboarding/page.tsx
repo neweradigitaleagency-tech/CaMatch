@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, Camera, Loader2 } from "lucide-react";
-import { getSupabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 const ZONES = [
@@ -49,7 +49,7 @@ export default function OnboardingPage() {
     setSaving(true);
     setError("");
     try {
-      const supabase = getSupabase();
+      const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Non connecté");
 

@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSupabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/useAuth";
 
 export function useSupabaseAuth() {
+  const supabase = createClient();
   const router = useRouter();
   const { login: setAuth, logout: clearAuth } = useAuthStore();
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,7 @@ export function useSupabaseAuth() {
   const sendOTP = async (phone: string) => {
     setLoading(true);
     setError(null);
-    const { error: otpError } = await getSupabase().auth.signInWithOtp({
+    const { error: otpError } = await supabase.auth.signInWithOtp({
       phone,
     });
     if (otpError) setError(otpError.message);
@@ -25,7 +26,7 @@ export function useSupabaseAuth() {
   const verifyOTP = async (phone: string, token: string, role?: string) => {
     setLoading(true);
     setError(null);
-    const { data, error: verifyError } = await getSupabase().auth.verifyOtp({
+    const { data, error: verifyError } = await supabase.auth.verifyOtp({
       phone,
       token,
       type: "sms",
@@ -58,7 +59,7 @@ export function useSupabaseAuth() {
   };
 
   const signOut = async () => {
-    await getSupabase().auth.signOut();
+    await supabase.auth.signOut();
     clearAuth();
     router.push("/login");
   };
