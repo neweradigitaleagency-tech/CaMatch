@@ -4,22 +4,29 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Avatar } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+
+interface Conversation {
+  partner: { id: string; profile?: { firstName?: string; lastName?: string; avatarUrl?: string } };
+  lastMessage: { content: string; createdAt: string };
+  unreadCount: number;
+}
 
 export default function MessagesPage() {
   const [search, setSearch] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [conversations, setConversations] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
+  const demoId = "0195e7f8-3d78-7fd7-9acb-881faa4a225c";
 
   useEffect(() => {
     let cancelled = false;
     const fetchConversations = async () => {
       try {
-        const res = await fetch("/api/messages?userId=demo-user-id");
+        const res = await fetch(`/api/messages?userId=${demoId}`);
         const data = await res.json();
         if (!cancelled) setConversations(data.conversations ?? []);
-      } catch (err) {
-        console.error("Failed to fetch conversations:", err);
+      } catch {
+        // silent
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -74,6 +81,9 @@ export default function MessagesPage() {
             <p className="text-sm text-text-secondary max-w-xs">
               Contactez un pro pour démarrer une conversation
             </p>
+            <Link href="/search" className="mt-4 text-sm text-primary font-medium">
+              Trouver un professionnel
+            </Link>
           </div>
         ) : (
           <div className="space-y-1">
@@ -82,29 +92,37 @@ export default function MessagesPage() {
               const lastName = conv.partner?.profile?.lastName ?? "";
               const name = `${firstName} ${lastName}`.trim() || "Utilisateur";
               const avatarUrl = conv.partner?.profile?.avatarUrl;
+              const partnerId = conv.partner?.id || "";
+              const hasUnread = conv.unreadCount > 0;
+              const time = conv.lastMessage?.createdAt
+                ? new Date(conv.lastMessage.createdAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
+                : "";
               return (
                 <motion.div
-                  key={conv.id}
+                  key={partnerId}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.04 }}
                 >
                   <Link
-                    href="#"
-                    className="flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                    href={`/messages/${partnerId}`}
+                    className={cn("flex items-center gap-3 p-3 rounded-2xl hover:bg-gray-50 active:bg-gray-100 transition-colors", hasUnread && "bg-primary-50/30")}
                   >
                     <div className="relative">
-                      <Avatar size="md" src={avatarUrl} alt={name} verified={false} />
+                      <Avatar size="md" src={avatarUrl} alt={name} />
+                      {hasUnread && <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#FF6B35] rounded-full border-2 border-white" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-bold text-sm text-text-primary truncate">{name}</h3>
-                        <span className="text-2xs text-text-tertiary flex-shrink-0 ml-2">{conv.lastMessage?.createdAt ?? ""}</span>
+                        <h3 className={cn("text-sm truncate", hasUnread ? "font-bold text-text-primary" : "font-semibold text-text-primary")}>{name}</h3>
+                        <span className="text-2xs text-text-tertiary flex-shrink-0 ml-2">{time}</span>
                       </div>
                       <div className="flex items-center justify-between mt-0.5">
-                        <p className="text-xs text-text-secondary truncate">{conv.lastMessage?.content ?? ""}</p>
-                        {conv.unreadCount > 0 && (
-                          <span className="w-5 h-5 bg-primary rounded-full text-white text-2xs font-bold flex items-center justify-center flex-shrink-0 ml-2">
+                        <p className={cn("text-xs truncate", hasUnread ? "font-semibold text-text-primary" : "text-text-secondary")}>
+                          {conv.lastMessage?.content || ""}
+                        </p>
+                        {hasUnread && (
+                          <span className="w-5 h-5 bg-[#FF6B35] rounded-full text-white text-2xs font-bold flex items-center justify-center flex-shrink-0 ml-2">
                             {conv.unreadCount}
                           </span>
                         )}

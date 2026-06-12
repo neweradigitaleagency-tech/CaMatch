@@ -30,7 +30,16 @@ export async function POST(request: NextRequest) {
         phone,
         role: role === 'pro' ? 'PROFESSIONAL' : 'CLIENT',
         status: 'ACTIVE',
+        profile: {
+          create: {
+            firstName: '',
+            lastName: '',
+            zone: [],
+            isAvailable: role === 'pro',
+          },
+        },
       },
+      include: { profile: true },
     });
 
     return NextResponse.json({

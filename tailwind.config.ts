@@ -9,6 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        brand: {
+          orange: "#FF6B35",
+          navy: "#1A1A2E",
+          ivory: "#F7F4EE",
+          green: "#2ED573",
+          gold: "#FFB830",
+          card: "#EDEAE3",
+          muted: "#8A8580",
+        },
         primary: {
           DEFAULT: "#10B981",
           50: "#ECFDF5",
@@ -37,6 +46,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        heading: ["Space Grotesk", "Inter", "system-ui", "sans-serif"],
       },
       fontSize: {
         "2xs": ["0.625rem", { lineHeight: "0.875rem" }],
@@ -58,9 +68,11 @@ const config: Config = {
       },
       boxShadow: {
         soft: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
-        card: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+        card: "0 2px 12px rgba(26,26,46,0.08)",
         elevated: "0 10px 15px -3px rgb(0 0 0 / 0.1)",
         inner: "inset 0 1px 1px rgba(255,255,255,0.15)",
+        cta: "0 4px 16px rgba(255,107,53,0.45)",
+        nav: "0 -4px 20px rgba(26,26,46,0.10)",
       },
       spacing: {
         safe: "env(safe-area-inset-bottom)",

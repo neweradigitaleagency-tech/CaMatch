@@ -57,6 +57,7 @@ model User {
   reviews              Review[]
   sentMessages         Message[] @relation("SenderMessages")
   receivedMessages     Message[] @relation("ReceivedMessages")
+  savedPros            SavedPro[] @relation("SavedPros")
 }
 
 model Session {
@@ -89,10 +90,14 @@ model Profile {
   responseTime  Int?
   acceptanceRate Float   @default(0)
   availability  Json?
+  isAvailable   Boolean  @default(true)
+  onboardingCompleted Boolean @default(false)
 
   portfolio   PortfolioItem[]
   services    Service[]
   pricing     Pricing[]
+  favorites   SavedPro[]
+  profileViews ProfileView[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -175,6 +180,25 @@ model Message {
   read       Boolean  @default(false)
   missionId  String?
   createdAt  DateTime @default(now())
+}
+
+model SavedPro {
+  id        String   @id @default(uuid())
+  clientId  String
+  client    User     @relation("SavedPros", fields: [clientId], references: [id])
+  proId     String
+  pro       Profile  @relation(fields: [proId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([clientId, proId])
+}
+
+model ProfileView {
+  id        String   @id @default(uuid())
+  proId     String
+  pro       Profile  @relation(fields: [proId], references: [id])
+  viewerSession String?
+  date      DateTime @default(now())
 }
 
 model Category {

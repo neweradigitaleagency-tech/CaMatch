@@ -33,7 +33,9 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className="antialiased bg-background text-text-primary min-h-screen">
-        <SiteHeader />
+        <div className="hidden md:block">
+          <SiteHeader />
+        </div>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {children}
         </div>

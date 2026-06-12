@@ -21,7 +21,7 @@ const navItems = [
 export function BottomNav() {
   const pathname = usePathname();
 
-  if (!pathname || pathname.startsWith("/login") || pathname.startsWith("/dashboard") || pathname.startsWith("/messages/")) {
+  if (!pathname || pathname.startsWith("/login") || pathname.startsWith("/messages/")) {
     return null;
   }
 
