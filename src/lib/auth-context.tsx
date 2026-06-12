@@ -25,8 +25,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const DEMO_CLIENT: AuthUser = {
-  id: "0195e7f8-3d78-7fd7-9acb-881faa4a225c",
-  phone: "+2250101020304",
+  id: "b84d770e-333c-4c5b-a7bc-40c1f771e1cb",
+  phone: "+2250564148172",
   role: "CLIENT",
   firstName: "Ahou",
   lastName: "Mireille",
@@ -34,8 +34,8 @@ const DEMO_CLIENT: AuthUser = {
 };
 
 const DEMO_PRO: AuthUser = {
-  id: "demo-pro-id",
-  phone: "+2250102030501",
+  id: "93c0b0ee-67a7-4b2e-bbf4-cff780d73652",
+  phone: "+2250564148173",
   role: "PROFESSIONAL",
   firstName: "Kouamé",
   lastName: "Yao",

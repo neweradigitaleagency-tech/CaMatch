@@ -58,6 +58,7 @@ model User {
   sentMessages         Message[] @relation("SenderMessages")
   receivedMessages     Message[] @relation("ReceivedMessages")
   savedPros            SavedPro[] @relation("SavedPros")
+  quickQuotes          QuickQuote[]
 }
 
 model Session {
@@ -199,6 +200,21 @@ model ProfileView {
   pro       Profile  @relation(fields: [proId], references: [id])
   viewerSession String?
   date      DateTime @default(now())
+}
+
+model QuickQuote {
+  id          String   @id @default(uuid())
+  clientId    String
+  client      User     @relation(fields: [clientId], references: [id])
+  category    String
+  description String   @db.Text
+  budget      Int?
+  mediaUrl    String?
+  mediaType   String?
+  status      String   @default("OPEN")
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Category {

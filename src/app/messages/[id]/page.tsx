@@ -85,7 +85,7 @@ function ChatContent() {
     <main className="min-h-screen bg-gray-50 flex flex-col">
       <div className="sticky top-0 z-40 bg-white border-b border-gray-100">
         <div className="max-w-4xl mx-auto flex items-center gap-3 h-14 px-4">
-          <button onClick={() => router.back()} className="btn-ghost p-2 -ml-2">
+          <button onClick={() => router.back()} className="btn-ghost p-3 min-w-[44px] min-h-[44px] flex items-center justify-center -ml-2">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <Avatar size="sm" alt="Client" />
@@ -93,7 +93,7 @@ function ChatContent() {
             <p className="text-sm font-bold text-text-primary truncate">Client</p>
             <p className="text-2xs text-text-secondary">En ligne</p>
           </div>
-          <button className="btn-ghost p-2">
+          <button className="btn-ghost p-3 min-w-[44px] min-h-[44px] flex items-center justify-center">
             <Phone className="w-5 h-5 text-primary" />
           </button>
         </div>
@@ -133,7 +133,7 @@ function ChatContent() {
                       : "bg-white border border-gray-100 text-text-primary rounded-bl-md shadow-soft"
                   }`}
                 >
-                  <p>{msg.content}</p>
+                  <p className="break-words">{msg.content}</p>
                   <div className={`flex items-center gap-1 mt-1 ${isMe ? "justify-end" : "justify-start"}`}>
                     <span className={`text-2xs ${isMe ? "text-white/70" : "text-text-tertiary"}`}>
                       {formatTime(msg.createdAt)}

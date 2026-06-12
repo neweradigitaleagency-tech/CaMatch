@@ -4,10 +4,11 @@ import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, MapPin, Clock, Search, X, ChevronLeft, MessageCircle, Loader2 } from "lucide-react";
+import { Star, MapPin, Clock, Search, X, ChevronLeft, MessageCircle, Loader2, Upload, DollarSign } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { BadgeLevel, VerificationBadge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/lib/auth-context";
 
 type SortKey = "proximite" | "note" | "disponible" | "prix-asc" | "prix-desc";
 
@@ -38,8 +39,11 @@ function SearchPageContent() {
   const [devisOpen, setDevisOpen] = useState(false);
   const [devisText, setDevisText] = useState("");
   const [devisCategory, setDevisCategory] = useState("");
+  const [devisBudget, setDevisBudget] = useState("");
+  const [devisMedia, setDevisMedia] = useState<File | null>(null);
   const [devisSending, setDevisSending] = useState(false);
   const [devisDone, setDevisDone] = useState(false);
+  const { user } = useUser();
 
   interface ProResult {
     id: string;
@@ -101,13 +105,43 @@ function SearchPageContent() {
   const handleDevisSubmit = async () => {
     if (!devisText.trim() || !devisCategory) return;
     setDevisSending(true);
-    await new Promise((r) => setTimeout(r, 800));
+
+    let mediaUrl: string | null = null;
+    let mediaType: string | null = null;
+    if (devisMedia) {
+      const reader = new FileReader();
+      mediaUrl = await new Promise((resolve) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(devisMedia);
+      });
+      mediaType = devisMedia.type.startsWith("video") ? "video" : "image";
+    }
+
+    try {
+      await fetch("/api/quick-quotes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientId: user?.id || "guest",
+          category: devisCategory,
+          description: devisText,
+          budget: devisBudget ? parseInt(devisBudget, 10) : null,
+          mediaUrl,
+          mediaType,
+        }),
+      });
+    } catch {
+      // silent
+    }
+
     setDevisDone(true);
     setTimeout(() => {
       setDevisOpen(false);
       setDevisDone(false);
       setDevisText("");
       setDevisCategory("");
+      setDevisBudget("");
+      setDevisMedia(null);
     }, 2000);
     setDevisSending(false);
   };
@@ -119,7 +153,7 @@ function SearchPageContent() {
           key={f.key}
           onClick={() => setActiveFilter(f.key)}
           className={cn(
-            "flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200",
+            "flex-shrink-0 px-3.5 py-2.5 rounded-full text-xs font-medium transition-all duration-200",
             activeFilter === f.key ? "bg-[#FF6B35] text-white" : "bg-gray-100 text-text-secondary hover:bg-gray-200"
           )}
         >
@@ -178,7 +212,7 @@ function SearchPageContent() {
           </div>
           <button
             onClick={() => setDevisOpen(true)}
-            className="bg-[#FF6B35] text-white text-sm font-semibold px-4 py-2.5 rounded-xl whitespace-nowrap hover:opacity-90 active:scale-95 transition-all"
+            className="bg-[#FF6B35] text-white text-sm font-semibold px-5 py-3 rounded-xl whitespace-nowrap hover:opacity-90 active:scale-95 transition-all"
           >
             Devis Rapide →
           </button>
@@ -280,7 +314,7 @@ function SearchPageContent() {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-xs bg-green-50 text-green-700 font-medium px-3 py-1.5 rounded-lg flex items-center gap-1 active:scale-95 transition-transform hover:bg-green-100"
+                          className="text-xs bg-green-50 text-green-700 font-medium px-3 py-2.5 rounded-lg flex items-center gap-1 active:scale-95 transition-transform hover:bg-green-100"
                         >
                           <MessageCircle className="w-3.5 h-3.5" />
                           WhatsApp
@@ -331,35 +365,63 @@ function SearchPageContent() {
                   <h3 className="text-lg font-bold text-text-primary mb-1">Devis Rapide</h3>
                   <p className="text-sm text-text-secondary mb-5">Décrivez votre besoin en quelques mots</p>
 
-                  <div className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium text-text-primary mb-1.5 block">Catégorie</label>
-                      <select
-                        value={devisCategory}
-                        onChange={(e) => setDevisCategory(e.target.value)}
-                        className="input-field"
-                      >
-                        <option value="">Sélectionnez une catégorie</option>
-                        <option value="Électricien">Électricien</option>
-                        <option value="Plombier">Plombier</option>
-                        <option value="Menuisier">Menuisier</option>
-                        <option value="Ménage">Ménage</option>
-                        <option value="Réparation téléphone">Réparation téléphone</option>
-                        <option value="Climatisation">Climatisation</option>
-                        <option value="Coiffure">Coiffure</option>
-                        <option value="Autre">Autre</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-text-primary mb-1.5 block">Description</label>
-                      <textarea
-                        placeholder="Ex: Je dois réparer un robinet qui fuit dans ma cuisine..."
-                        value={devisText}
-                        onChange={(e) => setDevisText(e.target.value)}
-                        rows={4}
-                        className="input-field resize-none"
-                      />
-                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-text-primary mb-1.5 block">Catégorie</label>
+                        <select
+                          value={devisCategory}
+                          onChange={(e) => setDevisCategory(e.target.value)}
+                          className="input-field"
+                        >
+                          <option value="">Sélectionnez une catégorie</option>
+                          <option value="Électricien">Électricien</option>
+                          <option value="Plombier">Plombier</option>
+                          <option value="Menuisier">Menuisier</option>
+                          <option value="Ménage">Ménage</option>
+                          <option value="Réparation téléphone">Réparation téléphone</option>
+                          <option value="Climatisation">Climatisation</option>
+                          <option value="Coiffure">Coiffure</option>
+                          <option value="Autre">Autre</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text-primary mb-1.5 block">Description du problème</label>
+                        <textarea
+                          placeholder="Ex: Je dois réparer un robinet qui fuit dans ma cuisine..."
+                          value={devisText}
+                          onChange={(e) => setDevisText(e.target.value)}
+                          rows={4}
+                          className="input-field resize-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text-primary mb-1.5 block">Budget proposé (FCFA)</label>
+                        <div className="relative">
+                          <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-text-secondary" />
+                          <input
+                            type="number"
+                            placeholder="Ex: 25000"
+                            value={devisBudget}
+                            onChange={(e) => setDevisBudget(e.target.value)}
+                            className="input-field pl-10"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-text-primary mb-1.5 block">Photo ou vidéo (optionnel)</label>
+                        <label className="flex items-center gap-3 p-3 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-brand-orange transition-colors">
+                          <Upload className="w-5 h-5 text-text-secondary shrink-0" />
+                          <span className="text-sm text-text-secondary truncate">
+                            {devisMedia ? devisMedia.name : "Ajouter une photo ou vidéo"}
+                          </span>
+                          <input
+                            type="file"
+                            accept="image/*,video/*"
+                            className="hidden"
+                            onChange={(e) => setDevisMedia(e.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                      </div>
                     <button
                       onClick={handleDevisSubmit}
                       disabled={!devisText.trim() || !devisCategory || devisSending}
