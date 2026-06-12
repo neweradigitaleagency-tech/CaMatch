@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { LoginGate } from "@/components/shared/login-gate";
+import { useUser } from "@/lib/auth-context";
 
 interface Conversation {
   partner: { id: string; profile?: { firstName?: string; lastName?: string; avatarUrl?: string } };
@@ -13,16 +15,18 @@ interface Conversation {
 }
 
 export default function MessagesPage() {
+  const { user } = useUser();
   const [search, setSearch] = useState("");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
-  const demoId = "0195e7f8-3d78-7fd7-9acb-881faa4a225c";
+  const userId = user?.id || "";
 
   useEffect(() => {
+    if (!userId) return;
     let cancelled = false;
     const fetchConversations = async () => {
       try {
-        const res = await fetch(`/api/messages?userId=${demoId}`);
+        const res = await fetch(`/api/messages?userId=${userId}`);
         const data = await res.json();
         if (!cancelled) setConversations(data.conversations ?? []);
       } catch {
@@ -33,7 +37,7 @@ export default function MessagesPage() {
     };
     fetchConversations();
     return () => { cancelled = true; };
-  }, []);
+  }, [userId]);
 
   const filtered = conversations.filter((c) => {
     const name = [c.partner?.profile?.firstName, c.partner?.profile?.lastName].filter(Boolean).join(" ");
@@ -41,6 +45,7 @@ export default function MessagesPage() {
   });
 
   return (
+    <LoginGate>
     <main className="min-h-screen pb-8 lg:pb-12">
       <div className="flex items-center justify-between py-4">
         <h1 className="text-lg lg:text-2xl font-bold text-text-primary">Messagerie</h1>
@@ -136,5 +141,6 @@ export default function MessagesPage() {
         )}
       </div>
     </main>
+    </LoginGate>
   );
 }

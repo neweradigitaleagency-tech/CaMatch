@@ -1,27 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Phone, ChevronLeft, ShieldCheck, Loader2 } from "lucide-react";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useUser } from "@/lib/auth-context";
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login: demoLogin } = useUser();
   const [step, setStep] = useState<"phone" | "otp">("phone");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState(["", "", "", ""]);
   const [role, setRole] = useState<"client" | "pro">("client");
-  const { sendOTP, verifyOTP, loading, error } = useSupabaseAuth();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSendOTP = async () => {
-    const fullPhone = `+225${phone}`;
-    const ok = await sendOTP(fullPhone);
-    if (ok) setStep("otp");
+    setLoading(true);
+    setError(null);
+    // Demo: bypass OTP and go directly to verification
+    const ok = await demoLogin(`+225${phone}`, role);
+    if (ok) {
+      router.push("/");
+    } else {
+      setError("Erreur de connexion");
+    }
+    setLoading(false);
   };
 
   const handleVerifyOTP = async () => {
-    const fullPhone = `+225${phone}`;
-    const token = otp.join("");
-    await verifyOTP(fullPhone, token, role);
+    // In production, this would verify the OTP with Supabase
+    const ok = await demoLogin(`+225${phone}`, role);
+    if (ok) router.push("/");
   };
 
   const handleOtpChange = (index: number, value: string) => {
@@ -43,8 +54,8 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <div className="w-20 h-20 bg-primary-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-            <ShieldCheck className="w-10 h-10 text-primary" />
+          <div className="w-20 h-20 bg-brand-orange/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <ShieldCheck className="w-10 h-10 text-brand-orange" />
           </div>
           <h1 className="text-2xl font-extrabold text-text-primary mb-2">
             {step === "phone" ? "Bienvenue sur Ça Match" : "Code de vérification"}
@@ -88,7 +99,7 @@ export default function LoginPage() {
                   onClick={() => setRole(r as typeof role)}
                   className={`flex-1 py-3 rounded-xl text-sm font-medium border transition-all ${
                     role === r
-                      ? "bg-primary text-white border-primary"
+                      ? "bg-brand-orange text-white border-brand-orange"
                       : "bg-white text-text-secondary border-gray-200"
                   }`}
                 >
@@ -99,7 +110,7 @@ export default function LoginPage() {
             <button
               onClick={handleSendOTP}
               disabled={phone.length < 10 || loading}
-              className="w-full bg-primary text-white font-bold rounded-2xl py-4 text-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-card flex items-center justify-center gap-2"
+              className="w-full bg-brand-orange text-white font-bold rounded-2xl py-4 text-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-cta flex items-center justify-center gap-2"
             >
               {loading && <Loader2 className="w-5 h-5 animate-spin" />}
               {loading ? "Envoi..." : "Envoyer le code"}
@@ -124,14 +135,14 @@ export default function LoginPage() {
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleOtpChange(index, e.target.value)}
-                  className="w-16 h-16 bg-gray-50 border border-gray-200 rounded-2xl text-center text-2xl font-bold text-text-primary outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                  className="w-16 h-16 bg-gray-50 border border-gray-200 rounded-2xl text-center text-2xl font-bold text-text-primary outline-none focus:ring-2 focus:ring-brand-orange/30 focus:border-brand-orange transition-all"
                 />
               ))}
             </div>
             <button
               onClick={handleVerifyOTP}
               disabled={otp.some((d) => !d) || loading}
-              className="w-full bg-primary text-white font-bold rounded-2xl py-4 text-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-card flex items-center justify-center gap-2"
+              className="w-full bg-brand-orange text-white font-bold rounded-2xl py-4 text-lg active:scale-[0.98] transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed shadow-cta flex items-center justify-center gap-2"
             >
               {loading && <Loader2 className="w-5 h-5 animate-spin" />}
               {loading ? "Vérification..." : "Vérifier"}
@@ -139,14 +150,14 @@ export default function LoginPage() {
             <div className="text-center space-y-2">
               <button
                 onClick={() => setStep("phone")}
-                className="text-sm text-primary font-medium flex items-center justify-center gap-1 mx-auto"
+                className="text-sm text-brand-orange font-medium flex items-center justify-center gap-1 mx-auto"
               >
                 <ChevronLeft className="w-4 h-4" />
                 Modifier le numéro
               </button>
               <p className="text-xs text-text-tertiary">
                 Code non reçu ?{" "}
-                <button onClick={handleSendOTP} className="text-primary font-medium">
+                <button onClick={handleSendOTP} className="text-brand-orange font-medium">
                   Renvoyer
                 </button>
               </p>

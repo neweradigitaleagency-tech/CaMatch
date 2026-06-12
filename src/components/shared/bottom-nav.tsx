@@ -9,21 +9,55 @@ import {
   MessageCircle,
   User,
   LayoutDashboard,
+  FileText,
+  Zap,
+  LogIn,
 } from "lucide-react";
+import { useUser, type UserRole } from "@/lib/auth-context";
 
-const navItems = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: typeof Home;
+}
+
+const visitorNav: NavItem[] = [
+  { href: "/", label: "Accueil", icon: Home },
+  { href: "/search", label: "Trouver un pro", icon: Search },
+  { href: "/login", label: "Connexion", icon: LogIn },
+];
+
+const clientNav: NavItem[] = [
   { href: "/", label: "Accueil", icon: Home },
   { href: "/search", label: "Recherche", icon: Search },
+  { href: "/demandes", label: "Mes demandes", icon: FileText },
   { href: "/messages", label: "Messagerie", icon: MessageCircle },
   { href: "/profile", label: "Mon Profil", icon: User },
 ];
 
+const proNav: NavItem[] = [
+  { href: "/", label: "Accueil", icon: Home },
+  { href: "/opportunites", label: "Opportunités", icon: Zap },
+  { href: "/messages", label: "Messagerie", icon: MessageCircle },
+  { href: "/dashboard", label: "Tableau de bord", icon: LayoutDashboard },
+  { href: "/profile", label: "Profil Pro", icon: User },
+];
+
+const navByRole: Record<UserRole, NavItem[]> = {
+  visitor: visitorNav,
+  client: clientNav,
+  pro: proNav,
+};
+
 export function BottomNav() {
   const pathname = usePathname();
+  const { role } = useUser();
 
   if (!pathname || pathname.startsWith("/login") || pathname.startsWith("/messages/")) {
     return null;
   }
+
+  const navItems = navByRole[role];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-lg border-t border-gray-100 safe-bottom lg:hidden">
@@ -43,7 +77,7 @@ export function BottomNav() {
               )}
             >
               <Icon className={cn("w-5 h-5", isActive && "fill-brand-orange/10")} />
-              <span className="text-2xs font-medium">{item.label}</span>
+              <span className="text-2xs font-medium text-center leading-tight">{item.label}</span>
             </Link>
           );
         })}
@@ -56,7 +90,7 @@ export function DashboardNav() {
   return (
     <Link
       href="/dashboard"
-      className="fixed bottom-20 right-4 z-50 w-12 h-12 bg-primary rounded-2xl shadow-card flex items-center justify-center text-white active:scale-90 transition-transform duration-200"
+      className="fixed bottom-20 right-4 z-50 w-12 h-12 bg-brand-orange rounded-2xl shadow-card flex items-center justify-center text-white active:scale-90 transition-transform duration-200"
     >
       <LayoutDashboard className="w-5 h-5" />
     </Link>

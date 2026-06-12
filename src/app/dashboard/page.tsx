@@ -8,6 +8,7 @@ import { TrustScoreBar } from "@/components/ui/trust-score-bar";
 import { BadgeLevel } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { LoginGate } from "@/components/shared/login-gate";
 
 type Tab = "semaine" | "mois" | "tout";
 type DayStatus = "dispo" | "indispo";
@@ -114,6 +115,7 @@ export default function DashboardPage() {
   const recentMissions = missions.slice(0, 4);
 
   return (
+    <LoginGate requiredRole="pro">
     <main className="min-h-screen pb-8 lg:pb-12">
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-3">
@@ -558,5 +560,6 @@ export default function DashboardPage() {
         </div>
       </div>
     </main>
+    </LoginGate>
   );
 }

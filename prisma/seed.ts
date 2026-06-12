@@ -285,6 +285,7 @@ async function main() {
   // ── 4. Generate 20 pros per category ──
   let phoneIndex = 1000;
   let proCount = 0;
+  const proUserIds: string[] = [];
 
   for (const [categoryName, data] of Object.entries(categoryData)) {
     const usedFirstNames = new Set<string>();
@@ -311,13 +312,13 @@ async function main() {
       const pricingCount = 2 + Math.floor(Math.random() * 1);
       const proPricing = pick(data.pricings, pricingCount);
       const experience = scoreToExperience(score);
-      const missionCount = scoreToMissions(score);
+      const missionCountSeed = scoreToMissions(score);
       const responseTime = scoreToResponseTime(score);
       const acceptanceRate = scoreToAcceptance(score);
 
       const phone = phoneFor(phoneIndex++);
 
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           phone,
           role: "PROFESSIONAL",
@@ -334,7 +335,7 @@ async function main() {
               isVerified: isEliteOrGold || Math.random() > 0.4,
               isOnsiteVerified: isEliteOrGold && Math.random() > 0.3,
               experience,
-              missionCount,
+              missionCount: missionCountSeed,
               responseTime,
               acceptanceRate,
               isAvailable: Math.random() > 0.2,
@@ -356,12 +357,113 @@ async function main() {
         },
       });
 
+      proUserIds.push(user.id);
       proCount++;
     }
     console.log(`  ✅ ${categoryName}: 20 pros créés`);
   }
 
   console.log(`🎉 ${proCount} pros créés avec succès !`);
+
+  // ── 5. Create missions, reviews, and portfolio ──
+  console.log("📝 Création des missions et avis...");
+
+  const reviewComments = [
+    "Excellent travail ! Très professionnel et ponctuel. Je recommande vivement.",
+    "Très bon service, je suis satisfait du résultat. Prix correct.",
+    "Bon travail dans l'ensemble. Quelques petits détails à améliorer mais satisfaisant.",
+    "Travail correct, livré dans les délais. Communication bonne.",
+    "Service moyen, le résultat n'est pas exactement ce que j'avais demandé.",
+    "Déçu du service. Le professionnel n'est pas venu à l'heure convenue.",
+    "Très déçu. Travail bâclé et manque de professionnalisme.",
+    "Super prestation ! Je referai appel sans hésiter. Merci encore !",
+    "Professionnel attentionné et à l'écoute. Très belle réalisation.",
+    "Rapport qualité-prix excellent. Je recommande les yeux fermés.",
+  ];
+
+  const portfolioDescriptions = [
+    "Rénovation complète - Avant / Après",
+    "Installation réalisée pour un client à Cocody",
+    "Projet terminé en 2 jours - Client satisfait",
+    "Avant / Après - Travail effectué à Marcory",
+    "Réalisation du jour - Nouveau client",
+  ];
+
+  const serviceNames = Object.values(categoryData).flatMap((d) => d.services);
+  const allZones = [...zones];
+  const statuses: Array<"PENDING" | "ACCEPTED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"> = ["COMPLETED", "COMPLETED", "COMPLETED", "COMPLETED", "COMPLETED", "ACCEPTED", "IN_PROGRESS"];
+
+  for (const proId of proUserIds) {
+    const proUser = await prisma.user.findUnique({
+      where: { id: proId },
+      include: { profile: { include: { services: true } } },
+    });
+    if (!proUser?.profile) continue;
+
+    const score = proUser.profile.trustScore;
+    const missionsCount = 1 + Math.floor(Math.random() * 3);
+    let totalRating = 0;
+    let reviewCount = 0;
+
+    for (let m = 0; m < missionsCount; m++) {
+      const serviceName = proUser.profile.services[m % proUser.profile.services.length]?.name || "Service standard";
+      const status = statuses[Math.floor(Math.random() * statuses.length)];
+      const isCompleted = status === "COMPLETED";
+
+      // Rating correlates with pro score, with some noise
+      const ratingBase = Math.round((score / 100) * 5);
+      const ratingVariation = Math.floor(Math.random() * 3) - 1; // -1 to +1
+      const rating = Math.max(1, Math.min(5, ratingBase + ratingVariation));
+
+      const mission = await prisma.mission.create({
+        data: {
+          clientId: client.id,
+          proId,
+          status,
+          service: serviceName,
+          description: `Demande de ${serviceName.toLowerCase()} pour mon domicile`,
+          address: `${pick(allZones, 1)[0]}, Abidjan`,
+          agreedPrice: Math.floor(Math.random() * 80000) + 10000,
+          finalPrice: isCompleted ? Math.floor(Math.random() * 90000) + 10000 : null,
+          clientRating: isCompleted ? rating : null,
+          completedAt: isCompleted ? new Date(Date.now() - Math.random() * 30 * 86400000) : null,
+        },
+      });
+
+      if (isCompleted) {
+        const comment = reviewComments[Math.floor(Math.random() * reviewComments.length)];
+        await prisma.review.create({
+          data: {
+            missionId: mission.id,
+            reviewerId: client.id,
+            rating,
+            comment: rating >= 3 ? comment : reviewComments[reviewComments.length - Math.ceil(Math.random() * 3)],
+            isVerified: rating >= 4,
+            createdAt: new Date(Date.now() - Math.random() * 30 * 86400000),
+          },
+        });
+        totalRating += rating;
+        reviewCount++;
+      }
+    }
+
+    // Portfolio for GOLD / ELITE pros
+    if (score >= 80) {
+      const portfolioCount = 1 + Math.floor(Math.random() * 3);
+      for (let p = 0; p < portfolioCount; p++) {
+        await prisma.portfolioItem.create({
+          data: {
+            profileId: proUser.profile.id,
+            type: "IMAGE",
+            description: portfolioDescriptions[Math.floor(Math.random() * portfolioDescriptions.length)],
+            afterUrl: "/placeholder-portfolio.jpg",
+          },
+        });
+      }
+    }
+  }
+
+  console.log("✅ Missions, avis et portfolio créés !");
 }
 
 main()
