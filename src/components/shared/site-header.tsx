@@ -9,8 +9,8 @@ import { Menu, X, Search, MessageCircle, User, LayoutDashboard, Home } from "luc
 const navLinks = [
   { href: "/", label: "Accueil" },
   { href: "/search", label: "Trouver un pro" },
-  { href: "/messages", label: "Messages" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/messages", label: "Messagerie" },
+  { href: "/dashboard", label: "Tableau de bord" },
 ];
 
 export function SiteHeader() {
@@ -42,7 +42,7 @@ export function SiteHeader() {
                   className={cn(
                     "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                     isActive
-                      ? "bg-primary-50 text-primary"
+                      ? "bg-brand-orange/10 text-brand-orange"
                       : "text-text-secondary hover:text-text-primary hover:bg-gray-50"
                   )}
                 >
@@ -55,7 +55,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="hidden sm:inline-flex items-center gap-2 bg-primary text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-primary-600 active:scale-[0.97] transition-all duration-200 shadow-soft"
+              className="hidden sm:inline-flex items-center gap-2 bg-brand-orange text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:brightness-110 active:scale-[0.97] transition-all duration-200 shadow-cta"
             >
               <User className="w-4 h-4" />
               Connexion
@@ -84,7 +84,7 @@ export function SiteHeader() {
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-primary-50 text-primary"
+                      ? "bg-brand-orange/10 text-brand-orange"
                       : "text-text-secondary hover:bg-gray-50"
                   )}
                 >
@@ -99,7 +99,7 @@ export function SiteHeader() {
             <Link
               href="/login"
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-primary text-white mt-3"
+              className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-brand-orange text-white mt-3"
             >
               <User className="w-4 h-4" />
               Connexion / Inscription

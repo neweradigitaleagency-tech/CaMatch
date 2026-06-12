@@ -94,7 +94,7 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-gray-100">
         <div className="max-w-lg mx-auto flex items-center justify-between h-14 px-4">
-          <h1 className="text-lg font-bold text-text-primary">Profil</h1>
+          <h1 className="text-lg font-bold text-text-primary">Mon Profil</h1>
         </div>
       </div>
 

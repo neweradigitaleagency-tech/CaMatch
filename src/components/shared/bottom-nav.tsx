@@ -14,8 +14,8 @@ import {
 const navItems = [
   { href: "/", label: "Accueil", icon: Home },
   { href: "/search", label: "Recherche", icon: Search },
-  { href: "/messages", label: "Messages", icon: MessageCircle },
-  { href: "/profile", label: "Profil", icon: User },
+  { href: "/messages", label: "Messagerie", icon: MessageCircle },
+  { href: "/profile", label: "Mon Profil", icon: User },
 ];
 
 export function BottomNav() {
@@ -38,11 +38,11 @@ export function BottomNav() {
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 w-16 py-1 rounded-xl transition-colors duration-200",
                 isActive
-                  ? "text-primary"
+                  ? "text-brand-orange"
                   : "text-text-tertiary hover:text-text-secondary"
               )}
             >
-              <Icon className={cn("w-5 h-5", isActive && "fill-primary/10")} />
+              <Icon className={cn("w-5 h-5", isActive && "fill-brand-orange/10")} />
               <span className="text-2xs font-medium">{item.label}</span>
             </Link>
           );

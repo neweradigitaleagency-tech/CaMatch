@@ -2,8 +2,231 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const firstNames = [
+  "Kouamé", "Amoin", "Koné", "N'Dri", "Bamba", "Koffi", "Diallo", "Tano",
+  "Ouattara", "Yao", "Kraidy", "Konan", "Zadi", "Boni", "Kouakou", "Timité",
+  "Kassi", "Touré", "Mambo", "Akissi", "Kouadio", "Awa", "Lazare", "Estelle",
+  "Martine", "Fanta", "Gérald", "Armande", "Ibrahim", "Emile", "Mamadou",
+  "Chloé", "Souleymane", "Béatrice", "Adama", "Moussa", "Fousseni", "Salimata",
+  "Nathalie", "Aminata", "Yasmine", "Fulgence", "Sidoine", "Aymar", "Murielle",
+  "Joël", "Pélagie", "Arsène", "Lydie", "Dorgeles",
+];
+
+const lastNames = [
+  "Coulibaly", "Touré", "Konaté", "Sangaré", "Kamagaté", "Bamba", "Koffi",
+  "Kouamé", "Kouadio", "N'Guessan", "Yao", "Konan", "N'Dri", "Loba", "Aka",
+  "Brou", "Ahoussou", "Dji", "Gooré", "Gboko", "Mambo", "Tano", "Kassi",
+  "Zadi", "Boni", "Kraidy", "Ouattara", "Silué", "Sylla", "Diarra",
+  "Keita", "Diallo", "Bah", "Cissé", "Camara", "Fofana", "Soro", "Kouyaté",
+  "Traoré", "Koné",
+];
+
+const zones = [
+  "Cocody", "Marcory", "Plateau", "Treichville", "Koumassi", "Yopougon",
+  "Abobo", "Adjamé", "Port-Bouët", "Bingerville", "Attécoubé", "Williamsville",
+  "Angré", "Riviera", "Deux-Plateaux",
+];
+
+function pick<T>(arr: T[], count: number): T[] {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+function badgeForScore(score: number): "NONE" | "BRONZE" | "SILVER" | "GOLD" | "ELITE" {
+  if (score >= 95) return "ELITE";
+  if (score >= 85) return "GOLD";
+  if (score >= 70) return "SILVER";
+  if (score >= 50) return "BRONZE";
+  return "NONE";
+}
+
+function scoreToExperience(score: number): number {
+  return Math.max(1, Math.round(score * 0.18 + Math.random() * 5));
+}
+
+function scoreToMissions(score: number): number {
+  return Math.round(score * 5.5 + Math.random() * 60);
+}
+
+function scoreToResponseTime(score: number): number {
+  return Math.max(3, Math.round(65 - score * 0.6 + Math.random() * 8));
+}
+
+function scoreToAcceptance(score: number): number {
+  return Math.min(99, Math.round(65 + score * 0.3 + Math.random() * 5));
+}
+
+function phoneFor(index: number): string {
+  const base = 22501020300 + index;
+  return `+225${base}`;
+}
+
+function indexToScore(index: number): number {
+  const scores = [
+    30, 35, 38, 42, 48,
+    52, 56, 60, 63, 68,
+    72, 75, 78, 80, 84,
+    87, 90, 93, 96, 99,
+  ];
+  return scores[index] ?? 50 + index;
+}
+
+// ── Category-specific data ──
+
+const categoryData: Record<string, {
+  professions: string[];
+  bios: string[];
+  services: string[];
+  pricings: { label: string; price: number; isStartingAt: boolean }[];
+}> = {
+  "Plombier": {
+    professions: ["Plombier", "Plombier", "Plombière", "Plombier", "Plombier"],
+    bios: [
+      "Plombier expérimenté, je résous tous vos problèmes de canalisations avec rapidité et professionnalisme. Intervention dans tout Abidjan.",
+      "Artisan plombier spécialisé dans l'installation sanitaire et le dépannage urgence. Devis gratuit et travail garanti.",
+      "Plombière agréée avec plus de 10 ans d'expérience. Installation, rénovation et entretien de vos équipements sanitaires.",
+      "Professionnel du bâtiment, je réalise tous vos travaux de plomberie: du simple robinet à la rénovation complète de salle d'eau.",
+      "Jeune plombier dynamique, interventions rapides et prix abordables. Spécialiste en détection de fuites sans casse.",
+    ],
+    services: ["Dépannage urgence", "Installation robinetterie", "Détection fuite", "Rénovation salle de bain", "Installation chauffe-eau", "Curage canalisation"],
+    pricings: [
+      { label: "Dépannage standard", price: 12000, isStartingAt: true },
+      { label: "Installation robinet", price: 25000, isStartingAt: false },
+      { label: "Détection fuite", price: 20000, isStartingAt: false },
+      { label: "Rénovation salle de bain", price: 150000, isStartingAt: true },
+      { label: "Curage canalisation", price: 35000, isStartingAt: false },
+    ],
+  },
+  "Électricien": {
+    professions: ["Électricien", "Électricienne", "Électricien", "Électricien", "Électricienne"],
+    bios: [
+      "Électricien professionnel certifié. Installation électrique, dépannage et mise aux normes. Sécurité et conformité garanties.",
+      "Spécialiste en électricité domestique et industrielle. Interventions soignées avec matériaux de qualité.",
+      "Électricienne agréée, je réalise vos installations et dépannages avec précision. Devis gratuit et rapide.",
+      "Artisan électricien avec 15 ans d'expérience. Domotique, tableaux électriques, éclairage. Garantie décennale.",
+      "Électricien disponible 7j/7 pour tous vos dépannages urgents. Intervention rapide dans l'heure.",
+    ],
+    services: ["Installation électrique", "Dépannage urgences", "Tableau électrique", "Domotique", "Mise aux normes", "Éclairage intérieur/extérieur"],
+    pricings: [
+      { label: "Dépannage", price: 15000, isStartingAt: true },
+      { label: "Installation prise", price: 5000, isStartingAt: false },
+      { label: "Installation complète", price: 75000, isStartingAt: false },
+      { label: "Mise aux normes", price: 50000, isStartingAt: false },
+      { label: "Installation domotique", price: 200000, isStartingAt: true },
+    ],
+  },
+  "Menuisier": {
+    professions: ["Menuisier", "Menuisière", "Menuisier", "Menuisier", "Ébéniste"],
+    bios: [
+      "Menuisier ébéniste passionné. Meubles sur mesure, cuisines équipées, agencement intérieur. Travail artisanal de qualité.",
+      "Artisan menuisier spécialisé dans la fabrication et l'installation de meubles. Bois massif et matériaux modernes.",
+      "Menuisière décoratrice, je crée des pièces uniques pour votre intérieur. Alliez style et fonctionnalité.",
+      "Menuisier général avec 20 ans d'expérience. Agencements, rénovations, meubles design. Devis gratuit.",
+      "Ébéniste d'art, restauration de meubles anciens et création contemporaine. Pièces uniques sur commande.",
+    ],
+    services: ["Meubles sur mesure", "Cuisine équipée", "Agencement intérieur", "Mobilier design", "Rénovation", "Portes et fenêtres"],
+    pricings: [
+      { label: "Petite réparation", price: 10000, isStartingAt: true },
+      { label: "Table sur mesure", price: 80000, isStartingAt: false },
+      { label: "Cuisine équipée", price: 350000, isStartingAt: true },
+      { label: "Bibliothèque", price: 120000, isStartingAt: false },
+      { label: "Porte intérieure", price: 45000, isStartingAt: false },
+    ],
+  },
+  "Réparateur": {
+    professions: ["Réparateur téléphone", "Réparatrice smartphone", "Technicien PC", "Réparateur électroménager", "Technicienne tablette"],
+    bios: [
+      "Spécialiste en réparation de smartphones et tablettes. Remplacement écran, batterie, connectique. Pièces d'origine garanties.",
+      "Technicien en électroménager. Je répare lave-linge, frigo, micro-ondes, cuisinière. Intervention à domicile possible.",
+      "Réparatrice agréée Apple et Samsung. Diagnostique gratuit, réparation rapide avec garantie 6 mois.",
+      "Expert en réparation PC et Mac. Problèmes logiciels, changement disque dur, mise à niveau. Déplacement possible.",
+      "Je répare tous vos appareils électroniques: TV, chaîne hi-fi, console de jeux. 8 ans d'expérience.",
+    ],
+    services: ["Remplacement écran", "Changement batterie", "Réparation logicielle", "Réparation PC/Mac", "Réparation électroménager", "Diagnostic express"],
+    pricings: [
+      { label: "Diagnostic", price: 5000, isStartingAt: true },
+      { label: "Remplacement écran", price: 25000, isStartingAt: false },
+      { label: "Nettoyage logiciel", price: 7000, isStartingAt: true },
+      { label: "Réparation PC", price: 20000, isStartingAt: false },
+      { label: "Dépannage électroménager", price: 15000, isStartingAt: false },
+    ],
+  },
+  "Ménager": {
+    professions: ["Femme de ménage", "Agent d'entretien", "Nettoyeur professionnel", "Aide ménagère", "Responsable nettoyage"],
+    bios: [
+      "Service de nettoyage professionnel pour particuliers et entreprises. Équipe ponctuelle, produits écologiques, résultat impeccable.",
+      "Agent d'entretien expérimenté. Nettoyage de bureaux, villas et appartements. Références fournies sur demande.",
+      "Aide ménagère à domicile. Repassage, ménage, vitres. Je travaille avec sérieux et discrétion.",
+      "Entreprise de nettoyage spécialisée dans les locaux professionnels. Devis gratuit, intervention rapide.",
+      "Service de ménage complet avec produit et matériel fournis. De la poussière aux vitres, tout est nickel.",
+    ],
+    services: ["Nettoyage complet", "Nettoyage bureau", "Repassage", "Nettoyage vitres", "Grand nettoyage", "Nettoyage après travaux"],
+    pricings: [
+      { label: "Ménage 2h", price: 10000, isStartingAt: true },
+      { label: "Nettoyage vitres", price: 15000, isStartingAt: false },
+      { label: "Nettoyage bureau", price: 25000, isStartingAt: false },
+      { label: "Grand nettoyage", price: 35000, isStartingAt: true },
+      { label: "Repassage", price: 8000, isStartingAt: false },
+    ],
+  },
+  "Cours & Coaching": {
+    professions: ["Professeur d'anglais", "Coach sportif", "Professeur de maths", "Professeur de français", "Coach en développement"],
+    bios: [
+      "Professeur d'anglais certifié. Cours pour tous niveaux: scolaire, professionnel, conversation. Méthode interactive et résultats garantis.",
+      "Coach sportif diplômé. Programmes personnalisés en musculation, cardio et perte de poids. Suivi en ligne et en présentiel.",
+      "Professeur de mathématiques et sciences. J'accompagne les élèves du collège au lycée avec pédagogie adaptée.",
+      "Professeur de français langue étrangère. Préparation aux examens, conversation, écriture. Cours particuliers ou en groupe.",
+      "Coach en développement personnel. Accompagnement pour atteindre vos objectifs: confiance, organisation, leadership.",
+    ],
+    services: ["Cours d'anglais", "Coaching personnel", "Mathématiques", "Français", "Préparation examens", "Soutien scolaire"],
+    pricings: [
+      { label: "Cours 1h", price: 6000, isStartingAt: true },
+      { label: "Forfait 10 séances", price: 55000, isStartingAt: false },
+      { label: "Coaching mensuel", price: 80000, isStartingAt: false },
+      { label: "Préparation examen", price: 15000, isStartingAt: true },
+      { label: "Soutien scolaire", price: 5000, isStartingAt: false },
+    ],
+  },
+  "Climatisation": {
+    professions: ["Climaticien", "Installateur clim", "Technicien frigoriste", "Climaticienne", "Expert climatisation"],
+    bios: [
+      "Expert en climatisation depuis 15 ans. Installation, entretien et dépannage de tous types de clims. Agréé par les principales marques.",
+      "Technicien frigoriste professionnel. Intervention 7j/7 sur tout Abidjan. Devis gratuit et travail garanti.",
+      "Installateur de systèmes de climatisation et ventilation. Neuf et rénovation, particuliers et professionnels.",
+      "Climaticienne agréée, spécialiste en entretien et dépannage de climatiseurs. Pièces d'origine et garantie.",
+      "Spécialiste en froid et climatisation. Installation de split, gainable, central. Économie d'énergie garantie.",
+    ],
+    services: ["Installation climatisation", "Dépannage urgence", "Entretien annuel", "Nettoyage clim", "Ventilation", "Dépannage froid"],
+    pricings: [
+      { label: "Nettoyage clim", price: 10000, isStartingAt: true },
+      { label: "Entretien clim", price: 15000, isStartingAt: false },
+      { label: "Installation split", price: 85000, isStartingAt: false },
+      { label: "Dépannage urgence", price: 25000, isStartingAt: false },
+      { label: "Installation gainable", price: 350000, isStartingAt: true },
+    ],
+  },
+  "Coiffure & Beauté": {
+    professions: ["Coiffeuse", "Coiffeur", "Barbier", "Maquilleuse", "Esthéticienne", "Manucure"],
+    bios: [
+      "Coiffeuse professionnelle spécialisée dans les tresses, tissages et coupes modernes. Salon climatisé, produits de qualité.",
+      "Barbier traditionnel et moderne. Coupe, barbe, soins visage. Ambiance conviviale et résultats impeccables.",
+      "Maquilleuse professionnelle pour tous vos événements. Mariage, soirée, shooting. Produits hypoallergéniques de luxe.",
+      "Esthéticienne diplômée. Soins du visage, épilation, massage. Détente et bien-être dans un cadre apaisant.",
+      "Manucure pédicure experte. Pose de vernis semi-permanent, ongle gel, nail art. Des mains et pieds sublimes.",
+    ],
+    services: ["Tresses et tissages", "Coupe et brushing", "Barbe et moustache", "Maquillage événementiel", "Soins du visage", "Manucure pédicure"],
+    pricings: [
+      { label: "Coupe + brushing", price: 10000, isStartingAt: true },
+      { label: "Tissage complet", price: 35000, isStartingAt: false },
+      { label: "Coupe barbe", price: 5000, isStartingAt: false },
+      { label: "Maquillage mariage", price: 50000, isStartingAt: true },
+      { label: "Pose de vernis", price: 8000, isStartingAt: false },
+    ],
+  },
+};
+
 async function main() {
-  // ── 1. Seed categories (idempotent) ──
+  // ── 1. Seed categories ──
   const categories = [
     { name: "Plombier", slug: "plombier", icon: "Wrench", order: 1 },
     { name: "Électricien", slug: "electricien", icon: "Lightbulb", order: 2 },
@@ -22,21 +245,23 @@ async function main() {
       create: cat,
     });
   }
-  console.log("✅ Categories seeded");
+  console.log("✅ 8 catégories créées");
 
-  // ── 2. Clear old pro/ client data ──
+  // ── 2. Clear old data ──
   await prisma.review.deleteMany();
   await prisma.portfolioItem.deleteMany();
   await prisma.message.deleteMany();
   await prisma.pricing.deleteMany();
   await prisma.service.deleteMany();
   await prisma.mission.deleteMany();
+  await prisma.savedPro.deleteMany();
+  await prisma.profileView.deleteMany();
   await prisma.profile.deleteMany();
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
-  console.log("🧹 Old data cleared");
+  console.log("🧹 Anciennes données supprimées");
 
-  // ── 3. Demo client (for reviews / missions) ──
+  // ── 3. Demo client ──
   const client = await prisma.user.create({
     data: {
       phone: "+2250101020304",
@@ -55,505 +280,88 @@ async function main() {
       },
     },
   });
-  console.log("✅ Demo client created");
+  console.log("✅ Client démo créé");
 
-  // ── 4. 20 fake pros ──
-  const pros = [
-    // ── Plombier ──
-    {
-      phone: "+2250102030501",
-      firstName: "Kouamé",
-      lastName: "Yao",
-      profession: "Plombier",
-      bio: "Plombier professionnel avec 15 ans d'expérience. Installation, dépannage et entretien de tous types de canalisations. Intervention rapide dans tout Abidjan.",
-      zone: ["Cocody", "Marcory", "Plateau"],
-      trustScore: 92,
-      badge: "GOLD" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 15,
-      missionCount: 340,
-      responseTime: 15,
-      acceptanceRate: 97,
-      category: "Plombier",
-      services: ["Dépannage urgence", "Installation robinetterie", "Détartrage chauffe-eau"],
-      pricing: [
-        { label: "Dépannage standard", price: 15000, isStartingAt: false },
-        { label: "Installation robinet", price: 25000, isStartingAt: true },
-      ],
-    },
-    {
-      phone: "+2250102030502",
-      firstName: "Amoin",
-      lastName: "N'Guessan",
-      profession: "Plombière",
-      bio: "Plombière agréée spécialisée dans les installations modernes. Je réalise vos projets de rénovation sanitaire avec soin et professionnalisme.",
-      zone: ["Marcory", "Treichville", "Koumassi"],
-      trustScore: 78,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: false,
-      experience: 8,
-      missionCount: 185,
-      responseTime: 25,
-      acceptanceRate: 88,
-      category: "Plombier",
-      services: ["Rénovation salle de bain", "Installation chauffe-eau", "Détection fuite"],
-      pricing: [
-        { label: "Détection fuite", price: 20000, isStartingAt: false },
-        { label: "Rénovation salle de bain", price: 150000, isStartingAt: true },
-      ],
-    },
-    {
-      phone: "+2250102030503",
-      firstName: "Koné",
-      lastName: "Moussa",
-      profession: "Plombier",
-      bio: "Maître plombier avec plus de 20 ans d'expérience. Je intervenir sur tout type de chantier, du simple robinet à la plomberie industrielle.",
-      zone: ["Yopougon", "Abobo", "Adjamé"],
-      trustScore: 95,
-      badge: "GOLD" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 22,
-      missionCount: 520,
-      responseTime: 10,
-      acceptanceRate: 99,
-      category: "Plombier",
-      services: ["Plomberie générale", "Pompe à eau", "Curage canalisation"],
-      pricing: [
-        { label: "Intervention simple", price: 12000, isStartingAt: true },
-        { label: "Curage canalisation", price: 35000, isStartingAt: false },
-      ],
-    },
-    // ── Électricien ──
-    {
-      phone: "+2250102030504",
-      firstName: "N'Dri",
-      lastName: "Akissi",
-      profession: "Électricienne",
-      bio: "Électricienne agréée. Spécialiste en installation électrique domestique et industrielle. Sécurité et conformité sont mes maîtres mots.",
-      zone: ["Plateau", "Cocody", "Marcory"],
-      trustScore: 88,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 12,
-      missionCount: 280,
-      responseTime: 20,
-      acceptanceRate: 93,
-      category: "Électricien",
-      services: ["Installation électrique", "Dépannage", "Tableau électrique"],
-      pricing: [
-        { label: "Dépannage", price: 15000, isStartingAt: true },
-        { label: "Installation complète", price: 75000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030505",
-      firstName: "Bamba",
-      lastName: "Souleymane",
-      profession: "Électricien",
-      bio: "Jeune électricien dynamique spécialisé dans le dépannage rapide et l'installation domestique. Interventions soignées à prix abordables.",
-      zone: ["Treichville", "Port-Bouët", "Koumassi"],
-      trustScore: 72,
-      badge: "BRONZE" as const,
-      isVerified: false,
-      isOnsiteVerified: false,
-      experience: 6,
-      missionCount: 120,
-      responseTime: 30,
-      acceptanceRate: 85,
-      category: "Électricien",
-      services: ["Dépannage express", "Montage prises", "Éclairage"],
-      pricing: [
-        { label: "Dépannage express", price: 10000, isStartingAt: true },
-        { label: "Installation prise", price: 5000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030506",
-      firstName: "Koffi",
-      lastName: "Lazare",
-      profession: "Électricien",
-      bio: "Ingénieur électricien de formation, je réalise tous vos projets électriques avec précision. Certification NFC et garantie décennale.",
-      zone: ["Cocody", "Plateau", "Bingerville"],
-      trustScore: 96,
-      badge: "ELITE" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 18,
-      missionCount: 450,
-      responseTime: 5,
-      acceptanceRate: 98,
-      category: "Électricien",
-      services: ["Installation complète", "Domotique", "Mise aux normes"],
-      pricing: [
-        { label: "Mise aux normes", price: 50000, isStartingAt: false },
-        { label: "Installation domotique", price: 200000, isStartingAt: true },
-      ],
-    },
-    // ── Menuisier ──
-    {
-      phone: "+2250102030507",
-      firstName: "Diallo",
-      lastName: "Ousmane",
-      profession: "Menuisier",
-      bio: "Menuisier ébéniste depuis 20 ans. Meubles sur mesure, cuisine équipée, agencement intérieur. Artisanat de qualité et finitions soignées.",
-      zone: ["Abobo", "Yopougon", "Adjamé"],
-      trustScore: 85,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: false,
-      experience: 20,
-      missionCount: 310,
-      responseTime: 20,
-      acceptanceRate: 91,
-      category: "Menuisier",
-      services: ["Meubles sur mesure", "Cuisine équipée", "Agencement"],
-      pricing: [
-        { label: "Petite réparation", price: 10000, isStartingAt: true },
-        { label: "Meuble sur mesure", price: 80000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030508",
-      firstName: "Tano",
-      lastName: "Béatrice",
-      profession: "Menuisière",
-      bio: "Menuisière décoratrice. Passionnée par le travail du bois, je crée des pièces uniques pour votre intérieur. Approche artisanale et moderne.",
-      zone: ["Bingerville", "Cocody", "Marcory"],
-      trustScore: 90,
-      badge: "GOLD" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 10,
-      missionCount: 160,
-      responseTime: 15,
-      acceptanceRate: 95,
-      category: "Menuisier",
-      services: ["Mobilier design", "Décoration bois", "Rénovation"],
-      pricing: [
-        { label: "Table design", price: 120000, isStartingAt: false },
-        { label: "Consultation décoration", price: 25000, isStartingAt: true },
-      ],
-    },
-    // ── Réparateur ──
-    {
-      phone: "+2250102030509",
-      firstName: "Ouattara",
-      lastName: "Adama",
-      profession: "Réparateur téléphone",
-      bio: "Spécialiste en réparation de téléphones et tablettes. Remplacement écran, batterie, connectique. Pièces d'origine et garantie 6 mois.",
-      zone: ["Adjamé", "Treichville", "Plateau"],
-      trustScore: 76,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: false,
-      experience: 7,
-      missionCount: 890,
-      responseTime: 10,
-      acceptanceRate: 96,
-      category: "Réparateur",
-      services: ["Remplacement écran", "Changement batterie", "Réparation logicielle"],
-      pricing: [
-        { label: "Remplacement écran", price: 25000, isStartingAt: false },
-        { label: "Diagnostic", price: 5000, isStartingAt: true },
-      ],
-    },
-    {
-      phone: "+2250102030510",
-      firstName: "Yao",
-      lastName: "Estelle",
-      profession: "Réparatrice smartphone",
-      bio: "Réparatrice agréée Apple et Samsung. Passionnée de tech, je redonne vie à vos appareils avec des pièces de haute qualité.",
-      zone: ["Marcory", "Cocody"],
-      trustScore: 81,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: false,
-      experience: 5,
-      missionCount: 560,
-      responseTime: 15,
-      acceptanceRate: 94,
-      category: "Réparateur",
-      services: ["Réparation iPhone", "Réparation Samsung", "Dépannage PC"],
-      pricing: [
-        { label: "Réparation iPhone écran", price: 35000, isStartingAt: false },
-        { label: "Nettoyage logiciel", price: 7000, isStartingAt: true },
-      ],
-    },
-    {
-      phone: "+2250102030511",
-      firstName: "Kraidy",
-      lastName: "André",
-      profession: "Réparateur électroménager",
-      bio: "Technicien en électroménager. Je répare tous vos appareils: lave-linge, frigo, micro-ondes, cuisinière. Plus de 14 ans d'expérience.",
-      zone: ["Yopougon", "Abobo", "Koumassi"],
-      trustScore: 70,
-      badge: "BRONZE" as const,
-      isVerified: false,
-      isOnsiteVerified: false,
-      experience: 14,
-      missionCount: 420,
-      responseTime: 25,
-      acceptanceRate: 82,
-      category: "Réparateur",
-      services: ["Réparation lave-linge", "Réparation frigo", "Entretien clim"],
-      pricing: [
-        { label: "Diagnostic", price: 8000, isStartingAt: true },
-        { label: "Réparation lave-linge", price: 20000, isStartingAt: false },
-      ],
-    },
-    // ── Ménager ──
-    {
-      phone: "+2250102030512",
-      firstName: "Konan",
-      lastName: "Martine",
-      profession: "Femme de ménage",
-      bio: "Service de nettoyage professionnel pour particuliers et entreprises. Produits écologiques, matériel moderne, équipe ponctuelle.",
-      zone: ["Cocody", "Marcory", "Plateau"],
-      trustScore: 88,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 6,
-      missionCount: 230,
-      responseTime: 30,
-      acceptanceRate: 98,
-      category: "Ménager",
-      services: ["Nettoyage complet", "Nettoyage bureau", "Repassage"],
-      pricing: [
-        { label: "Nettoyage appartement", price: 15000, isStartingAt: true },
-        { label: "Nettoyage bureau", price: 25000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030513",
-      firstName: "Zadi",
-      lastName: "Fanta",
-      profession: "Agent d'entretien",
-      bio: "Service d'entretien ménager de qualité. Grande expérience dans le nettoyage de bureaux, villas et appartements. Références fournies.",
-      zone: ["Plateau", "Treichville", "Adjamé"],
-      trustScore: 74,
-      badge: "BRONZE" as const,
-      isVerified: false,
-      isOnsiteVerified: false,
-      experience: 4,
-      missionCount: 140,
-      responseTime: 40,
-      acceptanceRate: 90,
-      category: "Ménager",
-      services: ["Ménage standard", "Grand nettoyage", "Nettoyage vitres"],
-      pricing: [
-        { label: "Ménage standard 2h", price: 10000, isStartingAt: true },
-        { label: "Nettoyage vitres", price: 15000, isStartingAt: false },
-      ],
-    },
-    // ── Cours & Coaching ──
-    {
-      phone: "+2250102030514",
-      firstName: "Boni",
-      lastName: "Gérald",
-      profession: "Professeur d'anglais",
-      bio: "Professeur d'anglais certifié TOEFL. Cours pour tous niveaux: scolaire, professionnel, conversation. Méthode interactive et résultats garantis.",
-      zone: ["Cocody", "Marcory", "Plateau"],
-      trustScore: 91,
-      badge: "GOLD" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 9,
-      missionCount: 380,
-      responseTime: 5,
-      acceptanceRate: 96,
-      category: "Cours & Coaching",
-      services: ["Cours d'anglais", "Préparation TOEFL", "Anglais professionnel"],
-      pricing: [
-        { label: "Cours particulier 1h", price: 8000, isStartingAt: true },
-        { label: "Forfait 10 séances", price: 70000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030515",
-      firstName: "Kouakou",
-      lastName: "Armande",
-      profession: "Coach sportif",
-      bio: "Coach sportif diplômée. Programmes personnalisés en musculation, cardio et perte de poids. Suivi en ligne et en présentiel.",
-      zone: ["Marcory", "Cocody", "Bingerville"],
-      trustScore: 84,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: false,
-      experience: 5,
-      missionCount: 190,
-      responseTime: 15,
-      acceptanceRate: 92,
-      category: "Cours & Coaching",
-      services: ["Coaching personnel", "Programme perte poids", "Yoga"],
-      pricing: [
-        { label: "Séance individuelle", price: 12000, isStartingAt: true },
-        { label: "Forfait mensuel", price: 80000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030516",
-      firstName: "Timité",
-      lastName: "Ibrahim",
-      profession: "Professeur de maths",
-      bio: "Professeur de mathématiques et sciences. J'accompagne les élèves du collège au lycée avec une pédagogie adaptée à chacun.",
-      zone: ["Abobo", "Yopougon", "Adjamé"],
-      trustScore: 79,
-      badge: "BRONZE" as const,
-      isVerified: false,
-      isOnsiteVerified: false,
-      experience: 11,
-      missionCount: 270,
-      responseTime: 20,
-      acceptanceRate: 89,
-      category: "Cours & Coaching",
-      services: ["Mathématiques", "Physique-chimie", "Soutien scolaire"],
-      pricing: [
-        { label: "Cours 1h", price: 6000, isStartingAt: true },
-        { label: "Forfait trimestre", price: 50000, isStartingAt: false },
-      ],
-    },
-    // ── Climatisation ──
-    {
-      phone: "+2250102030517",
-      firstName: "Kassi",
-      lastName: "Emile",
-      profession: "Climaticien",
-      bio: "Expert en climatisation. Installation, entretien et dépannage de tous types de clims. Agréé par les principales marques. Intervention 7j/7.",
-      zone: ["Treichville", "Cocody", "Plateau", "Marcory"],
-      trustScore: 93,
-      badge: "GOLD" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 16,
-      missionCount: 650,
-      responseTime: 5,
-      acceptanceRate: 97,
-      category: "Climatisation",
-      services: ["Installation clim", "Dépannage", "Entretien annuel"],
-      pricing: [
-        { label: "Entretien clim", price: 15000, isStartingAt: true },
-        { label: "Installation split", price: 85000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030518",
-      firstName: "Touré",
-      lastName: "Mamadou",
-      profession: "Installateur clim",
-      bio: "Installateur de systèmes de climatisation et ventilation. Devis gratuit, travail soigné et garantie sur toutes mes interventions.",
-      zone: ["Koumassi", "Port-Bouët", "Yopougon"],
-      trustScore: 77,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: false,
-      experience: 8,
-      missionCount: 190,
-      responseTime: 20,
-      acceptanceRate: 90,
-      category: "Climatisation",
-      services: ["Installation clim", "Dépannage", "Ventilation"],
-      pricing: [
-        { label: "Nettoyage clim", price: 10000, isStartingAt: true },
-        { label: "Dépannage urgence", price: 25000, isStartingAt: false },
-      ],
-    },
-    // ── Coiffure & Beauté ──
-    {
-      phone: "+2250102030519",
-      firstName: "Koffi",
-      lastName: "Awa",
-      profession: "Coiffeuse",
-      bio: "Coiffeuse professionnelle spécialisée dans les tresses, tissages et coupes modernes. Salon climatisé à Cocody. Produits de qualité.",
-      zone: ["Cocody", "Marcory"],
-      trustScore: 87,
-      badge: "SILVER" as const,
-      isVerified: true,
-      isOnsiteVerified: true,
-      experience: 7,
-      missionCount: 420,
-      responseTime: 10,
-      acceptanceRate: 95,
-      category: "Coiffure & Beauté",
-      services: ["Tresses", "Tissage", "Coupe et brushing"],
-      pricing: [
-        { label: "Coupe + brushing", price: 10000, isStartingAt: true },
-        { label: "Tissage complet", price: 35000, isStartingAt: false },
-      ],
-    },
-    {
-      phone: "+2250102030520",
-      firstName: "Mambo",
-      lastName: "Chloé",
-      profession: "Coiffeuse",
-      bio: "Coiffeuse passionnée, je vous conseille et réalise la coiffure qui vous mettra en valeur. Pose de mèches, coloration et soins.",
-      zone: ["Marcory", "Treichville", "Adjamé"],
-      trustScore: 69,
-      badge: "BRONZE" as const,
-      isVerified: false,
-      isOnsiteVerified: false,
-      experience: 3,
-      missionCount: 95,
-      responseTime: 30,
-      acceptanceRate: 86,
-      category: "Coiffure & Beauté",
-      services: ["Coloration", "Mèches", "Soins capillaires"],
-      pricing: [
-        { label: "Brushing", price: 5000, isStartingAt: true },
-        { label: "Coloration", price: 20000, isStartingAt: false },
-      ],
-    },
-  ];
+  // ── 4. Generate 20 pros per category ──
+  let phoneIndex = 1000;
+  let proCount = 0;
 
-  // ── 5. Create each pro ──
-  for (const p of pros) {
-    const user = await prisma.user.create({
-      data: {
-        phone: p.phone,
-        role: "PROFESSIONAL",
-        status: "ACTIVE",
-        profile: {
-          create: {
-            firstName: p.firstName,
-            lastName: p.lastName,
-            profession: p.profession,
-            bio: p.bio,
-            zone: p.zone,
-            trustScore: p.trustScore,
-            badge: p.badge,
-            isVerified: p.isVerified,
-            isOnsiteVerified: p.isOnsiteVerified,
-            experience: p.experience,
-            missionCount: p.missionCount,
-            responseTime: p.responseTime,
-            acceptanceRate: p.acceptanceRate,
-            availability: { weekdays: true, weekends: false },
-            services: {
-              create: p.services.map((name) => ({
-                name,
-                category: p.category,
-              })),
-            },
-            pricing: {
-              create: p.pricing.map((pr) => ({
-                service: pr.label,
-                label: pr.label,
-                price: pr.price,
-                isStartingAt: pr.isStartingAt,
-              })),
+  for (const [categoryName, data] of Object.entries(categoryData)) {
+    const usedFirstNames = new Set<string>();
+    const usedLastNames = new Set<string>();
+
+    for (let i = 0; i < 20; i++) {
+      const score = indexToScore(i);
+      const badge = badgeForScore(score);
+      const isEliteOrGold = badge === "ELITE" || badge === "GOLD";
+
+      let firstName: string;
+      let lastName: string;
+
+      do { firstName = firstNames[Math.floor(Math.random() * firstNames.length)]; } while (usedFirstNames.has(firstName));
+      do { lastName = lastNames[Math.floor(Math.random() * lastNames.length)]; } while (usedLastNames.has(lastName));
+      usedFirstNames.add(firstName);
+      usedLastNames.add(lastName);
+
+      const profession = data.professions[i % data.professions.length];
+      const bio = data.bios[i % data.bios.length];
+      const proZones = pick(zones, 1 + Math.floor(Math.random() * 3));
+      const serviceCount = 2 + Math.floor(Math.random() * 2);
+      const proServices = pick(data.services, serviceCount);
+      const pricingCount = 2 + Math.floor(Math.random() * 1);
+      const proPricing = pick(data.pricings, pricingCount);
+      const experience = scoreToExperience(score);
+      const missionCount = scoreToMissions(score);
+      const responseTime = scoreToResponseTime(score);
+      const acceptanceRate = scoreToAcceptance(score);
+
+      const phone = phoneFor(phoneIndex++);
+
+      await prisma.user.create({
+        data: {
+          phone,
+          role: "PROFESSIONAL",
+          status: "ACTIVE",
+          profile: {
+            create: {
+              firstName,
+              lastName,
+              profession,
+              bio,
+              zone: proZones,
+              trustScore: score,
+              badge,
+              isVerified: isEliteOrGold || Math.random() > 0.4,
+              isOnsiteVerified: isEliteOrGold && Math.random() > 0.3,
+              experience,
+              missionCount,
+              responseTime,
+              acceptanceRate,
+              isAvailable: Math.random() > 0.2,
+              onboardingCompleted: true,
+              availability: { weekdays: true, weekends: Math.random() > 0.5 },
+              services: {
+                create: proServices.map((name) => ({ name, category: categoryName })),
+              },
+              pricing: {
+                create: proPricing.map((pr) => ({
+                  service: pr.label,
+                  label: pr.label,
+                  price: pr.price,
+                  isStartingAt: pr.isStartingAt,
+                })),
+              },
             },
           },
         },
-      },
-    });
-    console.log(`  ✅ ${p.firstName} ${p.lastName} — ${p.profession} (${p.trustScore} pts, ${p.badge})`);
+      });
+
+      proCount++;
+    }
+    console.log(`  ✅ ${categoryName}: 20 pros créés`);
   }
 
-  console.log("🎉 20 pros créés avec succès !");
+  console.log(`🎉 ${proCount} pros créés avec succès !`);
 }
 
 main()
