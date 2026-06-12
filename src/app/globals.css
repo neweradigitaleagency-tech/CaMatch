@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary: #10B981;
+  --primary-dark: #059669;
+  --accent: #F59E0B;
+  --danger: #EF4444;
+  --background: #F9FAFB;
+  --surface: #FFFFFF;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--background);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    padding-bottom: 0 !important;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white font-semibold rounded-xl px-6 py-3 
+           active:scale-[0.98] transition-all duration-200
+           ease-[cubic-bezier(0.32,0.72,0,1)]
+           hover:bg-primary-600 shadow-soft;
+  }
+  .btn-secondary {
+    @apply bg-white text-text-primary font-medium rounded-xl px-6 py-3
+           border border-gray-200 active:scale-[0.98] transition-all duration-200
+           ease-[cubic-bezier(0.32,0.72,0,1)]
+           hover:bg-gray-50 shadow-soft;
+  }
+  .btn-ghost {
+    @apply text-text-secondary font-medium rounded-xl px-4 py-2
+           active:scale-[0.98] transition-all duration-200
+           ease-[cubic-bezier(0.32,0.72,0,1)]
+           hover:bg-gray-100;
+  }
+  .card {
+    @apply bg-white rounded-xl shadow-soft border border-gray-100;
+  }
+  .card-elevated {
+    @apply bg-white rounded-2xl shadow-card border border-gray-100;
+  }
+  .input-field {
+    @apply w-full bg-white border border-gray-200 rounded-xl px-4 py-3
+           text-text-primary placeholder:text-text-tertiary
+           focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary
+           transition-all duration-200;
+  }
+  .pill {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+  }
+  .badge {
+    @apply pill;
+  }
+  .badge-green {
+    @apply badge bg-primary-50 text-primary-700;
+  }
+  .badge-amber {
+    @apply badge bg-accent-50 text-accent-600;
+  }
+  .skeleton {
+    @apply bg-gray-200 animate-pulse rounded-lg;
+  }
+  .section-title {
+    @apply text-lg font-bold text-text-primary;
+  }
+  .subtitle {
+    @apply text-sm text-text-secondary;
+  }
+}
