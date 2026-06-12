@@ -88,10 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const fullPhone = phone.startsWith("+") ? phone : `+225${phone}`;
       const { error } = await supabase.auth.signInWithOtp({ phone: fullPhone });
-      if (error) return false;
+      if (error) {
+        console.error("signInWithOtp error:", error);
+        return false;
+      }
       setOtpSent(true);
       return true;
-    } catch {
+    } catch (err) {
+      console.error("signInWithOtp exception:", err);
       return false;
     }
   }, [supabase]);
