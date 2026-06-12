@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 interface AvatarProps {
@@ -10,19 +11,26 @@ interface AvatarProps {
   className?: string;
 }
 
-const sizeMap = {
-  sm: "w-8 h-8",
-  md: "w-12 h-12",
-  lg: "w-16 h-16",
-  xl: "w-[120px] h-[120px]",
+const sizeMap: Record<string, { container: string; px: number }> = {
+  sm: { container: "w-8 h-8", px: 32 },
+  md: { container: "w-12 h-12", px: 48 },
+  lg: { container: "w-16 h-16", px: 64 },
+  xl: { container: "w-[120px] h-[120px]", px: 120 },
 };
 
 export function Avatar({ src, alt, size = "md", verified, className }: AvatarProps) {
+  const dims = sizeMap[size];
   return (
     <div className={cn("relative inline-flex", className)}>
-      <div className={cn("rounded-full overflow-hidden bg-gray-100", sizeMap[size])}>
+      <div className={cn("rounded-full overflow-hidden bg-gray-100", dims.container)}>
         {src ? (
-          <img src={src} alt={alt} className="w-full h-full object-cover" />
+          <Image
+            src={src}
+            alt={alt}
+            width={dims.px}
+            height={dims.px}
+            className="w-full h-full object-cover"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-primary-100 text-primary-700 font-bold text-lg">
             {alt.charAt(0).toUpperCase()}

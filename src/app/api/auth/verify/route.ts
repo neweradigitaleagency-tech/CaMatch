@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Phone and token are required' }, { status: 400 });
     }
 
-    const { data, error } = await supabaseAdmin.auth.verifyOtp({
+    const { data, error } = await getSupabaseAdmin().auth.verifyOtp({
       phone,
       token,
       type: 'sms',

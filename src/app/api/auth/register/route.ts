@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { getSupabaseAdmin } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Phone number is required' }, { status: 400 });
     }
 
-    const { error } = await supabaseAdmin.auth.signInWithOtp({ phone });
+    const { error } = await getSupabaseAdmin().auth.signInWithOtp({ phone });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
