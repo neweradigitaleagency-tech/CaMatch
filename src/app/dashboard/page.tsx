@@ -116,7 +116,7 @@ export default function DashboardPage() {
 
   return (
     <LoginGate requiredRole="pro">
-    <main className="min-h-screen pb-8 lg:pb-12">
+    <main className="min-h-screen pb-24 md:pb-12">
       <div className="flex items-center justify-between py-4">
         <div className="flex items-center gap-3">
           <Link href="/profile" className="relative group">

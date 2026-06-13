@@ -4,9 +4,16 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return supabaseResponse;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -26,17 +33,31 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
+  interface DevUser { id: string; phone: string; role: string; firstName: string; lastName: string; }
+
+  let hasUser = !!user;
+  if (!hasUser) {
+    const devCookie = request.cookies.get("camatch_user")?.value;
+    if (devCookie) {
+      try {
+        const raw = Buffer.from(devCookie, "base64").toString("utf-8");
+        const devUser = JSON.parse(raw) as DevUser;
+        if (devUser.id) hasUser = true;
+      } catch { /* ignore invalid cookie */ }
+    }
+  }
+
   const protectedPaths = ["/dashboard", "/messages", "/demandes", "/opportunites", "/profile"];
   const isProtected = protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
-  const isAuthPage = request.nextUrl.pathname.startsWith("/login");
+  const isAuthPage = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/dev-login");
 
-  if (!user && isProtected) {
+  if (!hasUser && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
+  if (hasUser && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);

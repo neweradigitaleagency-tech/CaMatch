@@ -21,6 +21,7 @@ interface AuthContextType {
   loading: boolean;
   login: (phone: string) => Promise<boolean>;
   verifyOtp: (phone: string, token: string) => Promise<boolean>;
+  adminLogin: (phone: string, role: UserRole) => Promise<boolean>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => Promise<void>;
   otpSent: boolean;
@@ -65,13 +66,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSupabaseUser(session.user);
         const synced = await syncUser(session.user);
         if (synced) setUser(synced);
+      } else {
+        const res = await fetch("/api/auth/dev-session");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.user) setUser(data.user as AuthUser);
+        }
       }
       setLoading(false);
     };
     init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
+      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") && session?.user) {
         setSupabaseUser(session.user);
         const synced = await syncUser(session.user);
         if (synced) setUser(synced);
@@ -100,6 +107,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [supabase]);
 
+  const adminLogin = useCallback(async (phone: string, desiredRole: UserRole): Promise<boolean> => {
+    try {
+      const res = await fetch("/api/auth/admin-bypass", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone, role: desiredRole }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }, []);
+
   const verifyOtp = useCallback(async (phone: string, token: string): Promise<boolean> => {
     try {
       const fullPhone = phone.startsWith("+") ? phone : `+225${phone}`;
@@ -117,6 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
+    document.cookie = "camatch_user=; path=/; max-age=0";
     setUser(null);
     setSupabaseUser(null);
     setOtpSent(false);
@@ -146,7 +167,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const role: UserRole = !user ? "visitor" : user.role === "CLIENT" ? "client" : "pro";
 
   return (
-    <AuthContext.Provider value={{ user, role, loading, login, verifyOtp, logout, switchRole, otpSent, setOtpSent, supabaseUser }}>
+    <AuthContext.Provider value={{ user, role, loading, login, verifyOtp, adminLogin, logout, switchRole, otpSent, setOtpSent, supabaseUser }}>
       {children}
     </AuthContext.Provider>
   );

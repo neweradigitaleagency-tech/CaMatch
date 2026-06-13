@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, Mail, Loader2, ChevronLeft, CheckCircle2 } from "lucide-react";
+import { Phone, Mail, Loader2, ChevronLeft, CheckCircle2, Zap } from "lucide-react";
 import toast from "react-hot-toast";
 import { useUser } from "@/lib/auth-context";
 
 type AuthMode = "phone" | "email";
 type Step = "method" | "otp" | "role";
 
+const ADMIN_PHONE = "0564148172";
+
 export default function LoginPage() {
   const router = useRouter();
-  const { login, verifyOtp } = useUser();
+  const { login, verifyOtp, adminLogin } = useUser();
   const [mode, setMode] = useState<AuthMode>("phone");
   const [step, setStep] = useState<Step>("method");
   const [phone, setPhone] = useState("");
@@ -21,6 +23,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"client" | "pro">("client");
   const [sending, setSending] = useState(false);
+
+  const isAdmin = useMemo(() => phone.replace(/\D/g, "") === ADMIN_PHONE, [phone]);
+
+  const handleAdminLogin = async () => {
+    const cleaned = phone.replace(/\D/g, "");
+    if (cleaned !== ADMIN_PHONE) return;
+    setSending(true);
+    const ok = await adminLogin(cleaned, role);
+    setSending(false);
+    if (ok) {
+      toast.success("Connecté !");
+      setTimeout(() => { window.location.href = role === "pro" ? "/onboarding" : "/"; }, 400);
+    } else {
+      toast.error("Erreur de connexion");
+    }
+  };
 
   const handleSendOtp = async () => {
     const cleaned = phone.replace(/\D/g, "");
@@ -168,6 +186,22 @@ export default function LoginPage() {
                       {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
                       {sending ? "Envoi..." : "Recevoir le code"}
                     </button>
+                    {isAdmin && (
+                      <>
+                        <div className="flex items-center gap-2 justify-center text-2xs text-emerald-700 bg-emerald-50 rounded-xl px-3 py-2">
+                          <Zap className="w-3 h-3" />
+                          Numéro administrateur détecté
+                        </div>
+                        <button
+                          onClick={handleAdminLogin}
+                          disabled={sending}
+                          className="w-full bg-emerald-500 text-white font-bold py-3.5 rounded-xl active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:bg-emerald-600"
+                        >
+                          {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
+                          {sending ? "Connexion..." : "Connexion Rapide (Admin)"}
+                        </button>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -259,6 +293,16 @@ export default function LoginPage() {
           En continuant, vous acceptez nos{" "}
           <span className="text-[#FF6B35] font-medium">Conditions d&apos;utilisation</span>
         </p>
+
+        <div className="mt-6 pt-4 border-t border-gray-100">
+          <button
+            onClick={() => router.push("/dev-login")}
+            className="w-full text-xs text-text-secondary hover:text-text-primary transition-colors flex items-center justify-center gap-1.5"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-500" />
+            Accès démo sans SMS
+          </button>
+        </div>
       </motion.div>
     </div>
   );

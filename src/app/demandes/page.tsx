@@ -98,7 +98,7 @@ export default function DemandesPage() {
 
   return (
     <LoginGate>
-      <main className="min-h-screen pb-20 lg:pb-12">
+      <main className="min-h-screen pb-24 md:pb-12">
         <div className="flex items-center justify-between py-4">
           <h1 className="text-lg lg:text-2xl font-bold text-text-primary">Mes demandes</h1>
         </div>
