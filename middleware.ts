@@ -7,14 +7,21 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!supabaseUrl || !supabaseKey) {
-    return supabaseResponse;
+  interface DevUser { id: string; phone: string; role: string; }
+
+  let hasUser = false;
+
+  const devCookie = request.cookies.get("camatch_user")?.value;
+  if (devCookie) {
+    try {
+      const raw = Buffer.from(devCookie, "base64").toString("utf-8");
+      const devUser = JSON.parse(raw) as DevUser;
+      if (devUser.id) hasUser = true;
+    } catch { /* ignore invalid cookie */ }
   }
 
-  const supabase = createServerClient(
-    supabaseUrl,
-    supabaseKey,
-    {
+  if (!hasUser && supabaseUrl && supabaseKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseKey, {
       cookies: {
         getAll() {
           return request.cookies.getAll();
@@ -26,25 +33,13 @@ export async function middleware(request: NextRequest) {
           });
         },
       },
-    },
-  );
+    });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-  interface DevUser { id: string; phone: string; role: string; firstName: string; lastName: string; }
-
-  let hasUser = !!user;
-  if (!hasUser) {
-    const devCookie = request.cookies.get("camatch_user")?.value;
-    if (devCookie) {
-      try {
-        const raw = Buffer.from(devCookie, "base64").toString("utf-8");
-        const devUser = JSON.parse(raw) as DevUser;
-        if (devUser.id) hasUser = true;
-      } catch { /* ignore invalid cookie */ }
-    }
+    if (user) hasUser = true;
   }
 
   const protectedPaths = ["/dashboard", "/messages", "/demandes", "/opportunites", "/profile"];
