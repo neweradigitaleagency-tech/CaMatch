@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 const firstNames = [
   "Kouamé", "Amoin", "Koné", "N'Dri", "Bamba", "Koffi", "Diallo", "Tano",
@@ -383,7 +381,8 @@ export async function GET() {
       message: `✅ ${proCount} professionnels créés avec succès !`,
     });
   } catch (err) {
+    const message = err instanceof Error ? err.message : "Erreur inconnue";
     console.error("Seed error:", err);
-    return NextResponse.json({ error: "Échec du seeding" }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
