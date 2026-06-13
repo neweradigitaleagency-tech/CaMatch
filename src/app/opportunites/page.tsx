@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
@@ -166,7 +168,7 @@ export default function OpportunitesPage() {
                         {q.mediaType === "video" ? (
                           <video src={q.mediaUrl} controls className="w-full max-h-40 rounded-lg object-cover" />
                         ) : (
-                          <img src={q.mediaUrl} alt="" className="w-full max-h-40 rounded-lg object-cover" />
+                          <img src={q.mediaUrl} alt="Média de la demande" className="w-full max-h-40 rounded-lg object-cover" />
                         )}
                       </div>
                     )}

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import {
   Menu, X, Search, MessageCircle, User, LayoutDashboard, Home,
@@ -47,6 +47,13 @@ export function SiteHeader() {
   const { role, logout } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (pathname === href) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pathname]);
+
   if (pathname?.startsWith("/login")) return null;
 
   const navLinks = linksByRole[role];
@@ -72,6 +79,7 @@ export function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
                   className={cn(
                     "px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200",
                     isActive
@@ -122,7 +130,10 @@ export function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    handleNavClick(e, link.href);
+                  }}
                   className={cn(
                     "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors",
                     isActive

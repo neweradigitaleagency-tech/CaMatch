@@ -1,50 +1,24 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  const protectedPaths = ["/dashboard", "/messages", "/demandes", "/opportunites", "/profile", "/onboarding"];
+  const isProtected = protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
+  const isAuthPage = request.nextUrl.pathname.startsWith("/login");
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  interface DevUser { id: string; phone: string; role: string; }
-
-  let hasUser = false;
+  if (!isProtected && !isAuthPage) {
+    return NextResponse.next();
+  }
 
   const devCookie = request.cookies.get("camatch_user")?.value;
+  let hasUser = false;
+
   if (devCookie) {
     try {
       const raw = Buffer.from(devCookie, "base64").toString("utf-8");
-      const devUser = JSON.parse(raw) as DevUser;
+      const devUser = JSON.parse(raw);
       if (devUser.id) hasUser = true;
-    } catch { /* ignore invalid cookie */ }
+    } catch { /* ignore invalid */ }
   }
-
-  if (!hasUser && supabaseUrl && supabaseKey) {
-    const supabase = createServerClient(supabaseUrl, supabaseKey, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => {
-            request.cookies.set(name, value);
-            supabaseResponse.cookies.set(name, value);
-          });
-        },
-      },
-    });
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (user) hasUser = true;
-  }
-
-  const protectedPaths = ["/dashboard", "/messages", "/demandes", "/opportunites", "/profile"];
-  const isProtected = protectedPaths.some((p) => request.nextUrl.pathname.startsWith(p));
-  const isAuthPage = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/dev-login");
 
   if (!hasUser && isProtected) {
     const url = request.nextUrl.clone();
@@ -58,7 +32,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return NextResponse.next();
 }
 
 export const config = {

@@ -6,9 +6,18 @@ import { AuthProvider } from "@/lib/auth-context";
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "Ça Match - Trouvez le bon pro, rapidement",
-  description: "Ça Match connecte clients et professionnels de confiance en Côte d'Ivoire.",
+  metadataBase: new URL("https://ca-match.vercel.app"),
+  title: "Ça Match - Trouvez un artisan fiable à Abidjan | Électricien, Plombier, Menuisier",
+  description: "Plateforme de mise en relation avec des professionnels vérifiés en Côte d'Ivoire. Trouvez un électricien, plombier, menuisier ou coach à Cocody, Yopougon, Plateau.",
   manifest: "/manifest.json",
+  keywords: ["artisan Abidjan", "électricien Cocody", "plombier Abidjan", "travaux Côte d'Ivoire", "service de confiance"],
+  openGraph: {
+    title: "Ça Match - Artisans vérifiés à Abidjan",
+    description: "Trouvez un professionnel de confiance en 3 clics",
+    images: ['/og-image.jpg'],
+    type: "website",
+    locale: "fr_CI",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

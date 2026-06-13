@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
 
     const user = await prisma.user.upsert({
       where: { phone },
-      update: { role: isPro ? "PROFESSIONAL" : "CLIENT", status: "ACTIVE" },
+      update: {
+        role: isPro ? "PROFESSIONAL" : "CLIENT",
+        status: "ACTIVE",
+      },
       create: {
         phone,
         role: isPro ? "PROFESSIONAL" : "CLIENT",
@@ -22,13 +25,21 @@ export async function POST(request: NextRequest) {
           create: {
             firstName: isPro ? "Kouamé" : "Ahou",
             lastName: isPro ? "Jean" : "Mireille",
-            zone: ["Cocody"],
-            trustScore: isPro ? 847 : 100,
-            badge: isPro ? "GOLD" : "NONE",
-            isVerified: isPro,
+            zone: ["Cocody", "Riviera", "Plateau"],
+            trustScore: 999,
+            badge: "ELITE",
+            isVerified: true,
+            isOnsiteVerified: true,
             onboardingCompleted: true,
-            isAvailable: isPro,
-            profession: isPro ? "Électricien" : null,
+            isAvailable: true,
+            experience: 15,
+            missionCount: 247,
+            responseTime: 3,
+            acceptanceRate: 99,
+            profession: isPro ? "Super Professionnel" : null,
+            bio: isPro
+              ? "Professionnel certifié avec plus de 15 ans d'expérience. Intervention rapide et travail de qualité garantie."
+              : null,
           },
         },
       },

@@ -1,8 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
-import { createClient } from "@/lib/supabase/client";
-import type { User } from "@supabase/supabase-js";
+import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from "react";
 
 export type UserRole = "visitor" | "client" | "pro";
 
@@ -19,129 +17,53 @@ interface AuthContextType {
   user: AuthUser | null;
   role: UserRole;
   loading: boolean;
-  login: (phone: string) => Promise<boolean>;
-  verifyOtp: (phone: string, token: string) => Promise<boolean>;
-  adminLogin: (phone: string, role: UserRole) => Promise<boolean>;
+  login: (role: "client" | "pro") => Promise<boolean>;
   logout: () => Promise<void>;
   switchRole: (role: UserRole) => Promise<void>;
-  otpSent: boolean;
-  setOtpSent: (v: boolean) => void;
-  supabaseUser: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-async function syncUser(supabaseUser: User, desiredRole?: "client" | "pro"): Promise<AuthUser | null> {
-  try {
-    const res = await fetch("/api/auth/sync", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        supabaseId: supabaseUser.id,
-        phone: supabaseUser.phone || "",
-        role: desiredRole || supabaseUser.user_metadata?.role || "client",
-        firstName: supabaseUser.user_metadata?.firstName || "",
-        lastName: supabaseUser.user_metadata?.lastName || "",
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.user as AuthUser;
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const [otpSent, setOtpSent] = useState(false);
-  const [supabaseUser, setSupabaseUser] = useState<User | null>(null);
-  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     const init = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setSupabaseUser(session.user);
-        const synced = await syncUser(session.user);
-        if (synced) setUser(synced);
-      } else {
+      try {
         const res = await fetch("/api/auth/dev-session");
         if (res.ok) {
           const data = await res.json();
           if (data.user) setUser(data.user as AuthUser);
         }
+      } catch {
+        // silent
       }
       setLoading(false);
     };
     init();
+  }, []);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION") && session?.user) {
-        setSupabaseUser(session.user);
-        const synced = await syncUser(session.user);
-        if (synced) setUser(synced);
-      } else if (event === "SIGNED_OUT") {
-        setUser(null);
-        setSupabaseUser(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [supabase]);
-
-  const login = useCallback(async (phone: string): Promise<boolean> => {
+  const login = useCallback(async (role: "client" | "pro"): Promise<boolean> => {
     try {
-      const fullPhone = phone.startsWith("+") ? phone : `+225${phone}`;
-      const { error } = await supabase.auth.signInWithOtp({ phone: fullPhone });
-      if (error) {
-        console.error("signInWithOtp error:", error);
-        return false;
-      }
-      setOtpSent(true);
-      return true;
-    } catch (err) {
-      console.error("signInWithOtp exception:", err);
-      return false;
-    }
-  }, [supabase]);
-
-  const adminLogin = useCallback(async (phone: string, desiredRole: UserRole): Promise<boolean> => {
-    try {
-      const res = await fetch("/api/auth/admin-bypass", {
+      const res = await fetch("/api/auth/dev-login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, role: desiredRole }),
+        body: JSON.stringify({ role }),
       });
-      return res.ok;
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (data.user) setUser(data.user as AuthUser);
+      return true;
     } catch {
       return false;
     }
   }, []);
 
-  const verifyOtp = useCallback(async (phone: string, token: string): Promise<boolean> => {
-    try {
-      const fullPhone = phone.startsWith("+") ? phone : `+225${phone}`;
-      const { error } = await supabase.auth.verifyOtp({
-        phone: fullPhone,
-        token,
-        type: "sms",
-      });
-      if (error) return false;
-      return true;
-    } catch {
-      return false;
-    }
-  }, [supabase]);
-
   const logout = useCallback(async () => {
-    await supabase.auth.signOut();
     document.cookie = "camatch_user=; path=/; max-age=0";
     setUser(null);
-    setSupabaseUser(null);
-    setOtpSent(false);
-  }, [supabase]);
+  }, []);
 
   const switchRole = useCallback(async (newRole: UserRole) => {
     if (newRole === "visitor") {
@@ -167,7 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const role: UserRole = !user ? "visitor" : user.role === "CLIENT" ? "client" : "pro";
 
   return (
-    <AuthContext.Provider value={{ user, role, loading, login, verifyOtp, adminLogin, logout, switchRole, otpSent, setOtpSent, supabaseUser }}>
+    <AuthContext.Provider value={{ user, role, loading, login, logout, switchRole }}>
       {children}
     </AuthContext.Provider>
   );

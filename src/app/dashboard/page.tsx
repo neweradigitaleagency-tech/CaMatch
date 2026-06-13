@@ -9,6 +9,7 @@ import { BadgeLevel } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { LoginGate } from "@/components/shared/login-gate";
+import toast from "react-hot-toast";
 
 type Tab = "semaine" | "mois" | "tout";
 type DayStatus = "dispo" | "indispo";
@@ -108,7 +109,7 @@ export default function DashboardPage() {
       stats: "Statistiques détaillées bientôt disponibles",
       pricing: "Modification des tarifs bientôt disponible",
     };
-    alert(msgs[action] || "Bientôt disponible");
+    toast.success(msgs[action] || "Bientôt disponible");
   }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -143,7 +144,7 @@ export default function DashboardPage() {
               </span>
             )}
           </button>
-          <button className="btn-ghost p-2">
+          <button onClick={() => toast.success("Paramètres bientôt disponibles")} className="btn-ghost p-2">
             <Settings className="w-5 h-5" />
           </button>
         </div>
@@ -225,7 +226,7 @@ export default function DashboardPage() {
                 <Briefcase className="w-4 h-4 text-primary" />
                 <h2 className="text-sm font-bold text-text-primary">Missions récentes</h2>
               </div>
-              <button onClick={() => alert("Toutes les missions bientôt disponible")} className="text-xs text-primary font-medium flex items-center gap-0.5">
+              <button onClick={() => toast.success("Toutes les missions bientôt disponibles")} className="text-xs text-primary font-medium flex items-center gap-0.5">
                 Voir tout <ChevronRight className="w-3 h-3" />
               </button>
             </div>
@@ -356,7 +357,7 @@ export default function DashboardPage() {
                 <ShieldCheck className="w-4 h-4 text-primary" />
                 Confiance
               </h3>
-              <button onClick={() => alert("Détail du score bientôt disponible")} className="text-2xs text-primary font-medium">
+              <button onClick={() => toast.success("Détail du score bientôt disponible")} className="text-2xs text-primary font-medium">
                 Détail
               </button>
             </div>
@@ -551,7 +552,7 @@ export default function DashboardPage() {
               <button onClick={() => handleAction("photo")} className="flex-1 text-xs bg-white/20 hover:bg-white/30 rounded-xl py-2 font-medium transition-colors">
                 Compléter
               </button>
-              <button onClick={() => alert("Objectifs détaillés bientôt disponibles")} className="flex-1 text-xs bg-white/20 hover:bg-white/30 rounded-xl py-2 font-medium transition-colors">
+              <button onClick={() => toast.success("Objectifs détaillés bientôt disponibles")} className="flex-1 text-xs bg-white/20 hover:bg-white/30 rounded-xl py-2 font-medium transition-colors">
                 Détails
               </button>
             </div>

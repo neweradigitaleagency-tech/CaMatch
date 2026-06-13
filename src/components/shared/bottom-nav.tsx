@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback } from "react";
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -53,6 +54,13 @@ export function BottomNav() {
   const pathname = usePathname();
   const { role } = useUser();
 
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (pathname === href) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [pathname]);
+
   if (!pathname || pathname.startsWith("/login") || pathname.startsWith("/messages/")) {
     return null;
   }
@@ -69,6 +77,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
               className={cn(
                 "flex flex-col items-center justify-center gap-0.5 w-16 py-1 rounded-xl transition-colors duration-200",
                 isActive

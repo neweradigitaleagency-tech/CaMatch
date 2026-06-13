@@ -90,7 +90,17 @@ export default function ProProfilePage({ params }: { params: { id: string } }) {
         <Link href="/search" className="btn-ghost p-2 -ml-2">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <button className="btn-ghost p-2">
+        <button
+          onClick={async () => {
+            try {
+              await navigator.share({ title: pro?.name || "Profil", url: window.location.href });
+            } catch {
+              navigator.clipboard?.writeText(window.location.href);
+            }
+          }}
+          className="btn-ghost p-2"
+          aria-label="Partager le profil"
+        >
           <Share2 className="w-5 h-5" />
         </button>
       </div>
@@ -316,10 +326,13 @@ export default function ProProfilePage({ params }: { params: { id: string } }) {
           >
             <Phone className="w-5 h-5" />
           </a>
-          <button className="flex-1 h-12 bg-[#FF6B35] text-white font-semibold rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm">
+          <Link
+            href={`/messages?pro=${pro?.id}`}
+            className="flex-1 h-12 bg-[#FF6B35] text-white font-semibold rounded-2xl active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-sm"
+          >
             <MessageCircle className="w-4 h-4" />
             Envoyer un message
-          </button>
+          </Link>
         </div>
       </div>
     </main>

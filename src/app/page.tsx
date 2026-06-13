@@ -238,7 +238,7 @@ export default function HomePage() {
             Voir tout <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
           {CATEGORIES.map((cat) => (
             <Link
               key={cat.slug}
