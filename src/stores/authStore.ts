@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { supabase } from "../services/supabase";
+import { supabase, isSupabaseReady } from "../services/supabase";
 import type { User } from "@supabase/supabase-js";
 
 export type UserRole = "client" | "pro";
@@ -34,6 +34,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialized: false,
 
   initialize: async () => {
+    if (!isSupabaseReady()) {
+      set({ isLoading: false, initialized: true });
+      return;
+    }
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
@@ -53,30 +57,33 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ isLoading: false, initialized: true });
     }
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        set({
-          userId: session.user.id,
-          user: session.user,
-          role: "client",
-          isPro: !!session.user.user_metadata?.isPro,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      } else {
-        set({
-          userId: null,
-          user: null,
-          role: "client",
-          isPro: false,
-          isAuthenticated: false,
-          isLoading: false,
-        });
-      }
-    });
+    if (isSupabaseReady()) {
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          set({
+            userId: session.user.id,
+            user: session.user,
+            role: "client",
+            isPro: !!session.user.user_metadata?.isPro,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+        } else {
+          set({
+            userId: null,
+            user: null,
+            role: "client",
+            isPro: false,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+        }
+      });
+    }
   },
 
   signInWithPhone: async (phone: string) => {
+    if (!isSupabaseReady()) return { error: "Supabase non configuré" };
     const { error } = await supabase.auth.signInWithOtp({
       phone,
       options: { shouldCreateUser: true },
@@ -85,16 +92,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signInWithEmail: async (email: string, password: string) => {
+    if (!isSupabaseReady()) return { error: "Supabase non configuré" };
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error?.message || null };
   },
 
   signUpWithEmail: async (email: string, password: string) => {
+    if (!isSupabaseReady()) return { error: "Supabase non configuré" };
     const { error } = await supabase.auth.signUp({ email, password });
     return { error: error?.message || null };
   },
 
   verifyOtp: async (phone: string, token: string) => {
+    if (!isSupabaseReady()) return { error: "Supabase non configuré" };
     const { error } = await supabase.auth.verifyOtp({
       phone,
       token,
@@ -104,7 +114,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signOut: async () => {
-    await supabase.auth.signOut();
+    if (isSupabaseReady()) {
+      await supabase.auth.signOut();
+    }
     set({
       userId: null,
       user: null,

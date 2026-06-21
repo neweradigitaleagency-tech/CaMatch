@@ -1,4 +1,4 @@
-import { StrictMode, lazy, Suspense, useEffect, useState } from "react";
+import { StrictMode, lazy, Suspense, useEffect, useState, Component, type ReactNode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -36,6 +36,46 @@ const ProSubscriptionPage = lazy(() => import("./pages/profile/ProSubscriptionPa
 const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
+
+class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("App crash:", error, info.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen bg-brand-cream flex items-center justify-center p-6">
+          <div className="text-center max-w-xs">
+            <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">⚠️</span>
+            </div>
+            <h2 className="text-base font-extrabold text-brand-forest mb-2">Une erreur est survenue</h2>
+            <p className="text-caption text-secondary/60 mb-4">
+              L'application n'a pas pu se charger correctement.
+            </p>
+            <p className="text-2xs text-secondary/40 mb-4 font-mono bg-white rounded-xl p-3 border border-pale-mint/10 text-left break-all max-h-24 overflow-y-auto">
+              {this.state.error?.message || "Erreur inconnue"}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="h-10 px-6 bg-cm-green text-white text-xs font-bold rounded-xl cursor-pointer hover:bg-cm-green/90 transition-colors"
+            >
+              Recharger la page
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function PageLoader() {
   return (
@@ -117,10 +157,12 @@ function App() {
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorFallback>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorFallback>
   </StrictMode>
 );
