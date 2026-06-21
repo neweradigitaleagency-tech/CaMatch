@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  /* === Ça Match Design System v2 === */
+
+  /* Brand — Primary: Green */
+  --color-cm-green: #00A86B;
+  --color-cm-green-deep: #007A4D;
+  --color-cm-green-light: #E6F7F0;
+  --color-cm-green-dark: #005C3A;
+
+  /* Secondary — Warm accents */
+  --color-cm-orange: #FF6B35;
+  --color-cm-yellow: #FFC93C;
+  --color-cm-blue: #4A90E2;
+  --color-cm-purple: #8B5CF6;
+
+  /* Legacy brand names (keep for backward compat) */
+  --color-brand-cream: #F0EFE6;
+  --color-brand-forest: #0B130E;
+  --color-pale-mint: #E6EFE6;
+  --color-white: #FFFFFF;
+  --color-bg-cream: #F0EFE6;
+  --color-primary: #0B130E;
+
+  /* Contrast-fixed secondary: #4A4A4A = 5.2:1 on cream, 7.4:1 on white */
+  --color-secondary: #4A4A4A;
+
+  /* Semantic */
+  --color-cm-success: #10B981;
+  --color-cm-warning: #F59E0B;
+  --color-cm-error: #EF4444;
+  --color-cm-info: #3B82F6;
+
+  --shadow-ambient: 0px 10px 30px rgba(11, 19, 14, 0.04);
+}
+
+.dark {
+  --color-cm-green: #00A86B;
+  --color-cm-green-deep: #00995E;
+  --color-cm-green-light: #0A2E1F;
+  --color-cm-green-dark: #00C47D;
+
+  --color-brand-cream: #0B130E;
+  --color-brand-forest: #F0EFE6;
+  --color-pale-mint: #151D18;
+  --color-white: #111A14;
+  --color-bg-cream: #0B130E;
+  --color-primary: #F0EFE6;
+  --color-secondary: #c7c7be;
+  --shadow-ambient: 0px 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+@theme {
+  /* Fonts */
+  --font-sans: "Inter", "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-african: "Noto Sans", system-ui, sans-serif;
+
+  /* Brand colors */
+  --color-cm-green: var(--color-cm-green);
+  --color-cm-green-deep: var(--color-cm-green-deep);
+  --color-cm-green-light: var(--color-cm-green-light);
+  --color-cm-green-dark: var(--color-cm-green-dark);
+
+  --color-cm-orange: var(--color-cm-orange);
+  --color-cm-yellow: var(--color-cm-yellow);
+  --color-cm-blue: var(--color-cm-blue);
+  --color-cm-purple: var(--color-cm-purple);
+
+  --color-cm-success: var(--color-cm-success);
+  --color-cm-warning: var(--color-cm-warning);
+  --color-cm-error: var(--color-cm-error);
+  --color-cm-info: var(--color-cm-info);
+
+  /* Legacy aliases for backward compatibility */
+  --color-brand-cream: var(--color-brand-cream);
+  --color-brand-lime: var(--color-cm-green);
+  --color-brand-forest: var(--color-brand-forest);
+  --color-pale-mint: var(--color-pale-mint);
+  --color-white: var(--color-white);
+
+  --color-bg-cream: var(--color-bg-cream);
+  --color-primary: var(--color-primary);
+  --color-secondary: var(--color-secondary);
+
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 1.5rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+  --radius-pill: 9999px;
+
+  /* Shadows */
+  --shadow-premium: var(--shadow-ambient);
+  --shadow-ambient: var(--shadow-ambient);
+
+  /* Typography scale */
+  --text-display-lg: 2rem;
+  --text-display-lg--line-height: 2.5rem;
+  --text-display-lg--font-weight: 800;
+
+  --text-display-md: 1.5rem;
+  --text-display-md--line-height: 2rem;
+  --text-display-md--font-weight: 700;
+
+  --text-caption: 0.6875rem;
+  --text-caption--line-height: 1.3;
+  --text-caption--font-weight: 500;
+
+  --text-body-sm: 0.75rem;
+  --text-body-sm--line-height: 1.4;
+  --text-body-sm--font-weight: 400;
+
+  --text-body: 0.8125rem;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 400;
+
+  --text-subtitle: 0.9375rem;
+  --text-subtitle--line-height: 1.3;
+  --text-subtitle--font-weight: 600;
+
+  --text-title: 1.0625rem;
+  --text-title--line-height: 1.2;
+  --text-title--font-weight: 700;
+
+  /* Override defaults with proper line-height */
+  --text-xs--line-height: 1.4;
+  --text-sm--line-height: 1.5;
+  --text-base--line-height: 1.5;
+  --text-lg--line-height: 1.3;
+  --text-xl--line-height: 1.2;
+  --text-2xl--line-height: 1.1;
+}
+
+@keyframes sweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  70% { transform: scale(1.1); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.7; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
+}
+
+.radar-sweep {
+  transform-origin: bottom left;
+  animation: sweep 3s infinite linear;
+}
+
+.map-pulse {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+body {
+  background-color: var(--color-brand-cream);
+  color: var(--color-brand-forest);
+  font-family: "Inter", "Manrope", sans-serif;
+}
+
+/* Custom scrollbar hiding */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
