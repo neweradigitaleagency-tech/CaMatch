@@ -1,25 +1,32 @@
 import { useLocation } from "react-router-dom";
-import { motion } from "motion/react";
-import { Compass, MessageSquare, Search, ClipboardList, User, type LucideIcon } from "lucide-react";
 
-const NAV_ITEMS: { id: string; label: string; icon: LucideIcon; route: string }[] = [
-  { id: "home", label: "Accueil", icon: Compass, route: "/" },
-  { id: "messages", label: "Messages", icon: MessageSquare, route: "/messages" },
-  { id: "search", label: "Recherche", icon: Search, route: "/search" },
-  { id: "orders", label: "Commandes", icon: ClipboardList, route: "/orders" },
-  { id: "profile", label: "Profil", icon: User, route: "/profile" },
+const BASE_NAV = [
+  { id: "home", label: "Accueil", icon: "🏠", route: "/" },
+  { id: "messages", label: "Messages", icon: "📥", route: "/messages" },
+  { id: "search", label: "Recherche", icon: "🔍", route: "/search" },
+  { id: "profile", label: "Profil", icon: "👤", route: "/profile" },
 ];
+
+const CLIENT_NAV = { id: "orders", label: "Commandes", icon: "🗒️", route: "/orders" };
+const PRO_NAV = { id: "dashboard", label: "Dashboard", icon: "📊", route: "/orders" };
 
 interface BottomNavProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   unreadCount?: number;
+  isPro?: boolean;
 }
 
-export default function BottomNav({ activeTab, onTabChange, unreadCount = 0 }: BottomNavProps) {
+export default function BottomNav({ activeTab, onTabChange, unreadCount = 0, isPro = false }: BottomNavProps) {
   const location = useLocation();
 
-  const handleClick = (item: typeof NAV_ITEMS[0]) => {
+  const navItems = [
+    ...BASE_NAV.slice(0, 3),
+    isPro ? PRO_NAV : CLIENT_NAV,
+    ...BASE_NAV.slice(3),
+  ];
+
+  const handleClick = (item: typeof navItems[0]) => {
     const target = item.route;
     if (item.id === "home") {
       if (location.pathname === "/") {
@@ -35,10 +42,9 @@ export default function BottomNav({ activeTab, onTabChange, unreadCount = 0 }: B
 
   return (
     <nav className="fixed bottom-4 left-4 right-4 max-w-md mx-auto z-20" aria-label="Navigation principale">
-      <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-lg shadow-black/5 border border-white/40 px-2 py-2 flex items-center justify-around">
-        {NAV_ITEMS.map((item) => {
+      <div className="bg-[rgba(255,255,255,0.70)] backdrop-blur-[20px] rounded-[20px] shadow-[0_8px_32px_rgba(45,106,79,0.10)] border border-[rgba(255,255,255,0.35)] px-2 py-2 flex items-center justify-around">
+        {navItems.map((item) => {
           const isActive = activeTab === item.id;
-          const Icon = item.icon;
           return (
             <button
               key={item.id}
@@ -47,29 +53,20 @@ export default function BottomNav({ activeTab, onTabChange, unreadCount = 0 }: B
               aria-label={item.label}
               aria-current={isActive ? "page" : undefined}
             >
-              {isActive && (
-                <motion.div
-                  layoutId="nav-indicator"
-                  className="absolute inset-0 bg-cm-green/10 rounded-xl"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
               <div className="relative z-10 flex flex-col items-center gap-0.5">
                 <div className="relative">
-                  <Icon
-                    className={`w-5 h-5 transition-colors duration-200 ${
-                      isActive ? "text-cm-green" : "text-secondary/60"
-                    }`}
-                  />
+                  <span className={`text-[20px] transition-all duration-200 ${isActive ? "scale-110" : "opacity-60"}`}>
+                    {item.icon}
+                  </span>
                   {unreadCount > 0 && item.id === "messages" && (
-                    <span className="absolute -top-1.5 -right-2 bg-cm-error text-white text-caption font-medium min-w-[14px] h-3.5 flex items-center justify-center rounded-full px-1 leading-none shadow-sm">
+                    <span className="absolute -top-1.5 -right-2 bg-ca-error text-white text-[10px] font-bold min-w-[16px] h-4 flex items-center justify-center rounded-full px-1 leading-none shadow-sm">
                       {unreadCount > 99 ? "99+" : unreadCount}
                     </span>
                   )}
                 </div>
                 <span
-                  className={`text-caption font-medium tracking-wide transition-colors duration-200 ${
-                    isActive ? "text-cm-green font-bold" : "text-secondary/50"
+                  className={`text-[10px] font-semibold tracking-wide transition-all duration-200 ${
+                    isActive ? "text-ca-text-primary scale-105" : "text-ca-text-muted"
                   }`}
                 >
                   {item.label}

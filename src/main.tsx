@@ -1,4 +1,4 @@
-import { StrictMode, lazy, Suspense, useEffect, useState, Component, type ReactNode, type ErrorInfo } from "react";
+import { StrictMode, lazy, Suspense, Component, useState, useEffect, type ReactNode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -36,6 +36,10 @@ const ProSubscriptionPage = lazy(() => import("./pages/profile/ProSubscriptionPa
 const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
+const EditProfilePage = lazy(() => import("./pages/profile/EditProfilePage"));
+const SecurityPage = lazy(() => import("./pages/profile/SecurityPage"));
+const LanguagePage = lazy(() => import("./pages/profile/LanguagePage"));
+const TermsPage = lazy(() => import("./pages/profile/TermsPage"));
 
 class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
@@ -51,22 +55,20 @@ class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boole
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-brand-cream flex items-center justify-center p-6">
+        <div className="min-h-screen flex items-center justify-center p-6" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
           <div className="text-center max-w-xs">
-            <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-14 h-14 rounded-[16px] bg-[rgba(230,57,70,0.15)] flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">⚠️</span>
             </div>
-            <h2 className="text-base font-extrabold text-brand-forest mb-2">Une erreur est survenue</h2>
-            <p className="text-caption text-secondary/60 mb-4">
+            <h2 className="text-[15px] font-extrabold text-ca-text-primary mb-2">Une erreur est survenue</h2>
+            <p className="text-[12px] text-ca-text-muted mb-4">
               L'application n'a pas pu se charger correctement.
             </p>
-            <p className="text-2xs text-secondary/40 mb-4 font-mono bg-white rounded-xl p-3 border border-pale-mint/10 text-left break-all max-h-24 overflow-y-auto">
+            <p className="text-[10px] text-ca-text-muted mb-4 font-mono bg-[rgba(255,255,255,0.50)] backdrop-blur-[8px] rounded-[14px] p-3 border border-[rgba(255,255,255,0.35)] text-left break-all max-h-24 overflow-y-auto">
               {this.state.error?.message || "Erreur inconnue"}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="h-10 px-6 bg-cm-green text-white text-xs font-bold rounded-xl cursor-pointer hover:bg-cm-green/90 transition-colors"
-            >
+            <button onClick={() => window.location.reload()}
+              className="h-10 px-6 bg-[rgba(45,106,79,0.85)] backdrop-blur-[8px] border border-[rgba(82,183,136,0.40)] text-white text-[12px] font-bold rounded-[14px] cursor-pointer hover:bg-[rgba(45,106,79,0.95)] transition-all active:scale-[0.97]">
               Recharger la page
             </button>
           </div>
@@ -79,10 +81,10 @@ class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boole
 
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-brand-cream flex items-center justify-center">
+    <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-[#00A86B]/20 border-t-[#00A86B] rounded-full animate-spin" />
-        <p className="text-xs text-secondary/60">Chargement...</p>
+        <div className="w-8 h-8 border-2 border-[rgba(45,106,79,0.20)] border-t-ca-green-primary rounded-full animate-spin" />
+        <p className="text-[12px] text-ca-text-muted">Chargement...</p>
       </div>
     </div>
   );
@@ -114,7 +116,6 @@ function App() {
       <Route path="/onboarding" element={<Suspense fallback={<PageLoader />}><OnboardingPage /></Suspense>} />
       <Route path="/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
       <Route element={<AuthGate><AppLayout /></AuthGate>}>
-        {/* 5 tabs principales */}
         <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
         <Route path="messages" element={<Suspense fallback={<PageLoader />}><MessagingListPage /></Suspense>} />
@@ -131,6 +132,10 @@ function App() {
         <Route path="profile/addresses" element={<Suspense fallback={<PageLoader />}><ClientAddressesPage /></Suspense>} />
         <Route path="profile/notifications" element={<Suspense fallback={<PageLoader />}><ClientNotificationsPage /></Suspense>} />
         <Route path="profile/help" element={<Suspense fallback={<PageLoader />}><ClientHelpPage /></Suspense>} />
+        <Route path="profile/edit" element={<Suspense fallback={<PageLoader />}><EditProfilePage /></Suspense>} />
+        <Route path="profile/security" element={<Suspense fallback={<PageLoader />}><SecurityPage /></Suspense>} />
+        <Route path="profile/language" element={<Suspense fallback={<PageLoader />}><LanguagePage /></Suspense>} />
+        <Route path="profile/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
         <Route path="profile/pro-edit" element={<Suspense fallback={<PageLoader />}><ProEditPage /></Suspense>} />
         <Route path="profile/pro-verification" element={<Suspense fallback={<PageLoader />}><ProVerificationPage /></Suspense>} />
         <Route path="profile/pro-finances" element={<Suspense fallback={<PageLoader />}><ProFinancesPage /></Suspense>} />
@@ -139,13 +144,11 @@ function App() {
         <Route path="profile/pro-notifications" element={<Suspense fallback={<PageLoader />}><ProNotificationsPage /></Suspense>} />
         <Route path="profile/pro-help" element={<Suspense fallback={<PageLoader />}><ProHelpPage /></Suspense>} />
 
-        {/* Redirections */}
         <Route path="explorer" element={<Navigate to="/" replace />} />
         <Route path="requests" element={<Navigate to="/orders" replace />} />
         <Route path="requests/*" element={<Navigate to="/orders" replace />} />
         <Route path="pro/dashboard" element={<Navigate to="/orders" replace />} />
 
-        {/* Explorer deep links (conservés pour compatibilité) */}
         <Route path="explorer/pro/:id" element={<Suspense fallback={<PageLoader />}><ProProfilePage /></Suspense>} />
         <Route path="explorer/matching" element={<Suspense fallback={<PageLoader />}><AiMatchPricingPage /></Suspense>} />
         <Route path="explorer/request-creation" element={<Suspense fallback={<PageLoader />}><RequestCreationPage /></Suspense>} />

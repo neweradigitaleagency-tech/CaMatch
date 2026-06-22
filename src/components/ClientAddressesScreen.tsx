@@ -10,27 +10,27 @@ const addresses = [
 
 export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenProps) {
   return (
-    <div className="flex flex-col w-full min-h-screen bg-brand-cream pb-32">
-      <header className="flex items-center justify-between px-4 py-3 bg-brand-cream/90 backdrop-blur-md sticky top-0 z-10">
-        <button onClick={onBack} className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-brand-forest hover:bg-pale-mint transition-colors shadow-sm cursor-pointer active:scale-95"><ArrowLeft className="w-5 h-5" /></button>
-        <h1 className="font-sans text-sm font-bold">Adresses</h1>
+    <div className="flex flex-col w-full min-h-screen pb-32" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, rgba(216,243,220,0.90) 100%)" }}>
+        <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-[rgba(255,255,255,0.60)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.35)] cursor-pointer active:scale-90 transition-all"><ArrowLeft className="w-4 h-4 text-ca-text-primary" /></button>
+        <h1 className="text-[15px] font-bold text-ca-text-primary">Adresses</h1>
         <div className="w-9 h-9" />
       </header>
       <div className="px-4 pt-4 space-y-2">
         {addresses.map(a => (
-          <div key={a.id} className="bg-white rounded-2xl p-4 border border-pale-mint/20 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-pale-mint flex items-center justify-center"><a.icon className="w-4 h-4 text-brand-forest" /></div>
+          <div key={a.id} className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[16px] border border-[rgba(255,255,255,0.50)] p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[12px] bg-[rgba(255,255,255,0.50)] flex items-center justify-center"><a.icon className="w-4 h-4 text-ca-text-primary" /></div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-bold">{a.label}</p>
-                {a.default && <span className="text-caption bg-brand-lime/20 text-brand-forest font-bold px-1.5 py-0.5 rounded-full">Par défaut</span>}
+                <p className="text-[13px] font-bold text-ca-text-primary">{a.label}</p>
+                {a.default && <span className="text-[10px] font-medium bg-[rgba(45,106,79,0.12)] text-ca-green-primary px-1.5 py-0.5 rounded-full">Par défaut</span>}
               </div>
-              <p className="text-caption text-secondary">{a.addr}</p>
+              <p className="text-[12px] text-ca-text-muted mt-0.5">{a.addr}</p>
             </div>
-            <Trash2 className="w-4 h-4 text-secondary/50" />
+            <Trash2 className="w-4 h-4 text-ca-text-muted shrink-0" />
           </div>
         ))}
-        <button className="w-full h-12 bg-brand-lime rounded-2xl text-xs font-bold text-brand-forest flex items-center justify-center gap-2 cursor-pointer active:scale-95 mt-2">
+        <button className="w-full h-12 bg-[rgba(45,106,79,0.85)] rounded-[14px] text-[12px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all mt-2 hover:bg-[rgba(45,106,79,0.95)]">
           <Plus className="w-4 h-4" /> Ajouter une adresse
         </button>
       </div>

@@ -67,7 +67,7 @@ async function seed() {
     { email: "koffi@camatch.ci", bn: "Koffi Électricité", fn: "Koffi", ln: "Kouamé", cat: "electrician", hr: 12000, bio: "Installations triphasées, dépannages haute et basse tension dans tout Cocody et Plateau. Diplômé de l'INP-HB.", rating: 4.9, jobs: 140, vl: "certified" },
     { email: "ismael@camatch.ci", bn: "Koné Plomberie", fn: "Ismaël", ln: "Koné", cat: "plumber", hr: 10000, bio: "Spécialisé en réparation de fuites, débouchages urgents, robinetteries suspendues et raccordements sanitaires.", rating: 4.8, jobs: 95, vl: "id" },
     { email: "mamadou@camatch.ci", bn: "Clim Expert CI", fn: "Mamadou", ln: "K.", cat: "ac_refrigeration", hr: 15000, bio: "Expert certifié avec 8+ ans d'expérience. Spécialiste Samsung, LG, Sharp, Carrier.", rating: 4.9, jobs: 120, vl: "certified" },
-    { email: "fatou@camatch.ci", bn: "Fatou Cleaning", fn: "Fatou", ln: "Touré", cat: "cleaner", hr: 8000, bio: "Nettoyage résidentiel et de bureaux. Désinfection et remises au propre complètes.", rating: 4.7, jobs: 80, vl: "background" },
+    { email: "adama@camatch.ci", bn: "Adama Menuiserie", fn: "Adama", ln: "Traoré", cat: "carpenter", hr: 12000, bio: "Fabrication de meubles sur mesure, agencement intérieur, portes et fenêtres.", rating: 4.6, jobs: 70, vl: "id" },
   ];
   for (const p of pros) {
     const id = userIds[p.email];

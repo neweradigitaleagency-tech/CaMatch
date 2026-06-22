@@ -24,7 +24,8 @@ function mapPro(row: any): ProfessionalDetails {
     category: row.category === "electrician" ? "electricity" as const
       : row.category === "plumber" ? "plumbing" as const
       : row.category === "ac_refrigeration" ? "ac" as const
-      : "cleaning" as const,
+      : row.category === "carpenter" ? "carpenter" as const
+      : "carpenter" as const,
     title: row.business_name || "",
     bio: row.bio || "",
     experienceYears: Math.floor((row.total_jobs || 0) / 15),
@@ -78,13 +79,14 @@ function mapRequest(row: any): ClientRequest {
   return {
     id: row.id,
     clientId: row.client_id,
-    title: `Intervention ${row.category === "electrician" ? "électrique" : row.category === "plumber" ? "plomberie" : row.category === "ac_refrigeration" ? "climatisation" : "nettoyage"}`,
+    title: `Intervention ${row.category === "electrician" ? "électrique" : row.category === "plumber" ? "plomberie" : row.category === "ac_refrigeration" ? "climatisation" : "menuiserie"}`,
     description: row.description || "",
     photos: row.media_urls || [],
     category: row.category === "electrician" ? "electricity"
       : row.category === "plumber" ? "plumbing"
       : row.category === "ac_refrigeration" ? "ac"
-      : "cleaning",
+      : row.category === "carpenter" ? "carpenter"
+      : "carpenter",
     address: row.address || "",
     budgetXOF: row.estimated_price_max || 0,
     urgency: urgencyMap[row.urgency] || "flexible",
@@ -132,7 +134,8 @@ function mapMission(row: any): Mission {
     category: row.category === "electrician" ? "electricity"
       : row.category === "plumber" ? "plumbing"
       : row.category === "ac_refrigeration" ? "ac"
-      : "cleaning",
+      : row.category === "carpenter" ? "carpenter"
+      : "carpenter",
     address: row.address || "",
     budgetXOF: row.estimated_price_max || 0,
     photos: row.media_urls || [],

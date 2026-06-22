@@ -1,28 +1,20 @@
 import type { ReactNode, HTMLAttributes } from "react";
 
-interface CardProps extends HTMLAttributes<HTMLDivElement> {
+interface GlassCardProps extends HTMLAttributes<HTMLDivElement> {
   readonly children: ReactNode;
   readonly interactive?: boolean;
-  readonly padding?: "sm" | "md" | "lg";
   readonly className?: string;
 }
 
-const paddings = {
-  sm: "p-3",
-  md: "p-4",
-  lg: "p-6",
-};
-
-export default function Card({
+export default function GlassCard({
   children,
   interactive = false,
-  padding = "md",
   className = "",
   ...props
-}: CardProps) {
+}: GlassCardProps) {
   return (
     <div
-      className={`bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.35)] rounded-[20px] shadow-[0_8px_32px_rgba(45,106,79,0.10)] ${paddings[padding]} ${
+      className={`bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.35)] rounded-[20px] shadow-[0_8px_32px_rgba(45,106,79,0.10)] ${
         interactive ? "hover:scale-[1.02] hover:shadow-[0_12px_48px_rgba(45,106,79,0.15)] active:scale-[0.98] transition-all duration-200 cursor-pointer" : ""
       } ${className}`}
       {...props}

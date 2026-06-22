@@ -19,8 +19,6 @@ import type {
 } from "../types";
 import { UserRole } from "../types";
 
-const proCleaningAvatar = new URL("../../assets/pro_cleaning_avatar.png", import.meta.url).href;
-
 export const MOCK_PROS: ProfessionalDetails[] = [
   {
     id: "pro1", name: "Koffi Kouamé", email: "koffi.electricien@gmail.com",
@@ -53,12 +51,13 @@ export const MOCK_PROS: ProfessionalDetails[] = [
     availabilityStatus: "available", createdAt: "2026-06-18T05:25:00Z",
   },
   {
-    id: "pro4", name: "Fatou Touré", email: "fatou.cleaning@gmail.com",
-    phoneNumber: "+225 05 44 11 22", role: UserRole.PRO,
-    avatarUrl: proCleaningAvatar, category: "cleaning", title: "Experte Propreté & Nettoyage",
-    bio: "Nettoyage résidentiel et de bureaux. Spécialisée en désinfection et remises au propre complètes dans tout Cocody et Angré.",
-    experienceYears: 5, rating: 47, reviewCount: 52, hourlyRateXOF: 8000,
-    locationNeighborhood: "Cocody, Abidjan", isVerified: true, completedInterventions: 80,
+    id: "pro4", name: "Adama Traoré", email: "adama.menuiserie@gmail.com",
+    phoneNumber: "+225 07 55 33 22", role: UserRole.PRO,
+    avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face",
+    category: "carpenter", title: "Menuisier & Ébéniste",
+    bio: "Fabrication de meubles sur mesure, agencement intérieur, portes et fenêtres. Bois massif et stratifié.",
+    experienceYears: 8, rating: 46, reviewCount: 63, hourlyRateXOF: 12000,
+    locationNeighborhood: "Angré, Abidjan", isVerified: true, completedInterventions: 70,
     availabilityStatus: "available", createdAt: "2026-06-18T05:25:00Z",
   },
 ];
@@ -79,7 +78,7 @@ export const MOCK_SERVICES: Service[] = [
 export const MOCK_REQUESTS: ClientRequest[] = [
   { id: "cr1", clientId: "client_marie", title: "Climatisation ne refroidit plus", description: "Le split ne souffle que de l'air chaud, besoin d'un diagnostic et recharge fréon si nécessaire.", photos: [], category: "ac", address: "Cocody Riviera 3, Abidjan", budgetXOF: 35000, urgency: "today", status: "accepted", proId: "pro3", createdAt: "2026-06-17T08:00:00Z", updatedAt: "2026-06-17T09:00:00Z" },
   { id: "cr2", clientId: "client_marie", title: "Prise électrique grillée", description: "Prise dans la chambre principale ne fonctionne plus et fait des étincelles.", photos: [], category: "electricity", address: "Cocody Riviera 3, Abidjan", budgetXOF: 12000, urgency: "immediate", status: "created", createdAt: "2026-06-18T06:00:00Z", updatedAt: "2026-06-18T06:00:00Z" },
-  { id: "cr3", clientId: "client_marie", title: "Nettoyage appartement 3 pièces", description: "Ménage complet pour appartement 3 pièces à Cocody. Produits inclus.", photos: [], category: "cleaning", address: "Cocody Angré, Abidjan", budgetXOF: 25000, urgency: "this_week", status: "created", createdAt: "2026-06-18T07:00:00Z", updatedAt: "2026-06-18T07:00:00Z" },
+  { id: "cr3", clientId: "client_marie", title: "Fabrication bibliothèque sur mesure", description: "Bibliothèque en bois massif sur mesure pour salon. Dimensions: 2m x 1.5m. Finition laquée.", photos: [], category: "carpenter", address: "Cocody Angré, Abidjan", budgetXOF: 80000, urgency: "this_week", status: "created", createdAt: "2026-06-18T07:00:00Z", updatedAt: "2026-06-18T07:00:00Z" },
 ];
 
 export const MOCK_MISSIONS: Mission[] = [
@@ -148,7 +147,7 @@ export const MOCK_PRO_EARNINGS: ProEarning[] = [
 export const MOCK_PORTFOLIO: PortfolioItem[] = [
   { id: "pf1", imageUrl: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=400&fit=crop", caption: "Installation tableau électrique", category: "electricity", createdAt: "2026-06-01T00:00:00Z" },
   { id: "pf2", imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop", caption: "Rénovation complète salle de bain", category: "plumbing", createdAt: "2026-05-15T00:00:00Z" },
-  { id: "pf3", imageUrl: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=400&fit=crop", caption: "Nettoyage bureau Plateau", category: "cleaning", createdAt: "2026-05-10T00:00:00Z" },
+  { id: "pf3", imageUrl: "https://images.unsplash.com/photo-1611486212552-0f108aad1ef8?w=400&h=400&fit=crop", caption: "Bibliothèque sur mesure", category: "carpenter", createdAt: "2026-05-10T00:00:00Z" },
   { id: "pf4", imageUrl: "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?w=400&h=400&fit=crop", caption: "Installation climatisation split", category: "ac", createdAt: "2026-04-20T00:00:00Z" },
   { id: "pf5", imageUrl: "https://images.unsplash.com/photo-1585412727339-54e4bae3bbf9?w=400&h=400&fit=crop", caption: "Dépannage urgence Court-circuit", category: "electricity", createdAt: "2026-04-10T00:00:00Z" },
   { id: "pf6", imageUrl: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=400&h=400&fit=crop", caption: "Rénovation cuisine complète", category: "plumbing", createdAt: "2026-03-25T00:00:00Z" },

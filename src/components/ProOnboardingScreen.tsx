@@ -26,7 +26,7 @@ const CATEGORIES = [
   { id: "electricity", label: "Électricien", icon: Briefcase },
   { id: "plumbing", label: "Plombier", icon: Briefcase },
   { id: "ac", label: "Climatisation", icon: Briefcase },
-  { id: "cleaning", label: "Ménage/Nettoyage", icon: Briefcase },
+  { id: "carpenter", label: "Menuisier", icon: Briefcase },
 ];
 
 export default function ProOnboardingScreen({ onComplete, onSkip }: Props) {

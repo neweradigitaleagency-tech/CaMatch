@@ -1,19 +1,58 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import RequestsListScreen from "../components/RequestsListScreen";
-import { useClientRequests, useClientMissions, useProMissions } from "../hooks/useDatabase";
+import ProDashboardScreen from "../components/ProDashboardScreen";
+import { useClientRequests, useClientMissions } from "../hooks/useDatabase";
 import { useAuthStore } from "../stores/authStore";
-import { useState } from "react";
-import { StatusBadge } from "../components/ui";
-import type { Mission } from "../types";
-import { ChevronRight } from "lucide-react";
+import { useRequestStore } from "../stores/requestStore";
+import { useProStore } from "../stores/proStore";
+import { MOCK_REQUESTS, MOCK_MISSIONS, MOCK_PRO_JOBS, MOCK_PROS } from "../services/mockData";
+import type { Mission, ProAlert, ProDashboardStats } from "../types";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
   const isPro = useAuthStore((s) => s.isPro);
-  const { data: requests = [] } = useClientRequests();
-  const { data: missions = [] } = useClientMissions();
-  const { data: proMissions = [] } = useProMissions();
-  const [tab, setTab] = useState<"demandes" | "missions">("demandes");
+  const userId = useAuthStore((s) => s.userId);
+
+  const storeRequests = useRequestStore((s) => s.requests);
+  const setRequests = useRequestStore((s) => s.setRequests);
+  const storeMissions = useRequestStore((s) => s.missions);
+  const setMissions = useRequestStore((s) => s.setMissions);
+  const rawAlerts = useProStore((s) => s.alerts);
+  const removeAlert = useProStore((s) => s.removeAlert);
+  const isAvailable = useProStore((s) => s.isAvailable);
+  const toggleAvailability = useProStore((s) => s.toggleAvailability);
+
+  useEffect(() => {
+    if (storeRequests.length === 0 && MOCK_REQUESTS.length > 0) setRequests(MOCK_REQUESTS);
+    if (storeMissions.length === 0 && MOCK_MISSIONS.length > 0) setMissions(MOCK_MISSIONS);
+  }, []);
+
+  const currentPro = MOCK_PROS.find((p) => p.id === userId) || MOCK_PROS[0];
+  const alerts: ProAlert[] = rawAlerts.filter((a) => a.category === currentPro?.category).map((a) => ({
+    ...a, clientAvatarUrl: undefined, urgency: a.urgency as ProAlert["urgency"],
+  }));
+
+  const { data: requestsFromDb = [] } = useClientRequests();
+  const { data: missionsFromDb = [] } = useClientMissions();
+
+  const requests = storeRequests.length > 0 ? storeRequests : requestsFromDb;
+  const missions = storeMissions.length > 0 ? storeMissions : missionsFromDb;
+
+  const todayJobs = MOCK_PRO_JOBS.filter((j) => {
+    const today = new Date().toISOString().slice(0, 10);
+    return j.scheduledDate === today || j.status !== "completed";
+  });
+
+  const stats: ProDashboardStats = {
+    todayEarningsXOF: 45000,
+    weekEarningsXOF: 185000,
+    monthEarningsXOF: 720000,
+    totalJobsCompleted: 42,
+    todayJobsCount: todayJobs.length,
+    rating: 48,
+    reviewCount: 76,
+  };
 
   const commonHandlers = {
     onNewRequest: () => navigate("/orders/new"),
@@ -35,64 +74,38 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="flex flex-col w-full pb-24">
-      {/* Tabs */}
-      <div className="flex mx-4 mt-3 mb-3 bg-white rounded-xl p-1 border border-pale-mint/10">
-        <button
-          onClick={() => setTab("demandes")}
-          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-            tab === "demandes" ? "bg-cm-green text-white" : "text-secondary/60"
-          }`}
-        >
-          Mes demandes
-        </button>
-        <button
-          onClick={() => setTab("missions")}
-          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
-            tab === "missions" ? "bg-cm-green text-white" : "text-secondary/60"
-          }`}
-        >
-          Mes missions
-          {proMissions.length > 0 && (
-            <span className="ml-1.5 text-2xs bg-cm-green/20 text-cm-green px-1.5 py-0.5 rounded-full">
-              {proMissions.length}
-            </span>
-          )}
-        </button>
-      </div>
-
-      {tab === "demandes" ? (
-        <RequestsListScreen
-          requests={requests}
-          missions={missions}
-          {...commonHandlers}
-        />
-      ) : (
-        <div className="px-4 space-y-2">
-          {proMissions.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-sm text-secondary/50">Aucune mission pour le moment</p>
-            </div>
-          )}
-          {proMissions.map((mission: Mission) => (
-            <div
-              key={mission.id}
-              onClick={() => navigate(`/orders/tracker/${mission.id}`)}
-              className="bg-white rounded-2xl border border-pale-mint/10 p-4 cursor-pointer active:bg-pale-mint/30 transition-colors"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <p className="text-xs font-bold text-brand-forest">{mission.title}</p>
-                <StatusBadge status={mission.status} />
-              </div>
-              <p className="text-caption text-secondary/60 mb-2 line-clamp-2">{mission.description}</p>
-              <div className="flex items-center justify-between">
-                <span className="text-2xs font-semibold text-cm-green">{mission.budgetXOF.toLocaleString()} F</span>
-                <ChevronRight className="w-3.5 h-3.5 text-secondary/40" />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <ProDashboardScreen
+      pro={currentPro}
+      stats={stats}
+      todayJobs={todayJobs}
+      alerts={alerts}
+      available={isAvailable}
+      onToggleAvailability={toggleAvailability}
+      onViewJob={(job) => navigate(`/orders/tracker/${job.id}`)}
+      onAcceptAlert={(alert) => {
+        const newMission: Mission = {
+          id: "mission_" + Date.now(),
+          requestId: "req_" + Date.now(),
+          clientId: "client_marie",
+          proId: userId || "pro_mock",
+          status: "accepted",
+          title: alert.description.slice(0, 60),
+          description: alert.description,
+          category: alert.category,
+          address: alert.location,
+          budgetXOF: alert.estimatedPriceMinXOF,
+          photos: [],
+          proName: currentPro?.name || "Vous",
+          proAvatar: currentPro?.avatarUrl || "",
+          proPhone: currentPro?.phoneNumber || "",
+          clientName: alert.clientName,
+          clientPhone: alert.clientPhone,
+          createdAt: new Date().toISOString(),
+        };
+        setMissions([newMission, ...storeMissions]);
+        removeAlert(alert.id);
+      }}
+      onDeclineAlert={(alert) => removeAlert(alert.id)}
+    />
   );
 }

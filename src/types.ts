@@ -24,7 +24,7 @@ export interface User {
 // ─── Pro ───
 
 export interface ProfessionalDetails extends User {
-  category: "electricity" | "plumbing" | "ac" | "cleaning";
+  category: "electricity" | "plumbing" | "ac" | "carpenter";
   title: string;
   bio: string;
   experienceYears: number;

@@ -1,28 +1,25 @@
 import { AlertTriangle } from "lucide-react";
+import { Button } from "./index";
 
 interface ErrorStateProps {
   readonly message?: string;
   readonly onRetry?: () => void;
 }
 
-export default function ErrorState({
-  message = "Une erreur est survenue",
-  onRetry,
-}: ErrorStateProps) {
+export default function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center text-center px-8 py-16">
-      <div className="w-14 h-14 rounded-full bg-cm-error/10 flex items-center justify-center mb-3">
-        <AlertTriangle className="w-7 h-7 text-cm-error" />
+    <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="w-16 h-16 rounded-[20px] bg-[rgba(230,57,70,0.15)] backdrop-blur-[8px] border border-[rgba(230,57,70,0.25)] flex items-center justify-center mb-4">
+        <AlertTriangle className="w-8 h-8 text-ca-error" />
       </div>
-      <h3 className="text-sm font-bold mb-1">Oups !</h3>
-      <p className="text-xs text-secondary mb-4">{message}</p>
+      <h3 className="text-[16px] font-bold text-ca-text-primary mb-1">Oups !</h3>
+      <p className="text-[13px] text-ca-text-muted max-w-xs mb-4">
+        {message || "Une erreur est survenue"}
+      </p>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className="h-10 px-4 bg-cm-green text-white text-sm font-semibold rounded-xl hover:bg-cm-green-deep transition-colors cursor-pointer"
-        >
+        <Button variant="secondary" size="sm" onClick={onRetry}>
           Réessayer
-        </button>
+        </Button>
       )}
     </div>
   );

@@ -9,7 +9,7 @@ import { ProfessionalDetails } from "../types";
 
 interface ProSelectionScreenProps {
   proList: ProfessionalDetails[];
-  category: "electricity" | "plumbing" | "ac" | "cleaning";
+  category: "electricity" | "plumbing" | "ac" | "carpenter";
   onSelectPro: (pro: ProfessionalDetails) => void;
   onViewProfile: (pro: ProfessionalDetails) => void;
   onBack: () => void;
@@ -48,7 +48,7 @@ export default function ProSelectionScreen({ proList, category, onSelectPro, onV
       case "electricity": return "Électricien";
       case "plumbing": return "Plombier";
       case "ac": return "Climatisation";
-      case "cleaning": return "Ménage";
+      case "carpenter": return "Menuisier";
       default: return cat;
     }
   };
