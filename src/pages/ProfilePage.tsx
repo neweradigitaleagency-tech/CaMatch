@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const userId = useAuthStore((s) => s.userId);
   const locNeighborhood = useLocationStore((s) => s.neighborhood);
   const locStatus = useLocationStore((s) => s.status);
+  const geocodingSource = useLocationStore((s) => s.geocodingSource);
   const [showProOnboarding, setShowProOnboarding] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -105,7 +106,13 @@ export default function ProfilePage() {
         <div className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] overflow-hidden">
           <MenuItem icon={User} label="Informations personnelles" desc="Email, téléphone" onClick={() => openNavigateTo("edit-profile")} />
           <MenuItem icon={Shield} label="Sécurité" desc="Mot de passe" onClick={() => openNavigateTo("security")} />
-          <MenuItem icon={MapPin} label="Mes adresses" desc={locStatus === "available" ? locNeighborhood : "Cocody, Plateau, Marcory"} onClick={() => openNavigateTo("addresses")} last />
+          <MenuItem icon={MapPin} label="Mes adresses" desc={
+            locStatus === "available" && geocodingSource === "nominatim"
+              ? `${locNeighborhood} • GPS`
+              : locStatus === "available"
+                ? `${locNeighborhood} • estimé`
+                : "Cocody, Plateau, Marcory"
+          } onClick={() => openNavigateTo("addresses")} last />
         </div>
       </div>
 

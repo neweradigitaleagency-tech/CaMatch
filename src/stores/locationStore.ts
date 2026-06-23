@@ -1,6 +1,15 @@
 import { create } from "zustand";
 
 export type LocationStatus = "idle" | "locating" | "available" | "denied" | "error" | "unsupported";
+export type GeocodingSource = "nominatim" | "fallback" | "manual";
+
+interface PersistedData {
+  latitude: number;
+  longitude: number;
+  neighborhood: string;
+  gpsAccuracy: number | null;
+  geocodingSource: GeocodingSource;
+}
 
 interface LocationState {
   latitude: number;
@@ -8,6 +17,8 @@ interface LocationState {
   neighborhood: string;
   status: LocationStatus;
   error: string | null;
+  gpsAccuracy: number | null;
+  geocodingSource: GeocodingSource;
   refreshLocation: () => void;
   setNeighborhood: (name: string) => void;
   setCoords: (lat: number, lng: number) => void;
@@ -44,7 +55,25 @@ function findNearestNeighborhood(lat: number, lng: number): string {
   return closest;
 }
 
-function loadPersisted(): { latitude: number; longitude: number; neighborhood: string } | null {
+async function nominatimReverse(
+  lat: number,
+  lng: number,
+): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14&accept-language=fr`,
+      { headers: { "User-Agent": "CaMatch/1.0" } },
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    const addr = data.address;
+    return addr?.suburb || addr?.city_district || addr?.town || addr?.city || null;
+  } catch {
+    return null;
+  }
+}
+
+function loadPersisted(): PersistedData | null {
   try {
     const raw = localStorage.getItem("cm_location");
     return raw ? JSON.parse(raw) : null;
@@ -53,9 +82,9 @@ function loadPersisted(): { latitude: number; longitude: number; neighborhood: s
   }
 }
 
-function persist(lat: number, lng: number, neighborhood: string) {
+function persist(data: PersistedData) {
   try {
-    localStorage.setItem("cm_location", JSON.stringify({ latitude: lat, longitude: lng, neighborhood }));
+    localStorage.setItem("cm_location", JSON.stringify(data));
   } catch {}
 }
 
@@ -68,6 +97,8 @@ export const useLocationStore = create<LocationState>((set, get) => {
     neighborhood: saved?.neighborhood ?? "Cocody",
     status: "idle" as LocationStatus,
     error: null,
+    gpsAccuracy: saved?.gpsAccuracy ?? null,
+    geocodingSource: saved?.geocodingSource ?? "manual",
 
     refreshLocation: () => {
       if (!navigator.geolocation) {
@@ -76,11 +107,17 @@ export const useLocationStore = create<LocationState>((set, get) => {
       }
       set({ status: "locating", error: null });
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const { latitude, longitude } = pos.coords;
-          const neighborhood = findNearestNeighborhood(latitude, longitude);
-          persist(latitude, longitude, neighborhood);
-          set({ latitude, longitude, neighborhood, status: "available", error: null });
+        async (pos) => {
+          const { latitude, longitude, accuracy } = pos.coords;
+          const nbh = await nominatimReverse(latitude, longitude);
+          if (nbh) {
+            persist({ latitude, longitude, neighborhood: nbh, gpsAccuracy: accuracy, geocodingSource: "nominatim" });
+            set({ latitude, longitude, neighborhood: nbh, status: "available", error: null, gpsAccuracy: accuracy, geocodingSource: "nominatim" });
+          } else {
+            const nbh2 = findNearestNeighborhood(latitude, longitude);
+            persist({ latitude, longitude, neighborhood: nbh2, gpsAccuracy: accuracy, geocodingSource: "fallback" });
+            set({ latitude, longitude, neighborhood: nbh2, status: "available", error: null, gpsAccuracy: accuracy, geocodingSource: "fallback" });
+          }
         },
         (err) => {
           const msg = err.code === err.PERMISSION_DENIED
@@ -97,15 +134,15 @@ export const useLocationStore = create<LocationState>((set, get) => {
     setNeighborhood: (name: string) => {
       const coord = NEIGHBORHOOD_COORDS[name];
       if (coord) {
-        persist(coord.lat, coord.lng, name);
-        set({ latitude: coord.lat, longitude: coord.lng, neighborhood: name, error: null });
+        persist({ latitude: coord.lat, longitude: coord.lng, neighborhood: name, gpsAccuracy: null, geocodingSource: "manual" });
+        set({ latitude: coord.lat, longitude: coord.lng, neighborhood: name, error: null, gpsAccuracy: null, geocodingSource: "manual" });
       }
     },
 
     setCoords: (lat: number, lng: number) => {
       const neighborhood = findNearestNeighborhood(lat, lng);
-      persist(lat, lng, neighborhood);
-      set({ latitude: lat, longitude: lng, neighborhood, error: null });
+      persist({ latitude: lat, longitude: lng, neighborhood, gpsAccuracy: null, geocodingSource: "fallback" });
+      set({ latitude: lat, longitude: lng, neighborhood, error: null, gpsAccuracy: null, geocodingSource: "fallback" });
     },
   };
 });

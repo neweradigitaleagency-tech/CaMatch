@@ -46,6 +46,8 @@ export default function ClientOnboardingScreen({ onComplete, onSkip }: Props) {
   });
   const locNeighborhood = useLocationStore((s) => s.neighborhood);
   const locStatus = useLocationStore((s) => s.status);
+  const geocodingSource = useLocationStore((s) => s.geocodingSource);
+  const gpsAccuracy = useLocationStore((s) => s.gpsAccuracy);
   const refreshLocation = useLocationStore((s) => s.refreshLocation);
 
   const [step, setStep] = useState(0);
@@ -382,13 +384,22 @@ export default function ClientOnboardingScreen({ onComplete, onSkip }: Props) {
                 <div className={`p-3 rounded-xl flex items-center gap-2 ${
                   locStatus === "available" ? "bg-cm-green/10" : "bg-pale-mint"
                 }`}>
-                  <MapPin className={`w-4 h-4 shrink-0 ${locStatus === "available" ? "text-cm-green" : "text-cm-green"}`} />
-                  <span className="text-caption">
-                    {locStatus === "locating" ? "Détection de votre position..." :
-                     locStatus === "available" ? `Position détectée : ${locNeighborhood}` :
-                     locStatus === "denied" ? "Activez votre GPS pour une localisation précise" :
-                     "Activez votre GPS pour une localisation précise"}
-                  </span>
+                  <MapPin className="w-4 h-4 shrink-0 text-cm-green" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-caption block">
+                      {locStatus === "locating" ? "Détection de votre position..." :
+                       locStatus === "available" && geocodingSource === "nominatim"
+                         ? `${locNeighborhood} — position précise`
+                         : locStatus === "available"
+                           ? `${locNeighborhood} — position estimée`
+                           : locStatus === "denied"
+                             ? "Activez votre GPS pour une localisation précise"
+                             : "Activez votre GPS pour une localisation précise"}
+                    </span>
+                    {locStatus === "available" && gpsAccuracy != null && (
+                      <span className="text-[10px] text-cm-text-muted font-mono">Précision ±{Math.round(gpsAccuracy)} m</span>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

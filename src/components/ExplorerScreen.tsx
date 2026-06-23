@@ -51,6 +51,8 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   const storeLng = useLocationStore((s) => s.longitude);
   const neighborhood = useLocationStore((s) => s.neighborhood);
   const locStatus = useLocationStore((s) => s.status);
+  const gpsAccuracy = useLocationStore((s) => s.gpsAccuracy);
+  const geocodingSource = useLocationStore((s) => s.geocodingSource);
   const refreshLocation = useLocationStore((s) => s.refreshLocation);
   const setNeighborhood = useLocationStore((s) => s.setNeighborhood);
 
@@ -164,6 +166,9 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
             >
               <MapPin className="w-3.5 h-3.5 text-cm-text-soft" />
               <span className="truncate max-w-[100px] text-cm-text-soft">{neighborhood}</span>
+              {geocodingSource === "nominatim" && (
+                <span className="text-[9px] font-medium text-cm-accent">📍</span>
+              )}
               <ChevronDown className="w-3 h-3 text-cm-text-soft" />
             </button>
             <button onClick={() => setShowNotifications(true)}
@@ -514,6 +519,22 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               <div className="w-full mt-4 py-3 bg-cm-accent-soft rounded-[12px] text-[13px] font-medium text-cm-accent flex items-center justify-center gap-2">
                 <div className="w-4 h-4 border-2 border-cm-accent border-t-transparent rounded-full animate-spin" />
                 Détection en cours...
+              </div>
+            ) : locStatus === "available" ? (
+              <div className="w-full mt-4 space-y-2">
+                <div className="flex items-center justify-between px-4 py-2.5 bg-cm-accent-soft/60 rounded-[12px]">
+                  <div className="flex items-center gap-2 text-[12px] text-cm-text">
+                    <span className={`w-2 h-2 rounded-full ${geocodingSource === "nominatim" ? "bg-green-500" : "bg-amber-500"}`} />
+                    {geocodingSource === "nominatim" ? "Position précise (GPS)" : "Position estimée"}
+                  </div>
+                  {gpsAccuracy != null && (
+                    <span className="text-[11px] text-cm-text-muted font-mono">±{Math.round(gpsAccuracy)} m</span>
+                  )}
+                </div>
+                <button onClick={() => { refreshLocation(); }}
+                  className="w-full py-2.5 bg-cm-accent-soft/40 border border-cm-accent/20 rounded-[12px] text-[12px] font-medium text-cm-accent flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all">
+                  <MapPin className="w-3.5 h-3.5" /> Rafraîchir ma position
+                </button>
               </div>
             ) : (
               <button onClick={() => { refreshLocation(); setShowLocationPicker(false); }}
