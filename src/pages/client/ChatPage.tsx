@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChatScreen } from "../../components/MessagingScreen";
 import CallScreen from "../../components/CallScreen";
 import { useChatStore } from "../../stores/chatStore";
+import { useLocationStore } from "../../stores/locationStore";
 import { useAuthStore } from "../../stores/authStore";
 import { MOCK_MESSAGES } from "../../services/mockData";
 import type { CallSession } from "../../types";
@@ -89,13 +90,14 @@ export default function ChatPage() {
         });
       }}
       onSendLocation={() => {
+        const { latitude, longitude, neighborhood } = useLocationStore.getState();
         addMessage(conversationId, {
           id: `msg_${++msgCounter}`,
           conversationId,
           senderId: currentUserId,
           text: "",
           photos: [],
-          location: { lat: 5.36, lng: -4.02, label: "Ma position" },
+          location: { lat: latitude, lng: longitude, label: neighborhood || "Ma position" },
           createdAt: new Date().toISOString(),
         });
       }}

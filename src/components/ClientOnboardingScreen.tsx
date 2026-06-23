@@ -1,10 +1,11 @@
-import { useState, useRef, type ComponentType } from "react";
+import { useState, useEffect, useRef, type ComponentType } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
   ChevronLeft, ChevronRight, Check, Camera, MapPin, Smartphone,
   UserIcon, Sparkles, Shield, Globe, MessageSquare, Star, Bell,
 } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
+import { useLocationStore, COMMUNES } from "../stores/locationStore";
 
 interface ClientOnboardingData {
   firstName: string;
@@ -19,12 +20,6 @@ interface Props {
   onComplete: (data: ClientOnboardingData) => void;
   onSkip?: () => void;
 }
-
-const COMMUNES = [
-  "Cocody", "Plateau", "Marcory", "Treichville", "Adjamé",
-  "Yopougon", "Abobo", "Koumassi", "Port-Bouët", "Bingerville",
-  "Anyama", "Attécoubé", "Williamsville",
-];
 
 const LANGUAGES = [
   { id: "fr" as const, label: "Français", desc: "Langue officielle" },
@@ -49,6 +44,10 @@ export default function ClientOnboardingScreen({ onComplete, onSkip }: Props) {
     firstName: "", lastName: "", phone: "", language: "fr",
     commune: "Cocody",
   });
+  const locNeighborhood = useLocationStore((s) => s.neighborhood);
+  const locStatus = useLocationStore((s) => s.status);
+  const refreshLocation = useLocationStore((s) => s.refreshLocation);
+
   const [step, setStep] = useState(0);
   const [otpCode, setOtpCode] = useState(["", "", "", "", "", ""]);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
@@ -58,6 +57,18 @@ export default function ClientOnboardingScreen({ onComplete, onSkip }: Props) {
   const [error, setError] = useState("");
   const photoRef = useRef<HTMLInputElement>(null);
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    if (STEPS[step].key === "location" && locStatus === "idle") {
+      refreshLocation();
+    }
+  }, [step, locStatus, refreshLocation]);
+
+  useEffect(() => {
+    if (STEPS[step].key === "location" && locStatus === "available" && locNeighborhood) {
+      setData((d) => ({ ...d, commune: locNeighborhood }));
+    }
+  }, [step, locStatus, locNeighborhood]);
 
   const progress = ((step + 1) / STEPS.length) * 100;
   const isLast = step === STEPS.length - 1;
@@ -368,9 +379,16 @@ export default function ClientOnboardingScreen({ onComplete, onSkip }: Props) {
                     </button>
                   ))}
                 </div>
-                <div className="bg-pale-mint p-3 rounded-xl flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-cm-green shrink-0" />
-                  <span className="text-caption">Activez votre GPS pour une localisation précise</span>
+                <div className={`p-3 rounded-xl flex items-center gap-2 ${
+                  locStatus === "available" ? "bg-cm-green/10" : "bg-pale-mint"
+                }`}>
+                  <MapPin className={`w-4 h-4 shrink-0 ${locStatus === "available" ? "text-cm-green" : "text-cm-green"}`} />
+                  <span className="text-caption">
+                    {locStatus === "locating" ? "Détection de votre position..." :
+                     locStatus === "available" ? `Position détectée : ${locNeighborhood}` :
+                     locStatus === "denied" ? "Activez votre GPS pour une localisation précise" :
+                     "Activez votre GPS pour une localisation précise"}
+                  </span>
                 </div>
               </div>
             )}

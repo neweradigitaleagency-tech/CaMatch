@@ -6,6 +6,7 @@ import { ProCardSkeleton } from "./ui/Skeleton";
 import VerifiedBadge from "./ui/VerifiedBadge";
 import { useAuthStore } from "../stores/authStore";
 import { useNotificationStore } from "../stores/notificationStore";
+import { useLocationStore, haversineKm, LOCATIONS } from "../stores/locationStore";
 import { findBestMatch } from "../data/serviceCategories";
 import NotificationPanel from "./NotificationPanel";
 
@@ -23,14 +24,13 @@ const PROMO_BANNERS = [
   { id: "referral", emoji: "🤝", title: "Parrainage", desc: "Parrainez un ami, gagnez 2 000 FCFA" },
 ];
 
-const LOCATIONS = ["Abidjan, Cocody", "Abidjan, Plateau", "Abidjan, Marcory", "Abidjan, Yopougon", "Abidjan, Treichville"];
+
 
 export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiateAiRequest, activeMissions = [], onViewActiveMission }: ExplorerScreenProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
-  const [location, setLocation] = useState(LOCATIONS[0]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(() => {
     const seen = localStorage.getItem("howItWorksSeen");
@@ -46,6 +46,13 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   const isPro = useAuthStore((s) => s.isPro);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Marie";
   const unreadNotifs = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
+
+  const storeLat = useLocationStore((s) => s.latitude);
+  const storeLng = useLocationStore((s) => s.longitude);
+  const neighborhood = useLocationStore((s) => s.neighborhood);
+  const locStatus = useLocationStore((s) => s.status);
+  const refreshLocation = useLocationStore((s) => s.refreshLocation);
+  const setNeighborhood = useLocationStore((s) => s.setNeighborhood);
 
   const activeMission = activeMissions.find(m => ["accepted", "en_route", "in_progress"].includes(m.status));
   const hasActiveJobs = !!activeMission;
@@ -88,25 +95,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
     }
   }, [searchQuery, nav]);
 
-  const LOCATION_COORDS: Record<string, { lat: number; lng: number }> = {
-    "Abidjan, Cocody": { lat: 5.360, lng: -4.008 },
-    "Abidjan, Plateau": { lat: 5.323, lng: -4.019 },
-    "Abidjan, Marcory": { lat: 5.310, lng: -3.999 },
-    "Abidjan, Yopougon": { lat: 5.350, lng: -4.083 },
-    "Abidjan, Treichville": { lat: 5.301, lng: -4.006 },
-  };
-
-  const userCoord = LOCATION_COORDS[location] || LOCATION_COORDS["Abidjan, Cocody"];
-
-  function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
-    const R = 6371;
-    const dLat = ((b.lat - a.lat) * Math.PI) / 180;
-    const dLng = ((b.lng - a.lng) * Math.PI) / 180;
-    const sinDLat = Math.sin(dLat / 2);
-    const sinDLng = Math.sin(dLng / 2);
-    const h = sinDLat * sinDLat + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinDLng * sinDLng;
-    return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
-  }
+  const userCoord = { lat: storeLat, lng: storeLng };
 
   const sortedByDistance = [...recommendedPros]
     .filter((p) => p.lat != null && p.lng != null)
@@ -174,7 +163,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               className="flex items-center gap-1.5 bg-cm-elevated border border-cm-border rounded-full px-3 h-8 text-[13px] font-medium text-cm-text cursor-pointer cm-scale-btn"
             >
               <MapPin className="w-3.5 h-3.5 text-cm-text-soft" />
-              <span className="truncate max-w-[100px] text-cm-text-soft">{location.split(",")[1]?.trim() || location.split(",")[0]}</span>
+              <span className="truncate max-w-[100px] text-cm-text-soft">{neighborhood}</span>
               <ChevronDown className="w-3 h-3 text-cm-text-soft" />
             </button>
             <button onClick={() => setShowNotifications(true)}
@@ -506,19 +495,32 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               </button>
             </div>
             <div className="space-y-1">
-              {LOCATIONS.map((loc) => (
-                <button key={loc} onClick={() => { setLocation(loc); setShowLocationPicker(false); }}
-                  className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${
-                    location === loc ? "bg-cm-accent-soft text-cm-accent" : "text-cm-text hover:bg-cm-accent-soft"
-                  }`}>
-                  <MapPin className={`w-4 h-4 ${location === loc ? "text-cm-accent" : "text-cm-text-muted"}`} />
-                  {loc}
-                </button>
-              ))}
+              {LOCATIONS.map((loc) => {
+                const hood = loc.split(",")[1].trim();
+                const isActive = neighborhood === hood;
+                return (
+                  <button key={loc} onClick={() => { setNeighborhood(hood); setShowLocationPicker(false); }}
+                    className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${
+                      isActive ? "bg-cm-accent-soft text-cm-accent" : "text-cm-text hover:bg-cm-accent-soft"
+                    }`}>
+                    <MapPin className={`w-4 h-4 ${isActive ? "text-cm-accent" : "text-cm-text-muted"}`} />
+                    <span className="flex-1">{loc}</span>
+                    {isActive && <span className="text-[10px] text-cm-accent font-semibold mr-1">✓</span>}
+                  </button>
+                );
+              })}
             </div>
-            <button className="w-full mt-4 py-3 bg-cm-accent-soft rounded-[12px] text-[13px] font-medium text-cm-accent flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all">
-              <MapPin className="w-4 h-4" /> Détecter ma position
-            </button>
+            {locStatus === "locating" ? (
+              <div className="w-full mt-4 py-3 bg-cm-accent-soft rounded-[12px] text-[13px] font-medium text-cm-accent flex items-center justify-center gap-2">
+                <div className="w-4 h-4 border-2 border-cm-accent border-t-transparent rounded-full animate-spin" />
+                Détection en cours...
+              </div>
+            ) : (
+              <button onClick={() => { refreshLocation(); setShowLocationPicker(false); }}
+                className="w-full mt-4 py-3 bg-cm-accent-soft rounded-[12px] text-[13px] font-medium text-cm-accent flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all">
+                <MapPin className="w-4 h-4" /> Détecter ma position
+              </button>
+            )}
           </div>
         </div>
       )}

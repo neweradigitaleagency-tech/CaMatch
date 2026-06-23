@@ -4,6 +4,7 @@ import { ArrowLeft, Send, Camera, MapPin, Navigation, ImagePlus, Phone, External
 import { Conversation, Message } from "../types";
 import ImageViewer from "./ImageViewer";
 import GlassCard from "./ui/GlassCard";
+import { useLocationStore } from "../stores/locationStore";
 
 interface MessagingScreenProps {
   conversations: Conversation[];
@@ -142,11 +143,18 @@ export function ChatScreen({
 
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length, otherUserTyping]);
 
-  const SAVED_LOCATIONS = [
-    { label: "Domicile", addr: "Cocody Riviera 3, Abidjan", lat: 5.36, lng: -4.02 },
-    { label: "Bureau", addr: "Plateau, Avenue Noguès, Abidjan", lat: 5.33, lng: -4.02 },
-    { label: "Parents", addr: "Marcory Zone 4, Abidjan", lat: 5.30, lng: -3.99 },
-  ];
+  const storeLat = useLocationStore((s) => s.latitude);
+  const storeLng = useLocationStore((s) => s.longitude);
+  const storeNeighborhood = useLocationStore((s) => s.neighborhood);
+  const refreshLocation = useLocationStore((s) => s.refreshLocation);
+  const locStatus = useLocationStore((s) => s.status);
+
+  const currentLocation = {
+    label: "Ma position",
+    addr: storeNeighborhood ? `${storeNeighborhood}, Abidjan` : "Cocody, Abidjan",
+    lat: storeLat,
+    lng: storeLng,
+  };
 
   const handleSend = () => { if (!text.trim()) return; onSendMessage(text); setText(""); };
 
@@ -316,23 +324,24 @@ export function ChatScreen({
             </div>
             <p className="text-[12px] text-cm-text-muted">Choisissez parmi vos adresses enregistrées</p>
             <div className="space-y-2">
-              {SAVED_LOCATIONS.map((loc, i) => (
-                <button key={i} onClick={() => { onSendLocation(); setShowLocations(false); }}
-                  className="w-full bg-cm-elevated border border-cm-border rounded-[16px] p-4 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform text-left shadow-cm-sm">
-                  <div className="w-10 h-10 rounded-[12px] bg-cm-accent-soft flex items-center justify-center">
-                    <MapPin className="w-4 h-4 text-cm-accent" />
-                  </div>
-                  <div>
-                    <p className="text-[13px] font-bold text-cm-text">{loc.label}</p>
-                    <p className="text-[11px] text-cm-text-muted">{loc.addr}</p>
-                  </div>
+              <button onClick={() => { onSendLocation(); setShowLocations(false); }}
+                className="w-full bg-cm-elevated border border-cm-accent/40 rounded-[16px] p-4 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform text-left shadow-cm-sm">
+                <div className="w-10 h-10 rounded-[12px] bg-cm-accent-soft flex items-center justify-center">
+                  <Navigation className="w-4 h-4 text-cm-accent" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[13px] font-bold text-cm-text">{currentLocation.label}</p>
+                  <p className="text-[11px] text-cm-text-muted">{currentLocation.addr}</p>
+                  <p className="text-[10px] text-cm-accent mt-0.5">
+                    {locStatus === "locating" ? "Détection..." : `${currentLocation.lat.toFixed(3)}, ${currentLocation.lng.toFixed(3)}`}
+                  </p>
+                </div>
+                <button onClick={(e) => { e.stopPropagation(); refreshLocation(); }}
+                  className="text-[10px] font-medium text-cm-accent border border-cm-accent rounded-full px-2.5 py-1 cursor-pointer shrink-0">
+                  Mettre à jour
                 </button>
-              ))}
+              </button>
             </div>
-            <button onClick={() => { onSendLocation(); setShowLocations(false); }}
-              className="w-full h-11 bg-cm-text rounded-[14px] text-[13px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer active:scale-95">
-              <MapPin className="w-3.5 h-3.5" /> Envoyer ma position actuelle
-            </button>
           </div>
         </div>
       )}

@@ -7,6 +7,7 @@ import BentoCard from "../components/ui/BentoCard";
 import VerifiedBadge from "../components/ui/VerifiedBadge";
 import { SERVICE_CATEGORIES, findBestMatch } from "../data/serviceCategories";
 import { MOCK_PROS } from "../services/mockData";
+import { useLocationStore, haversineKm } from "../stores/locationStore";
 import type { ProfessionalDetails } from "../types";
 
 const container = {
@@ -28,6 +29,10 @@ export default function SearchPage() {
   const [query, setQuery] = useState("");
   const [typedResults, setTypedResults] = useState<ProfessionalDetails[]>([]);
   const [searched, setSearched] = useState(!!subCategoryParam);
+  const [nearbyOnly, setNearbyOnly] = useState(false);
+
+  const storeLat = useLocationStore((s) => s.latitude);
+  const storeLng = useLocationStore((s) => s.longitude);
 
   const initialResults = useMemo(() => {
     if (subCategoryParam) {
@@ -41,6 +46,17 @@ export default function SearchPage() {
   }, [subCategoryParam]);
 
   const results = subCategoryParam && !query ? initialResults : typedResults;
+
+  const nearbyResults = useMemo(() => {
+    if (!nearbyOnly) return results;
+    return [...results]
+      .filter((p) => p.lat != null && p.lng != null)
+      .sort((a, b) => {
+        const dA = haversineKm({ lat: storeLat, lng: storeLng }, { lat: a.lat!, lng: a.lng! });
+        const dB = haversineKm({ lat: storeLat, lng: storeLng }, { lat: b.lat!, lng: b.lng! });
+        return dA - dB;
+      });
+  }, [results, nearbyOnly, storeLat, storeLng]);
 
   const featuredPros = useMemo(() => {
     let list = [...MOCK_PROS];
@@ -113,11 +129,19 @@ export default function SearchPage() {
           {searched ? (
             <motion.div key="results" variants={container} initial="hidden" animate="show" exit={{ opacity: 0 }}>
               {/* Results header */}
-              <div className="flex items-center justify-between mt-3 mb-2">
+              <div className="flex items-center gap-2 mt-3 mb-2">
                 <span className="text-[12px] text-cm-text-muted">
-                  {results.length} résultat{results.length !== 1 ? "s" : ""}
+                  {nearbyResults.length} résultat{nearbyResults.length !== 1 ? "s" : ""}
                   {subCategoryParam && !query ? ` - ${subCategoryParam}` : ""}
                 </span>
+                <button onClick={() => setNearbyOnly(!nearbyOnly)}
+                  className={`ml-auto text-[11px] font-medium flex items-center gap-1 px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
+                    nearbyOnly
+                      ? "bg-cm-accent-soft border-cm-accent text-cm-accent"
+                      : "bg-cm-elevated border-cm-border text-cm-text-muted hover:border-cm-accent"
+                  }`}>
+                  <MapPin className="w-3 h-3" /> À proximité
+                </button>
                 {query && (
                   <button onClick={() => { setQuery(""); setTypedResults([]); if (!subCategoryParam) setSearched(false); }}
                     className="text-[11px] font-medium text-cm-text-muted flex items-center gap-1 cursor-pointer">
@@ -126,7 +150,7 @@ export default function SearchPage() {
                 )}
               </div>
 
-              {results.length === 0 ? (
+              {nearbyResults.length === 0 ? (
                 <motion.div variants={itemAnim} className="text-center py-12">
                   <div className="w-14 h-14 rounded-[18px] bg-cm-border-soft border border-cm-border flex items-center justify-center mx-auto mb-3">
                     <Search className="w-6 h-6 text-cm-text-muted" />
@@ -136,7 +160,7 @@ export default function SearchPage() {
                 </motion.div>
               ) : (
                 <motion.div variants={container} className="grid grid-cols-2 gap-3 mt-1">
-                  {results.map((pro) => {
+                  {nearbyResults.map((pro) => {
                     const tier = getTier(pro.completedInterventions);
                     return (
                       <motion.div key={pro.id} variants={itemAnim}>
@@ -166,7 +190,9 @@ export default function SearchPage() {
                             <div className="flex items-center justify-between">
                               <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5 truncate">
                                 <MapPin className="w-2.5 h-2.5 shrink-0" />
-                                {pro.locationNeighborhood.split(",")[0]}
+                                {nearbyOnly && pro.lat != null
+                                  ? `${haversineKm({ lat: storeLat, lng: storeLng }, { lat: pro.lat, lng: pro.lng }).toFixed(1)} km`
+                                  : pro.locationNeighborhood.split(",")[0]}
                               </span>
                               <span className="text-[12px] font-bold text-cm-text font-mono">
                                 {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
@@ -205,9 +231,19 @@ export default function SearchPage() {
                   <h2 className="text-[14px] font-display font-bold text-cm-text">
                     {subCategoryParam ? `Pros ${subCategoryParam}` : "Pros à la une"}
                   </h2>
-                  <button onClick={() => nav("/explorer")} className="text-[11px] font-medium text-cm-accent cursor-pointer">
-                    Voir tout
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setNearbyOnly(!nearbyOnly)}
+                      className={`text-[11px] font-medium flex items-center gap-1 px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
+                        nearbyOnly
+                          ? "bg-cm-accent-soft border-cm-accent text-cm-accent"
+                          : "bg-cm-elevated border-cm-border text-cm-text-muted hover:border-cm-accent"
+                      }`}>
+                      <MapPin className="w-3 h-3" /> À proximité
+                    </button>
+                    <button onClick={() => nav("/explorer")} className="text-[11px] font-medium text-cm-accent cursor-pointer">
+                      Voir tout
+                    </button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   {featuredPros.map((pro) => {
@@ -239,7 +275,9 @@ export default function SearchPage() {
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5 truncate">
                               <MapPin className="w-2.5 h-2.5 shrink-0" />
-                              {pro.locationNeighborhood.split(",")[0]}
+                              {nearbyOnly && pro.lat != null
+                                ? `${haversineKm({ lat: storeLat, lng: storeLng }, { lat: pro.lat, lng: pro.lng }).toFixed(1)} km`
+                                : pro.locationNeighborhood.split(",")[0]}
                             </span>
                             <span className="text-[12px] font-bold text-cm-text font-mono">
                               {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
