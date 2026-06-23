@@ -114,8 +114,8 @@ export default function MissionTrackerScreen({
         <StatusBadge status={mission.status} className="text-[12px] h-7 px-3" />
       </div>
 
-      {/* Photos */}
-      {(mission.beforePhotos?.length > 0 || mission.afterPhotos?.length > 0) && (
+      {/* Photos — visible only at evaluation (reviewed) */}
+      {mission.status === "reviewed" && (mission.beforePhotos?.length > 0 || mission.afterPhotos?.length > 0) && (
         <div className="px-4 mb-3">
           <div className="border border-cm-border rounded-2xl bg-cm-elevated p-4 shadow-sm">
             <h4 className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-3 flex items-center gap-1.5">

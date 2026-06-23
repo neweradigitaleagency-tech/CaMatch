@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useChatStore } from "../stores/chatStore";
 import { useAuthStore } from "../stores/authStore";
@@ -34,6 +35,10 @@ export default function AppLayout() {
 
   const hideNavRoutes = ["/messages/", "/orders/new", "/orders/tracker/", "/profile/pro-", "/profile/edit", "/profile/security", "/profile/language", "/profile/terms", "/explorer/pro/", "/explorer/matching", "/explorer/request-creation", "/explorer/pro-selection", "/orders/qr-payment", "/orders/review", "/orders/invoice"];
   const showNav = !hideNavRoutes.some((r) => location.pathname.startsWith(r)) && location.pathname !== "/auth" && location.pathname !== "/onboarding";
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" as ScrollBehavior });
+  }, [location.pathname]);
 
   return (
     <div className={`min-h-screen ${""} text-cm-text flex flex-col font-sans max-w-md mx-auto relative shadow-2xl border-x border-cm-border overflow-x-hidden`} style={{ background: "#FAFAF9" }}>

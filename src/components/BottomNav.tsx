@@ -82,7 +82,7 @@ export default function BottomNav({ activeTab, onTabChange, unreadCount = 0, isP
   };
 
   return (
-    <nav className="sticky bottom-0 z-20 border-t border-cm-border bg-cm-elevated" aria-label="Navigation">
+    <nav className="fixed bottom-0 z-20 border-t border-cm-border bg-cm-elevated w-full max-w-md left-1/2 -translate-x-1/2" aria-label="Navigation">
       <div className="flex items-center justify-around px-2 pt-2 pb-[max(8px,env(safe-area-inset-bottom,8px))]">
         {items.map((item) => {
           const isActive = activeTab === item.id;

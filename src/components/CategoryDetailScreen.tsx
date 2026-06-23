@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, TrendingUp, Clock, Users } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { SERVICE_CATEGORIES } from "../data/serviceCategories";
 import { MOCK_PROS } from "../services/mockData";
 import BentoCard from "./ui/BentoCard";

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, X, Star, MapPin, Sparkles, Camera, Mic, ArrowLeft } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import GlassCard from "../components/ui/GlassCard";
 import BentoCard from "../components/ui/BentoCard";
 import VerifiedBadge from "../components/ui/VerifiedBadge";
