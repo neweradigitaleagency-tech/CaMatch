@@ -12,23 +12,26 @@ const notifs = [
 
 export default function ClientNotificationsScreen({ onBack }: ClientNotificationsScreenProps) {
   return (
-    <div className="flex flex-col w-full min-h-screen pb-32" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, rgba(216,243,220,0.90) 100%)" }}>
-        <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-[rgba(255,255,255,0.60)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.35)] cursor-pointer active:scale-90 transition-all"><ArrowLeft className="w-4 h-4 text-ca-text-primary" /></button>
-        <h1 className="text-[15px] font-bold text-ca-text-primary">Notifications</h1>
-        <button className="text-[11px] font-semibold text-ca-green-primary cursor-pointer">Tout lu</button>
+    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
+        <button onClick={onBack}
+          className="w-9 h-9 flex items-center justify-center rounded-[12px] border border-cm-border bg-cm-elevated cursor-pointer active:scale-90 transition-all">
+          <ArrowLeft className="w-4 h-4 text-cm-text" />
+        </button>
+        <h1 className="text-[15px] font-bold text-cm-text">Notifications</h1>
+        <button className="text-[11px] font-semibold text-cm-accent cursor-pointer">Tout lu</button>
       </header>
       <div className="px-4 pt-4 space-y-1">
         {notifs.map(n => (
-          <div key={n.id} className={`bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[16px] border ${n.unread ? "border-[rgba(45,106,79,0.30)]" : "border-[rgba(255,255,255,0.50)]"} p-4 flex items-center gap-3`}>
-            <div className={`w-9 h-9 rounded-[10px] ${n.unread ? "bg-[rgba(45,106,79,0.12)]" : "bg-[rgba(255,255,255,0.50)]"} flex items-center justify-center`}>
-              <n.icon className={`w-4 h-4 ${n.unread ? "text-ca-green-primary" : "text-ca-text-muted"}`} />
+          <div key={n.id} className={`bg-cm-elevated border rounded-[16px] p-4 flex items-center gap-3 shadow-cm-sm ${n.unread ? "border-cm-accent" : "border-cm-border"}`}>
+            <div className={`w-9 h-9 rounded-[10px] ${n.unread ? "bg-cm-accent-soft" : "bg-cm-border-soft"} flex items-center justify-center`}>
+              <n.icon className={`w-4 h-4 ${n.unread ? "text-cm-accent" : "text-cm-text-muted"}`} />
             </div>
             <div className="flex-1">
-              <p className="text-[13px] font-bold text-ca-text-primary">{n.text}</p>
-              <p className="text-[11px] text-ca-text-muted mt-0.5">{n.time}</p>
+              <p className="text-[13px] font-bold text-cm-text">{n.text}</p>
+              <p className="text-[11px] text-cm-text-muted mt-0.5">{n.time}</p>
             </div>
-            {n.unread && <div className="w-2 h-2 rounded-full bg-ca-green-primary shrink-0" />}
+            {n.unread && <div className="w-2 h-2 rounded-full bg-cm-accent shrink-0" />}
           </div>
         ))}
       </div>

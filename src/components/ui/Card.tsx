@@ -22,8 +22,8 @@ export default function Card({
 }: CardProps) {
   return (
     <div
-      className={`bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] border border-[rgba(255,255,255,0.35)] rounded-[20px] shadow-[0_8px_32px_rgba(45,106,79,0.10)] ${paddings[padding]} ${
-        interactive ? "hover:scale-[1.02] hover:shadow-[0_12px_48px_rgba(45,106,79,0.15)] active:scale-[0.98] transition-all duration-200 cursor-pointer" : ""
+      className={`bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] ${paddings[padding]} ${
+        interactive ? "cm-scale-btn cursor-pointer hover:border-cm-accent/30" : ""
       } ${className}`}
       {...props}
     >

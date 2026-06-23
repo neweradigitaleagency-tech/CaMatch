@@ -2,7 +2,6 @@ import { useState, type ComponentType } from "react";
 import { ChevronRight, User, CreditCard, MapPin, Settings, Bell, HelpCircle, Camera } from "lucide-react";
 import ImageViewer from "./ImageViewer";
 import { Toggle } from "./ui";
-import GlassCard from "./ui/GlassCard";
 
 interface ClientProfileScreenProps {
   clientName: string;
@@ -53,15 +52,17 @@ export default function ClientProfileScreen({
   ];
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-32" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
-      <div className="px-4 pt-5 pb-3">
-        <h1 className="text-[18px] font-bold text-ca-text-primary">Paramètres du compte</h1>
+    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+      {/* Header */}
+      <div className="px-4 pt-4 pb-3">
+        <h1 className="text-[18px] font-display font-bold text-cm-text">Paramètres du compte</h1>
       </div>
 
+      {/* Avatar card */}
       <div className="mx-4 mb-6">
-        <GlassCard className="p-4 flex items-center gap-3">
+        <div className="border border-cm-border rounded-[14px] bg-cm-elevated p-4 shadow-cm-sm flex items-center gap-3">
           <div className="relative group cursor-pointer shrink-0" onClick={handleAvatarClick}>
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-ca-green-light">
+            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-cm-border-soft">
               <img alt={clientName} className="w-full h-full object-cover" referrerPolicy="no-referrer" src={currentAvatar} />
             </div>
             {onChangeAvatar && (
@@ -71,52 +72,54 @@ export default function ClientProfileScreen({
             )}
           </div>
           <div className="flex-1">
-            <h2 className="text-[16px] font-bold text-ca-text-primary">{clientName}</h2>
-            <p className="text-[12px] text-ca-text-muted">{clientTag}</p>
+            <h2 className="text-[16px] font-bold text-cm-text">{clientName}</h2>
+            <p className="text-[12px] text-cm-text-muted">{clientTag}</p>
           </div>
-        </GlassCard>
+        </div>
       </div>
 
+      {/* General section */}
       <div className="mx-4 mb-6">
-        <p className="text-[11px] font-medium text-ca-text-muted uppercase tracking-wider mb-2 px-1">Général</p>
-        <GlassCard className="!p-0 overflow-hidden">
+        <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider mb-2 px-1">Général</p>
+        <div className="border border-cm-border rounded-[14px] bg-cm-elevated overflow-hidden shadow-cm-sm">
           {generalItems.map((item, i) => (
             <div key={item.id} onClick={() => openNavigateTo(item.id)}
-              className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-[rgba(255,255,255,0.50)] transition-colors ${
-                i < generalItems.length - 1 ? "border-b border-[rgba(232,224,208,0.30)]" : ""
+              className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-cm-accent-soft transition-colors ${
+                i < generalItems.length - 1 ? "border-b border-cm-border" : ""
               }`}>
-              <div className="w-9 h-9 rounded-[12px] bg-[rgba(255,255,255,0.50)] flex items-center justify-center shrink-0">
-                <item.icon className="w-4 h-4 text-ca-text-primary" />
+              <div className="w-9 h-9 rounded-[10px] bg-cm-accent-soft flex items-center justify-center shrink-0">
+                <item.icon className="w-4 h-4 text-cm-accent" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-ca-text-primary">{item.label}</p>
-                <p className="text-[11px] text-ca-text-muted mt-0.5">{item.desc}</p>
+                <p className="text-[13px] font-bold text-cm-text">{item.label}</p>
+                <p className="text-[11px] text-cm-text-muted mt-0.5">{item.desc}</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-ca-text-muted shrink-0" />
+              <ChevronRight className="w-4 h-4 text-cm-text-muted shrink-0" />
             </div>
           ))}
-        </GlassCard>
+        </div>
       </div>
 
+      {/* Preferences section */}
       <div className="mx-4 mb-6">
-        <p className="text-[11px] font-medium text-ca-text-muted uppercase tracking-wider mb-2 px-1">Préférences</p>
-        <GlassCard className="!p-0 overflow-hidden">
+        <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider mb-2 px-1">Préférences</p>
+        <div className="border border-cm-border rounded-[14px] bg-cm-elevated overflow-hidden shadow-cm-sm">
           {prefItems.map((item, i) => (
             <div key={item.id} onClick={() => { if (!item.toggle) { item.id === "settings" ? onOpenSettings() : openNavigateTo(item.id); } }}
-              className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-[rgba(255,255,255,0.50)] transition-colors ${
-                i < prefItems.length - 1 ? "border-b border-[rgba(232,224,208,0.30)]" : ""
+              className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-cm-accent-soft transition-colors ${
+                i < prefItems.length - 1 ? "border-b border-cm-border" : ""
               }`}>
-              <div className="w-9 h-9 rounded-[12px] bg-[rgba(255,255,255,0.50)] flex items-center justify-center shrink-0">
-                <item.icon className="w-4 h-4 text-ca-text-primary" />
+              <div className="w-9 h-9 rounded-[10px] bg-cm-accent-soft flex items-center justify-center shrink-0">
+                <item.icon className="w-4 h-4 text-cm-accent" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[13px] font-bold text-ca-text-primary">{item.label}</p>
-                <p className="text-[11px] text-ca-text-muted mt-0.5">{item.desc}</p>
+                <p className="text-[13px] font-bold text-cm-text">{item.label}</p>
+                <p className="text-[11px] text-cm-text-muted mt-0.5">{item.desc}</p>
               </div>
-              {item.toggle ? <Toggle enabled={notifEnabled} onChange={setNotifEnabled} /> : <ChevronRight className="w-4 h-4 text-ca-text-muted shrink-0" />}
+              {item.toggle ? <Toggle enabled={notifEnabled} onChange={setNotifEnabled} /> : <ChevronRight className="w-4 h-4 text-cm-text-muted shrink-0" />}
             </div>
           ))}
-        </GlassCard>
+        </div>
       </div>
 
       <ImageViewer images={[{ url: currentAvatar, title: clientName }]} initialIndex={0} open={avatarViewOpen} onClose={() => setAvatarViewOpen(false)} />

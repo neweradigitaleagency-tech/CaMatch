@@ -23,8 +23,13 @@ export interface User {
 
 // ─── Pro ───
 
+export type ProCategory =
+  | "maison-reparations" | "transport-livraison" | "evenements"
+  | "education-formation" | "social-media-informatique" | "assistance-services";
+
 export interface ProfessionalDetails extends User {
-  category: "electricity" | "plumbing" | "ac" | "carpenter";
+  category: ProCategory;
+  subCategory: string;
   title: string;
   bio: string;
   experienceYears: number;
@@ -460,6 +465,65 @@ export interface FaqItem {
   question: string;
   answer: string;
   category: string;
+}
+
+// ─── Pipeline Tracking ───
+
+export type ServiceStatus = 'EN_ROUTE' | 'SUR_PLACE' | 'TERMINE';
+
+export interface TrackingData {
+  status: ServiceStatus;
+  proName: string;
+  proPhoto: string;
+  proPhone: string;
+  estimatedArrival: string;
+  proCoordinates: { lat: number; lng: number };
+}
+
+// ─── Invoice ───
+
+export interface Invoice {
+  id: string;
+  missionId: string;
+  clientId: string;
+  proId: string;
+  clientName: string;
+  proName: string;
+  category: string;
+  address: string;
+  reason: string;
+  laborCostXOF: number;
+  materialsCostXOF: number;
+  travelCostXOF: number;
+  totalXOF: number;
+  commissionPercent: number;
+  commissionXOF: number;
+  proAmountXOF: number;
+  beforePhotos: string[];
+  afterPhotos: string[];
+  clientRating?: number;
+  clientComment?: string;
+  createdAt: string;
+  paidAt?: string;
+}
+
+// ─── In-App Call ───
+
+export type CallStatus = "ringing" | "connecting" | "connected" | "ended";
+
+export interface CallSession {
+  id: string;
+  callerId: string;
+  calleeId: string;
+  callerName: string;
+  callerAvatar: string;
+  calleeName: string;
+  calleeAvatar: string;
+  status: CallStatus;
+  durationMs: number;
+  startedAt: string;
+  endedAt?: string;
+  isIncoming: boolean;
 }
 
 // ─── Onboarding ───

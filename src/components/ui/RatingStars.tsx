@@ -42,10 +42,10 @@ export default function RatingStars({
                 size={size}
                 className={`transition-all duration-150 ${
                   filled
-                    ? "fill-ca-warning text-ca-warning"
+                    ? "fill-cm-accent text-cm-accent"
                     : half
-                    ? "fill-ca-warning/50 text-ca-warning"
-                    : "fill-[rgba(232,224,208,0.50)] text-[rgba(232,224,208,0.50)]"
+                    ? "fill-cm-accent/50 text-cm-accent"
+                    : "fill-cm-border-soft text-cm-border-soft"
                 }`}
               />
             </button>
@@ -53,12 +53,12 @@ export default function RatingStars({
         })}
       </div>
       {showValue && (
-        <span className="text-[13px] font-semibold text-ca-text-primary ml-1">
+        <span className="text-[13px] font-semibold text-cm-text ml-1">
           {displayRating.toFixed(1)}
         </span>
       )}
       {reviewCount !== undefined && (
-        <span className="text-[12px] text-ca-text-muted ml-0.5">
+        <span className="text-[12px] text-cm-text-muted ml-0.5">
           ({reviewCount})
         </span>
       )}

@@ -13,8 +13,8 @@ export default function Toggle({ enabled, onChange, id }: ToggleProps) {
       onClick={() => onChange(!enabled)}
       className={`relative w-12 h-7 rounded-full transition-colors border-2 cursor-pointer shrink-0 ${
         enabled
-          ? "bg-cm-green border-cm-green"
-          : "bg-pale-mint/50 border-pale-mint"
+          ? "bg-cm-accent border-cm-accent"
+          : "bg-cm-border-soft border-cm-border"
       }`}
     >
       <div

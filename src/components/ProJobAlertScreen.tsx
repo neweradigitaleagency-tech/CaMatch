@@ -60,7 +60,7 @@ export default function ProJobAlertScreen({
       ? "text-red-400"
       : alert.urgency === "high"
       ? "text-amber-400"
-      : "text-brand-lime";
+      : "text-cm-accent";
 
   const urgencyLabel =
     alert.urgency === "emergency"
@@ -75,12 +75,12 @@ export default function ProJobAlertScreen({
         key="accepted"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="fixed inset-0 z-50 bg-brand-forest flex flex-col items-center justify-center px-8"
+        className="fixed inset-0 z-50 bg-cm-text flex flex-col items-center justify-center px-8"
       >
-        <div className="w-20 h-20 rounded-full bg-brand-lime flex items-center justify-center mb-6">
-          <Check className="w-10 h-10 text-brand-forest" />
+        <div className="w-20 h-20 rounded-full bg-cm-accent flex items-center justify-center mb-6">
+          <Check className="w-10 h-10 text-white" />
         </div>
-        <h2 className="text-white text-2xl font-extrabold mb-2 text-center">
+        <h2 className="text-white text-2xl font-display font-bold mb-2 text-center">
           Mission Acceptée !
         </h2>
         <p className="text-white/60 text-sm text-center">
@@ -102,45 +102,43 @@ export default function ProJobAlertScreen({
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="w-full max-w-md bg-brand-cream rounded-t-4xl sm:rounded-3xl p-6 pb-10 space-y-5 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md bg-cm-bg rounded-t-4xl sm:rounded-3xl p-6 pb-10 space-y-5 max-h-[90vh] overflow-y-auto"
       >
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              alert.urgency === "emergency" ? "bg-red-100 animate-pulse" : "bg-brand-lime/20"
+              alert.urgency === "emergency" ? "bg-red-100 animate-pulse" : "bg-cm-accent-soft"
             }`}>
               <Bell className={`w-5 h-5 ${
-                alert.urgency === "emergency" ? "text-red-500" : "text-brand-forest"
+                alert.urgency === "emergency" ? "text-red-500" : "text-cm-accent"
               }`} />
             </div>
             <div>
-              <p className={`text-caption font-extrabold uppercase tracking-wider ${urgencyColor}`}>
+              <p className={`text-[11px] font-display font-bold uppercase tracking-wider ${urgencyColor}`}>
                 {urgencyLabel}
               </p>
-              <h2 className="text-lg font-extrabold text-brand-forest">
+              <h2 className="text-lg font-display font-bold text-cm-text">
                 {alert.clientName}
               </h2>
             </div>
           </div>
           <button
             onClick={onDismiss}
-            className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm cursor-pointer"
+            className="w-12 h-12 rounded-full bg-cm-elevated flex items-center justify-center border border-cm-border cursor-pointer active:scale-95"
           >
-            <X className="w-5 h-5 text-secondary" />
+            <X className="w-5 h-5 text-cm-text-soft" />
           </button>
         </div>
 
-        {/* Timer */}
-        <div className="bg-brand-forest text-white p-4 rounded-2xl flex items-center justify-between">
+        <div className="bg-cm-text text-white p-4 rounded-2xl flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Clock className="w-5 h-5 text-brand-lime" />
-            <span className="text-xs font-bold uppercase tracking-wider">
+            <Clock className="w-5 h-5 text-cm-accent" />
+            <span className="text-xs font-display font-bold uppercase tracking-wider">
               Temps restant
             </span>
           </div>
           <span
-            className={`text-2xl font-extrabold font-mono ${
+            className={`text-2xl font-display font-bold font-mono ${
               countdown <= 30
                 ? "text-red-400"
                 : countdown <= 60
@@ -152,58 +150,52 @@ export default function ProJobAlertScreen({
           </span>
         </div>
 
-        {/* Description */}
-        <div className="bg-white p-4 rounded-2xl space-y-3">
+        <div className="bg-cm-elevated p-4 rounded-2xl border border-cm-border space-y-3">
           <div>
-            <p className="text-caption font-medium text-secondary uppercase tracking-wider mb-1">
+            <p className="text-[11px] font-medium text-cm-text-soft uppercase tracking-wider mb-1">
               Description
             </p>
-            <p className="text-sm font-medium leading-relaxed">
+            <p className="text-sm font-medium text-cm-text leading-relaxed">
               {alert.description}
             </p>
           </div>
 
-          <div className="flex items-center gap-3 text-xs text-secondary">
+          <div className="flex items-center gap-3 text-xs text-cm-text-soft">
             <span className="flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5" /> {alert.location}
-            </span>
-            <span className="flex items-center gap-1">
-              <Phone className="w-3.5 h-3.5" /> {alert.clientPhone}
             </span>
           </div>
 
           {alert.urgency === "emergency" && (
             <div className="flex items-center gap-2 bg-red-50 p-3 rounded-xl">
               <AlertTriangle className="w-4 h-4 text-red-500 shrink-0" />
-              <p className="text-caption text-red-600 font-bold">
+              <p className="text-[11px] text-red-600 font-bold">
                 Urgence signalée par le client — intervention prioritaire
               </p>
             </div>
           )}
         </div>
 
-        {/* Price */}
-        <div className="bg-white p-4 rounded-2xl flex items-center justify-between">
-          <span className="text-xs font-bold text-secondary uppercase tracking-wider">
+        <div className="bg-cm-elevated p-4 rounded-2xl border border-cm-border flex items-center justify-between">
+          <span className="text-xs font-bold text-cm-text-soft uppercase tracking-wider">
             Estimation
           </span>
-          <span className="text-lg font-extrabold text-brand-forest">
+          <span className="text-lg font-display font-bold text-cm-text font-mono">
             {alert.estimatedPriceMinXOF.toLocaleString()} -{" "}
             {alert.estimatedPriceMaxXOF.toLocaleString()} F
           </span>
         </div>
 
-        {/* Actions */}
         <div className="flex gap-3">
           <button
             onClick={handleDecline}
-            className="flex-1 py-4 rounded-2xl border-2 border-red-200 text-red-600 font-extrabold text-sm uppercase tracking-wider hover:bg-red-50 transition-all active:scale-95 cursor-pointer"
+            className="flex-1 py-4 rounded-2xl border-2 border-cm-border text-cm-text-soft font-display font-bold text-sm uppercase tracking-wider hover:bg-cm-accent-soft transition-all active:scale-95 cursor-pointer"
           >
             Refuser
           </button>
           <button
             onClick={handleAccept}
-            className="flex-1 py-4 rounded-2xl bg-brand-lime text-brand-forest font-extrabold text-sm uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 cursor-pointer"
+            className="flex-1 py-4 rounded-2xl bg-cm-text text-cm-bg font-display font-bold text-sm uppercase tracking-wider hover:opacity-90 transition-all active:scale-95 cursor-pointer"
           >
             Accepter
           </button>

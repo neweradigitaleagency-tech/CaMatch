@@ -1,333 +1,276 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, X, Filter, Camera, Star, MapPin, ChevronRight, SlidersHorizontal, ArrowUpDown } from "lucide-react";
-import { usePros } from "../hooks/useDatabase";
-import { ProCardSkeleton } from "../components/ui/Skeleton";
-import MapView from "../components/ui/MapView";
+import { useState, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Search, X, Star, MapPin, Sparkles, Camera, Mic, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import GlassCard from "../components/ui/GlassCard";
-import GlassButton from "../components/ui/GlassButton";
+import BentoCard from "../components/ui/BentoCard";
 import VerifiedBadge from "../components/ui/VerifiedBadge";
+import { SERVICE_CATEGORIES, findBestMatch } from "../data/serviceCategories";
+import { MOCK_PROS } from "../services/mockData";
 import type { ProfessionalDetails } from "../types";
 
-type SortOption = "recommended" | "closest" | "highest_rated" | "most_active";
+const container = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.04 } },
+};
+
+const itemAnim = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 260, damping: 24 } },
+};
 
 export default function SearchPage() {
   const nav = useNavigate();
-  const { data: pros = [] } = usePros();
+  const [searchParams] = useSearchParams();
+  const subCategoryParam = searchParams.get("subCategory");
+  const categoryParam = searchParams.get("category");
 
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<ProfessionalDetails[]>([]);
-  const [searched, setSearched] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [mapView, setMapView] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
-  const [showSort, setShowSort] = useState(false);
-  const [sortBy, setSortBy] = useState<SortOption>("recommended");
-  const [filters, setFilters] = useState({ minRating: 0, maxPrice: 100000, maxDistance: 30, verifiedOnly: false });
-  const [pendingFilters, setPendingFilters] = useState(filters);
-  const cameraRef = useRef<HTMLInputElement>(null);
+  const [typedResults, setTypedResults] = useState<ProfessionalDetails[]>([]);
+  const [searched, setSearched] = useState(!!subCategoryParam);
+
+  const initialResults = useMemo(() => {
+    if (subCategoryParam) {
+      const q = subCategoryParam.toLowerCase();
+      return MOCK_PROS.filter(p =>
+        p.subCategory.toLowerCase().includes(q) ||
+        p.title.toLowerCase().includes(q)
+      );
+    }
+    return [];
+  }, [subCategoryParam]);
+
+  const results = subCategoryParam && !query ? initialResults : typedResults;
+
+  const featuredPros = useMemo(() => {
+    let list = [...MOCK_PROS];
+    if (subCategoryParam) {
+      list = list.filter(p => p.subCategory === subCategoryParam);
+    }
+    return list.sort((a, b) => b.rating - a.rating).slice(0, 8);
+  }, [subCategoryParam]);
 
   const handleSearch = (val: string) => {
     setQuery(val);
-    if (val.length < 2) { setResults([]); setSearched(false); return; }
-    setLoading(true);
+    if (val.length < 2) {
+      if (!subCategoryParam) { setTypedResults([]); setSearched(false); }
+      return;
+    }
     setSearched(true);
     const q = val.toLowerCase();
-    let filtered = pros.filter((pro) =>
-      pro.name.toLowerCase().includes(q) ||
-      pro.title.toLowerCase().includes(q) ||
-      pro.locationNeighborhood.toLowerCase().includes(q)
-    ).filter((pro) => pro.rating / 10 >= filters.minRating)
-     .filter((pro) => pro.hourlyRateXOF <= filters.maxPrice);
-    if (filters.verifiedOnly) filtered = filtered.filter((p) => p.isVerified);
-    filtered = sortResults(filtered, sortBy);
-    setTimeout(() => { setResults(filtered); setLoading(false); }, 300);
-  };
-
-  const sortResults = (list: ProfessionalDetails[], sort: SortOption): ProfessionalDetails[] => {
-    switch (sort) {
-      case "closest": return [...list];
-      case "highest_rated": return [...list].sort((a, b) => b.rating - a.rating);
-      case "most_active": return [...list].sort((a, b) => b.completedInterventions - a.completedInterventions);
-      default: return list;
-    }
-  };
-
-  const applyFiltersAndSearch = () => {
-    setFilters(pendingFilters);
-    setShowFilters(false);
-    if (query.length >= 2) {
-      setLoading(true);
-      setSearched(true);
-      const q = query.toLowerCase();
-      let filtered = pros.filter((pro) =>
-        pro.name.toLowerCase().includes(q) ||
-        pro.title.toLowerCase().includes(q) ||
-        pro.locationNeighborhood.toLowerCase().includes(q)
-      ).filter((pro) => (pro.rating / 10) >= pendingFilters.minRating)
-       .filter((pro) => pro.hourlyRateXOF <= pendingFilters.maxPrice);
-      if (pendingFilters.verifiedOnly) filtered = filtered.filter((p) => p.isVerified);
-      filtered = sortResults(filtered, sortBy);
-      setTimeout(() => { setResults(filtered); setLoading(false); }, 300);
-    }
+    const match = findBestMatch(val);
+    const filtered = MOCK_PROS.filter((pro) => {
+      const nameMatch = pro.name.toLowerCase().includes(q);
+      const titleMatch = pro.title.toLowerCase().includes(q);
+      const locationMatch = pro.locationNeighborhood.toLowerCase().includes(q);
+      const subMatch = match && (
+        pro.title.toLowerCase().includes(match.subName.toLowerCase()) ||
+        pro.subCategory.toLowerCase().includes(match.subName.toLowerCase())
+      );
+      return nameMatch || titleMatch || locationMatch || subMatch;
+    });
+    setTypedResults(filtered);
   };
 
   const getTier = (completed: number) => {
-    if (completed >= 120) return { label: "Expert", color: "text-[#B8632E]", bg: "bg-[rgba(244,162,97,0.20)]" };
-    if (completed >= 60) return { label: "Avancé", color: "text-ca-text-secondary", bg: "bg-[rgba(255,255,255,0.50)]" };
-    return { label: "Débutant", color: "text-ca-error", bg: "bg-[rgba(230,57,70,0.10)]" };
+    if (completed >= 120) return { label: "Expert", color: "text-cm-accent", bg: "bg-cm-accent-soft" };
+    if (completed >= 60) return { label: "Avancé", color: "text-cm-text-soft", bg: "bg-cm-border-soft" };
+    return { label: "Débutant", color: "text-cm-text-muted", bg: "bg-cm-border-soft" };
   };
 
-  const sortOptions: { value: SortOption; label: string }[] = [
-    { value: "recommended", label: "Recommandés" },
-    { value: "closest", label: "Proches" },
-    { value: "highest_rated", label: "Mieux notés" },
-    { value: "most_active", label: "Plus actifs" },
-  ];
-
   return (
-    <div className="flex flex-col w-full pb-24 min-h-screen" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
-      {/* Search Header */}
-      <div className="px-4 pt-4 pb-3 sticky top-0 z-10" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, transparent 100%)" }}>
-        <h1 className="text-[22px] font-extrabold text-ca-text-primary mb-3">Rechercher un pro</h1>
-        <div className="relative w-full">
-          <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-            <Search className="w-4 h-4 text-ca-green-light" />
-          </div>
-          <input
-            type="text" autoFocus
-            className="w-full h-12 pl-10 pr-16 text-[14px] bg-[rgba(255,255,255,0.55)] backdrop-blur-[12px] border border-[rgba(255,255,255,0.40)] rounded-[14px] outline-none transition-all duration-200 text-ca-text-primary placeholder-ca-text-muted focus:bg-[rgba(255,255,255,0.75)] focus:border-[rgba(82,183,136,0.40)]"
-            placeholder="Plombier, électricien, menuisier..."
-            value={query}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-          <div className="absolute inset-y-0 right-2 flex items-center gap-0.5">
-            <button onClick={() => { setPendingFilters(filters); setShowFilters(true); }}
-              className="w-10 h-10 rounded-[10px] hover:bg-white/40 flex items-center justify-center text-ca-text-muted cursor-pointer">
-              <Filter className="w-4 h-4" />
-            </button>
-            <button onClick={() => cameraRef.current?.click()}
-              className="w-10 h-10 rounded-[10px] hover:bg-white/40 flex items-center justify-center text-ca-text-muted cursor-pointer">
-              <Camera className="w-4 h-4" />
-            </button>
-            <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" />
-          </div>
-        </div>
-      </div>
-
-      {/* Results */}
-      <div className="px-4">
-        {query.length >= 2 && (
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[12px] text-ca-text-muted">
-              {loading ? "Recherche..." : `${results.length} résultat(s) pour "${query}"`}
-            </p>
-            <button onClick={() => { setQuery(""); setResults([]); setSearched(false); }}
-              className="text-[11px] font-medium text-ca-text-muted flex items-center gap-0.5 cursor-pointer">
-              <X className="w-3 h-3" /> Effacer
-            </button>
-          </div>
-        )}
-
-        {!searched && !loading && (
-          <div className="pt-8 text-center animate-fade-in">
-            <div className="w-16 h-16 rounded-[20px] bg-[rgba(82,183,136,0.15)] backdrop-blur-[8px] border border-[rgba(82,183,136,0.25)] flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-ca-text-muted" />
-            </div>
-            <p className="text-[15px] font-bold text-ca-text-primary mb-1">Que cherchez-vous ?</p>
-            <p className="text-[12px] text-ca-text-muted">Tapez un métier, un nom ou un lieu</p>
-          </div>
-        )}
-
-        {searched && !loading && results.length === 0 && query.length >= 2 && (
-          <GlassCard className="p-6 text-center">
-            <Search className="w-8 h-8 text-ca-text-muted mx-auto mb-2" />
-            <p className="text-[14px] font-bold text-ca-text-primary mb-1">Aucun résultat</p>
-            <p className="text-[12px] text-ca-text-muted">Essayez d'autres mots-clés</p>
-          </GlassCard>
-        )}
-
-        {loading && (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => <ProCardSkeleton key={i} />)}
-          </div>
-        )}
-
-        {!loading && results.length > 0 && (
-          <>
-            {/* Filter & Sort bar */}
-            <div className="flex items-center gap-2 mb-3 overflow-x-auto no-scrollbar">
-              <button onClick={() => { setPendingFilters(filters); setShowFilters(true); }}
-                className="inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium bg-[rgba(255,255,255,0.55)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.35)] rounded-[12px] cursor-pointer active:scale-95 whitespace-nowrap">
-                <SlidersHorizontal className="w-3 h-3" /> Filtres
+    <div className="min-h-screen bg-cm-bg pb-24">
+      {/* Sticky Search Header */}
+      <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
+        <div className="px-4 pt-3 pb-3">
+          <div className="flex items-center gap-2 mb-2">
+            {subCategoryParam && (
+              <button onClick={() => nav(-1)}
+                className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer shrink-0">
+                <ArrowLeft className="w-4 h-4 text-cm-text" />
               </button>
-              <button onClick={() => setShowSort(true)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 text-[11px] font-medium bg-[rgba(255,255,255,0.55)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.35)] rounded-[12px] cursor-pointer active:scale-95 whitespace-nowrap">
-                <ArrowUpDown className="w-3 h-3" /> {sortOptions.find(o => o.value === sortBy)?.label || "Tri"}
-              </button>
-              <button onClick={() => setMapView((p) => !p)}
-                className={`text-[11px] font-medium px-3 py-1.5 rounded-[12px] transition-all cursor-pointer whitespace-nowrap ${mapView ? "bg-ca-green-primary text-white" : "bg-[rgba(255,255,255,0.55)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.35)] text-ca-text-primary"}`}>
-                {mapView ? "Liste" : "🗺️ Carte"}
-              </button>
-              <span className="text-[11px] text-ca-text-muted whitespace-nowrap">{results.length} pros</span>
-            </div>
-
-            {mapView ? (
-              <div className="rounded-[16px] overflow-hidden border border-[rgba(255,255,255,0.35)] shadow-[0_8px_32px_rgba(45,106,79,0.10)]">
-                <MapView
-                  markers={results.map((pro) => ({
-                    id: pro.id, lat: pro.lat, lng: pro.lng,
-                    label: `${pro.name} - ${pro.hourlyRateXOF.toLocaleString("fr-FR")} F`,
-                  }))}
-                  onMarkerClick={(id) => { const p = results.find((r) => r.id === id); if (p) nav(`/explorer/pro/${p.id}`); }}
-                  height="h-[500px]" interactive
-                />
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {results.map((pro) => {
-                  const tier = getTier(pro.completedInterventions);
-                  return (
-                    <GlassCard key={pro.id} interactive onClick={() => nav(`/explorer/pro/${pro.id}`)} className="flex items-center gap-3 p-3">
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[rgba(82,183,136,0.30)] shrink-0">
-                        <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <h4 className="text-[14px] font-bold text-ca-text-primary truncate">{pro.name}</h4>
-                          {pro.isVerified && <VerifiedBadge />}
-                          <span className={`text-[11px] font-medium px-1.5 py-0.5 rounded-[9999px] ${tier.bg} ${tier.color}`}>{tier.label}</span>
-                        </div>
-                        <p className="text-[12px] text-ca-text-secondary truncate">{pro.title}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-[12px] text-ca-text-muted flex items-center gap-0.5">
-                            <Star className="w-3 h-3 fill-ca-warning text-ca-warning" />{(pro.rating / 10).toFixed(1)}
-                          </span>
-                          <span className="text-[12px] text-ca-text-muted flex items-center gap-0.5">
-                            <MapPin className="w-3 h-3" />{pro.locationNeighborhood.split(",")[0]}
-                          </span>
-                          <span className="text-[12px] font-bold text-ca-text-primary ml-auto">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F</span>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-ca-text-muted shrink-0" />
-                    </GlassCard>
-                  );
-                })}
-              </div>
             )}
-          </>
-        )}
+          </div>
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted pointer-events-none" />
+            <input
+              type="text"
+              autoFocus={!subCategoryParam}
+              className="w-full h-11 pl-9 pr-10 text-[13px] bg-cm-elevated border border-cm-border rounded-[14px] outline-none transition-all text-cm-text placeholder-cm-text-muted focus:border-cm-accent"
+              placeholder="Plombier, électricien..."
+              value={query}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+            <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+              <button className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[10px] hover:bg-cm-accent-soft text-cm-text-muted cursor-pointer">
+                <Mic className="w-3.5 h-3.5" />
+              </button>
+              <button className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[10px] hover:bg-cm-accent-soft text-cm-text-muted cursor-pointer">
+                <Camera className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Sort Bottom Sheet */}
-      {showSort && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setShowSort(false)}>
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md bg-[rgba(255,255,255,0.85)] backdrop-blur-[24px] rounded-t-[24px] p-5 pb-10 animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[15px] font-bold text-ca-text-primary">Trier par</h3>
-              <button onClick={() => setShowSort(false)} className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.60)] backdrop-blur-[4px] flex items-center justify-center cursor-pointer">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="space-y-1">
-              {sortOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  onClick={() => { setSortBy(opt.value); setShowSort(false); }}
-                  className={`w-full py-3.5 px-4 rounded-[14px] text-[13px] font-semibold text-left transition-all cursor-pointer ${
-                    sortBy === opt.value
-                      ? "bg-[rgba(45,106,79,0.10)] text-ca-green-primary"
-                      : "text-ca-text-primary hover:bg-[rgba(255,255,255,0.50)]"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Filter Sheet */}
-      {showFilters && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setShowFilters(false)}>
-          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-          <div className="relative w-full max-w-md bg-[rgba(255,255,255,0.85)] backdrop-blur-[24px] rounded-t-[24px] p-5 pb-10 space-y-4 animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between">
-              <h3 className="text-[15px] font-bold text-ca-text-primary">Filtres</h3>
-              <button onClick={() => setShowFilters(false)} className="w-10 h-10 rounded-full bg-[rgba(255,255,255,0.60)] backdrop-blur-[4px] flex items-center justify-center cursor-pointer">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Catégorie */}
-            <div>
-              <p className="text-[11px] font-medium text-ca-text-secondary uppercase tracking-wider mb-2">Catégorie</p>
-              <div className="flex gap-2 overflow-x-auto no-scrollbar">
-                {["Tous", "Plomberie", "Électricité", "Climatisation", "Menuiserie"].map((c) => (
-                  <button key={c} className="px-3 py-1.5 rounded-[9999px] text-[11px] font-medium bg-[rgba(255,255,255,0.55)] backdrop-blur-[4px] border border-[rgba(255,255,255,0.35)] cursor-pointer active:scale-95 whitespace-nowrap">
-                    {c}
+      <div className="px-4">
+        {/* Search results / Suggestions */}
+        <AnimatePresence mode="wait">
+          {searched ? (
+            <motion.div key="results" variants={container} initial="hidden" animate="show" exit={{ opacity: 0 }}>
+              {/* Results header */}
+              <div className="flex items-center justify-between mt-3 mb-2">
+                <span className="text-[12px] text-cm-text-muted">
+                  {results.length} résultat{results.length !== 1 ? "s" : ""}
+                  {subCategoryParam && !query ? ` - ${subCategoryParam}` : ""}
+                </span>
+                {query && (
+                  <button onClick={() => { setQuery(""); setTypedResults([]); if (!subCategoryParam) setSearched(false); }}
+                    className="text-[11px] font-medium text-cm-text-muted flex items-center gap-1 cursor-pointer">
+                    <X className="w-3 h-3" /> Effacer
                   </button>
-                ))}
+                )}
               </div>
-            </div>
 
-            {/* Note min */}
-            <div>
-              <p className="text-[11px] font-medium text-ca-text-secondary uppercase tracking-wider mb-2">
-                Note min : {pendingFilters.minRating}★
-              </p>
-              <input type="range" min="0" max="5" step="0.5" value={pendingFilters.minRating}
-                onChange={(e) => setPendingFilters((f) => ({ ...f, minRating: parseFloat(e.target.value) }))}
-                className="w-full accent-ca-green-primary" />
-              <div className="flex justify-between text-[11px] text-ca-text-muted"><span>0</span><span>3</span><span>5</span></div>
-            </div>
+              {results.length === 0 ? (
+                <motion.div variants={itemAnim} className="text-center py-12">
+                  <div className="w-14 h-14 rounded-[18px] bg-cm-border-soft border border-cm-border flex items-center justify-center mx-auto mb-3">
+                    <Search className="w-6 h-6 text-cm-text-muted" />
+                  </div>
+                  <p className="text-[14px] font-bold text-cm-text mb-1">Aucun résultat</p>
+                  <p className="text-[12px] text-cm-text-muted">Essayez d'autres mots-clés</p>
+                </motion.div>
+              ) : (
+                <motion.div variants={container} className="grid grid-cols-2 gap-3 mt-1">
+                  {results.map((pro) => {
+                    const tier = getTier(pro.completedInterventions);
+                    return (
+                      <motion.div key={pro.id} variants={itemAnim}>
+                        <button onClick={() => nav(`/explorer/pro/${pro.id}`)} className="w-full text-left cursor-pointer">
+                          <BentoCard className="p-3.5 h-full group hover:border-cm-accent/30 transition-colors">
+                            <div className="flex items-center gap-2.5 mb-2">
+                              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-cm-border-soft shrink-0">
+                                <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1">
+                                  <h4 className="text-[12px] font-bold text-cm-text truncate">{pro.name}</h4>
+                                  {pro.isVerified && <VerifiedBadge />}
+                                </div>
+                                <p className="text-[10px] text-cm-text-soft truncate">{pro.title}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-[11px] text-cm-text-muted flex items-center gap-0.5">
+                                <Star className="w-3 h-3 fill-cm-accent text-cm-accent" />
+                                {(pro.rating / 10).toFixed(1)}
+                              </span>
+                              <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-[9999px] ${tier.bg} ${tier.color}`}>
+                                {tier.label}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5 truncate">
+                                <MapPin className="w-2.5 h-2.5 shrink-0" />
+                                {pro.locationNeighborhood.split(",")[0]}
+                              </span>
+                              <span className="text-[12px] font-bold text-cm-text font-mono">
+                                {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
+                              </span>
+                            </div>
+                          </BentoCard>
+                        </button>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div key="browse" variants={container} initial="hidden" animate="show" exit={{ opacity: 0 }}>
+              {/* Categories Row */}
+              <motion.div variants={itemAnim} className="mt-4 mb-5">
+                <h2 className="text-[14px] font-display font-bold text-cm-text mb-3">Catégories</h2>
+                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                  {SERVICE_CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => nav(`/explorer/category/${cat.id}`)}
+                      className="cm-scale-btn flex items-center gap-2 px-4 py-2.5 bg-cm-elevated border border-cm-border rounded-[14px] whitespace-nowrap cursor-pointer hover:border-cm-accent/30 transition-colors shadow-cm-bento shrink-0"
+                    >
+                      <span className="text-[16px]">{cat.icon}</span>
+                      <span className="text-[12px] font-semibold text-cm-text">{cat.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
 
-            {/* Prix max */}
-            <div>
-              <p className="text-[11px] font-medium text-ca-text-secondary uppercase tracking-wider mb-2">
-                Prix max : {pendingFilters.maxPrice.toLocaleString()} F
-              </p>
-              <input type="range" min="5000" max="100000" step="5000" value={pendingFilters.maxPrice}
-                onChange={(e) => setPendingFilters((f) => ({ ...f, maxPrice: parseInt(e.target.value) }))}
-                className="w-full accent-ca-green-primary" />
-              <div className="flex justify-between text-[11px] text-ca-text-muted"><span>5 000</span><span>50 000</span><span>100 000</span></div>
-            </div>
+              {/* Featured Pros */}
+              <motion.div variants={itemAnim} className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-[14px] font-display font-bold text-cm-text">
+                    {subCategoryParam ? `Pros ${subCategoryParam}` : "Pros à la une"}
+                  </h2>
+                  <button onClick={() => nav("/explorer")} className="text-[11px] font-medium text-cm-accent cursor-pointer">
+                    Voir tout
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {featuredPros.map((pro) => {
+                    const tier = getTier(pro.completedInterventions);
+                    return (
+                      <button key={pro.id} onClick={() => nav(`/explorer/pro/${pro.id}`)} className="w-full text-left cursor-pointer">
+                        <BentoCard className="p-3.5 group hover:border-cm-accent/30 transition-colors">
+                          <div className="flex items-center gap-2.5 mb-2">
+                            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-cm-border-soft shrink-0">
+                              <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1">
+                                <h4 className="text-[12px] font-bold text-cm-text truncate">{pro.name}</h4>
+                                {pro.isVerified && <VerifiedBadge />}
+                              </div>
+                              <p className="text-[10px] text-cm-text-soft truncate">{pro.title}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <span className="text-[11px] text-cm-text-muted flex items-center gap-0.5">
+                              <Star className="w-3 h-3 fill-cm-accent text-cm-accent" />
+                              {(pro.rating / 10).toFixed(1)}
+                            </span>
+                            <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded-[9999px] ${tier.bg} ${tier.color}`}>
+                              {tier.label}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5 truncate">
+                              <MapPin className="w-2.5 h-2.5 shrink-0" />
+                              {pro.locationNeighborhood.split(",")[0]}
+                            </span>
+                            <span className="text-[12px] font-bold text-cm-text font-mono">
+                              {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
+                            </span>
+                          </div>
+                        </BentoCard>
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
 
-            {/* Distance */}
-            <div>
-              <p className="text-[11px] font-medium text-ca-text-secondary uppercase tracking-wider mb-2">
-                Distance max : {pendingFilters.maxDistance} km
-              </p>
-              <input type="range" min="1" max="50" value={pendingFilters.maxDistance}
-                onChange={(e) => setPendingFilters((f) => ({ ...f, maxDistance: parseInt(e.target.value) }))}
-                className="w-full accent-ca-green-primary" />
-              <div className="flex justify-between text-[11px] text-ca-text-muted"><span>1 km</span><span>25 km</span><span>50 km</span></div>
-            </div>
-
-            {/* Vérification toggle */}
-            <label className="flex items-center justify-between py-2 cursor-pointer">
-              <span className="text-[13px] font-semibold text-ca-text-primary">Pros vérifiés uniquement</span>
-              <div
-                onClick={() => setPendingFilters((f) => ({ ...f, verifiedOnly: !f.verifiedOnly }))}
-                className={`w-11 h-6 rounded-[9999px] transition-all duration-200 relative cursor-pointer ${
-                  pendingFilters.verifiedOnly ? "bg-ca-green-primary" : "bg-[rgba(232,224,208,0.60)]"
-                }`}
-              >
-                <div className={`w-5 h-5 rounded-full bg-white shadow-sm absolute top-0.5 transition-all duration-200 ${
-                  pendingFilters.verifiedOnly ? "left-[22px]" : "left-0.5"
-                }`} />
-              </div>
-            </label>
-
-            <button onClick={applyFiltersAndSearch}
-              className="w-full py-4 bg-[rgba(45,106,79,0.85)] backdrop-blur-[8px] border border-[rgba(82,183,136,0.40)] text-white font-bold text-[14px] rounded-[14px] hover:bg-[rgba(45,106,79,0.95)] transition-all cursor-pointer active:scale-[0.97]">
-              Appliquer
-            </button>
-          </div>
-        </div>
-      )}
+              {/* Bottom CTA */}
+              <motion.div variants={itemAnim} className="text-center pb-4">
+                <button
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-cm-accent-soft border border-cm-accent/30 rounded-[14px] text-[13px] font-semibold text-cm-accent cursor-pointer cm-scale-btn"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  Je ne sais pas qui contacter
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

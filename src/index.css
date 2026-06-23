@@ -2,92 +2,70 @@
 @import "tailwindcss";
 
 :root {
-  --ca-green-primary: #2D6A4F;
-  --ca-green-light: #52B788;
-  --ca-green-soft: #B7E4C7;
-  --ca-green-mist: #D8F3DC;
-
-  --ca-beige-warm: #F5F0E8;
-  --ca-beige-card: #FDFAF5;
-  --ca-beige-border: #E8E0D0;
-
-  --ca-white: #FFFFFF;
-  --ca-white-glass: rgba(255, 255, 255, 0.65);
-
-  --ca-text-primary: #1B2E1F;
-  --ca-text-secondary: #4A6741;
-  --ca-text-muted: #8A9E85;
-
-  --ca-success: #52B788;
-  --ca-warning: #F4A261;
-  --ca-error: #E63946;
-  --ca-info: #457B9D;
+  --cm-bg: #f6f3fa;
+  --cm-elevated: #FFFFFF;
+  --cm-border: #e5def0;
+  --cm-border-soft: #efe9f7;
+  --cm-text: #1f1926;
+  --cm-text-soft: #382b47;
+  --cm-text-muted: #baa1d5;
+  --cm-accent: #661ddb;
+  --cm-accent-hover: #5518c4;
+  --cm-accent-soft: #f0ebf7;
+  --cm-error: #D62828;
+  --cm-overlay: rgba(31,25,38,0.35);
 }
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --font-display: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
-  --color-ca-green-primary: #2D6A4F;
-  --color-ca-green-light: #52B788;
-  --color-ca-green-soft: #B7E4C7;
-  --color-ca-green-mist: #D8F3DC;
-  --color-ca-beige-warm: #F5F0E8;
-  --color-ca-beige-card: #FDFAF5;
-  --color-ca-beige-border: #E8E0D0;
-  --color-ca-white: #FFFFFF;
-  --color-ca-text-primary: #1B2E1F;
-  --color-ca-text-secondary: #4A6741;
-  --color-ca-text-muted: #8A9E85;
-  --color-ca-success: #52B788;
-  --color-ca-warning: #F4A261;
-  --color-ca-error: #E63946;
-  --color-ca-info: #457B9D;
+  --color-cm-bg: #f6f3fa;
+  --color-cm-elevated: #FFFFFF;
+  --color-cm-border: #e5def0;
+  --color-cm-border-soft: #efe9f7;
+  --color-cm-text: #1f1926;
+  --color-cm-text-soft: #382b47;
+  --color-cm-text-muted: #baa1d5;
+  --color-cm-accent: #661ddb;
+  --color-cm-accent-hover: #5518c4;
+  --color-cm-accent-soft: #f0ebf7;
+  --color-cm-error: #D62828;
 
-  --radius-glass: 20px;
-  --radius-glass-sm: 12px;
-  --radius-glass-lg: 24px;
-  --radius-glass-pill: 9999px;
+  --radius-cm: 10px;
+  --radius-cm-lg: 14px;
+  --radius-cm-full: 9999px;
 
-  --shadow-glass: 0 8px 32px rgba(45, 106, 79, 0.10);
-  --shadow-glass-lg: 0 12px 48px rgba(45, 106, 79, 0.15);
+  --shadow-cm-sm: 0 1px 2px rgba(31,25,38,0.06);
+  --shadow-cm-md: 0 4px 12px rgba(31,25,38,0.08);
 
-  --text-caption: 0.6875rem;
-  --text-caption--line-height: 1.3;
-  --text-caption--font-weight: 500;
+  --ease-snappy: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 body {
-  background-color: var(--ca-beige-warm);
-  color: var(--ca-text-primary);
-  font-family: "Inter", sans-serif;
+  background-color: var(--cm-bg);
+  color: var(--cm-text);
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
 @keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
 @keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
+  from { opacity: 0; transform: scale(0.97); }
   to { opacity: 1; transform: scale(1); }
 }
 
@@ -96,7 +74,53 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-fade-in { animation: fade-in 0.4s ease-out; }
-.animate-fade-in-up { animation: fade-in-up 0.5s ease-out; }
-.animate-scale-in { animation: scale-in 0.3s ease-out; }
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.animate-fade-in { animation: fade-in 0.25s ease-out; }
+.animate-fade-up { animation: fade-up 0.35s ease-out both; }
+.animate-scale-in { animation: scale-in 0.2s ease-out both; }
 .animate-slide-up { animation: slide-up 0.3s ease-out; }
+.animate-pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+.cm-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cm-card {
+  border-radius: var(--radius-cm-lg);
+  background: var(--cm-elevated);
+  border: 1px solid var(--cm-border);
+  transition: transform 0.15s ease;
+}
+
+.cm-card:active {
+  transform: scale(0.98);
+}
+
+.cm-card--wide {
+  grid-column: span 2;
+}
+
+.cm-scale-btn {
+  transition: transform 0.15s ease;
+}
+
+.cm-scale-btn:active {
+  transform: scale(0.96);
+}
+
+@media (prefers-reduced-motion) {
+  .cm-scale-btn:active { transform: none; }
+  .cm-card:active { transform: none; }
+  .cm-card { transition: none; }
+}

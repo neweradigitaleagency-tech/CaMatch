@@ -7,9 +7,9 @@ interface VerifiedBadgeProps {
 export default function VerifiedBadge({ className = "" }: VerifiedBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-[9999px] text-[11px] font-semibold bg-[rgba(82,183,136,0.20)] border border-[rgba(82,183,136,0.50)] text-ca-green-primary backdrop-blur-[4px] ${className}`}
+      className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-cm-accent text-white ${className}`}
     >
-      <BadgeCheck className="w-3 h-3" />
+      <BadgeCheck className="w-2.5 h-2.5" />
       Vérifié
     </span>
   );

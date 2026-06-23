@@ -1,4 +1,4 @@
-import { ArrowLeft, FileText, Shield, AlertCircle } from "lucide-react";
+import { ArrowLeft, FileText, AlertCircle } from "lucide-react";
 import { useState } from "react";
 
 interface TermsScreenProps { onBack: () => void; }
@@ -42,49 +42,45 @@ export default function TermsScreen({ onBack }: TermsScreenProps) {
   const [openSection, setOpenSection] = useState<number | null>(0);
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-32" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, rgba(216,243,220,0.90) 100%)" }}>
-        <button onClick={onBack} className="w-9 h-9 flex items-center justify-center rounded-[12px] bg-[rgba(255,255,255,0.60)] backdrop-blur-[8px] border border-[rgba(255,255,255,0.35)] cursor-pointer active:scale-90 transition-all">
-          <ArrowLeft className="w-4 h-4 text-ca-text-primary" />
+    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
+        <button onClick={onBack}
+          className="w-9 h-9 flex items-center justify-center rounded-[12px] border border-cm-border bg-cm-elevated cursor-pointer active:scale-90 transition-all">
+          <ArrowLeft className="w-4 h-4 text-cm-text" />
         </button>
-        <h1 className="text-[15px] font-bold text-ca-text-primary">Conditions d'utilisation</h1>
+        <h1 className="text-[15px] font-bold text-cm-text">Conditions d'utilisation</h1>
         <div className="w-9 h-9" />
       </header>
 
       <div className="mx-4 pt-4">
-        <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] border border-[rgba(255,255,255,0.50)] p-5 mb-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-[12px] bg-[rgba(45,106,79,0.12)] flex items-center justify-center shrink-0">
-            <FileText className="w-5 h-5 text-ca-green-primary" />
+        <div className="bg-cm-elevated border border-cm-border rounded-[20px] p-5 mb-4 flex items-center gap-3 shadow-cm-sm">
+          <div className="w-10 h-10 rounded-[12px] bg-cm-accent-soft flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5 text-cm-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] font-bold text-ca-text-primary">Version 1.0</p>
-            <p className="text-[11px] text-ca-text-muted">Dernière mise à jour : Juin 2026</p>
+            <p className="text-[13px] font-bold text-cm-text">Version 1.0</p>
+            <p className="text-[11px] text-cm-text-muted">Dernière mise à jour : Juin 2026</p>
           </div>
         </div>
 
         <div className="space-y-2">
           {SECTIONS.map((section, i) => (
-            <div
-              key={i}
-              className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[16px] border border-[rgba(255,255,255,0.50)] overflow-hidden"
-            >
-              <button
-                onClick={() => setOpenSection(openSection === i ? null : i)}
-                className="w-full flex items-center justify-between px-4 py-3.5 cursor-pointer text-left"
-              >
-                <p className="text-[13px] font-bold text-ca-text-primary">{section.title}</p>
-                <AlertCircle className={`w-4 h-4 text-ca-text-muted transition-transform ${openSection === i ? "rotate-180" : ""}`} />
+            <div key={i} className="bg-cm-elevated border border-cm-border rounded-[16px] overflow-hidden shadow-cm-sm">
+              <button onClick={() => setOpenSection(openSection === i ? null : i)}
+                className="w-full flex items-center justify-between px-4 py-3.5 cursor-pointer text-left">
+                <p className="text-[13px] font-bold text-cm-text">{section.title}</p>
+                <AlertCircle className={`w-4 h-4 text-cm-text-muted transition-transform ${openSection === i ? "rotate-180" : ""}`} />
               </button>
               {openSection === i && (
                 <div className="px-4 pb-3.5">
-                  <p className="text-[12px] text-ca-text-secondary leading-relaxed">{section.content}</p>
+                  <p className="text-[12px] text-cm-text-soft leading-relaxed">{section.content}</p>
                 </div>
               )}
             </div>
           ))}
         </div>
 
-        <p className="text-[11px] text-ca-text-muted mt-4 px-1 leading-relaxed text-center">
+        <p className="text-[11px] text-cm-text-muted mt-4 px-1 leading-relaxed text-center">
           En utilisant Ça Match, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
         </p>
       </div>

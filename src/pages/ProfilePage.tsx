@@ -67,17 +67,15 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-32" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
-      {/* Header */}
-      <div className="px-4 pt-5 pb-3">
-        <h1 className="text-[18px] font-bold text-ca-text-primary">Profil</h1>
+    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+      <div className="px-5 pt-5 pb-3">
+        <h1 className="text-[18px] font-bold text-cm-text">Profil</h1>
       </div>
 
-      {/* Profile Card */}
-      <div className="mx-4 mb-6">
-        <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] border border-[rgba(255,255,255,0.50)] p-5 flex items-center gap-4">
-          <div className="relative shrink-0 group cursor-pointer">
-            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-ca-green-light">
+      <div className="mx-5 mb-6">
+        <div className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] p-4 flex items-center gap-4">
+          <div className="relative shrink-0">
+            <div className="w-16 h-16 rounded-full overflow-hidden border border-cm-border">
               <img
                 alt="Jean Kouassi"
                 className="w-full h-full object-cover"
@@ -85,125 +83,66 @@ export default function ProfilePage() {
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
               />
             </div>
-            <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-              <Camera className="w-5 h-5 text-white" />
-            </div>
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-[16px] font-bold text-ca-text-primary">Jean Kouassi</h2>
-            <p className="text-[12px] text-ca-text-muted mt-0.5">Membre depuis Jan 2026</p>
+            <h2 className="text-[16px] font-bold text-cm-text">Jean Kouassi</h2>
+            <p className="text-[12px] text-cm-text-soft mt-0.5">Membre depuis Jan 2026</p>
             <button
               onClick={() => openNavigateTo("edit-profile")}
-              className="mt-1.5 text-[11px] font-semibold text-ca-green-primary bg-[rgba(45,106,79,0.12)] hover:bg-[rgba(45,106,79,0.18)] transition-colors px-3 py-1 rounded-full"
+              className="mt-2 text-[12px] font-medium text-cm-accent bg-cm-accent-soft px-3 py-1 rounded-[var(--radius-cm)]"
             >
-              Modifier Profil
+              Modifier le profil
             </button>
           </div>
         </div>
       </div>
 
-      {/* Section: COMPTE */}
-      <div className="mx-4 mb-6">
-        <p className="text-[11px] font-medium text-ca-text-muted uppercase tracking-wider mb-2 px-1">Compte</p>
-        <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] border border-[rgba(255,255,255,0.50)] !p-0 overflow-hidden">
-          <MenuItem
-            icon={User}
-            label="Informations Personnelles"
-            desc="Email, téléphone"
-            onClick={() => openNavigateTo("edit-profile")}
-          />
-          <MenuItem
-            icon={Shield}
-            label="Sécurité"
-            desc="Mot de passe"
-            onClick={() => openNavigateTo("security")}
-          />
-          <MenuItem
-            icon={MapPin}
-            label="Mes Adresses"
-            desc="Cocody, Plateau, Marcory"
-            onClick={() => openNavigateTo("addresses")}
-            last
-          />
+      <div className="mx-5 mb-6">
+        <p className="text-[12px] font-medium text-cm-text-muted mb-2">Compte</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] overflow-hidden">
+          <MenuItem icon={User} label="Informations personnelles" desc="Email, téléphone" onClick={() => openNavigateTo("edit-profile")} />
+          <MenuItem icon={Shield} label="Sécurité" desc="Mot de passe" onClick={() => openNavigateTo("security")} />
+          <MenuItem icon={MapPin} label="Mes adresses" desc="Cocody, Plateau, Marcory" onClick={() => openNavigateTo("addresses")} last />
         </div>
       </div>
 
-      {/* Section: PAIEMENT & PREFS */}
-      <div className="mx-4 mb-6">
-        <p className="text-[11px] font-medium text-ca-text-muted uppercase tracking-wider mb-2 px-1">Paiement & Préfs</p>
-        <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] border border-[rgba(255,255,255,0.50)] !p-0 overflow-hidden">
-          <MenuItem
-            icon={Wallet}
-            label="Moyens de Paiement"
-            desc="Wave, Orange Money, cartes"
-            onClick={() => openNavigateTo("payments")}
-          />
-          <MenuItem
-            icon={Bell}
-            label="Notifications"
-            desc="Alertes, rappels"
-            onClick={() => openNavigateTo("notifications")}
-          />
-          <MenuItem
-            icon={Globe}
-            label="Langue"
-            desc="Français"
-            onClick={() => openNavigateTo("language")}
-            last
-          />
+      <div className="mx-5 mb-6">
+        <p className="text-[12px] font-medium text-cm-text-muted mb-2">Paiement & Préférences</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] overflow-hidden">
+          <MenuItem icon={Wallet} label="Moyens de paiement" desc="Wave, Orange Money, cartes" onClick={() => openNavigateTo("payments")} />
+          <MenuItem icon={Bell} label="Notifications" desc="Alertes, rappels" onClick={() => openNavigateTo("notifications")} />
+          <MenuItem icon={Globe} label="Langue" desc="Français" onClick={() => openNavigateTo("language")} last />
         </div>
       </div>
 
-      {/* Section: ÉVOLUER (caché si déjà prestataire) */}
-      {!isPro && <div className="mx-4 mb-6">
-        <p className="text-[11px] font-medium text-ca-text-muted uppercase tracking-wider mb-2 px-1">Évoluer</p>
-        <div
-          onClick={() => setShowProOnboarding(true)}
-          className="bg-[rgba(45,106,79,0.12)] backdrop-blur-[8px] rounded-[20px] border border-[rgba(45,106,79,0.20)] p-5 cursor-pointer active:bg-[rgba(45,106,79,0.18)] transition-all group"
-        >
-          <div className="flex items-start gap-3 mb-2">
-            <div className="w-10 h-10 rounded-[14px] bg-[rgba(255,255,255,0.50)] flex items-center justify-center shrink-0">
-              <Rocket className="w-5 h-5 text-ca-green-primary" />
+      {!isPro && <div className="mx-5 mb-6">
+        <p className="text-[12px] font-medium text-cm-text-muted mb-2">Évoluer</p>
+        <div onClick={() => setShowProOnboarding(true)} className="bg-cm-accent-soft border border-cm-accent/30 rounded-[var(--radius-cm-lg)] p-4 cursor-pointer">
+          <div className="flex items-start gap-3 mb-3">
+            <div className="w-9 h-9 rounded-lg bg-cm-elevated flex items-center justify-center shrink-0">
+              <Rocket className="w-5 h-5 text-cm-accent" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[15px] font-bold text-ca-green-primary">Devenir Prestataire</p>
-              <p className="text-[12px] text-ca-text-muted mt-0.5">Gagnez de l'argent avec vos compétences</p>
+              <p className="text-[15px] font-bold text-cm-accent">Devenir Prestataire</p>
+              <p className="text-[12px] text-cm-text-soft mt-0.5">Gagnez de l'argent avec vos compétences</p>
             </div>
           </div>
-          <div className="flex justify-end">
-            <span className="text-[12px] font-semibold text-white bg-ca-green-primary px-5 py-1.5 rounded-full group-hover:bg-ca-green-primary/90 transition-colors">
-              Commencer
-            </span>
-          </div>
+          <span className="inline-block text-[12px] font-medium text-white bg-cm-accent px-4 py-1.5 rounded-[var(--radius-cm)]">
+            Commencer
+          </span>
         </div>
       </div>}
 
-      {/* Section: AIDE */}
-      <div className="mx-4 mb-6">
-        <p className="text-[11px] font-medium text-ca-text-muted uppercase tracking-wider mb-2 px-1">Aide</p>
-        <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] border border-[rgba(255,255,255,0.50)] !p-0 overflow-hidden">
-          <MenuItem
-            icon={HelpCircle}
-            label="Centre d'aide & FAQ"
-            desc="Questions fréquentes, support"
-            onClick={() => openNavigateTo("help")}
-          />
-          <MenuItem
-            icon={FileText}
-            label="Conditions d'utilisation"
-            desc="CGU, politique de confidentialité"
-            onClick={() => openNavigateTo("terms")}
-            last
-          />
+      <div className="mx-5 mb-6">
+        <p className="text-[12px] font-medium text-cm-text-muted mb-2">Aide</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] overflow-hidden">
+          <MenuItem icon={HelpCircle} label="Centre d'aide & FAQ" desc="Questions fréquentes, support" onClick={() => openNavigateTo("help")} />
+          <MenuItem icon={FileText} label="Conditions d'utilisation" desc="CGU, politique de confidentialité" onClick={() => openNavigateTo("terms")} last />
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="mx-4 mt-2">
-        <button
-          onClick={handleLogout}
-          className="w-full h-11 flex items-center justify-center gap-2 text-[13px] font-semibold text-red-500 bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[16px] border border-[rgba(255,255,255,0.50)] hover:bg-[rgba(255,255,255,0.75)] transition-colors cursor-pointer"
-        >
+      <div className="mx-5 mt-2">
+        <button onClick={handleLogout} className="w-full h-11 flex items-center justify-center gap-2 text-[13px] font-medium text-cm-error bg-cm-elevated border border-cm-border rounded-[var(--radius-cm)] cm-scale-btn">
           <LogOut className="w-4 h-4" />
           Se déconnecter
         </button>
@@ -228,18 +167,18 @@ function MenuItem({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-[rgba(255,255,255,0.50)] transition-colors ${
-        !last ? "border-b border-[rgba(232,224,208,0.30)]" : ""
+      className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer active:bg-cm-accent-soft ${
+        !last ? "border-b border-cm-border" : ""
       }`}
     >
-      <div className="w-9 h-9 rounded-[12px] bg-[rgba(255,255,255,0.50)] flex items-center justify-center shrink-0">
-        <Icon className="w-4 h-4 text-ca-text-primary" />
+      <div className="w-8 h-8 rounded-lg bg-cm-accent-soft flex items-center justify-center shrink-0">
+        <Icon className="w-4 h-4 text-cm-accent" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[13px] font-bold text-ca-text-primary">{label}</p>
-        <p className="text-[11px] text-ca-text-muted mt-0.5">{desc}</p>
+        <p className="text-[14px] font-medium text-cm-text">{label}</p>
+        <p className="text-[12px] text-cm-text-soft">{desc}</p>
       </div>
-      <ChevronRight className="w-4 h-4 text-ca-text-muted shrink-0" />
+      <ChevronRight className="w-4 h-4 text-cm-text-muted shrink-0" />
     </div>
   );
 }

@@ -39,7 +39,7 @@ interface Props {
   onAcceptAlert: (alert: ProAlert) => void;
   onDeclineAlert: (alert: ProAlert) => void;
   onOpenChat?: (clientName: string) => void;
-  /** Optional chart data for advanced dashboard */
+  onOpenCall?: (clientName: string) => void;
   revenueHistory?: number[];
   missionHistory?: number[];
   ratingHistory?: number[];
@@ -56,99 +56,93 @@ export default function ProDashboardScreen({
   onViewJob,
   onAcceptAlert,
   onDeclineAlert,
+  onOpenChat,
+  onOpenCall,
   revenueHistory = [120000, 180000, 150000, 220000, 195000, 245000],
   missionHistory = [18, 22, 20, 25, 23, 28],
   ratingHistory = [4.2, 4.4, 4.3, 4.5, 4.6, 4.7],
   monthLabels = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun"],
 }: Props) {
   const [currentAlertIndex, setCurrentAlertIndex] = useState(0);
-  const [period, setPeriod] = useState<"7j" | "30j" | "12m">("30j");
 
   const currentAlert = alerts.length > 0 ? alerts[currentAlertIndex] : null;
 
   const kpiData = [
     {
       title: "Revenus", value: stats.monthEarningsXOF.toLocaleString(), suffix: "F",
-      trend: 12, icon: DollarSign, color: "bg-cm-success/10 text-cm-success",
+      trend: 12, icon: DollarSign,
     },
     {
       title: "Missions", value: stats.totalJobsCompleted.toString(),
-      trend: 8, icon: Briefcase, color: "bg-cm-info/10 text-cm-info",
+      trend: 8, icon: Briefcase,
     },
     {
       title: "Satisfaction", value: (stats.rating / 10).toFixed(1), suffix: "/5",
-      trend: 2, icon: Star, color: "bg-cm-warning/10 text-cm-warning",
+      trend: 2, icon: Star,
     },
     {
       title: "Clients", value: stats.reviewCount.toString(),
-      trend: 15, icon: UserIcon, color: "bg-cm-purple/10 text-cm-purple",
+      trend: 15, icon: UserIcon,
     },
   ];
 
   return (
-    <div className="px-5 py-5 pb-32 space-y-5 font-sans">
-      {/* Header */}
+    <div className="px-5 py-5 pb-32 space-y-5 bg-cm-bg min-h-screen">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-cm-green shrink-0">
+          <div className="w-11 h-11 rounded-full overflow-hidden border border-cm-border shrink-0">
             <img alt={pro.name} className="w-full h-full object-cover" src={pro.avatarUrl} />
           </div>
           <div>
-            <h2 className="text-lg font-extrabold text-brand-forest leading-tight">{pro.name}</h2>
-            <p className="text-caption text-secondary font-bold uppercase tracking-wider">{pro.title}</p>
+            <h2 className="text-[16px] font-bold text-cm-text">{pro.name}</h2>
+            <p className="text-[12px] text-cm-text-soft font-medium">{pro.title}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 bg-pale-mint px-3 py-1.5 rounded-full">
-          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-          <span className="text-xs font-bold">{(pro.rating / 10).toFixed(1)}</span>
+        <div className="flex items-center gap-1 bg-cm-accent-soft px-2.5 py-1 rounded-[var(--radius-cm)]">
+          <Star className="w-3 h-3 text-cm-accent" />
+          <span className="text-[12px] font-semibold text-cm-accent">{(pro.rating / 10).toFixed(1)}</span>
         </div>
       </div>
 
-      {/* Availability Toggle */}
       <div
-        className={`p-4 rounded-2xl flex items-center justify-between cursor-pointer transition-colors ${
-          available ? "bg-cm-green/15 border border-cm-green/30" : "bg-cm-error/10 border border-cm-error/30"
+        className={`p-4 rounded-[var(--radius-cm-lg)] flex items-center justify-between cursor-pointer border ${
+          available ? "bg-cm-accent-soft border-cm-accent/30" : "bg-cm-elevated border-cm-border"
         }`}
         onClick={onToggleAvailability}
       >
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${available ? "bg-cm-green" : "bg-red-200"}`}>
-            <Power className={`w-5 h-5 ${available ? "text-white" : "text-red-600"}`} />
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${available ? "bg-cm-accent" : "bg-gray-200"}`}>
+            <Power className={`w-4 h-4 ${available ? "text-white" : "text-cm-text-soft"}`} />
           </div>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider">
-              {available ? "Disponible" : "Indisponible"}
-            </h4>
-            <p className="text-caption text-secondary mt-0.5">
-              {available ? "Vous recevez les alertes de missions" : "Vous ne recevez pas de nouvelles missions"}
-            </p>
+            <h4 className="text-[13px] font-semibold text-cm-text">{available ? "Disponible" : "Indisponible"}</h4>
+            <p className="text-[12px] text-cm-text-soft">{available ? "Vous recevez les alertes de missions" : "Vous ne recevez pas de nouvelles missions"}</p>
           </div>
         </div>
-        <div className={`relative w-12 h-7 rounded-full transition-colors ${available ? "bg-cm-green" : "bg-pale-mint"}`}>
-          <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${
+        <div className={`relative w-11 h-6 rounded-full ${available ? "bg-cm-accent" : "bg-gray-200"}`}>
+          <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
             available ? "translate-x-5.5 left-0.5" : "translate-x-0.5 left-0"
           }`} />
         </div>
       </div>
 
-      {/* Incoming Alerts */}
       <AnimatePresence>
         {currentAlert && (
           <motion.div
             key={currentAlert.id}
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="bg-brand-forest text-white p-5 rounded-2xl space-y-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-cm-text text-cm-bg p-4 rounded-[var(--radius-cm-lg)] space-y-3"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center animate-pulse">
-                  <Bell className="w-4 h-4 text-white" />
+                <div className="w-7 h-7 rounded-full bg-red-500 flex items-center justify-center">
+                  <Bell className="w-3.5 h-3.5 text-white" />
                 </div>
-                <span className="text-caption font-medium text-cm-green uppercase tracking-wider">Nouvelle mission</span>
+                <span className="text-[12px] font-medium text-cm-accent">Nouvelle mission</span>
               </div>
-              <span className={`text-caption font-medium px-2 py-1 rounded-full ${
+              <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
                 currentAlert.urgency === "emergency" ? "bg-red-500/20 text-red-400" :
                 currentAlert.urgency === "high" ? "bg-amber-500/20 text-amber-400" :
                 "bg-white/10 text-white/70"
@@ -157,17 +151,16 @@ export default function ProDashboardScreen({
               </span>
             </div>
             <div>
-              <h3 className="text-base font-bold">{currentAlert.clientName}</h3>
-              <p className="text-xs text-white/70 mt-0.5">{currentAlert.description}</p>
+              <h3 className="text-[15px] font-bold">{currentAlert.clientName}</h3>
+              <p className="text-[12px] text-white/70 mt-0.5">{currentAlert.description}</p>
             </div>
-            <div className="flex items-center gap-4 text-caption text-white/70">
+            <div className="flex items-center gap-3 text-[12px] text-white/70">
               <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {currentAlert.location}</span>
-              <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {currentAlert.clientPhone}</span>
             </div>
             <div className="flex items-center justify-between pt-1">
               <div>
-                <p className="text-caption text-white/50 uppercase tracking-wider">Estimation</p>
-                <p className="text-sm font-extrabold text-cm-green">
+                <p className="text-[11px] text-white/50">Estimation</p>
+                <p className="text-[14px] font-bold text-cm-accent">
                   {currentAlert.estimatedPriceMinXOF.toLocaleString()} - {currentAlert.estimatedPriceMaxXOF.toLocaleString()} F CFA
                 </p>
               </div>
@@ -175,11 +168,11 @@ export default function ProDashboardScreen({
             </div>
             <div className="flex gap-2 pt-1">
               <button onClick={() => onAcceptAlert(currentAlert)}
-                className="flex-1 bg-cm-green text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider hover:brightness-110 transition-all active:scale-95 cursor-pointer">
+                className="flex-1 bg-cm-accent text-white font-medium text-[12px] py-2.5 rounded-[var(--radius-cm)] cm-scale-btn hover:bg-cm-accent-hover">
                 Accepter
               </button>
               <button onClick={() => { onDeclineAlert(currentAlert); if (currentAlertIndex < alerts.length - 1) setCurrentAlertIndex((i) => i + 1); }}
-                className="flex-1 bg-white/10 text-white font-extrabold text-xs py-3 rounded-xl uppercase tracking-wider hover:bg-white/20 transition-all active:scale-95 cursor-pointer">
+                className="flex-1 bg-white/10 text-white font-medium text-[12px] py-2.5 rounded-[var(--radius-cm)] hover:bg-white/20">
                 Refuser
               </button>
             </div>
@@ -187,58 +180,53 @@ export default function ProDashboardScreen({
         )}
       </AnimatePresence>
 
-      {/* KPI Cards Grid */}
       <div className="flex flex-wrap gap-3">
         {kpiData.map((kpi) => (
-          <div key={kpi.title} className="bg-white rounded-xl p-3.5 border border-pale-mint/20 shadow-sm flex-1 min-w-[calc(50%-6px)]">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${kpi.color}`}>
-                <kpi.icon className="w-4 h-4" />
+          <div key={kpi.title} className="bg-cm-elevated rounded-[var(--radius-cm)] p-3 border border-cm-border flex-1 min-w-[calc(50%-6px)]">
+            <div className="flex items-center justify-between mb-1">
+              <div className="w-7 h-7 rounded-lg bg-cm-accent-soft flex items-center justify-center">
+                <kpi.icon className="w-3.5 h-3.5 text-cm-accent" />
               </div>
-              <div className={`flex items-center gap-0.5 text-caption font-medium ${kpi.trend >= 0 ? "text-cm-success" : "text-cm-error"}`}>
+              <div className={`flex items-center gap-0.5 text-[11px] font-medium ${kpi.trend >= 0 ? "text-cm-accent" : "text-red-500"}`}>
                 {kpi.trend >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                 {kpi.trend > 0 ? "+" : ""}{kpi.trend}%
               </div>
             </div>
-            <p className="text-caption text-secondary font-medium">{kpi.title}</p>
-            <p className="text-sm font-extrabold mt-0.5">
-              {kpi.value}{kpi.suffix && <span className="text-caption text-secondary font-medium ml-0.5">{kpi.suffix}</span>}
+            <p className="text-[11px] text-cm-text-soft">{kpi.title}</p>
+            <p className="text-[15px] font-bold text-cm-text mt-0.5">
+              {kpi.value}{kpi.suffix && <span className="text-[11px] text-cm-text-soft font-medium ml-0.5">{kpi.suffix}</span>}
             </p>
           </div>
         ))}
       </div>
 
-      {/* Sparklines Row */}
       <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
         {[
-          { label: "Revenus", data: revenueHistory, color: "#00A86B" },
-          { label: "Missions", data: missionHistory, color: "#8B5CF6" },
-          { label: "Avis", data: ratingHistory, color: "#F59E0B" },
+          { label: "Revenus", data: revenueHistory, color: "#12f22d" },
+          { label: "Missions", data: missionHistory, color: "#151e12" },
+          { label: "Avis", data: ratingHistory, color: "#7a9972" },
         ].map((s) => (
-          <div key={s.label} className="bg-white rounded-xl p-3 border border-pale-mint/20 shadow-sm min-w-[130px] flex-1">
+          <div key={s.label} className="bg-cm-elevated rounded-[var(--radius-cm)] p-3 border border-cm-border min-w-[120px] flex-1">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-caption text-secondary font-bold uppercase tracking-wider">{s.label}</span>
-              <Eye className="w-3 h-3 text-secondary/50" />
+              <span className="text-[11px] font-medium text-cm-text-soft">{s.label}</span>
+              <Eye className="w-3 h-3 text-cm-text-soft" />
             </div>
             <Sparkline data={s.data} color={s.color} />
           </div>
         ))}
       </div>
 
-      {/* Today's Jobs */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
-            <Briefcase className="w-4 h-4" /> Interventions du jour
-          </h4>
-          <span className="text-caption font-medium bg-pale-mint px-2.5 py-1 rounded-full">
+          <h4 className="text-[14px] font-bold text-cm-text">Interventions du jour</h4>
+          <span className="text-[11px] font-medium bg-cm-accent-soft text-cm-accent px-2.5 py-0.5 rounded-[var(--radius-cm)]">
             {stats.todayJobsCount} mission{stats.todayJobsCount > 1 ? "s" : ""}
           </span>
         </div>
         {todayJobs.length === 0 ? (
-          <div className="bg-white p-6 rounded-2xl border border-pale-mint/15 shadow-sm text-center">
-            <CalendarCheck className="w-10 h-10 text-secondary/60 mx-auto mb-2" />
-            <p className="text-xs text-secondary font-medium">Aucune intervention prévue aujourd'hui</p>
+          <div className="bg-cm-elevated p-6 rounded-[var(--radius-cm-lg)] border border-cm-border text-center">
+            <CalendarCheck className="w-8 h-8 text-cm-text-soft mx-auto mb-2" />
+            <p className="text-[13px] text-cm-text-soft">Aucune intervention prévue aujourd'hui</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -246,39 +234,38 @@ export default function ProDashboardScreen({
               const stepIdx = DASHBOARD_STEPS.indexOf(job.status);
               return (
                 <div key={job.id} onClick={() => onViewJob(job)}
-                  className="bg-white p-3.5 rounded-xl border border-pale-mint/15 shadow-sm cursor-pointer hover:bg-pale-mint/30 transition-colors active:scale-[0.98]">
+                  className="bg-cm-elevated p-3.5 rounded-[var(--radius-cm)] border border-cm-border cursor-pointer cm-scale-btn">
                   <div className="flex items-center justify-between mb-1.5">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-full overflow-hidden bg-pale-mint flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-cm-accent-soft flex items-center justify-center shrink-0">
                         {job.clientAvatarUrl ? (
                           <img alt={job.clientName} className="w-full h-full object-cover" src={job.clientAvatarUrl} />
                         ) : (
-                          <UserIcon className="w-4 h-4 text-secondary" />
+                          <UserIcon className="w-4 h-4 text-cm-accent" />
                         )}
                       </div>
                       <div className="min-w-0">
-                        <h5 className="text-xs font-bold truncate">{job.serviceName}</h5>
-                        <p className="text-caption text-secondary flex items-center gap-1 mt-0.5 truncate">
+                        <h5 className="text-[13px] font-semibold text-cm-text truncate">{job.serviceName}</h5>
+                        <p className="text-[11px] text-cm-text-soft flex items-center gap-1 mt-0.5 truncate">
                           <MapPin className="w-2.5 h-2.5 shrink-0" /> {job.clientLocation}
                         </p>
                       </div>
                     </div>
-                    <span className="text-xs font-bold shrink-0 ml-2">{job.totalFeeXOF.toLocaleString()} F</span>
+                    <span className="text-[13px] font-semibold text-cm-text shrink-0 ml-2">{job.totalFeeXOF.toLocaleString()} F</span>
                   </div>
                   {stepIdx >= 0 && (
-                    <div className="flex items-center gap-1 mb-1.5">
+                    <div className="flex items-center gap-1 mb-2">
                       {DASHBOARD_STEPS.map((s, i) => {
                         const done = i <= stepIdx;
-                        const labels = ["Accepté", "En route", "En cours", "Terminé"];
                         return (
                           <div key={s} className="flex items-center flex-1">
-                            <div className={`flex items-center justify-center w-4 h-4 rounded-full shrink-0 transition-all ${
-                              done ? "bg-cm-green" : "bg-pale-mint"
-                            } ${i === stepIdx ? "ring-2 ring-offset-1 ring-cm-green" : ""}`}>
-                              {done ? <Check className="w-2.5 h-2.5 text-white stroke-[3]" /> : <span className="text-[8px] font-bold text-secondary">{i + 1}</span>}
+                            <div className={`flex items-center justify-center w-3.5 h-3.5 rounded-full shrink-0 ${
+                              done ? "bg-cm-accent" : "bg-gray-200"
+                            }`}>
+                              {done ? <Check className="w-2 h-2 text-white" /> : null}
                             </div>
                             {i < DASHBOARD_STEPS.length - 1 && (
-                              <div className={`flex-1 h-0.5 mx-0.5 ${done ? "bg-cm-green" : "bg-pale-mint"}`} />
+                              <div className={`flex-1 h-0.5 mx-0.5 ${done ? "bg-cm-accent" : "bg-gray-200"}`} />
                             )}
                           </div>
                         );
@@ -286,17 +273,17 @@ export default function ProDashboardScreen({
                     </div>
                   )}
                   <div className="flex items-center justify-between">
-                    <StatusBadge status={job.status} />
+                    <StatusBadgeLocal status={job.status} />
                     <div className="flex items-center gap-1">
-                      <button onClick={(e) => { e.stopPropagation(); window.open(`tel:${job.clientPhone}`); }}
-                        className="p-1.5 rounded-lg bg-pale-mint text-brand-forest hover:bg-pale-mint/70 transition-colors cursor-pointer">
+                      <button onClick={(e) => { e.stopPropagation(); onOpenCall?.(job.clientName); }}
+                        className="p-1.5 rounded-lg bg-cm-accent-soft text-cm-accent">
                         <Phone className="w-3 h-3" />
                       </button>
-                      <button onClick={(e) => { e.stopPropagation(); alert("Message à " + job.clientName); }}
-                        className="p-1.5 rounded-lg bg-pale-mint text-brand-forest hover:bg-pale-mint/70 transition-colors cursor-pointer">
+                      <button onClick={(e) => { e.stopPropagation(); onOpenChat?.(job.clientName); }}
+                        className="p-1.5 rounded-lg bg-cm-accent-soft text-cm-accent">
                         <MessageSquare className="w-3 h-3" />
                       </button>
-                      <ChevronRight className="w-3.5 h-3.5 text-secondary shrink-0" />
+                      <ChevronRight className="w-3 h-3 text-cm-text-soft shrink-0" />
                     </div>
                   </div>
                 </div>
@@ -306,13 +293,12 @@ export default function ProDashboardScreen({
         )}
       </div>
 
-      {/* Earnings Summary */}
-      <div className="bg-white rounded-xl p-4 border border-pale-mint/20 shadow-sm">
+      <div className="bg-cm-elevated rounded-[var(--radius-cm-lg)] p-4 border border-cm-border">
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-8 h-8 rounded-xl bg-cm-green/20 flex items-center justify-center">
-            <Wallet className="w-4 h-4 text-cm-green" />
+          <div className="w-7 h-7 rounded-lg bg-cm-accent-soft flex items-center justify-center">
+            <Wallet className="w-3.5 h-3.5 text-cm-accent" />
           </div>
-          <h4 className="text-xs font-bold uppercase tracking-wider">Aperçu des revenus</h4>
+          <h4 className="text-[13px] font-semibold text-cm-text">Aperçu des revenus</h4>
         </div>
         <div className="grid grid-cols-3 gap-3">
           {[
@@ -321,34 +307,33 @@ export default function ProDashboardScreen({
             { label: "Ce mois", value: stats.monthEarningsXOF },
           ].map((e) => (
             <div key={e.label} className="text-center">
-              <p className="text-caption text-secondary font-medium uppercase tracking-wider">{e.label}</p>
-              <p className="text-sm font-extrabold mt-1">{e.value.toLocaleString()} <span className="text-caption text-secondary font-medium">F</span></p>
+              <p className="text-[11px] text-cm-text-soft">{e.label}</p>
+              <p className="text-[15px] font-bold text-cm-text mt-1">{e.value.toLocaleString()} <span className="text-[11px] text-cm-text-soft">F</span></p>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Chart Section */}
       <div className="space-y-3">
-        <ChartCard title="Évolution des revenus" data={revenueHistory} color="#00A86B" suffix=" F" monthLabels={monthLabels} />
-        <ChartCard title="Évolution des missions" data={missionHistory} color="#8B5CF6" suffix="" monthLabels={monthLabels} />
-        <ChartCard title="Évolution des avis" data={ratingHistory} color="#F59E0B" suffix="/5" monthLabels={monthLabels} />
+        <ChartCard title="Évolution des revenus" data={revenueHistory} color="#12f22d" suffix=" F" monthLabels={monthLabels} />
+        <ChartCard title="Évolution des missions" data={missionHistory} color="#151e12" suffix="" monthLabels={monthLabels} />
+        <ChartCard title="Évolution des avis" data={ratingHistory} color="#7a9972" suffix="/5" monthLabels={monthLabels} />
       </div>
     </div>
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadgeLocal({ status }: { status: string }) {
   const config: Record<string, { label: string; classes: string }> = {
-    pending: { label: "En attente", classes: "bg-cm-warning/10 text-cm-warning" },
-    accepted: { label: "Accepté", classes: "bg-cm-info/10 text-cm-info" },
-    en_route: { label: "En route", classes: "bg-cm-purple/10 text-cm-purple" },
-    in_progress: { label: "En cours", classes: "bg-cm-green/30 text-brand-forest" },
-    completed: { label: "Terminé", classes: "bg-cm-success/10 text-cm-success" },
-    cancelled: { label: "Annulé", classes: "bg-cm-error/10 text-cm-error" },
+    pending: { label: "En attente", classes: "bg-cm-accent-soft text-cm-accent" },
+    accepted: { label: "Accepté", classes: "bg-cm-accent-soft text-cm-accent" },
+    en_route: { label: "En route", classes: "bg-gray-100 text-cm-text-soft" },
+    in_progress: { label: "En cours", classes: "bg-cm-accent-soft text-cm-accent" },
+    completed: { label: "Terminé", classes: "bg-gray-100 text-cm-text-soft" },
+    cancelled: { label: "Annulé", classes: "bg-red-100 text-red-600" },
   };
   const c = config[status] || config.pending;
-  return <span className={`text-caption font-medium px-2 py-0.5 rounded-full uppercase tracking-wider ${c.classes}`}>{c.label}</span>;
+  return <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${c.classes}`}>{c.label}</span>;
 }
 
 function CountdownTimer({ expiresAt, onExpire }: { expiresAt: string; onExpire: () => void }) {
@@ -363,16 +348,16 @@ function CountdownTimer({ expiresAt, onExpire }: { expiresAt: string; onExpire: 
   const minutes = Math.floor(remaining / 60);
   const seconds = remaining % 60;
   return (
-    <div className="flex items-center gap-1.5">
-      <Clock className="w-3.5 h-3.5 text-white/70" />
-      <span className={`text-sm font-extrabold font-mono ${remaining <= 30 ? "text-red-400" : remaining <= 60 ? "text-amber-400" : "text-white"}`}>
+    <div className="flex items-center gap-1">
+      <Clock className="w-3 h-3 text-white/70" />
+      <span className={`text-[14px] font-semibold ${remaining <= 30 ? "text-red-400" : remaining <= 60 ? "text-amber-400" : "text-white"}`}>
         {minutes}:{seconds.toString().padStart(2, "0")}
       </span>
     </div>
   );
 }
 
-function Sparkline({ data, color = "#00A86B", height = 40 }: { data: number[]; color?: string; height?: number }) {
+function Sparkline({ data, color = "#1B4D3E", height = 40 }: { data: number[]; color?: string; height?: number }) {
   if (data.length === 0) return null;
   const max = Math.max(...data); const min = Math.min(...data); const range = max - min || 1;
   const w = 120;
@@ -388,7 +373,7 @@ function Sparkline({ data, color = "#00A86B", height = 40 }: { data: number[]; c
   );
 }
 
-function ChartCard({ title, data, color = "#00A86B", suffix, monthLabels: ml }: {
+function ChartCard({ title, data, color = "#1B4D3E", suffix, monthLabels: ml }: {
   title: string; data: number[]; color?: string; suffix?: string; monthLabels: string[];
 }) {
   const max = Math.max(...data); const min = Math.min(...data); const range = max - min || 1;
@@ -400,10 +385,10 @@ function ChartCard({ title, data, color = "#00A86B", suffix, monthLabels: ml }: 
   }).join(" ");
   const areaPts = `0,${h} ${pts} ${w},${h}`;
   return (
-    <div className="bg-white rounded-xl p-4 border border-pale-mint/20 shadow-sm">
+    <div className="bg-cm-elevated rounded-xl p-4 border border-cm-border">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-bold">{title}</h3>
-        <span className="text-caption text-secondary">Dernière période</span>
+        <h3 className="text-xs font-display font-bold text-cm-text">{title}</h3>
+        <span className="text-[11px] text-cm-text-soft">Dernière période</span>
       </div>
       <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto">
         <polygon points={areaPts} fill={`${color}20`} />

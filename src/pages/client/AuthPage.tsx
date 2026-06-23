@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
-import { supabase } from "../../services/supabase";
+import { supabase, isSupabaseReady } from "../../services/supabase";
 
 type AuthMode = "phone" | "email";
 type PhoneStep = "phone-input" | "otp";
@@ -114,9 +114,12 @@ export default function AuthPage() {
         setLoading(false);
         return;
       }
-      const session = await supabase.auth.getSession();
-      const existingRole = session.data.session?.user?.user_metadata?.role;
-      setUser(session.data.session?.user?.id || "demo", existingRole || "client");
+      if (isSupabaseReady()) {
+        const session = await supabase.auth.getSession();
+        setUser(session.data.session?.user?.id || "demo", "client");
+      } else {
+        setUser(email, "client");
+      }
       nav("/", { replace: true });
     } else {
       const { error: err } = await signUpWithEmail(email, password);

@@ -17,3 +17,4 @@ export { default as GlassInput } from "./GlassInput";
 export { default as VerifiedBadge } from "./VerifiedBadge";
 export { default as RatingStars } from "./RatingStars";
 export { default as CategoryChip } from "./CategoryChip";
+export { default as BentoCard } from "./BentoCard";

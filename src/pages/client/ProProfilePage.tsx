@@ -4,10 +4,10 @@ import { MOCK_PROS, MOCK_SERVICES, MOCK_PORTFOLIO, MOCK_VERIFICATION } from "../
 
 export default function ProProfilePage() {
   const nav = useNavigate();
-  const { proId } = useParams<{ proId: string }>();
+  const { id } = useParams<{ id: string }>();
   const location = useLocation();
 
-  const pro = MOCK_PROS.find((p) => p.id === proId) ?? MOCK_PROS[0];
+  const pro = MOCK_PROS.find((p) => p.id === id) ?? MOCK_PROS[0];
   const services = MOCK_SERVICES.filter((s) => s.proId === pro.id);
   const portfolio = MOCK_PORTFOLIO.filter((p) => p.category === pro.category);
 

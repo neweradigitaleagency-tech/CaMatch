@@ -9,11 +9,11 @@ interface ErrorStateProps {
 export default function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
-      <div className="w-16 h-16 rounded-[20px] bg-[rgba(230,57,70,0.15)] backdrop-blur-[8px] border border-[rgba(230,57,70,0.25)] flex items-center justify-center mb-4">
-        <AlertTriangle className="w-8 h-8 text-ca-error" />
+      <div className="w-16 h-16 rounded-[20px] bg-cm-border-soft border border-cm-border flex items-center justify-center mb-4">
+        <AlertTriangle className="w-8 h-8 text-cm-text-muted" />
       </div>
-      <h3 className="text-[16px] font-bold text-ca-text-primary mb-1">Oups !</h3>
-      <p className="text-[13px] text-ca-text-muted max-w-xs mb-4">
+      <h3 className="text-[16px] font-bold text-cm-text mb-1">Oups !</h3>
+      <p className="text-[13px] text-cm-text-muted max-w-xs mb-4">
         {message || "Une erreur est survenue"}
       </p>
       {onRetry && (

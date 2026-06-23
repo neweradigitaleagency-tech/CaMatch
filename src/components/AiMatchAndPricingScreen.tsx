@@ -1,10 +1,5 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useEffect, useState } from "react";
-import { Sparkles, CheckCircle, ArrowRight, ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, Sparkles, CheckCircle, Lock, Clock, CircuitBoard, Wallet } from "lucide-react";
 import { Service, ProfessionalDetails } from "../types";
 
 interface AiMatchAndPricingScreenProps {
@@ -14,6 +9,14 @@ interface AiMatchAndPricingScreenProps {
   onConfirmMatch: (travelFee: number, laborFee: number, total: number) => void;
 }
 
+const PAYMENT_STATES = [
+  { icon: Sparkles, label: "Analyse IA", color: "text-cm-text" },
+  { icon: CheckCircle, label: "Confirmé", color: "text-cm-accent" },
+  { icon: Clock, label: "En cours", color: "text-cm-text" },
+  { icon: CircuitBoard, label: "Finalisation", color: "text-cm-text" },
+  { icon: Wallet, label: "Libéré", color: "text-cm-accent" },
+];
+
 export default function AiMatchAndPricingScreen({
   pro,
   selectedServices,
@@ -21,150 +24,160 @@ export default function AiMatchAndPricingScreen({
   onConfirmMatch,
 }: AiMatchAndPricingScreenProps) {
   const [analysisStep, setAnalysisStep] = useState(0);
+  const [showStates, setShowStates] = useState(false);
 
-  // Compute estimates (travel cost is fixed at 5,000 F, labor is the sum of selected services or first service hourly/flat estimate)
   const travelFee = 5000;
   const laborFee = selectedServices.reduce((sum, service) => sum + service.priceEstimateXOF, 0);
   const totalFee = travelFee + laborFee;
 
   useEffect(() => {
-    // Stagger matching state loading ticks
     const interval = setInterval(() => {
       setAnalysisStep((prev) => (prev < 2 ? prev + 1 : prev));
     }, 1500);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (analysisStep === 2) {
+      const t = setTimeout(() => setShowStates(true), 400);
+      return () => clearTimeout(t);
+    }
+  }, [analysisStep]);
+
   return (
-    <div className="flex flex-col w-full pb-24 items-center justify-start min-h-[80vh]">
-      {/* Top Header */}
-      <header className="w-full flex justify-between items-center px-6 py-4 sticky top-0 z-10 bg-brand-cream/90 backdrop-blur-md">
-        <button
-          onClick={onBack}
-          className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-brand-forest hover:bg-pale-mint transition-colors shadow-sm cursor-pointer active:scale-95 duration-150"
-        >
+    <div className="flex flex-col w-full min-h-screen bg-cm-bg">
+      {/* Header */}
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
+        <button onClick={onBack}
+          className="w-10 h-10 flex items-center justify-center rounded-full text-cm-text hover:bg-cm-accent-soft transition-colors cursor-pointer active:scale-95">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <span className="font-sans text-sm font-extrabold text-brand-forest uppercase tracking-widest">
-          Transparence IA
-        </span>
-        <div className="w-10 h-10"></div> {/* filler spacer */}
+        <h1 className="text-[14px] font-display font-bold text-cm-text">Estimation</h1>
+        <div className="w-10 h-10" />
       </header>
 
-      <main className="w-full px-6 flex flex-col items-center">
-        {/* Radar Scanner Animation visualizer */}
-        <div className="relative py-8 flex flex-col items-center justify-center w-full max-w-sm">
-          <div className="relative w-64 h-64 bg-black/5 rounded-full flex items-center justify-center overflow-hidden border border-black/5">
-            {/* Pulsing visual circles */}
-            <div className="absolute inset-2 border border-black/5 rounded-full map-pulse" style={{ animationDelay: "0s" }}></div>
-            <div className="absolute inset-8 border border-black/5 rounded-full map-pulse" style={{ animationDelay: "1.5s" }}></div>
-            <div className="absolute inset-14 border border-black/5 rounded-full map-pulse" style={{ animationDelay: "3s" }}></div>
-            
-            {/* Spinning sweeps */}
-            <div className="absolute top-[50%] left-[50%] w-1/2 h-1/2 bg-gradient-to-r from-brand-lime/20 to-transparent radar-sweep border-l border-brand-lime/30 origin-top-left -mt-[0.5px] -ml-[0.5px]"></div>
-            
-            {/* Pro Floating Profile Icon */}
-            <div className="absolute top-10 left-10 w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-premium animate-bounce" style={{ animationDuration: "3.5s" }}>
-              <img
-                alt="Client Marie"
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
-              />
+      <main className="flex-1 px-4 pt-6 pb-32">
+        {/* AI Matching Animation */}
+        <div className="flex flex-col items-center mb-8">
+          <div className="relative w-56 h-56 flex items-center justify-center">
+            <svg className="absolute inset-0 w-full h-full" viewBox="0 0 224 224">
+              <circle cx="112" cy="112" r="104" fill="none" stroke="#E5E5E5" strokeWidth="1" />
+              <circle cx="112" cy="112" r="80" fill="none" stroke="#E5E5E5" strokeWidth="0.5" />
+              <circle cx="112" cy="112" r="56" fill="none" stroke="#E5E5E5" strokeWidth="0.5" />
+            </svg>
+            {/* Rotating arc */}
+            <div className="absolute w-[112px] h-[112px] top-0 left-0 origin-bottom-right opacity-20"
+              style={{ animation: "spin 3s linear infinite" }}>
+              <div className="w-full h-full rounded-tr-full bg-gradient-to-r from-transparent to-cm-accent" />
             </div>
-            
-            {/* Pro Avatar Floating */}
-            <div className="absolute bottom-12 right-12 w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-premium animate-bounce" style={{ animationDuration: "4.5s" }}>
-              <img
-                alt={pro.name}
-                className="w-full h-full object-cover"
-                referrerPolicy="no-referrer"
-                src={pro.avatarUrl}
-              />
+            {/* Pro avatar */}
+            <div className="absolute top-8 left-8 w-12 h-12 rounded-full overflow-hidden border-2 border-cm-border shadow-cm-sm"
+              style={{ animation: "bounce 3.5s infinite" }}>
+              <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
-
-            {/* AI Center Badge */}
-            <div className="z-10 bg-white p-5 rounded-full shadow-premium flex items-center justify-center">
-              <Sparkles className="w-8 h-8 text-brand-forest animate-pulse" />
+            {/* Client avatar */}
+            <div className="absolute bottom-8 right-8 w-12 h-12 rounded-full overflow-hidden border-2 border-cm-border shadow-cm-sm"
+              style={{ animation: "bounce 4.5s infinite" }}>
+              <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face" alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            </div>
+            {/* Center AI icon */}
+            <div className="z-10 w-16 h-16 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center shadow-cm-md">
+              <Sparkles className={`w-7 h-7 ${analysisStep < 2 ? "text-cm-text" : "text-cm-accent"}`} />
             </div>
           </div>
 
-          <p className="mt-6 text-xs font-bold text-secondary text-center tracking-widest uppercase">
+          <p className="text-[12px] font-medium text-cm-text-soft text-center uppercase tracking-wider mt-2">
             {analysisStep === 0 && "Analyse de votre demande..."}
             {analysisStep === 1 && "Calcul du meilleur itinéraire..."}
-            {analysisStep === 2 && "Estimation tarifaire validée"}
+            {analysisStep === 2 && "Estimation validée par l'IA"}
           </p>
         </div>
 
-        {/* Pricing Transparency Breakdown Card */}
-        <div className="w-full bg-white rounded-3xl p-6 shadow-premium border border-pale-mint/15 transition-all duration-500 transform scale-100 hover:scale-[1.01]">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="bg-pale-mint p-2.5 rounded-2xl text-brand-forest">
-              <CheckCircle className="w-6 h-6 stroke-[2]" />
+        {/* 5-State Payment Flow */}
+        {showStates && (
+          <div className="mb-6 animate-fade-in">
+            <div className="border border-cm-border rounded-[14px] bg-cm-elevated p-4 shadow-cm-sm">
+              <h3 className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-4">Cycle de paiement</h3>
+              <div className="flex items-start justify-between">
+                {PAYMENT_STATES.map((state, i) => (
+                  <div key={state.label} className="flex flex-col items-center flex-1">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
+                      i === 1 ? "bg-cm-accent text-white" : i === 4 ? "bg-cm-accent text-white" : i === 0 ? "bg-cm-text text-white" : "bg-cm-border-soft text-cm-text-soft"
+                    }`}>
+                      <state.icon className="w-4 h-4" />
+                    </div>
+                    <p className={`text-[9px] text-center mt-1.5 font-medium ${
+                      i === 1 || i === 4 ? "text-cm-accent font-bold" : "text-cm-text-muted"
+                    }`}>{state.label}</p>
+                    {i < PAYMENT_STATES.length - 1 && (
+                      <div className="w-full h-px bg-cm-border-soft mt-[-16px] ml-4 hidden sm:block" />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="border-t border-cm-border mt-4" />
+            </div>
+          </div>
+        )}
+
+        {/* Pricing Breakdown Card */}
+        <div className="border border-cm-border rounded-[14px] bg-cm-elevated p-5 shadow-cm-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-[12px] bg-cm-accent-soft flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-cm-accent" />
             </div>
             <div>
-              <h2 className="font-sans text-lg font-bold text-brand-forest">Estimation Instantanée</h2>
-              <p className="text-xs text-secondary font-medium">Calculé par l'IA - Aucun frais caché</p>
+              <h2 className="text-[15px] font-display font-bold text-cm-text">Estimation Instantanée</h2>
+              <p className="text-[11px] text-cm-text-muted">Calculé par l'IA — Aucun frais caché</p>
             </div>
           </div>
 
-          {/* Pricing item list */}
-          <div className="space-y-4 border-b border-pale-mint/20 pb-6 mb-6">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-secondary font-medium">Frais de déplacement</span>
-              <span className="font-bold text-brand-forest">{travelFee.toLocaleString("fr-FR")} F</span>
+          <div className="space-y-3 border-b border-cm-border pb-4 mb-4">
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-cm-text-soft">Frais de déplacement</span>
+              <span className="text-[13px] font-bold text-cm-text font-mono">{travelFee.toLocaleString("fr-FR")} F</span>
             </div>
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-secondary font-medium">Main d'œuvre estimée</span>
-              <span className="font-bold text-brand-forest">{laborFee.toLocaleString("fr-FR")} F</span>
+            <div className="flex justify-between items-center">
+              <span className="text-[13px] text-cm-text-soft">Main d'œuvre estimée</span>
+              <span className="text-[13px] font-bold text-cm-text font-mono">{laborFee.toLocaleString("fr-FR")} F</span>
             </div>
-            
-            {/* Small list of selected services in block */}
-            <div className="bg-pale-mint/25 p-3.5 rounded-2xl text-xs space-y-1">
-              <span className="font-bold text-caption text-brand-forest uppercase tracking-wider block mb-1">
+
+            <div className="bg-cm-bg rounded-[12px] p-3 border border-cm-border-soft text-[12px] space-y-1">
+              <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider mb-1">
                 Détail des prestations ({selectedServices.length}) :
-              </span>
+              </p>
               {selectedServices.map((service) => (
-                <div key={service.id} className="flex justify-between items-center opacity-90 text-body-sm">
-                  <span className="truncate max-w-[180px]">{service.name}</span>
-                  <span className="font-semibold">{service.priceEstimateXOF.toLocaleString("fr-FR")} F</span>
+                <div key={service.id} className="flex justify-between items-center">
+                  <span className="text-cm-text-soft truncate max-w-[180px]">{service.name}</span>
+                  <span className="font-mono font-medium text-cm-text">{service.priceEstimateXOF.toLocaleString("fr-FR")} F</span>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Pricing Total in CFA */}
           <div className="flex justify-between items-end">
             <div>
-              <span className="text-caption text-secondary font-bold uppercase tracking-wider block mb-1">
-                À régler après service (XOF)
-              </span>
+              <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider mb-1">À régler après service (XOF)</p>
               <div className="flex items-baseline gap-1">
-                <span className="font-sans text-3xl font-extrabold text-brand-forest">
-                  Total : {totalFee.toLocaleString("fr-FR")}
+                <span className="text-[24px] font-display font-bold text-cm-text">
+                  {totalFee.toLocaleString("fr-FR")}
                 </span>
-                <span className="text-lg font-bold text-brand-forest">F</span>
+                <span className="text-[14px] font-bold text-cm-text">F</span>
               </div>
             </div>
-            
-            <div className="bg-brand-cream px-3 py-1.5 rounded-full border border-pale-mint/30 shadow-sm">
-              <span className="text-body-sm font-extrabold text-brand-forest uppercase tracking-wider">
-                CFA
-              </span>
-            </div>
+            <span className="text-[10px] font-mono font-medium text-cm-text-soft px-2 py-1 border border-cm-border-soft rounded-[8px]">CFA</span>
           </div>
+
+          <div className="border-t border-cm-border mt-4" />
         </div>
 
-        {/* CTA triggers state transition to tracker */}
-        <button
-          onClick={() => onConfirmMatch(travelFee, laborFee, totalFee)}
-          className="w-full mt-6 py-5 bg-brand-forest text-white font-bold text-base rounded-full shadow-lg hover:bg-brand-lime hover:text-brand-forest transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] duration-150 group"
-        >
-          <span>Confirmer le Match</span>
-          <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+        {/* CTA */}
+        <button onClick={() => onConfirmMatch(travelFee, laborFee, totalFee)}
+          className="w-full mt-5 h-13 bg-cm-accent text-white text-[14px] font-semibold rounded-[12px] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all hover:bg-cm-accent-hover shadow-cm-md">
+          <Lock className="w-4 h-4" /> Confirmer le Match
         </button>
 
-        <p className="mt-4 text-center text-body-sm text-secondary leading-relaxed px-6">
+        <p className="mt-3 text-center text-[11px] text-cm-text-muted leading-relaxed">
           En confirmant, vous acceptez nos conditions de service. Le professionnel est réservé et partira immédiatement.
         </p>
       </main>

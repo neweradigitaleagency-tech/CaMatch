@@ -16,6 +16,7 @@ const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const ProProfilePage = lazy(() => import("./pages/client/ProProfilePage"));
 const AiMatchPricingPage = lazy(() => import("./pages/client/AiMatchPricingPage"));
+const CategoryDetailScreen = lazy(() => import("./components/CategoryDetailScreen"));
 const RequestCreationPage = lazy(() => import("./pages/client/RequestCreationPage"));
 const ProSelectionPage = lazy(() => import("./pages/client/ProSelectionPage"));
 const RequestDetailPage = lazy(() => import("./pages/client/RequestDetailPage"));
@@ -36,6 +37,8 @@ const ProSubscriptionPage = lazy(() => import("./pages/profile/ProSubscriptionPa
 const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
+const InvoicePage = lazy(() => import("./pages/client/InvoicePage"));
+const ProMissionListPage = lazy(() => import("./pages/profile/ProMissionListPage"));
 const EditProfilePage = lazy(() => import("./pages/profile/EditProfilePage"));
 const SecurityPage = lazy(() => import("./pages/profile/SecurityPage"));
 const LanguagePage = lazy(() => import("./pages/profile/LanguagePage"));
@@ -55,20 +58,20 @@ class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boole
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-6" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
+        <div className="min-h-screen flex items-center justify-center p-6 bg-cm-bg">
           <div className="text-center max-w-xs">
-            <div className="w-14 h-14 rounded-[16px] bg-[rgba(230,57,70,0.15)] flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl">⚠️</span>
+            <div className="w-14 h-14 rounded-[16px] bg-cm-accent-soft flex items-center justify-center mx-auto mb-4">
+              <span className="text-[24px]">!</span>
             </div>
-            <h2 className="text-[15px] font-extrabold text-ca-text-primary mb-2">Une erreur est survenue</h2>
-            <p className="text-[12px] text-ca-text-muted mb-4">
+            <h2 className="text-[15px] font-extrabold text-cm-text mb-2">Une erreur est survenue</h2>
+            <p className="text-[12px] text-cm-text-muted mb-4">
               L'application n'a pas pu se charger correctement.
             </p>
-            <p className="text-[10px] text-ca-text-muted mb-4 font-mono bg-[rgba(255,255,255,0.50)] backdrop-blur-[8px] rounded-[14px] p-3 border border-[rgba(255,255,255,0.35)] text-left break-all max-h-24 overflow-y-auto">
+            <p className="text-[10px] text-cm-text-muted mb-4 font-mono bg-cm-elevated rounded-[14px] p-3 border border-cm-border text-left break-all max-h-24 overflow-y-auto">
               {this.state.error?.message || "Erreur inconnue"}
             </p>
             <button onClick={() => window.location.reload()}
-              className="h-10 px-6 bg-[rgba(45,106,79,0.85)] backdrop-blur-[8px] border border-[rgba(82,183,136,0.40)] text-white text-[12px] font-bold rounded-[14px] cursor-pointer hover:bg-[rgba(45,106,79,0.95)] transition-all active:scale-[0.97]">
+              className="h-10 px-6 bg-cm-text text-white text-[12px] font-bold rounded-[14px] cursor-pointer hover:opacity-90 transition-all active:scale-[0.97]">
               Recharger la page
             </button>
           </div>
@@ -81,10 +84,10 @@ class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boole
 
 function PageLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "linear-gradient(180deg, #D8F3DC 0%, #F5F0E8 100%)" }}>
+    <div className="min-h-screen flex items-center justify-center bg-cm-bg">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-8 h-8 border-2 border-[rgba(45,106,79,0.20)] border-t-ca-green-primary rounded-full animate-spin" />
-        <p className="text-[12px] text-ca-text-muted">Chargement...</p>
+        <div className="w-8 h-8 border-2 border-cm-border-soft border-t-cm-text rounded-full animate-spin" />
+        <p className="text-[12px] text-cm-text-muted">Chargement...</p>
       </div>
     </div>
   );
@@ -109,6 +112,12 @@ function App() {
     initialize().finally(() => setBooted(true));
   }, []);
 
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
+
   if (!booted) return <PageLoader />;
 
   return (
@@ -126,6 +135,8 @@ function App() {
         <Route path="orders/tracker/:id" element={<Suspense fallback={<PageLoader />}><MissionTrackerPage /></Suspense>} />
         <Route path="orders/review" element={<Suspense fallback={<PageLoader />}><ReviewPage /></Suspense>} />
         <Route path="orders/qr-payment" element={<Suspense fallback={<PageLoader />}><QRPaymentPage /></Suspense>} />
+        <Route path="orders/invoice" element={<Suspense fallback={<PageLoader />}><InvoicePage /></Suspense>} />
+        <Route path="profile/pro-missions" element={<Suspense fallback={<PageLoader />}><ProMissionListPage /></Suspense>} />
         <Route path="profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
         <Route path="profile/settings" element={<Suspense fallback={<PageLoader />}><AppSettingsPage /></Suspense>} />
         <Route path="profile/payments" element={<Suspense fallback={<PageLoader />}><ClientPaymentsPage /></Suspense>} />
@@ -153,6 +164,7 @@ function App() {
         <Route path="explorer/matching" element={<Suspense fallback={<PageLoader />}><AiMatchPricingPage /></Suspense>} />
         <Route path="explorer/request-creation" element={<Suspense fallback={<PageLoader />}><RequestCreationPage /></Suspense>} />
         <Route path="explorer/pro-selection" element={<Suspense fallback={<PageLoader />}><ProSelectionPage /></Suspense>} />
+        <Route path="explorer/category/:categoryId" element={<Suspense fallback={<PageLoader />}><CategoryDetailScreen /></Suspense>} />
       </Route>
     </Routes>
   );

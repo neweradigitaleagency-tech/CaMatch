@@ -6,12 +6,12 @@ interface SkeletonProps {
 }
 
 export default function Skeleton({ variant = "text", width, height, className = "" }: SkeletonProps) {
-  const base = "rounded-xl bg-gradient-to-r from-[rgba(183,228,199,0.30)] via-[rgba(255,255,255,0.50)] to-[rgba(183,228,199,0.30)] bg-[length:200%_100%] animate-[shimmer_1.5s_infinite]";
+  const base = "rounded-xl bg-gradient-to-r from-cm-border via-cm-elevated to-cm-border bg-[length:200%_100%] animate-[shimmer_1.5s_infinite]";
   const variants = {
     text: "h-3 w-full rounded-md",
     circle: "rounded-full aspect-square",
-    rect: "rounded-xl",
-    card: "rounded-[20px] w-full",
+    rect: "rounded-[var(--radius-cm-lg)]",
+    card: "rounded-[var(--radius-cm-bento)] w-full",
   };
   return (
     <div
@@ -24,7 +24,7 @@ export default function Skeleton({ variant = "text", width, height, className = 
 
 export function SkeletonCard() {
   return (
-    <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] p-4 border border-[rgba(255,255,255,0.35)] space-y-3" aria-hidden="true">
+    <div className="bg-cm-elevated rounded-[20px] p-4 border border-cm-border space-y-3" aria-hidden="true">
       <div className="flex items-center gap-3">
         <Skeleton variant="circle" width="48px" height="48px" className="shrink-0" />
         <div className="flex-1 space-y-2">
@@ -45,7 +45,7 @@ export function SkeletonCard() {
 export function AISkeleton() {
   return (
     <div className="space-y-4">
-      <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[24px] p-5 border border-[rgba(255,255,255,0.35)] space-y-4">
+      <div className="bg-cm-elevated rounded-[24px] p-5 border border-cm-border space-y-4">
         <div className="flex items-center gap-2">
           <Skeleton variant="circle" width="32px" height="32px" />
           <Skeleton variant="text" className="w-1/3" />
@@ -67,7 +67,7 @@ export function AISkeleton() {
 
 export function ProCardSkeleton() {
   return (
-    <div className="bg-[rgba(255,255,255,0.60)] backdrop-blur-[16px] rounded-[20px] overflow-hidden border border-[rgba(255,255,255,0.35)]" aria-hidden="true">
+    <div className="bg-cm-elevated rounded-[20px] overflow-hidden border border-cm-border" aria-hidden="true">
       <div className="flex gap-3 p-3">
         <Skeleton variant="circle" width="56px" height="56px" className="shrink-0" />
         <div className="flex-1 space-y-2 pt-1">

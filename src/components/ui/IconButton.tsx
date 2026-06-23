@@ -9,9 +9,9 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  default: "bg-white dark:bg-brand-forest text-brand-forest dark:text-brand-cream hover:bg-pale-mint dark:hover:bg-pale-mint/30 shadow-sm",
-  ghost: "bg-transparent text-secondary hover:bg-pale-mint/50",
-  green: "bg-cm-green text-white hover:bg-cm-green-deep shadow-sm",
+  default: "bg-cm-elevated text-cm-text hover:bg-cm-accent-soft border border-cm-border",
+  ghost: "bg-transparent text-cm-text-soft hover:bg-cm-accent-soft",
+  green: "bg-cm-accent text-white hover:bg-cm-accent-hover shadow-cm-sm",
 };
 
 const sizes = {
@@ -28,7 +28,7 @@ export default function IconButton({
 }: IconButtonProps) {
   return (
     <button
-      className={`flex items-center justify-center rounded-full transition-all duration-200 active:scale-95 cursor-pointer shrink-0 ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer shrink-0 cm-scale-btn ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {icon}
