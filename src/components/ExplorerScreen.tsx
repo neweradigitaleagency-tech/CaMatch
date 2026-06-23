@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Star, ChevronRight, MapPin, X, Mic, Bell, ChevronDown } from "lucide-react";
+import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown } from "lucide-react";
 import { ProfessionalDetails, Mission } from "../types";
 import { ProCardSkeleton } from "./ui/Skeleton";
 import VerifiedBadge from "./ui/VerifiedBadge";
 import { useAuthStore } from "../stores/authStore";
+import { useNotificationStore } from "../stores/notificationStore";
 import { findBestMatch } from "../data/serviceCategories";
+import NotificationPanel from "./NotificationPanel";
 
 interface ExplorerScreenProps {
   onSelectPro: (pro: ProfessionalDetails) => void;
@@ -36,12 +38,14 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   });
   const [promoIndex, setPromoIndex] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const nav = useNavigate();
 
   const user = useAuthStore((s) => s.user);
   const isPro = useAuthStore((s) => s.isPro);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Marie";
+  const unreadNotifs = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
 
   const activeMission = activeMissions.find(m => ["accepted", "en_route", "in_progress"].includes(m.status));
   const hasActiveJobs = !!activeMission;
@@ -49,6 +53,10 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    searchRef.current?.focus();
   }, []);
 
   useEffect(() => {
@@ -73,6 +81,40 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
     nav(".", { replace: true });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [nav]);
+
+  const handleSearchNavigation = useCallback(() => {
+    if (searchQuery.trim().length >= 2) {
+      nav(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  }, [searchQuery, nav]);
+
+  const LOCATION_COORDS: Record<string, { lat: number; lng: number }> = {
+    "Abidjan, Cocody": { lat: 5.360, lng: -4.008 },
+    "Abidjan, Plateau": { lat: 5.323, lng: -4.019 },
+    "Abidjan, Marcory": { lat: 5.310, lng: -3.999 },
+    "Abidjan, Yopougon": { lat: 5.350, lng: -4.083 },
+    "Abidjan, Treichville": { lat: 5.301, lng: -4.006 },
+  };
+
+  const userCoord = LOCATION_COORDS[location] || LOCATION_COORDS["Abidjan, Cocody"];
+
+  function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
+    const R = 6371;
+    const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+    const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+    const sinDLat = Math.sin(dLat / 2);
+    const sinDLng = Math.sin(dLng / 2);
+    const h = sinDLat * sinDLat + Math.cos((a.lat * Math.PI) / 180) * Math.cos((b.lat * Math.PI) / 180) * sinDLng * sinDLng;
+    return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+  }
+
+  const sortedByDistance = [...recommendedPros]
+    .filter((p) => p.lat != null && p.lng != null)
+    .sort((a, b) => {
+      const dA = haversineKm(userCoord, { lat: a.lat!, lng: a.lng! });
+      const dB = haversineKm(userCoord, { lat: b.lat!, lng: b.lng! });
+      return dA - dB;
+    });
 
   const filteredPros = recommendedPros.filter((pro) => {
     if (activeCategory && pro.category !== activeCategory) return false;
@@ -135,11 +177,14 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               <span className="truncate max-w-[100px] text-cm-text-soft">{location.split(",")[1]?.trim() || location.split(",")[0]}</span>
               <ChevronDown className="w-3 h-3 text-cm-text-soft" />
             </button>
-            <button className="relative w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
+            <button onClick={() => setShowNotifications(true)}
+              className="relative w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
               <Bell className="w-4 h-4 text-cm-text" />
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-cm-error rounded-full flex items-center justify-center text-[10px] font-bold text-white border-2 border-cm-elevated">
-                3
-              </span>
+              {unreadNotifs > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-cm-error rounded-full flex items-center justify-center text-[10px] font-bold text-white border-2 border-cm-elevated px-0.5">
+                  {unreadNotifs > 99 ? "99+" : unreadNotifs}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -170,6 +215,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               if (e.target.value.length === 0) setShowSearchResults(false);
             }}
             onFocus={() => { if (searchQuery.length >= 2) setShowSearchResults(true); }}
+            onKeyDown={(e) => { if (e.key === "Enter") handleSearchNavigation(); }}
           />
         </div>
       </section>
@@ -185,47 +231,17 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               <X className="w-3 h-3" /> Effacer
             </button>
           </div>
-          {loading ? (
-            <div className="space-y-3">{[1, 2, 3].map((i) => <ProCardSkeleton key={i} />)}</div>
-          ) : filteredPros.length === 0 ? (
-            <div className="p-8 text-center cm-card">
-              <Search className="w-8 h-8 text-cm-text-muted mx-auto mb-2" />
-              <p className="text-[14px] font-semibold text-cm-text mb-1">Aucun résultat</p>
-              <p className="text-[12px] text-cm-text-soft">Essayez d'autres mots-clés</p>
+          <button onClick={handleSearchNavigation}
+            className="w-full flex items-center justify-between p-4 bg-cm-elevated border border-cm-border rounded-[var(--radius-cm)] cursor-pointer cm-scale-btn">
+            <div className="flex items-center gap-3">
+              <Search className="w-5 h-5 text-cm-accent" />
+              <div className="text-left">
+                <p className="text-[13px] font-semibold text-cm-text">Voir tous les résultats</p>
+                <p className="text-[11px] text-cm-text-soft">Rechercher "{searchQuery}" dans toute l'application</p>
+              </div>
             </div>
-          ) : (
-            <div className="space-y-3">
-              {filteredPros.map((pro) => {
-                const tier = getTier(pro.completedInterventions);
-                return (
-                  <div key={pro.id} onClick={() => onSelectPro(pro)}
-                    className="flex items-center gap-3 p-3 bg-cm-elevated border border-cm-border rounded-[var(--radius-cm)] cursor-pointer cm-scale-btn">
-                    <div className="w-12 h-12 rounded-full overflow-hidden border border-cm-border shrink-0">
-                      <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="text-[14px] font-semibold text-cm-text truncate">{pro.name}</h4>
-                        {pro.isVerified && <VerifiedBadge />}
-                        <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${tier.bg} ${tier.color}`}>{tier.label}</span>
-                      </div>
-                      <p className="text-[12px] text-cm-text-soft truncate">{pro.title}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-[12px] text-cm-text-muted flex items-center gap-0.5">
-                          <Star className="w-3 h-3 text-cm-text-muted" />{(pro.rating / 10).toFixed(1)}
-                        </span>
-                        <span className="text-[12px] text-cm-text-muted flex items-center gap-0.5">
-                          <MapPin className="w-3 h-3" />{pro.locationNeighborhood.split(",")[0]}
-                        </span>
-                        <span className="text-[13px] font-semibold text-cm-text ml-auto">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F</span>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-cm-text-muted shrink-0" />
-                  </div>
-                );
-              })}
-            </div>
-          )}
+            <ChevronRight className="w-4 h-4 text-cm-text-muted shrink-0" />
+          </button>
         </section>
       ) : (
         <>
@@ -400,7 +416,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
                 Voir tout <ChevronRight className="w-3 h-3 inline" />
               </button>
             </div>
-            {filteredPros.length === 0 ? (
+            {sortedByDistance.length === 0 ? (
               <div className="mx-5 p-6 text-center cm-card">
                 <span className="text-[24px]">🗺️</span>
                 <p className="text-[14px] font-semibold text-cm-text mt-2">Aucun pro à proximité</p>
@@ -411,8 +427,8 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               </div>
             ) : (
               <div className="px-5 space-y-2">
-                {filteredPros.slice(0, 3).map((pro) => {
-                  const distance = (Math.random() * 4 + 0.5).toFixed(1);
+                {sortedByDistance.slice(0, 3).map((pro) => {
+                  const dist = haversineKm(userCoord, { lat: pro.lat!, lng: pro.lng! });
                   return (
                     <div key={`nearby-${pro.id}`} onClick={() => onSelectPro(pro)}
                       className="flex items-center gap-3 p-3.5 cm-card cursor-pointer">
@@ -423,7 +439,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
                         <div className="flex items-center gap-1.5">
                           <h4 className="text-[13px] font-semibold text-cm-text truncate">{pro.name}</h4>
                           <span className="text-[11px] text-cm-text-muted shrink-0 flex items-center gap-0.5">
-                            <MapPin className="w-2.5 h-2.5" />{distance} km
+                            <MapPin className="w-2.5 h-2.5" />{dist.toFixed(1)} km
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
@@ -445,7 +461,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
           </section>
 
           {/* Become a Pro CTA */}
-          <section className="px-5 py-2 mb-4">
+          {!isPro && <section className="px-5 py-2 mb-4">
             <div onClick={() => nav("/profile")}
               className="border border-cm-border rounded-[var(--radius-cm-lg)] bg-cm-elevated p-5 cursor-pointer cm-scale-btn">
               <div className="flex items-start gap-3 mb-3">
@@ -471,9 +487,12 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
                 Devenir Professionnel
               </span>
             </div>
-          </section>
+          </section>}
         </>
       )}
+
+      {/* Notification Panel */}
+      <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
 
       {/* Location Picker */}
       {showLocationPicker && (

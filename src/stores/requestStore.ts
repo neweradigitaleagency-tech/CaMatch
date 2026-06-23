@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { ClientRequest, Mission } from "../types";
+import { useNotificationStore } from "./notificationStore";
 
 interface RequestState {
   requests: ClientRequest[];
@@ -13,7 +14,7 @@ interface RequestState {
   updateMissionStatus: (id: string, status: string) => void;
 }
 
-export const useRequestStore = create<RequestState>((set) => ({
+export const useRequestStore = create<RequestState>((set, get) => ({
   requests: [],
   missions: [],
   selectedMission: null,
@@ -26,7 +27,25 @@ export const useRequestStore = create<RequestState>((set) => ({
     })),
   setMissions: (missions) => set({ missions }),
   selectMission: (mission) => set({ selectedMission: mission }),
-  updateMissionStatus: (id: string, status: string) =>
+  updateMissionStatus: (id: string, status: string) => {
+    const mission = get().missions.find((m) => m.id === id);
+    const statusLabels: Record<string, string> = {
+      accepted: "accepté votre demande",
+      en_route: "est en route",
+      in_progress: "a commencé l'intervention",
+      completed: "a terminé l'intervention",
+      paid: "paiement confirmé",
+      reviewed: "évaluation reçue",
+    };
+    const label = statusLabels[status];
+    if (label && mission) {
+      useNotificationStore.getState().addNotification({
+        type: "mission",
+        title: mission.proName || "Mise à jour",
+        body: `${mission.proName || "Le professionnel"} a ${label}`,
+        actionUrl: `/orders/tracker/${id}`,
+      });
+    }
     set((state) => ({
       missions: state.missions.map((m) =>
         m.id === id ? { ...m, status: status as never } : m
@@ -35,5 +54,6 @@ export const useRequestStore = create<RequestState>((set) => ({
         state.selectedMission?.id === id
           ? { ...state.selectedMission, status: status as never }
           : state.selectedMission,
-    })),
+    }));
+  },
 }));

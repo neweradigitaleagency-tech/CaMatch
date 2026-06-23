@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Search, X, Star, MapPin, Sparkles, Camera, Mic, ArrowLeft } from "lucide-react";
+import { Search, X, Star, MapPin, Sparkles, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import GlassCard from "../components/ui/GlassCard";
 import BentoCard from "../components/ui/BentoCard";
@@ -102,12 +102,6 @@ export default function SearchPage() {
               onChange={(e) => handleSearch(e.target.value)}
             />
             <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
-              <button className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[10px] hover:bg-cm-accent-soft text-cm-text-muted cursor-pointer">
-                <Mic className="w-3.5 h-3.5" />
-              </button>
-              <button className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[10px] hover:bg-cm-accent-soft text-cm-text-muted cursor-pointer">
-                <Camera className="w-3.5 h-3.5" />
-              </button>
             </div>
           </div>
         </div>

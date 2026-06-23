@@ -182,7 +182,31 @@ const PROS_DATA: ProfessionalDetails[] = [
   { id: "pro160", name: "Djakaridja Kouyaté", email: "djakaridja.kouyate_a@gmail.com", phoneNumber: "+225 07 8202 233", role: UserRole.PRO, avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", category: "assistance-services", subCategory: "Accompagnement administratif", title: "Expert Accompagnement administratif", bio: "", experienceYears: 14, rating: 42, reviewCount: 22, hourlyRateXOF: 21845, locationNeighborhood: "Zone 4, Abidjan", isVerified: true, completedInterventions: 13, availabilityStatus: "available", createdAt: "2026-06-18T05:25:00Z" },
 ];
 
-export const MOCK_PROS: ProfessionalDetails[] = PROS_DATA;
+const NEIGHBORHOOD_COORDS: Record<string, { lat: number; lng: number }> = {
+  Cocody: { lat: 5.360, lng: -4.008 },
+  Plateau: { lat: 5.323, lng: -4.019 },
+  Marcory: { lat: 5.310, lng: -3.999 },
+  Yopougon: { lat: 5.350, lng: -4.083 },
+  Treichville: { lat: 5.301, lng: -4.006 },
+  Koumassi: { lat: 5.286, lng: -3.997 },
+  Abobo: { lat: 5.400, lng: -4.017 },
+  Adjamé: { lat: 5.340, lng: -4.010 },
+  "Port-Bouët": { lat: 5.252, lng: -3.942 },
+  Riviera: { lat: 5.367, lng: -3.989 },
+  Angré: { lat: 5.368, lng: -3.976 },
+  "Zone 4": { lat: 5.328, lng: -3.999 },
+  Bingerville: { lat: 5.353, lng: -3.899 },
+  "Saint-Jean": { lat: 5.316, lng: -3.974 },
+  Anyama: { lat: 5.486, lng: -4.051 },
+};
+
+const DEFAULT_COORD = { lat: 5.360, lng: -4.008 };
+
+export const MOCK_PROS: ProfessionalDetails[] = PROS_DATA.map((p) => {
+  const hood = p.locationNeighborhood.split(",")[0].trim();
+  const coord = NEIGHBORHOOD_COORDS[hood] || DEFAULT_COORD;
+  return { ...p, lat: coord.lat, lng: coord.lng };
+});
 
 export const MOCK_SERVICES: Service[] = [
   { id: "s1", proId: "pro6", name: "Diagnostic Électrique", description: "Vérification complète de l'installation électrique (prises, disjoncteurs, mise à la terre)", priceEstimateXOF: 15000 },
