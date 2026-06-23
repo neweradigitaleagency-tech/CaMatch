@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useChatStore } from "../stores/chatStore";
 import { useAuthStore } from "../stores/authStore";
+import { useLocationStore } from "../stores/locationStore";
 import BottomNav from "../components/BottomNav";
 import { AnimatePresence, motion } from "motion/react";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
@@ -32,6 +33,18 @@ export default function AppLayout() {
     };
     nav(routes[tab] || "/");
   };
+
+  const refreshLocation = useLocationStore((s) => s.refreshLocation);
+  const locStatus = useLocationStore((s) => s.status);
+  const locAttempted = useRef(false);
+
+  useEffect(() => {
+    if (locAttempted.current) return;
+    if (locStatus === "idle") {
+      locAttempted.current = true;
+      refreshLocation();
+    }
+  }, [locStatus, refreshLocation]);
 
   const hideNavRoutes = ["/messages/", "/orders/new", "/orders/tracker/", "/profile/pro-", "/profile/edit", "/profile/security", "/profile/language", "/profile/terms", "/explorer/pro/", "/explorer/matching", "/explorer/request-creation", "/explorer/pro-selection", "/orders/qr-payment", "/orders/review", "/orders/invoice"];
   const showNav = !hideNavRoutes.some((r) => location.pathname.startsWith(r)) && location.pathname !== "/auth" && location.pathname !== "/onboarding";
