@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, X, Star, MapPin, Sparkles, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -25,11 +25,33 @@ export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const subCategoryParam = searchParams.get("subCategory");
   const categoryParam = searchParams.get("category");
+  const qParam = searchParams.get("q");
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(qParam || subCategoryParam || "");
   const [typedResults, setTypedResults] = useState<ProfessionalDetails[]>([]);
-  const [searched, setSearched] = useState(!!subCategoryParam);
+  const [searched, setSearched] = useState(!!subCategoryParam || !!qParam);
   const [nearbyOnly, setNearbyOnly] = useState(false);
+  const initialized = useRef(false);
+
+  if (!initialized.current) {
+    initialized.current = true;
+    const searchTerm = qParam || subCategoryParam;
+    if (searchTerm) {
+      const q = searchTerm.toLowerCase();
+      const match = findBestMatch(searchTerm);
+      const filtered = MOCK_PROS.filter((pro) => {
+        const nameMatch = pro.name.toLowerCase().includes(q);
+        const titleMatch = pro.title.toLowerCase().includes(q);
+        const locationMatch = pro.locationNeighborhood.toLowerCase().includes(q);
+        const subMatch = match && (
+          pro.title.toLowerCase().includes(match.subName.toLowerCase()) ||
+          pro.subCategory.toLowerCase().includes(match.subName.toLowerCase())
+        );
+        return nameMatch || titleMatch || locationMatch || subMatch;
+      });
+      setTypedResults(filtered);
+    }
+  }
 
   const storeLat = useLocationStore((s) => s.latitude);
   const storeLng = useLocationStore((s) => s.longitude);
@@ -45,7 +67,7 @@ export default function SearchPage() {
     return [];
   }, [subCategoryParam]);
 
-  const results = subCategoryParam && !query ? initialResults : typedResults;
+  const results = typedResults.length > 0 ? typedResults : initialResults;
 
   const nearbyResults = useMemo(() => {
     if (!nearbyOnly) return results;

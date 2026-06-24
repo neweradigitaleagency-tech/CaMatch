@@ -154,12 +154,22 @@ export interface Review {
 
 // ─── Message & Conversation ───
 
+export type MediaType = "image" | "video" | "voice" | "none";
+
+export interface MediaAttachment {
+  type: MediaType;
+  url: string;
+  thumbnailUrl?: string;
+  duration?: number; // seconds (for video/voice)
+}
+
 export interface Message {
   id: string;
   conversationId: string;
   senderId: string;
   text: string;
   photos: string[];
+  media?: MediaAttachment[];
   location?: { lat: number; lng: number; label: string };
   createdAt: string;
   status?: "sent" | "delivered" | "read";
@@ -332,6 +342,7 @@ export interface ProAlert {
 
 export interface ProJob {
   id: string;
+  clientId: string;
   clientName: string;
   clientPhone: string;
   clientAvatarUrl?: string;
@@ -403,6 +414,53 @@ export interface ProVerification {
   certStatus: "not_submitted" | "pending" | "approved" | "rejected";
   submittedAt: string;
   verifiedAt?: string;
+}
+
+// ─── Gamification & Progression ───
+
+export type ProLevel = "débutant" | "avancé" | "expert" | "élite";
+
+export interface ProLevelConfig {
+  level: ProLevel;
+  minXP: number;
+  maxXP: number;
+  label: string;
+  color: string;
+  commissionPercent: number;
+  benefits: string[];
+}
+
+export const PRO_LEVELS: ProLevelConfig[] = [
+  { level: "débutant", minXP: 0, maxXP: 599, label: "Débutant", color: "text-cm-text-muted", commissionPercent: 15, benefits: ["Accès aux missions", "Support standard"] },
+  { level: "avancé", minXP: 600, maxXP: 1199, label: "Avancé", color: "text-cm-text-soft", commissionPercent: 12, benefits: ["Commission réduite (12%)", "Visibilité accrue", "Support prioritaire"] },
+  { level: "expert", minXP: 1200, maxXP: 2499, label: "Expert", color: "text-cm-accent", commissionPercent: 8, benefits: ["Commission réduite (8%)", "Badge Expert", "Mise en avant", "Support dédié"] },
+  { level: "élite", minXP: 2500, maxXP: Infinity, label: "Élite", color: "text-yellow-500", commissionPercent: 5, benefits: ["Commission réduite (5%)", "Badge Élite", "Avantage prioritaire", "Accès aux missions premium", "Conciergerie"] },
+];
+
+export function getProLevel(xp: number): ProLevelConfig {
+  return PRO_LEVELS.find(l => xp >= l.minXP && xp <= l.maxXP) ?? PRO_LEVELS[0];
+}
+
+export function getProLevelFromJobs(jobs: number): ProLevelConfig {
+  return getProLevel(jobs * 50);
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlocked: boolean;
+  unlockedAt?: string;
+}
+
+export interface ProgressionState {
+  xp: number;
+  level: ProLevel;
+  badges: Badge[];
+  completedJobs: number;
+  totalEarningsXOF: number;
+  currentCommissionPercent: number;
 }
 
 // ─── Portfolio ───

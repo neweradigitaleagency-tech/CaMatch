@@ -21,11 +21,8 @@ function mapPro(row: any): ProfessionalDetails {
     phoneNumber: row.users?.phone_number || "",
     role: UserRole.PRO,
     avatarUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`,
-    category: row.category === "electrician" ? "electricity" as const
-      : row.category === "plumber" ? "plumbing" as const
-      : row.category === "ac_refrigeration" ? "ac" as const
-      : row.category === "carpenter" ? "carpenter" as const
-      : "carpenter" as const,
+    category: "maison-reparations" as const,
+    subCategory: row.sub_category || "",
     title: row.business_name || "",
     bio: row.bio || "",
     experienceYears: Math.floor((row.total_jobs || 0) / 15),
@@ -205,6 +202,7 @@ export function useProDashboard() {
         .filter((r: any) => r.scheduled_at?.startsWith(today) || r.status === "in_progress")
         .map((r: any) => ({
           id: r.id,
+          clientId: r.client_id || "",
           clientName: "Client",
           clientPhone: "",
           clientLocation: r.address || "",

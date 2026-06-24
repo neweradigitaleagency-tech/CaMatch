@@ -28,7 +28,7 @@ const DOMAIN_ICONS: Record<string, typeof Zap> = {
   cleaning: Sparkles,
 };
 
-const DISPLAYABLE = MISSION_STATUS_ORDER.filter((s) => s !== "created");
+const DISPLAYABLE: MissionStatus[] = MISSION_STATUS_ORDER.filter((s) => s !== "created");
 
 const STATUS_STEP_ICONS: Record<string, typeof Circle> = {
   accepted: CheckCircle,

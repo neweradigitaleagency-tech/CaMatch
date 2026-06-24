@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Sparkles, Star, Verified, Navigation, CheckCircle, ChevronRight, UserIcon } from "lucide-react";
-import { ProfessionalDetails } from "../types";
+import { ProfessionalDetails, type ProCategory } from "../types";
 
 interface ProSelectionScreenProps {
   proList: ProfessionalDetails[];
-  category: "electricity" | "plumbing" | "ac" | "carpenter";
+  category: ProCategory | string;
   onSelectPro: (pro: ProfessionalDetails) => void;
   onViewProfile: (pro: ProfessionalDetails) => void;
   onBack: () => void;
@@ -36,6 +36,12 @@ export default function ProSelectionScreen({ proList, category, onSelectPro, onV
 
   const getCategoryLabel = (cat: string) => {
     switch (cat) {
+      case "maison-reparations": return "Maison & Réparations";
+      case "transport-livraison": return "Transport & Livraison";
+      case "evenements": return "Événements";
+      case "education-formation": return "Éducation & Formation";
+      case "social-media-informatique": return "Social Media & Informatique";
+      case "assistance-services": return "Assistance & Services";
       case "electricity": return "Électricien";
       case "plumbing": return "Plombier";
       case "ac": return "Climatisation";

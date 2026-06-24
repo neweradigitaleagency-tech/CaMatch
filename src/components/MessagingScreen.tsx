@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, Send, Camera, MapPin, Navigation, ImagePlus, Phone, ExternalLink, Mic, Square, X, MessageSquare, Search } from "lucide-react";
-import { Conversation, Message } from "../types";
-import ImageViewer from "./ImageViewer";
-import GlassCard from "./ui/GlassCard";
-import { useLocationStore } from "../stores/locationStore";
+import { ArrowLeft, Send, Camera, ImagePlus, Mic, Square, X, MessageSquare, Search, Play, Video, Trash2, Pause } from "lucide-react";
+import type { Conversation, Message, MediaAttachment } from "../types";
+import { useChatStore } from "../stores/chatStore";
 
 interface MessagingScreenProps {
   conversations: Conversation[];
@@ -50,9 +48,6 @@ export default function MessagingScreen({ conversations, onBack, onOpenConversat
           </div>
           <h3 className="text-[15px] font-bold text-cm-text mb-1">Aucune conversation</h3>
           <p className="text-[13px] text-cm-text-muted">Quand une demande sera acceptée, la conversation démarrera automatiquement.</p>
-          <button className="mt-5 h-11 px-6 bg-cm-text text-white text-[13px] font-semibold rounded-[14px] hover:opacity-90 transition-all cursor-pointer active:scale-[0.97]">
-            Explorer les pros
-          </button>
         </div>
       ) : (
         <div className="px-4 space-y-1">
@@ -104,86 +99,136 @@ function getRelativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
 }
 
-// ─── Conversation Detail Screen ───
+// ─── Chat Screen ───
 
 interface ChatScreenProps {
   conversation: Conversation;
   messages: Message[];
   onBack: () => void;
   onSendMessage: (text: string) => void;
-  onSendPhoto: (photo: string) => void;
-  onSendLocation: () => void;
-  onOpenCall?: () => void;
+  onSendMedia: (file: File, type: "image" | "video" | "voice") => void;
   currentUserId: string;
 }
 
 export function ChatScreen({
-  conversation, messages, onBack, onSendMessage, onSendPhoto, onSendLocation, onOpenCall, currentUserId,
+  conversation, messages, onBack, onSendMessage, onSendMedia, currentUserId,
 }: ChatScreenProps) {
   const [text, setText] = useState("");
-  const [viewerOpen, setViewerOpen] = useState(false);
-  const [viewerIdx, setViewerIdx] = useState(0);
   const [recording, setRecording] = useState(false);
-  const [showLocations, setShowLocations] = useState(false);
+  const [recordingDuration, setRecordingDuration] = useState(0);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [videoPreview, setVideoPreview] = useState<string | null>(null);
+  const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const [otherUserTyping, setOtherUserTyping] = useState(false);
+  const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (messages.length === 0) return;
-    const last = messages[messages.length - 1];
-    if (last.senderId === currentUserId) {
-      const delay = 1500 + Math.random() * 2000;
-      const typing = setTimeout(() => setOtherUserTyping(true), delay);
-      const stopTyping = setTimeout(() => { setOtherUserTyping(false); }, delay + 2000 + Math.random() * 2500);
-      return () => { clearTimeout(typing); clearTimeout(stopTyping); };
-    }
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages.length, otherUserTyping]);
+  useEffect(() => {
+    return () => {
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
-  const storeLat = useLocationStore((s) => s.latitude);
-  const storeLng = useLocationStore((s) => s.longitude);
-  const storeNeighborhood = useLocationStore((s) => s.neighborhood);
-  const refreshLocation = useLocationStore((s) => s.refreshLocation);
-  const locStatus = useLocationStore((s) => s.status);
-
-  const currentLocation = {
-    label: "Ma position",
-    addr: storeNeighborhood ? `${storeNeighborhood}, Abidjan` : "Cocody, Abidjan",
-    lat: storeLat,
-    lng: storeLng,
+  const handleSend = () => {
+    if (!text.trim()) return;
+    onSendMessage(text);
+    setText("");
   };
 
-  const handleSend = () => { if (!text.trim()) return; onSendMessage(text); setText(""); };
+  const handleFilePick = () => {
+    fileRef.current?.click();
+  };
 
-  const handlePhoto = () => {
-    const file = fileRef.current?.files?.[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => { if (reader.result) onSendPhoto(reader.result as string); };
-    reader.readAsDataURL(file);
+    e.target.value = "";
+
+    if (file.type.startsWith("video/")) {
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.onloadedmetadata = () => {
+        if (video.duration > 30) {
+          alert("La vidéo ne doit pas dépasser 30 secondes.");
+          return;
+        }
+        onSendMedia(file, "video");
+      };
+      video.src = URL.createObjectURL(file);
+    } else {
+      onSendMedia(file, "image");
+    }
   };
 
   const handleVoiceRecord = async () => {
-    if (recording) { mediaRecorderRef.current?.stop(); setRecording(false); return; }
+    if (recording) {
+      mediaRecorderRef.current?.stop();
+      setRecording(false);
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+      setRecordingDuration(0);
+      return;
+    }
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
-      const chunks: Blob[] = [];
-      mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data);
+      };
+
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/webm" });
-        const reader = new FileReader();
-        reader.onload = () => { if (reader.result) onSendPhoto(reader.result as string); };
-        reader.readAsDataURL(blob);
+        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const file = new File([blob], `voice_${Date.now()}.webm`, { type: "audio/webm" });
+        onSendMedia(file, "voice");
         stream.getTracks().forEach((t) => t.stop());
       };
+
       mediaRecorder.start();
       setRecording(true);
-    } catch { /* Permission denied */ }
+
+      let sec = 0;
+      recordingTimerRef.current = setInterval(() => {
+        sec++;
+        setRecordingDuration(sec);
+        if (sec >= 60) {
+          mediaRecorder.stop();
+          setRecording(false);
+          if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+          setRecordingDuration(0);
+        }
+      }, 1000);
+    } catch {
+      // Permission denied
+    }
+  };
+
+  const handlePlayVoice = (url: string) => {
+    if (playingVoice === url) {
+      audioRef.current?.pause();
+      setPlayingVoice(null);
+      return;
+    }
+    if (audioRef.current) audioRef.current.pause();
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    audio.onended = () => setPlayingVoice(null);
+    audio.play();
+    setPlayingVoice(url);
   };
 
   return (
@@ -199,22 +244,7 @@ export function ChatScreen({
           </div>
           <div>
             <h3 className="text-[14px] font-bold text-cm-text">{conversation.otherUserName}</h3>
-            <p className="text-[11px] text-cm-text-muted">
-              {otherUserTyping ? (
-                <span className="text-cm-accent font-medium flex items-center gap-1">
-                  <TypingDots />
-                </span>
-              ) : "En ligne"}
-            </p>
           </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <button onClick={onOpenCall} className="w-11 h-11 rounded-[12px] border border-cm-border bg-cm-elevated flex items-center justify-center cursor-pointer hover:bg-cm-accent-soft transition-colors active:scale-90">
-            <Phone className="w-5 h-5 text-cm-text" />
-          </button>
-          <button className="w-11 h-11 rounded-[12px] border border-cm-border bg-cm-elevated flex items-center justify-center cursor-pointer hover:bg-cm-accent-soft transition-colors">
-            <ExternalLink className="w-5 h-5 text-cm-text" />
-          </button>
         </div>
       </header>
 
@@ -226,32 +256,42 @@ export function ChatScreen({
               className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[80%] space-y-1.5 flex flex-col ${isMe ? "items-end" : "items-start"}`}>
                 {msg.photos.map((photo, i) => (
-                  <div key={i} onClick={() => {
-                    const all = messages.flatMap(m => m.photos.map(u => ({ url: u })));
-                    const found = all.findIndex(p => p.url === photo);
-                    setViewerIdx(found >= 0 ? found : 0);
-                    setViewerOpen(true);
-                  }} className="rounded-[16px] overflow-hidden border border-cm-border-soft max-w-[200px] cursor-pointer active:scale-95 transition-transform">
+                  <div key={i}
+                    className="rounded-[16px] overflow-hidden border border-cm-border-soft max-w-[200px] cursor-pointer active:scale-95 transition-transform">
                     <img src={photo} alt="" className="w-full h-auto" />
                   </div>
                 ))}
-                {msg.location && (
-                  <GlassCard className="p-3 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-[12px] font-bold text-cm-text">
-                      <MapPin className="w-3.5 h-3.5" />{msg.location.label}
-                    </div>
-                    <div className="bg-cm-bg rounded-[12px] p-2 flex items-center justify-between border border-cm-border-soft">
-                      <span className="text-[11px] text-cm-text-muted">Position partagée</span>
-                      <Navigation className="w-3.5 h-3.5 text-cm-text-soft" />
-                    </div>
-                    <div className="flex gap-1.5">
-                      <button className="flex-1 h-7 bg-cm-text text-white rounded-[10px] text-[11px] font-medium cursor-pointer active:scale-95">Google Maps</button>
-                      <button className="flex-1 h-7 bg-cm-text text-white rounded-[10px] text-[11px] font-medium cursor-pointer active:scale-95">Waze</button>
-                      <button className="flex-1 h-7 bg-cm-text text-white rounded-[10px] text-[11px] font-medium cursor-pointer active:scale-95">Apple Maps</button>
-                    </div>
-                  </GlassCard>
-                )}
-                {msg.text && (
+
+                {msg.media?.map((m, i) => (
+                  <div key={i}>
+                    {m.type === "voice" && (
+                      <div
+                        onClick={() => handlePlayVoice(m.url)}
+                        className={`flex items-center gap-2 px-4 py-3 rounded-[16px] cursor-pointer min-w-[160px] ${
+                          isMe ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text"
+                        }`}
+                      >
+                        {playingVoice === m.url ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                        <div className="flex-1 h-2 rounded-full bg-current opacity-20">
+                          <div className={`h-full rounded-full bg-current opacity-60 transition-all ${playingVoice === m.url ? "w-3/4" : "w-0"}`} />
+                        </div>
+                        <span className="text-[11px] opacity-70">{m.duration ? `${m.duration}s` : "🎤"}</span>
+                      </div>
+                    )}
+                    {m.type === "video" && (
+                      <div className="rounded-[16px] overflow-hidden border border-cm-border-soft max-w-[240px] relative">
+                        <video
+                          src={m.url}
+                          className="w-full h-auto max-h-[320px] object-cover"
+                          controls
+                          preload="metadata"
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {msg.text && !msg.media?.some((m) => m.type === "voice") && (
                   <div className={`px-3.5 py-2.5 rounded-[16px] text-[12px] leading-relaxed ${
                     isMe
                       ? "bg-cm-text text-white rounded-br-[4px]"
@@ -260,6 +300,7 @@ export function ChatScreen({
                     {msg.text}
                   </div>
                 )}
+
                 <div className={`flex items-center gap-1 px-1 ${isMe ? "flex-row" : "flex-row-reverse"}`}>
                   <p className="text-[11px] text-cm-text-muted">
                     {new Date(msg.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
@@ -271,35 +312,30 @@ export function ChatScreen({
           );
         })}
 
-        {otherUserTyping && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex justify-start">
-            <div className="bg-cm-elevated border border-cm-border rounded-[16px] rounded-bl-[4px] px-4 py-3 flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-cm-text-muted animate-bounce" style={{ animationDelay: "0ms" }} />
-              <div className="w-1.5 h-1.5 rounded-full bg-cm-text-muted animate-bounce" style={{ animationDelay: "150ms" }} />
-              <div className="w-1.5 h-1.5 rounded-full bg-cm-text-muted animate-bounce" style={{ animationDelay: "300ms" }} />
-            </div>
-          </motion.div>
-        )}
-
         <div ref={chatEndRef} />
       </div>
 
       <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto">
         <div className="bg-cm-elevated border border-cm-border rounded-[16px] shadow-cm-md px-3 py-2 flex items-center gap-2">
-          <button onClick={() => { const inp = fileRef.current; if (inp) { inp.accept = "image/*,video/*"; inp.click(); } }}
+          <button onClick={() => setShowMediaPicker(!showMediaPicker)}
             className="w-10 h-10 rounded-[12px] border border-cm-border bg-cm-elevated flex items-center justify-center shrink-0 cursor-pointer hover:bg-cm-accent-soft">
             <ImagePlus className="w-4 h-4 text-cm-text" />
           </button>
-          <button onClick={() => setShowLocations(true)}
-            className="w-10 h-10 rounded-[12px] border border-cm-border bg-cm-elevated flex items-center justify-center shrink-0 cursor-pointer hover:bg-cm-accent-soft">
-            <MapPin className="w-4 h-4 text-cm-text" />
-          </button>
+
           <button onClick={handleVoiceRecord}
             className={`w-10 h-10 rounded-[12px] flex items-center justify-center shrink-0 cursor-pointer transition-all border ${
-              recording ? "bg-cm-text text-white border-cm-text animate-pulse" : "border-cm-border bg-cm-elevated text-cm-text hover:bg-cm-accent-soft"
+              recording ? "bg-red-500 text-white border-red-500" : "border-cm-border bg-cm-elevated text-cm-text hover:bg-cm-accent-soft"
             }`}>
             {recording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </button>
+
+          {recording && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-red-50 rounded-[10px] border border-red-200">
+              <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <span className="text-[12px] font-mono text-red-600 tabular-nums">{recordingDuration}s</span>
+            </div>
+          )}
+
           <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSend()}
             placeholder="Écrivez un message..." className="flex-1 h-9 text-[13px] bg-transparent outline-none px-2 text-cm-text placeholder-cm-text-muted" />
           <button onClick={handleSend} disabled={!text.trim()}
@@ -308,50 +344,30 @@ export function ChatScreen({
             }`}>
             <Send className="w-4 h-4" />
           </button>
-          <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={handlePhoto} />
-        </div>
-      </div>
 
-      {/* Location picker */}
-      {showLocations && (
-        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-end sm:items-center justify-center" onClick={() => setShowLocations(false)}>
-          <div className="w-full max-w-md bg-cm-elevated border border-cm-border rounded-t-[24px] p-5 pb-8 space-y-3 animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-[14px] font-bold text-cm-text">Envoyer une adresse</h3>
-              <button onClick={() => setShowLocations(false)} className="w-10 h-10 rounded-full bg-cm-accent-soft flex items-center justify-center cursor-pointer">
-                <X className="w-4 h-4" />
+          <input ref={fileRef} type="file" accept="image/*,video/*" className="hidden" onChange={handleFileChange} />
+        </div>
+
+        {showMediaPicker && (
+          <div className="mt-2 bg-cm-elevated border border-cm-border rounded-[16px] p-3 shadow-cm-md">
+            <div className="flex gap-3">
+              <button onClick={() => { fileRef.current?.click(); setShowMediaPicker(false); }}
+                className="flex-1 flex flex-col items-center gap-1.5 p-3 rounded-[12px] border border-cm-border bg-cm-bg cursor-pointer hover:bg-cm-accent-soft active:scale-95">
+                <Camera className="w-6 h-6 text-cm-text" />
+                <span className="text-[10px] text-cm-text-muted">Photo</span>
               </button>
-            </div>
-            <p className="text-[12px] text-cm-text-muted">Choisissez parmi vos adresses enregistrées</p>
-            <div className="space-y-2">
-              <button onClick={() => { onSendLocation(); setShowLocations(false); }}
-                className="w-full bg-cm-elevated border border-cm-accent/40 rounded-[16px] p-4 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform text-left shadow-cm-sm">
-                <div className="w-10 h-10 rounded-[12px] bg-cm-accent-soft flex items-center justify-center">
-                  <Navigation className="w-4 h-4 text-cm-accent" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[13px] font-bold text-cm-text">{currentLocation.label}</p>
-                  <p className="text-[11px] text-cm-text-muted">{currentLocation.addr}</p>
-                  <p className="text-[10px] text-cm-accent mt-0.5">
-                    {locStatus === "locating" ? "Détection..." : `${currentLocation.lat.toFixed(3)}, ${currentLocation.lng.toFixed(3)}`}
-                  </p>
-                </div>
-                <button onClick={(e) => { e.stopPropagation(); refreshLocation(); }}
-                  className="text-[10px] font-medium text-cm-accent border border-cm-accent rounded-full px-2.5 py-1 cursor-pointer shrink-0">
-                  Mettre à jour
-                </button>
+              <button onClick={() => { videoRef.current?.click(); setShowMediaPicker(false); }}
+                className="flex-1 flex flex-col items-center gap-1.5 p-3 rounded-[12px] border border-cm-border bg-cm-bg cursor-pointer hover:bg-cm-accent-soft active:scale-95">
+                <Video className="w-6 h-6 text-cm-text" />
+                <span className="text-[10px] text-cm-text-muted">Vidéo (30s max)</span>
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <ImageViewer
-        images={messages.flatMap(m => m.photos.map(u => ({ url: u })))}
-        initialIndex={viewerIdx}
-        open={viewerOpen}
-        onClose={() => setViewerOpen(false)}
-      />
+        <input ref={videoRef} type="file" accept="video/*" className="hidden"
+          onChange={handleFileChange} />
+      </div>
     </div>
   );
 }
@@ -360,14 +376,4 @@ function ReadReceipt({ status }: { status: string }) {
   if (status === "read") return <span className="text-[8px] text-cm-accent font-bold leading-none">✓✓</span>;
   if (status === "delivered") return <span className="text-[8px] text-cm-text-muted font-bold leading-none">✓✓</span>;
   return <span className="text-[8px] text-cm-text-muted font-bold leading-none">✓</span>;
-}
-
-function TypingDots() {
-  return (
-    <span className="flex items-center gap-0.5">
-      <span className="w-1 h-1 rounded-full bg-cm-accent animate-bounce" style={{ animationDelay: "0ms" }} />
-      <span className="w-1 h-1 rounded-full bg-cm-accent animate-bounce" style={{ animationDelay: "150ms" }} />
-      <span className="w-1 h-1 rounded-full bg-cm-accent animate-bounce" style={{ animationDelay: "300ms" }} />
-    </span>
-  );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ArrowLeft, Star, MapPin, Check, Plus, Image as ImageIcon, MessageSquare, ChevronRight } from "lucide-react";
-import { ProfessionalDetails, Service, PortfolioItem, ProVerification, VerificationLevel } from "../types";
+import { ArrowLeft, Star, MapPin, Check, Plus, Image as ImageIcon, MessageSquare, ChevronRight, Crown, Award, TrendingDown } from "lucide-react";
+import { ProfessionalDetails, Service, PortfolioItem, ProVerification, VerificationLevel, PRO_LEVELS, type ProLevelConfig, type Badge } from "../types";
 import ImageViewer from "./ImageViewer";
 import VerifiedBadge from "./ui/VerifiedBadge";
 import RatingStars from "./ui/RatingStars";
@@ -12,6 +12,10 @@ interface ProfilProScreenProps {
   verification?: ProVerification;
   onBack: () => void;
   onInitiateMatch: (selectedServices: Service[]) => void;
+  reviews?: { clientName: string; clientAvatar: string; rating: number; comment: string; createdAt: string }[];
+  levelConfig?: ProLevelConfig;
+  badges?: Badge[];
+  commissionPercent?: number;
 }
 
 const VERIFICATION_LABELS: Record<VerificationLevel, { label: string; color: string }> = {
@@ -23,7 +27,7 @@ const VERIFICATION_LABELS: Record<VerificationLevel, { label: string; color: str
   elite: { label: "Niveau Élite", color: "text-cm-accent" },
 };
 
-export default function ProfilProScreen({ pro, services, portfolio, verification, onBack, onInitiateMatch }: ProfilProScreenProps) {
+export default function ProfilProScreen({ pro, services, portfolio, verification, onBack, onInitiateMatch, reviews, levelConfig, badges, commissionPercent }: ProfilProScreenProps) {
   const [selectedServiceIds, setSelectedServiceIds] = useState<string[]>([]);
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIdx, setGalleryIdx] = useState(0);
@@ -40,7 +44,9 @@ export default function ProfilProScreen({ pro, services, portfolio, verification
 
   const handleLaunchMatch = () => {
     const activeServices = services.filter((s) => selectedServiceIds.includes(s.id));
-    const finalServicesList = activeServices.length > 0 ? activeServices : [services[0]];
+    const fallback = services.length > 0 ? [services[0]] : [];
+    const finalServicesList = activeServices.length > 0 ? activeServices : fallback;
+    if (finalServicesList.length === 0) return;
     onInitiateMatch(finalServicesList);
   };
 
@@ -91,7 +97,7 @@ export default function ProfilProScreen({ pro, services, portfolio, verification
         </div>
       </section>
 
-      {/* Stats row */}
+      {/* Stats row + Level */}
       <section className="px-4 mb-4">
         <div className="border border-cm-border rounded-[14px] bg-cm-elevated p-4 shadow-cm-sm">
           <div className="grid grid-cols-3 gap-3">
@@ -108,6 +114,26 @@ export default function ProfilProScreen({ pro, services, portfolio, verification
               <p className="text-[11px] text-cm-text-soft">Tps réponse</p>
             </div>
           </div>
+          {levelConfig && (() => {
+            const tierIndex = PRO_LEVELS.findIndex(l => l.level === levelConfig.level) + 1;
+            return (
+            <div className="border-t border-cm-border mt-3 pt-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {levelConfig.level === "élite" ? <Crown className="w-4 h-4 text-cm-accent" /> : <Award className="w-4 h-4 text-cm-accent" />}
+                <div>
+                  <span className="text-[13px] font-bold text-cm-text">{levelConfig.label}</span>
+                  <span className="text-[11px] text-cm-text-muted ml-2">Niveau {tierIndex}/4</span>
+                </div>
+              </div>
+              {commissionPercent !== undefined && (
+                <div className="flex items-center gap-1 text-[11px] text-cm-text-soft">
+                  <TrendingDown className="w-3 h-3" />
+                  Commission {commissionPercent}%
+                </div>
+              )}
+            </div>
+            );
+          })()}
         </div>
       </section>
 
@@ -132,6 +158,26 @@ export default function ProfilProScreen({ pro, services, portfolio, verification
           <div className="border-t border-cm-border mt-3" />
         </div>
       </section>
+
+      {/* Badges */}
+      {badges && badges.length > 0 && (
+        <section className="px-4 mb-4">
+          <div className="border border-cm-border rounded-[14px] bg-cm-elevated p-4 shadow-cm-sm">
+            <h3 className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-3 flex items-center gap-1.5">
+              <Award className="w-3.5 h-3.5" /> Badges ({badges.length})
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {badges.map((badge) => (
+                <div key={badge.id} className="flex items-center gap-1.5 px-2.5 py-1.5 bg-cm-bg rounded-[10px] border border-cm-border-soft"
+                  title={badge.description}>
+                  <span className="text-[14px]">{badge.icon}</span>
+                  <span className="text-[11px] font-medium text-cm-text">{badge.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Portfolio */}
       {portfolio && portfolio.length > 0 && (
@@ -201,39 +247,40 @@ export default function ProfilProScreen({ pro, services, portfolio, verification
       </section>
 
       {/* Reviews */}
-      <section className="px-4 mb-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-[16px] font-display font-bold text-cm-text">Avis</h3>
-          <button onClick={() => setShowAllReviews(!showAllReviews)} className="text-[12px] text-cm-accent font-medium cursor-pointer">
-            {showAllReviews ? "Moins" : "Voir tout"}
-          </button>
-        </div>
-        <div className="space-y-2">
-          {(showAllReviews ? [1, 2, 3, 4, 5] : [1, 2, 3]).map((i) => (
-            <div key={i} className="p-4 border border-cm-border rounded-[14px] bg-cm-elevated shadow-cm-sm">
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full overflow-hidden border border-cm-border-soft shrink-0 bg-cm-bg">
-                  <img src={`https://i.pravatar.cc/40?u=${i}`} alt="" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="text-[13px] font-semibold text-cm-text">Client {i}</h4>
-                    <span className="text-[11px] text-cm-text-muted">Il y a {i * 3}j</span>
+      {reviews && reviews.length > 0 && (
+        <section className="px-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-[16px] font-display font-bold text-cm-text">Avis ({reviews.length})</h3>
+            {reviews.length > 3 && (
+              <button onClick={() => setShowAllReviews(!showAllReviews)} className="text-[12px] text-cm-accent font-medium cursor-pointer">
+                {showAllReviews ? "Moins" : "Voir tout"}
+              </button>
+            )}
+          </div>
+          <div className="space-y-2">
+            {(showAllReviews ? reviews : reviews.slice(0, 3)).map((review, i) => {
+              const daysAgo = Math.floor((Date.now() - new Date(review.createdAt).getTime()) / 86400000);
+              return (
+                <div key={i} className="p-4 border border-cm-border rounded-[14px] bg-cm-elevated shadow-cm-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full overflow-hidden border border-cm-border-soft shrink-0 bg-cm-bg">
+                      <img src={review.clientAvatar} alt={review.clientName} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-[13px] font-semibold text-cm-text">{review.clientName}</h4>
+                        <span className="text-[11px] text-cm-text-muted">Il y a {daysAgo || 1}j</span>
+                      </div>
+                      <RatingStars rating={review.rating} size={12} />
+                      <p className="text-[12px] text-cm-text-soft mt-1.5 leading-relaxed">{review.comment}</p>
+                    </div>
                   </div>
-                  <RatingStars rating={5 - i + 1} size={12} />
-                  <p className="text-[12px] text-cm-text-soft mt-1.5 leading-relaxed">
-                    {i === 1 ? "Excellent travail ! Professionnel et ponctuel. Je recommande vivement." :
-                     i === 2 ? "Très bon service, travail soigné. Un peu de retard mais prévenu à l'avance." :
-                     i === 3 ? "Correct dans l'ensemble, correspond à la description." :
-                     i === 4 ? "Travail satisfaisant, je referai appel." :
-                     "Bon rapport qualité-prix, professionnel."}
-                  </p>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* Fixed bottom CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-20">

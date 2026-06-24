@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon } from "lucide-react";
 import type { ProJob } from "../types";
+import { useAuthStore } from "../stores/authStore";
+import { createConversation, findConversation } from "../services/chatService";
 import MapView from "./ui/MapView";
 
 type ProStep = "idle" | "accepted" | "en_route" | "arrived" | "completed";
@@ -61,10 +63,22 @@ export default function ProControlPanel({
     return () => { stopGpsTracking(); };
   }, [stopGpsTracking]);
 
-  const handleAcceptMission = () => {
+  const handleAcceptMission = async () => {
     setStep("accepted");
     onUpdateStatus(job.id, "accepted");
     notify("Mission acceptée", "Vous avez accepté la mission. Activez le tracking pour partager votre position.");
+
+    const currentUserId = useAuthStore.getState().userId;
+    if (currentUserId && job.clientId) {
+      const existing = await findConversation(currentUserId, job.clientId);
+      if (!existing) {
+        await createConversation({
+          participant1: currentUserId,
+          participant2: job.clientId,
+          jobId: job.id,
+        });
+      }
+    }
   };
 
   const handleStartTrip = () => {

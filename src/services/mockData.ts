@@ -273,9 +273,9 @@ export const MOCK_PRO_STATS: ProDashboardStats = {
 };
 
 export const MOCK_PRO_JOBS: ProJob[] = [
-  { id: "job1", clientName: "Aminata Diallo", clientPhone: "+225 07 12 34 56", clientLocation: "Cocody Riviera 2, Abidjan", category: "electricity", serviceName: "Dépannage Disjoncteur", description: "Le disjoncteur général saute régulièrement. Vérification et remplacement nécessaire.", status: "pending", travelFeeXOF: 5000, laborFeeXOF: 12000, totalFeeXOF: 17000, createdAt: "2026-06-18T07:00:00Z", scheduledDate: "2026-06-18", scheduledTime: "10:00" },
-  { id: "job2", clientName: "Jean-Pascal Bédié", clientPhone: "+225 05 98 76 54", clientLocation: "Plateau, Abidjan", category: "electricity", serviceName: "Installation Lustre", description: "Installation d'un lustre design au plafond du salon avec raccordement.", status: "accepted", travelFeeXOF: 5000, laborFeeXOF: 18000, totalFeeXOF: 23000, createdAt: "2026-06-17T14:00:00Z", scheduledDate: "2026-06-18", scheduledTime: "14:30" },
-  { id: "job3", clientName: "Fatoumata Koné", clientPhone: "+225 01 23 45 67", clientLocation: "Angré 8ème Tranche, Abidjan", category: "electricity", serviceName: "Changement Prise", description: "Remplacement de 3 prises électriques murales qui ne fonctionnent plus.", status: "en_route", travelFeeXOF: 5000, laborFeeXOF: 10000, totalFeeXOF: 15000, createdAt: "2026-06-17T09:00:00Z", scheduledDate: "2026-06-18", scheduledTime: "08:00" },
+  { id: "job1", clientId: "client_marie", clientName: "Aminata Diallo", clientPhone: "+225 07 12 34 56", clientLocation: "Cocody Riviera 2, Abidjan", category: "electricity", serviceName: "Dépannage Disjoncteur", description: "Le disjoncteur général saute régulièrement. Vérification et remplacement nécessaire.", status: "pending", travelFeeXOF: 5000, laborFeeXOF: 12000, totalFeeXOF: 17000, createdAt: "2026-06-18T07:00:00Z", scheduledDate: "2026-06-18", scheduledTime: "10:00" },
+  { id: "job2", clientId: "client_jean", clientName: "Jean-Pascal Bédié", clientPhone: "+225 05 98 76 54", clientLocation: "Plateau, Abidjan", category: "electricity", serviceName: "Installation Lustre", description: "Installation d'un lustre design au plafond du salon avec raccordement.", status: "accepted", travelFeeXOF: 5000, laborFeeXOF: 18000, totalFeeXOF: 23000, createdAt: "2026-06-17T14:00:00Z", scheduledDate: "2026-06-18", scheduledTime: "14:30" },
+  { id: "job3", clientId: "client_fatou", clientName: "Fatoumata Koné", clientPhone: "+225 01 23 45 67", clientLocation: "Angré 8ème Tranche, Abidjan", category: "electricity", serviceName: "Changement Prise", description: "Remplacement de 3 prises électriques murales qui ne fonctionnent plus.", status: "en_route", travelFeeXOF: 5000, laborFeeXOF: 10000, totalFeeXOF: 15000, createdAt: "2026-06-17T09:00:00Z", scheduledDate: "2026-06-18", scheduledTime: "08:00" },
 ];
 
 export const MOCK_PRO_ALERTS: ProAlert[] = [
@@ -352,3 +352,38 @@ export const MOCK_PAYMENT_TXS: PaymentTransaction[] = [
   { id: "ptx2", missionId: "m2", clientId: "client_marie", proId: "pro1", amountXOF: 23000, method: "mtn_momo", commissionPercent: 15, commissionXOF: 3450, proAmountXOF: 19550, platformAmountXOF: 3450, status: "completed", createdAt: "2026-06-16T16:00:00Z" },
   { id: "ptx3", missionId: "m3", clientId: "client_marie", proId: "pro2", amountXOF: 15000, method: "wave", commissionPercent: 10, commissionXOF: 1500, proAmountXOF: 13500, platformAmountXOF: 1500, status: "pending", createdAt: "2026-06-18T08:00:00Z" },
 ];
+
+export const MOCK_REVIEWS: { id: string; proId: string; clientName: string; clientAvatar: string; rating: number; comment: string; createdAt: string }[] = [
+  { id: "rev1", proId: "pro1", clientName: "Marie K.", clientAvatar: "https://i.pravatar.cc/40?u=marie", rating: 5, comment: "Excellent travail ! Professionnel et ponctuel. Je recommande vivement.", createdAt: "2026-06-15" },
+  { id: "rev2", proId: "pro1", clientName: "Jean B.", clientAvatar: "https://i.pravatar.cc/40?u=jean", rating: 4, comment: "Très bon service, travail soigné. Un peu de retard mais prévenu à l'avance.", createdAt: "2026-06-12" },
+  { id: "rev3", proId: "pro1", clientName: "Fatou S.", clientAvatar: "https://i.pravatar.cc/40?u=fatou", rating: 5, comment: "Rapide et efficace. Problème résolu en moins d'une heure.", createdAt: "2026-06-10" },
+  { id: "rev4", proId: "pro1", clientName: "Oumar D.", clientAvatar: "https://i.pravatar.cc/40?u=oumar", rating: 4, comment: "Correct dans l'ensemble, correspond à la description.", createdAt: "2026-06-08" },
+  { id: "rev5", proId: "pro1", clientName: "Aminata T.", clientAvatar: "https://i.pravatar.cc/40?u=aminata", rating: 3, comment: "Travail satisfaisant, je referai appel.", createdAt: "2026-06-05" },
+  { id: "rev6", proId: "pro6", clientName: "Koffi A.", clientAvatar: "https://i.pravatar.cc/40?u=koffi", rating: 5, comment: "Installation électrique parfaite. Très professionnel !", createdAt: "2026-06-14" },
+  { id: "rev7", proId: "pro6", clientName: "Mariam B.", clientAvatar: "https://i.pravatar.cc/40?u=mariam", rating: 4, comment: "Bon travail, prix correct.", createdAt: "2026-06-11" },
+  { id: "rev8", proId: "pro6", clientName: "Seydou K.", clientAvatar: "https://i.pravatar.cc/40?u=seydou", rating: 5, comment: "Je recommande ! Très compétent en électricité.", createdAt: "2026-06-09" },
+  { id: "rev9", proId: "pro11", clientName: "Adama C.", clientAvatar: "https://i.pravatar.cc/40?u=adama", rating: 5, comment: "Maçonnerie de qualité, finitions soignées.", createdAt: "2026-06-13" },
+  { id: "rev10", proId: "pro11", clientName: "Rokia D.", clientAvatar: "https://i.pravatar.cc/40?u=rokia", rating: 4, comment: "Bon maçon, respecte les délais.", createdAt: "2026-06-07" },
+];
+
+export const MOCK_BADGES = [
+  { id: "badge1", name: "Première mission", description: "Première mission accomplie", icon: "🚀", unlocked: true },
+  { id: "badge2", name: "Régulier", description: "10 missions complétées", icon: "⭐", unlocked: true },
+  { id: "badge3", name: "Pro confirmé", description: "50 missions complétées", icon: "🏆", unlocked: true },
+  { id: "badge4", name: "Expert", description: "100 missions complétées", icon: "👑", unlocked: true },
+  { id: "badge5", name: "Top note", description: "Note moyenne ≥ 4.5 sur 20 missions", icon: "💎", unlocked: false },
+  { id: "badge6", name: "Rapidité", description: "Répondre en moins de 5 min à 10 demandes", icon: "⚡", unlocked: false },
+  { id: "badge7", name: "Polyvalent", description: "Travailler dans 3 catégories différentes", icon: "🎯", unlocked: false },
+  { id: "badge8", name: "Fidèle", description: "1 an sur la plateforme", icon: "🎂", unlocked: true },
+];
+
+export function getReviewsForPro(proId: string) {
+  return MOCK_REVIEWS.filter(r => r.proId === proId);
+}
+
+export function getBadgesForXp(xp: number) {
+  return MOCK_BADGES.map(b => ({
+    ...b,
+    unlocked: b.unlocked || xp >= (parseInt(b.id.replace("badge", "")) * 100),
+  }));
+}

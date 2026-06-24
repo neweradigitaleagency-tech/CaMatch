@@ -45,7 +45,7 @@ export default function ProfilePage() {
         user_id: userId || "demo",
         first_name: data.firstName,
         last_name: data.lastName,
-        category: data.category || "electricity",
+        category: data.category || "maison-reparations",
         hourly_rate: data.hourlyRateXOF || 10000,
         min_job_price: data.travelFeeXOF || 5000,
         service_radius_km: data.serviceRadiusKm || 10,

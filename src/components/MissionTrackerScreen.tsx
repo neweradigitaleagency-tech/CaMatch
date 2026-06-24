@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import {
-  ArrowLeft, CheckCircle, MapPin, Phone, Navigation, Star, MessageSquare, DollarSign, Camera, FileText,
+  ArrowLeft, CheckCircle, MapPin, Navigation, Star, MessageSquare, DollarSign, Camera, FileText,
   Zap, Droplets, Wind, Sparkles, AlertTriangle, Circle,
 } from "lucide-react";
 import MapView from "./ui/MapView";
@@ -14,13 +14,12 @@ interface MissionTrackerScreenProps {
   mission: Mission;
   onBack: () => void;
   onOpenChat: () => void;
-  onOpenCall: () => void;
   onOpenInvoice: () => void;
   onUpdateStatus: (status: MissionStatus) => void;
   onReview: (mission: Mission) => void;
 }
 
-const SIX_STEPS = MISSION_STATUS_ORDER.filter((s) => s !== "created");
+  const SIX_STEPS: MissionStatus[] = MISSION_STATUS_ORDER.filter((s) => s !== "created");
 
 const STEP_ICONS: Record<string, typeof Circle> = {
   accepted: CheckCircle,
@@ -41,7 +40,7 @@ const STEP_SHORT_LABELS: Record<string, string> = {
 };
 
 export default function MissionTrackerScreen({
-  mission, onBack, onOpenChat, onOpenCall, onOpenInvoice, onUpdateStatus, onReview,
+  mission, onBack, onOpenChat, onOpenInvoice, onUpdateStatus, onReview,
 }: MissionTrackerScreenProps) {
   const [galleryOpen, setGalleryOpen] = useState(false);
   const currentIdx = SIX_STEPS.indexOf(mission.status);
@@ -69,28 +68,30 @@ export default function MissionTrackerScreen({
 
               return (
                 <div key={s} className="flex flex-col items-center relative z-10 flex-1">
-                  <motion.div
-                    animate={active ? { scale: [1, 1.15, 1] } : {}}
-                    transition={{ duration: 1.5, repeat: active ? Infinity : 0, repeatDelay: 1.5 }}
-                    className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
-                      done || active ? "bg-cm-accent" : "bg-cm-border-soft"
-                    }`}
-                  >
-                    <StepIcon className={`w-4 h-4 ${done || active ? "text-white" : "text-cm-text-muted"}`} />
-                  </motion.div>
+                  <div className="relative">
+                    <motion.div
+                      animate={active ? { scale: [1, 1.15, 1] } : {}}
+                      transition={{ duration: 1.5, repeat: active ? Infinity : 0, repeatDelay: 1.5 }}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500 ${
+                        done || active ? "bg-cm-accent" : "bg-cm-border-soft"
+                      }`}
+                    >
+                      <StepIcon className={`w-4 h-4 ${done || active ? "text-white" : "text-cm-text-muted"}`} />
+                    </motion.div>
+                    {active && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: [1, 0.3, 1], scale: [1, 0.95, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="absolute -inset-1 rounded-full border-2 border-cm-accent/40 pointer-events-none"
+                      />
+                    )}
+                  </div>
                   <span className={`text-[9px] mt-1.5 font-medium text-center leading-tight ${
                     active ? "text-cm-accent font-bold" : done ? "text-cm-text" : "text-cm-text-muted"
                   }`}>
                     {STEP_SHORT_LABELS[s] || s}
                   </span>
-                  {active && (
-                    <motion.span
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: [1, 0.3, 1], scale: [1, 0.95, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="absolute -inset-1 rounded-full border-2 border-cm-accent/40 pointer-events-none"
-                    />
-                  )}
                 </div>
               );
             })}
@@ -167,10 +168,6 @@ export default function MissionTrackerScreen({
                 <h4 className="font-bold text-[14px] text-cm-text">{mission.proName}</h4>
                 <p className="text-[12px] text-cm-text-muted">{mission.category}</p>
               </div>
-              <button onClick={onOpenCall}
-                className="w-10 h-10 rounded-xl bg-cm-accent-soft flex items-center justify-center cursor-pointer hover:bg-cm-accent/20 transition-colors active:scale-90">
-                <Phone className="w-4 h-4 text-cm-accent" />
-              </button>
             </div>
             <div className="flex gap-2">
               <button onClick={onOpenChat}

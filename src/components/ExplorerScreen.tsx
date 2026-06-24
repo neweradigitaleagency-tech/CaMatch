@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown } from "lucide-react";
 import { ProfessionalDetails, Mission } from "../types";
@@ -8,6 +8,7 @@ import { useAuthStore } from "../stores/authStore";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, haversineKm, LOCATIONS } from "../stores/locationStore";
 import { findBestMatch } from "../data/serviceCategories";
+import { MOCK_PROS } from "../services/mockData";
 import NotificationPanel from "./NotificationPanel";
 
 interface ExplorerScreenProps {
@@ -109,18 +110,24 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
 
   const filteredPros = recommendedPros.filter((pro) => {
     if (activeCategory && pro.category !== activeCategory) return false;
-    if (!searchQuery) return true;
+    return true;
+  });
+
+  const searchResults = useMemo(() => {
+    if (!searchQuery || searchQuery.length < 2) return [];
     const q = searchQuery.toLowerCase();
     const match = findBestMatch(searchQuery);
-    const nameMatch = pro.name.toLowerCase().includes(q);
-    const titleMatch = pro.title.toLowerCase().includes(q);
-    const locationMatch = pro.locationNeighborhood.toLowerCase().includes(q);
-    const subMatch = match && (
-      pro.subCategory?.toLowerCase().includes(match.subName.toLowerCase()) ||
-      pro.title.toLowerCase().includes(match.subName.toLowerCase())
-    );
-    return nameMatch || titleMatch || locationMatch || subMatch;
-  });
+    return MOCK_PROS.filter((pro) => {
+      const nameMatch = pro.name.toLowerCase().includes(q);
+      const titleMatch = pro.title.toLowerCase().includes(q);
+      const locationMatch = pro.locationNeighborhood.toLowerCase().includes(q);
+      const subMatch = match && (
+        pro.subCategory?.toLowerCase().includes(match.subName.toLowerCase()) ||
+        pro.title.toLowerCase().includes(match.subName.toLowerCase())
+      );
+      return nameMatch || titleMatch || locationMatch || subMatch;
+    });
+  }, [searchQuery]);
 
   const getTier = (completed: number) => {
     if (completed >= 120) return { label: "Expert", color: "text-cm-text", bg: "bg-cm-accent-soft" };
@@ -185,7 +192,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
       </section>
 
       {/* Welcome + Search Hero */}
-      <section className="px-5 pt-2 pb-4">
+      <section className="relative px-5 pt-2 pb-4">
         <p className="text-[24px] font-bold text-cm-text mb-1">
           Bonjour, <span className="text-cm-accent">{firstName}</span>
         </p>
@@ -212,33 +219,88 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
             onKeyDown={(e) => { if (e.key === "Enter") handleSearchNavigation(); }}
           />
         </div>
-      </section>
 
-      {showSearchResults && searchQuery.length >= 2 ? (
-        <section className="px-5 pt-2 pb-4 animate-fade-in">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-[15px] font-semibold text-cm-text">
-              Résultats pour "{searchQuery}"
-            </h3>
-            <button onClick={() => { setSearchQuery(""); setShowSearchResults(false); searchRef.current?.focus(); }}
-              className="text-[12px] font-medium text-cm-text-soft flex items-center gap-0.5 cursor-pointer">
-              <X className="w-3 h-3" /> Effacer
-            </button>
-          </div>
-          <button onClick={handleSearchNavigation}
-            className="w-full flex items-center justify-between p-4 bg-cm-elevated border border-cm-border rounded-[var(--radius-cm)] cursor-pointer cm-scale-btn">
-            <div className="flex items-center gap-3">
-              <Search className="w-5 h-5 text-cm-accent" />
-              <div className="text-left">
-                <p className="text-[13px] font-semibold text-cm-text">Voir tous les résultats</p>
-                <p className="text-[11px] text-cm-text-soft">Rechercher "{searchQuery}" dans toute l'application</p>
+        {/* Search dropdown overlay */}
+        {showSearchResults && searchQuery.length >= 2 && (
+          <div className="absolute z-20 left-0 right-0 top-full mt-1 animate-fade-in pointer-events-none">
+            <div className="mx-5 bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] shadow-cm-bento pointer-events-auto max-h-[60vh] flex flex-col overflow-hidden">
+              {/* Header */}
+              <div className="flex items-center justify-between px-4 pt-3 pb-2 shrink-0">
+                <h3 className="text-[13px] font-semibold text-cm-text">
+                  Résultats pour "<span className="text-cm-accent">{searchQuery}</span>"
+                  <span className="text-cm-text-muted font-normal"> ({searchResults.length})</span>
+                </h3>
+                <button onClick={() => { setSearchQuery(""); setShowSearchResults(false); searchRef.current?.focus(); }}
+                  className="text-[11px] font-medium text-cm-text-soft flex items-center gap-0.5 cursor-pointer shrink-0">
+                  <X className="w-3 h-3" /> Effacer
+                </button>
+              </div>
+
+              {/* Results list */}
+              {searchResults.length > 0 ? (
+                <div className="overflow-y-auto px-3 pb-1 space-y-0.5">
+                  {searchResults.slice(0, 10).map((pro) => {
+                    const dist = pro.lat != null && storeLat != null
+                      ? haversineKm({ lat: storeLat, lng: storeLng }, { lat: pro.lat, lng: pro.lng })
+                      : null;
+                    return (
+                      <div key={pro.id} onClick={() => onSelectPro(pro)}
+                        className="flex items-center gap-3 p-2.5 rounded-[var(--radius-cm)] hover:bg-cm-border-soft cursor-pointer transition-colors">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-cm-border shrink-0">
+                          <img alt={pro.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" src={pro.avatarUrl} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1">
+                            <h4 className="text-[12px] font-semibold text-cm-text truncate">{pro.name}</h4>
+                            {pro.isVerified && <VerifiedBadge />}
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5">
+                              <Star className="w-2.5 h-2.5 fill-cm-accent text-cm-accent" />
+                              {(pro.rating / 10).toFixed(1)}
+                            </span>
+                            <span className="text-[9px] text-cm-text-soft">{pro.title}</span>
+                          </div>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[12px] font-bold text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F</p>
+                          {dist != null && (
+                            <p className="text-[9px] text-cm-text-muted">{dist.toFixed(1)} km</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {searchResults.length > 10 && (
+                    <p className="text-[10px] text-center text-cm-text-muted py-2">
+                      +{searchResults.length - 10} autres résultats
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="px-4 py-6 text-center">
+                  <p className="text-[12px] text-cm-text-muted">Aucun pro trouvé pour "{searchQuery}"</p>
+                </div>
+              )}
+
+              {/* View all button */}
+              <div className="shrink-0 px-3 pb-3 pt-1">
+                <button onClick={handleSearchNavigation}
+                  className="w-full flex items-center justify-between p-3 bg-cm-accent-soft rounded-[var(--radius-cm)] cursor-pointer cm-scale-btn">
+                  <div className="flex items-center gap-2">
+                    <Search className="w-3.5 h-3.5 text-cm-accent" />
+                    <span className="text-[12px] font-semibold text-cm-accent">Voir tous les résultats</span>
+                  </div>
+                  <ChevronRight className="w-3.5 h-3.5 text-cm-accent shrink-0" />
+                </button>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-cm-text-muted shrink-0" />
-          </button>
-        </section>
-      ) : (
-        <>
+          </div>
+        )}
+      </section>
+
+      {/* ---- Home content (always visible) ---- */}
+      <>
           {/* Active Mission */}
           {hasActiveJobs && (
             <section className="px-5 mb-4">
@@ -290,7 +352,11 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               {POPULAR_SUBCATEGORIES.map((sub) => (
                 <button
                   key={sub.name}
-                  onClick={() => nav(`/search?subCategory=${encodeURIComponent(sub.name)}&category=${sub.categoryId}`)}
+                  onClick={() => {
+                    setSearchQuery(sub.name);
+                    setShowSearchResults(true);
+                    searchRef.current?.focus();
+                  }}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-cm-elevated border border-cm-border rounded-full cursor-pointer cm-scale-btn hover:border-cm-accent"
                 >
                   <span className="text-[14px]">{sub.emoji}</span>
@@ -483,7 +549,6 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
             </div>
           </section>}
         </>
-      )}
 
       {/* Notification Panel */}
       <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />

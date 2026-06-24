@@ -1,35 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ChatScreen } from "../../components/MessagingScreen";
-import CallScreen from "../../components/CallScreen";
 import { useChatStore } from "../../stores/chatStore";
-import { useLocationStore } from "../../stores/locationStore";
 import { useAuthStore } from "../../stores/authStore";
-import { MOCK_MESSAGES } from "../../services/mockData";
-import type { CallSession } from "../../types";
-
-let msgCounter = 100;
 
 export default function ChatPage() {
   const { conversationId } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
   const conversations = useChatStore((s) => s.conversations);
   const messages = useChatStore((s) => s.messages);
-  const setMessages = useChatStore((s) => s.setMessages);
-  const addMessage = useChatStore((s) => s.addMessage);
+  const loadMessages = useChatStore((s) => s.loadMessages);
+  const sendTextMessage = useChatStore((s) => s.sendTextMessage);
+  const sendMediaMessage = useChatStore((s) => s.sendMediaMessage);
   const userId = useAuthStore((s) => s.userId);
-
-  const [showCall, setShowCall] = useState(false);
+  const initialized = useRef(false);
 
   const conversation = conversations.find((c) => c.id === conversationId);
   const convMessages = conversationId ? messages[conversationId] || [] : [];
+  const currentUserId = userId || "client_marie";
 
   useEffect(() => {
-    if (conversationId && !messages[conversationId]) {
-      const mock = MOCK_MESSAGES[conversationId] || [];
-      setMessages({ ...messages, [conversationId]: mock });
+    if (conversationId && !initialized.current) {
+      initialized.current = true;
+      loadMessages(conversationId, currentUserId);
     }
-  }, [conversationId]);
+  }, [conversationId, currentUserId, loadMessages]);
 
   if (!conversation || !conversationId) {
     return (
@@ -39,69 +34,17 @@ export default function ChatPage() {
     );
   }
 
-  const currentUserId = userId || "client_marie";
-
-  const callSession: CallSession = {
-    id: "call_chat_1",
-    callerId: currentUserId,
-    calleeId: "pro3",
-    callerName: "Marie Kouadio",
-    callerAvatar: "",
-    calleeName: conversation.otherUserName,
-    calleeAvatar: conversation.otherUserAvatar,
-    status: "ringing",
-    durationMs: 0,
-    startedAt: new Date().toISOString(),
-    isIncoming: false,
-  };
-
-  if (showCall) {
-    return (
-      <CallScreen
-        session={callSession}
-        onEnd={() => setShowCall(false)}
-      />
-    );
-  }
-
   return (
     <ChatScreen
       conversation={conversation}
       messages={convMessages}
       onBack={() => navigate("/messages")}
       onSendMessage={(text) => {
-        addMessage(conversationId, {
-          id: `msg_${++msgCounter}`,
-          conversationId,
-          senderId: currentUserId,
-          text,
-          photos: [],
-          createdAt: new Date().toISOString(),
-        });
+        sendTextMessage(conversationId, currentUserId, text);
       }}
-      onSendPhoto={(photo) => {
-        addMessage(conversationId, {
-          id: `msg_${++msgCounter}`,
-          conversationId,
-          senderId: currentUserId,
-          text: "",
-          photos: [photo],
-          createdAt: new Date().toISOString(),
-        });
+      onSendMedia={(file, type) => {
+        sendMediaMessage(conversationId, currentUserId, file, type);
       }}
-      onSendLocation={() => {
-        const { latitude, longitude, neighborhood } = useLocationStore.getState();
-        addMessage(conversationId, {
-          id: `msg_${++msgCounter}`,
-          conversationId,
-          senderId: currentUserId,
-          text: "",
-          photos: [],
-          location: { lat: latitude, lng: longitude, label: neighborhood || "Ma position" },
-          createdAt: new Date().toISOString(),
-        });
-      }}
-      onOpenCall={() => setShowCall(true)}
       currentUserId={currentUserId}
     />
   );

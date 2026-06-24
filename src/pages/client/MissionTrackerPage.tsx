@@ -2,14 +2,13 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MissionTrackerScreen from "../../components/MissionTrackerScreen";
 import ProControlPanel from "../../components/ProControlPanel";
-import CallScreen from "../../components/CallScreen";
 import InvoiceScreen from "../../components/InvoiceScreen";
 import { useRequestStore } from "../../stores/requestStore";
 import { useChatStore } from "../../stores/chatStore";
 import { useAuthStore } from "../../stores/authStore";
 import { useNotifications } from "../../hooks/useNotifications";
 import { MOCK_PRO_JOBS } from "../../services/mockData";
-import type { MissionStatus, CallSession, Invoice } from "../../types";
+import type { MissionStatus, Invoice } from "../../types";
 
 const MOCK_INVOICE: Invoice = {
   id: "INV-2026-001",
@@ -47,7 +46,6 @@ export default function MissionTrackerPage() {
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === id));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
   const conversations = useChatStore((s) => s.conversations);
-  const [showCall, setShowCall] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
 
   const { sendLocalNotification } = useNotifications();
@@ -60,20 +58,6 @@ export default function MissionTrackerPage() {
       </div>
     );
   }
-
-  const callSession: CallSession = {
-    id: "call_1",
-    callerId: "client_marie",
-    calleeId: mission?.proId || proJob?.id || "pro_mock",
-    callerName: "Marie Kouadio",
-    callerAvatar: "",
-    calleeName: mission?.proName || proJob?.clientName || "Pro",
-    calleeAvatar: mission?.proAvatar || "",
-    status: "ringing",
-    durationMs: 0,
-    startedAt: new Date().toISOString(),
-    isIncoming: false,
-  };
 
   if (isPro && proJob) {
     return (
@@ -96,9 +80,7 @@ export default function MissionTrackerPage() {
 
   return (
     <>
-      {showCall ? (
-        <CallScreen session={callSession} onEnd={() => setShowCall(false)} />
-      ) : showInvoice ? (
+      {showInvoice ? (
         <InvoiceScreen mission={mission} invoice={MOCK_INVOICE} onBack={() => setShowInvoice(false)} />
       ) : (
         <MissionTrackerScreen
@@ -108,7 +90,6 @@ export default function MissionTrackerPage() {
             const conv = conversations.find((c) => c.missionId === mission.id);
             if (conv) navigate(`/messages/${conv.id}`);
           }}
-          onOpenCall={() => setShowCall(true)}
           onOpenInvoice={() => setShowInvoice(true)}
           onUpdateStatus={(status: MissionStatus) => updateMissionStatus(mission.id, status)}
           onReview={(m) => navigate("/orders/review", { state: { mission: m } })}
