@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon } from "lucide-react";
-import type { ProJob } from "../types";
+import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon, Camera, X, Image } from "lucide-react";
+import type { ProJob, MissionStatus } from "../types";
 import { useAuthStore } from "../stores/authStore";
 import { createConversation, findConversation } from "../services/chatService";
 import MapView from "./ui/MapView";
+import { useRequestStore } from "../stores/requestStore";
 
-type ProStep = "idle" | "accepted" | "en_route" | "arrived" | "completed";
+type ProStep = "idle" | "accepted" | "en_route" | "arrived" | "photos_before" | "in_progress" | "photos_after" | "completed";
 
 interface ProControlPanelProps {
   job: ProJob;
@@ -23,7 +24,12 @@ export default function ProControlPanel({
   const [gpsActive, setGpsActive] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [beforePhotos, setBeforePhotos] = useState<string[]>([]);
+  const [afterPhotos, setAfterPhotos] = useState<string[]>([]);
   const watchIdRef = useRef<number | null>(null);
+  const beforeInputRef = useRef<HTMLInputElement>(null);
+  const afterInputRef = useRef<HTMLInputElement>(null);
+  const setMissionField = useRequestStore((s) => s.setMissionField);
 
   const notify = useCallback((title: string, body: string) => {
     if (onNotification) {
@@ -95,11 +101,59 @@ export default function ProControlPanel({
     notify("Arrivé sur place", "Le client est informé de votre arrivée.");
   };
 
+  const handleCaptureBefore = () => {
+    beforeInputRef.current?.click();
+  };
+
+  const handleBeforeFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const urls: string[] = [];
+    Array.from(files).forEach((f) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        urls.push(reader.result as string);
+        if (urls.length === files.length) {
+          setBeforePhotos((prev) => [...prev, ...urls]);
+        }
+      };
+      reader.readAsDataURL(f);
+    });
+  };
+
+  const handleStartIntervention = () => {
+    setStep("in_progress");
+    onUpdateStatus(job.id, "in_progress");
+    notify("Intervention commencée", "Le client est informé du début de l'intervention.");
+  };
+
+  const handleCaptureAfter = () => {
+    afterInputRef.current?.click();
+  };
+
+  const handleAfterFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const urls: string[] = [];
+    Array.from(files).forEach((f) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        urls.push(reader.result as string);
+        if (urls.length === files.length) {
+          setAfterPhotos((prev) => [...prev, ...urls]);
+        }
+      };
+      reader.readAsDataURL(f);
+    });
+  };
+
   const handleComplete = () => {
+    setMissionField(job.id, "beforePhotos", beforePhotos);
+    setMissionField(job.id, "afterPhotos", afterPhotos);
     setStep("completed");
     setCompleted(true);
     onUpdateStatus(job.id, "completed");
-    notify("Mission terminée", "Le récapitulatif est disponible.");
+    notify("Mission terminée", "Le client valide maintenant le travail.");
     setTimeout(() => onComplete(job.id), 2000);
   };
 
@@ -110,9 +164,9 @@ export default function ProControlPanel({
         <div className="w-16 h-16 rounded-full bg-cm-accent-soft flex items-center justify-center mb-5">
           <CheckCircle className="w-8 h-8 text-cm-accent" />
         </div>
-        <h2 className="text-xl font-bold text-cm-text mb-2">Mission terminée !</h2>
+        <h2 className="text-xl font-bold text-cm-text mb-2">Mission terminée !        </h2>
         <p className="text-[14px] text-cm-text-soft mb-6 max-w-xs">
-          Le client va noter votre prestation.
+          Le client valide maintenant le travail effectué.
         </p>
         <div className="bg-cm-elevated p-4 rounded-[14px] border border-cm-border w-full max-w-sm space-y-3">
           <div className="flex justify-between text-[14px]">
@@ -172,6 +226,37 @@ export default function ProControlPanel({
         </div>
       )}
 
+      {/* Before photos preview */}
+      {beforePhotos.length > 0 && (
+        <div className="mx-5 mb-4">
+          <p className="text-[11px] font-bold text-cm-text-soft uppercase tracking-wider mb-2">Photos avant</p>
+          <div className="flex gap-2 overflow-x-auto">
+            {beforePhotos.map((p, i) => (
+              <div key={i} className="w-20 h-20 rounded-[12px] overflow-hidden border border-cm-border shrink-0">
+                <img src={p} alt="" className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* After photos preview */}
+      {afterPhotos.length > 0 && (
+        <div className="mx-5 mb-4">
+          <p className="text-[11px] font-bold text-cm-accent uppercase tracking-wider mb-2">Photos après</p>
+          <div className="flex gap-2 overflow-x-auto">
+            {afterPhotos.map((p, i) => (
+              <div key={i} className="w-20 h-20 rounded-[12px] overflow-hidden border border-cm-accent/30 shrink-0">
+                <img src={p} alt="" className="w-full h-full object-cover" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <input ref={beforeInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleBeforeFiles} />
+      <input ref={afterInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleAfterFiles} />
+
       {/* 3-big-button panel */}
       <div className="mx-5 space-y-3">
         <AnimatePresence mode="wait">
@@ -200,10 +285,34 @@ export default function ProControlPanel({
           )}
 
           {step === "arrived" && (
-            <motion.button key="complete" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+            <motion.button key="before" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+              onClick={handleCaptureBefore}
+              className="w-full py-5 bg-cm-text text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md hover:opacity-90">
+              <Camera className="w-6 h-6" /> Photo avant intervention
+            </motion.button>
+          )}
+
+          {step === "arrived" && beforePhotos.length > 0 && (
+            <motion.button key="start-work" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              onClick={handleStartIntervention}
+              className="w-full py-5 bg-cm-accent text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md">
+              <CheckCircle className="w-6 h-6" /> Commencer l'intervention
+            </motion.button>
+          )}
+
+          {step === "in_progress" && (
+            <motion.button key="after" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+              onClick={handleCaptureAfter}
+              className="w-full py-5 bg-cm-text text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md hover:opacity-90">
+              <Camera className="w-6 h-6" /> Photo après intervention
+            </motion.button>
+          )}
+
+          {step === "in_progress" && afterPhotos.length > 0 && (
+            <motion.button key="complete-work" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               onClick={handleComplete}
               className="w-full py-5 bg-cm-text text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md hover:opacity-90">
-              <CheckCircle className="w-6 h-6" /> Mission terminée
+              <CheckCircle className="w-6 h-6" /> Terminer la mission
             </motion.button>
           )}
         </AnimatePresence>

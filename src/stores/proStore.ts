@@ -1,36 +1,5 @@
 import { create } from "zustand";
-
-interface ProJob {
-  id: string;
-  clientName: string;
-  clientPhone: string;
-  clientLocation: string;
-  category: string;
-  serviceName: string;
-  description: string;
-  status: string;
-  travelFeeXOF: number;
-  laborFeeXOF: number;
-  totalFeeXOF: number;
-  createdAt: string;
-  scheduledDate?: string;
-  scheduledTime?: string;
-  completedAt?: string;
-}
-
-interface ProAlert {
-  id: string;
-  clientName: string;
-  clientPhone: string;
-  category: string;
-  description: string;
-  urgency: string;
-  estimatedPriceMinXOF: number;
-  estimatedPriceMaxXOF: number;
-  location: string;
-  sentAt: string;
-  expiresAt: string;
-}
+import type { ProJob, ProAlert, ProJobStatus } from "../types";
 
 interface ProState {
   isAvailable: boolean;
@@ -74,7 +43,7 @@ export const useProStore = create<ProState>((set) => ({
   updateJobStatus: (jobId, status) =>
     set((state) => ({
       jobs: state.jobs.map((j) =>
-        j.id === jobId ? { ...j, status } : j
+        j.id === jobId ? { ...j, status: status as ProJobStatus } : j
       ),
     })),
 }));

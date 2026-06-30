@@ -175,7 +175,7 @@ export default function InvoiceScreen({ mission, invoice, onBack }: InvoiceScree
 
       <ImageViewer
         images={allPhotos}
-        initialIndex={viewerIndex}
+        initialIndex={viewerIndex ?? undefined}
         open={viewerIndex !== null}
         onClose={() => setViewerIndex(null)}
       />

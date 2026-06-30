@@ -11,7 +11,7 @@ import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
 
-// Custom green marker for cm-green brand
+// Custom lime marker for cm-accent brand
 const cmIcon = new L.Icon({
   iconUrl,
   iconRetinaUrl,
@@ -24,7 +24,7 @@ const cmIcon = new L.Icon({
 
 const selectedIcon = new L.DivIcon({
   className: "custom-marker-selected",
-  html: `<div style="width:32px;height:32px;background:#00A86B;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`,
+  html: `<div style="width:32px;height:32px;background:#AECB2A;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`,
   iconSize: [32, 32],
   iconAnchor: [16, 16],
 });

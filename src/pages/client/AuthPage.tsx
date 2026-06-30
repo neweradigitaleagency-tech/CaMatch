@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, MessageCircle } from "lucide-react";
+import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, MessageCircle, ArrowLeft } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
 import { supabase, isSupabaseReady } from "../../services/supabase";
 
@@ -134,14 +134,20 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-cream flex flex-col">
+    <div className="min-h-screen bg-cm-bg flex flex-col">
+      <div className="px-4 pt-3 pb-1">
+        <button onClick={() => nav(-1)}
+          className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-white/80 border border-gray-200 cursor-pointer shrink-0">
+          <ArrowLeft className="w-4 h-4 text-gray-700" />
+        </button>
+      </div>
       <div className="flex-1 flex flex-col justify-center px-6 max-w-sm mx-auto w-full">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-[#00A86B] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#00A86B]/20">
+          <div className="w-16 h-16 rounded-2xl bg-cm-accent flex items-center justify-center mx-auto mb-4 shadow-cm-md">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-xl font-extrabold tracking-tight">Ça Match</h1>
-          <p className="text-xs text-secondary mt-1">
+          <p className="text-xs text-cm-text-soft mt-1">
             {mode === "phone"
               ? phoneStep === "phone-input"
                 ? "Connectez-vous avec votre numéro"
@@ -150,11 +156,11 @@ export default function AuthPage() {
           </p>
         </div>
 
-        <div className="flex rounded-xl bg-pale-mint/50 p-1 mb-6">
+        <div className="flex rounded-xl bg-cm-accent-soft/50 p-1 mb-6">
           <button
             onClick={() => { setMode("phone"); setError(""); setMessage(""); setPhoneStep("phone-input"); }}
             className={`flex-1 h-10 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              mode === "phone" ? "bg-white shadow-sm text-brand-forest" : "text-secondary/60 hover:text-secondary"
+              mode === "phone" ? "bg-white shadow-sm text-cm-accent" : "text-cm-text-muted hover:text-cm-text-soft"
             }`}
           >
             <MessageCircle className="w-4 h-4" /> Téléphone
@@ -162,7 +168,7 @@ export default function AuthPage() {
           <button
             onClick={() => { setMode("email"); setError(""); setMessage(""); }}
             className={`flex-1 h-10 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              mode === "email" ? "bg-white shadow-sm text-brand-forest" : "text-secondary/60 hover:text-secondary"
+              mode === "email" ? "bg-white shadow-sm text-cm-accent" : "text-cm-text-muted hover:text-cm-text-soft"
             }`}
           >
             <Mail className="w-4 h-4" /> Email
@@ -173,24 +179,24 @@ export default function AuthPage() {
           phoneStep === "phone-input" ? (
             <form onSubmit={handlePhoneSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-secondary block mb-1.5">Numéro de téléphone</label>
+                <label className="text-xs font-semibold text-cm-text-soft block mb-1.5">Numéro de téléphone</label>
                 <div className="relative">
-                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
+                  <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
                   <input
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="+225 XX XX XX XX"
-                    className="w-full h-12 pl-10 pr-4 bg-white rounded-xl border border-pale-mint text-sm placeholder:text-secondary/40 focus:outline-none focus:ring-2 focus:ring-[#00A86B]/30 focus:border-[#00A86B] transition-all"
+                    className="w-full h-12 pl-10 pr-4 bg-white rounded-xl border border-cm-border text-sm placeholder:text-cm-text-muted focus:outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
                     autoComplete="tel"
                   />
                 </div>
               </div>
-              {error && <p className="text-xs text-[#EF4444] bg-[#EF4444]/5 rounded-lg px-3 py-2">{error}</p>}
+              {error && <p className="text-xs text-cm-error bg-cm-error/5 rounded-lg px-3 py-2">{error}</p>}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-[#00A86B] text-white font-bold text-sm rounded-xl hover:bg-[#007A4D] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -204,8 +210,8 @@ export default function AuthPage() {
           ) : (
             <form onSubmit={handleOtpSubmit} className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-secondary block mb-3 text-center">
-                  Code envoyé au <span className="text-brand-forest">{phone}</span>
+                <label className="text-xs font-semibold text-cm-text-soft block mb-3 text-center">
+                  Code envoyé au <span className="text-cm-accent">{phone}</span>
                 </label>
                 <div className="flex justify-center gap-2">
                   {otp.map((digit, i) => (
@@ -218,17 +224,17 @@ export default function AuthPage() {
                       value={digit}
                       onChange={(e) => handleOtpChange(i, e.target.value)}
                       onKeyDown={(e) => handleOtpKeyDown(i, e.key)}
-                      className="w-11 h-12 text-center text-lg font-bold bg-white rounded-xl border border-pale-mint focus:outline-none focus:ring-2 focus:ring-[#00A86B]/30 focus:border-[#00A86B] transition-all"
+                      className="w-11 h-12 text-center text-lg font-bold bg-white rounded-xl border border-cm-border focus:outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
                     />
                   ))}
                 </div>
               </div>
-              {message && <p className="text-xs text-[#00A86B] bg-[#00A86B]/5 rounded-lg px-3 py-2">{message}</p>}
-              {error && <p className="text-xs text-[#EF4444] bg-[#EF4444]/5 rounded-lg px-3 py-2">{error}</p>}
+              {message && <p className="text-xs text-cm-accent bg-cm-accent/5 rounded-lg px-3 py-2">{message}</p>}
+              {error && <p className="text-xs text-cm-error bg-cm-error/5 rounded-lg px-3 py-2">{error}</p>}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-[#00A86B] text-white font-bold text-sm rounded-xl hover:bg-[#007A4D] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -239,7 +245,7 @@ export default function AuthPage() {
               <button
                 type="button"
                 onClick={() => { setPhoneStep("phone-input"); setOtp(["", "", "", "", "", ""]); setError(""); }}
-                className="w-full text-xs text-secondary/60 hover:text-secondary transition-colors cursor-pointer"
+                className="w-full text-xs text-cm-text-muted hover:text-cm-text-soft transition-colors cursor-pointer"
               >
                 Changer de numéro
               </button>
@@ -248,48 +254,48 @@ export default function AuthPage() {
         ) : (
           <form onSubmit={handleEmailSubmit} className="space-y-4">
             <div>
-              <label className="text-xs font-semibold text-secondary block mb-1.5">Email</label>
+              <label className="text-xs font-semibold text-cm-text-soft block mb-1.5">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
                 <input
                   ref={emailRef}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="vous@exemple.com"
-                  className="w-full h-12 pl-10 pr-4 bg-white rounded-xl border border-pale-mint text-sm placeholder:text-secondary/40 focus:outline-none focus:ring-2 focus:ring-[#00A86B]/30 focus:border-[#00A86B] transition-all"
+                  className="w-full h-12 pl-10 pr-4 bg-white rounded-xl border border-cm-border text-sm placeholder:text-cm-text-muted focus:outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
                   autoComplete="email"
                 />
               </div>
             </div>
             <div>
-              <label className="text-xs font-semibold text-secondary block mb-1.5">Mot de passe</label>
+              <label className="text-xs font-semibold text-cm-text-soft block mb-1.5">Mot de passe</label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-secondary/60" />
+                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
                 <input
                   type={showPwd ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full h-12 pl-10 pr-12 bg-white rounded-xl border border-pale-mint text-sm placeholder:text-secondary/40 focus:outline-none focus:ring-2 focus:ring-[#00A86B]/30 focus:border-[#00A86B] transition-all"
+                  className="w-full h-12 pl-10 pr-12 bg-white rounded-xl border border-cm-border text-sm placeholder:text-cm-text-muted focus:outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
                   autoComplete={emailMode === "login" ? "current-password" : "new-password"}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPwd((p) => !p)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-secondary/60 hover:text-secondary transition-colors cursor-pointer"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cm-text-muted hover:text-cm-text-soft transition-colors cursor-pointer"
                   tabIndex={-1}
                 >
                   {showPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
-            {message && <p className="text-xs text-[#00A86B] bg-[#00A86B]/5 rounded-lg px-3 py-2">{message}</p>}
-            {error && <p className="text-xs text-[#EF4444] bg-[#EF4444]/5 rounded-lg px-3 py-2">{error}</p>}
+            {message && <p className="text-xs text-cm-accent bg-cm-accent/5 rounded-lg px-3 py-2">{message}</p>}
+            {error && <p className="text-xs text-cm-error bg-cm-error/5 rounded-lg px-3 py-2">{error}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-[#00A86B] text-white font-bold text-sm rounded-xl hover:bg-[#007A4D] disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
               {loading ? (
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -304,7 +310,7 @@ export default function AuthPage() {
               <button
                 type="button"
                 onClick={() => { setEmailMode((m) => m === "login" ? "register" : "login"); setError(""); setMessage(""); }}
-                className="text-xs text-[#00A86B] font-semibold hover:underline cursor-pointer"
+                className="text-xs text-cm-accent font-semibold hover:underline cursor-pointer"
               >
                 {emailMode === "login" ? "Pas encore de compte ? S'inscrire" : "Déjà un compte ? Se connecter"}
               </button>
@@ -313,7 +319,7 @@ export default function AuthPage() {
         )}
 
         <div className="mt-6 text-center">
-          <p className="text-[10px] text-secondary/40">
+          <p className="text-[10px] text-cm-text-muted">
             En continuant, vous acceptez les{" "}
             <span className="underline cursor-pointer">Conditions d'utilisation</span>
           </p>
@@ -323,7 +329,7 @@ export default function AuthPage() {
       <div className="px-6 pb-8">
         <button
           onClick={goToClient}
-          className="w-full h-10 text-xs text-secondary/60 hover:text-secondary transition-colors cursor-pointer"
+          className="w-full h-10 text-xs text-cm-text-muted hover:text-cm-text-soft transition-colors cursor-pointer"
         >
           Mode démo — Continuer sans compte
         </button>

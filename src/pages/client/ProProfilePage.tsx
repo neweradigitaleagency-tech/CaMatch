@@ -38,7 +38,7 @@ export default function ProProfilePage() {
   const nav = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  const pro = MOCK_PROS.find((p) => p.id === id) ?? MOCK_PROS[0];
+  const pro = MOCK_PROS.find((p) => p.id === id) ?? MOCK_PROS[0]!;
   const filteredServices = MOCK_SERVICES.filter((s) => s.proId === pro.id);
   const services = filteredServices.length > 0 ? filteredServices : getDefaultServices(pro.id, pro.category);
   const portfolio = MOCK_PORTFOLIO.filter((p) => p.category === pro.category);

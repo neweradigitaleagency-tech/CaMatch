@@ -134,10 +134,10 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
           onClick={() => setSelectedDate(dateKey)}
           className={`relative p-1.5 rounded-xl text-center transition-all cursor-pointer active:scale-90 ${
             isSelected
-              ? "bg-brand-lime text-brand-forest"
+              ? "bg-cm-accent text-cm-accent"
               : isToday(day)
-              ? "bg-brand-forest text-white"
-              : "hover:bg-pale-mint"
+              ? "bg-cm-accent text-white"
+              : "hover:bg-cm-accent-soft"
           }`}
         >
           <span className="text-xs font-bold">{day}</span>
@@ -145,14 +145,14 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
             {dayJobs.length > 0 && (
               <div
                 className={`w-1.5 h-1.5 rounded-full ${
-                  isSelected ? "bg-brand-forest" : "bg-brand-lime"
+                  isSelected ? "bg-cm-accent" : "bg-cm-accent"
                 }`}
               />
             )}
             {isAvailable && (
               <div
                 className={`w-1.5 h-1.5 rounded-full ${
-                  isSelected ? "bg-brand-forest/50" : "bg-green-400"
+                  isSelected ? "bg-cm-accent/50" : "bg-green-400"
                 }`}
               />
             )}
@@ -172,7 +172,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
         </h2>
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-caption font-medium transition-all cursor-pointer ${showSettings ? "bg-brand-lime text-brand-forest" : "bg-pale-mint text-secondary"}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-caption font-medium transition-all cursor-pointer ${showSettings ? "bg-cm-accent text-cm-accent" : "bg-cm-accent-soft text-cm-text-soft"}`}
         >
           <Settings className="w-3.5 h-3.5" />
           Disponibilités
@@ -180,13 +180,13 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
       </div>
 
       {/* Weekly Overview */}
-      <div className="bg-white p-4 rounded-3xl shadow-premium border border-pale-mint/15 space-y-3">
+      <div className="bg-white p-4 rounded-3xl shadow-cm-card border border-cm-border/15 space-y-3">
         <h4 className="font-sans text-caption font-extrabold uppercase tracking-wider flex items-center gap-1.5">
           <TrendingUp className="w-3.5 h-3.5" /> Cette semaine
         </h4>
         <div className="grid grid-cols-3 gap-3">
           <div className="text-center">
-            <p className="text-lg font-extrabold text-brand-forest">{jobs.filter(j => {
+            <p className="text-lg font-extrabold text-cm-accent">{jobs.filter(j => {
               const d = j.scheduledDate || j.createdAt.slice(0, 10);
               const jobDate = new Date(d);
               const weekStart = new Date(today);
@@ -195,10 +195,10 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
               weekEnd.setDate(weekEnd.getDate() + 6);
               return jobDate >= weekStart && jobDate <= weekEnd;
             }).length}</p>
-            <p className="text-caption text-secondary font-medium">Interventions</p>
+            <p className="text-caption text-cm-text-soft font-medium">Interventions</p>
           </div>
-          <div className="text-center border-x border-pale-mint/20">
-            <p className="text-lg font-extrabold text-brand-lime">{jobs.filter(j => j.status === "completed").filter(j => {
+          <div className="text-center border-x border-cm-border/20">
+            <p className="text-lg font-extrabold text-cm-accent">{jobs.filter(j => j.status === "completed").filter(j => {
               const d = j.completedAt || j.createdAt.slice(0, 10);
               const jobDate = new Date(d);
               const weekStart = new Date(today);
@@ -207,7 +207,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
               weekEnd.setDate(weekEnd.getDate() + 6);
               return jobDate >= weekStart && jobDate <= weekEnd;
             }).reduce((sum, j) => sum + j.totalFeeXOF, 0).toLocaleString()} F</p>
-            <p className="text-caption text-secondary font-medium">Gains semaine</p>
+            <p className="text-caption text-cm-text-soft font-medium">Gains semaine</p>
           </div>
           <div className="text-center">
             <p className="text-lg font-extrabold text-amber-500">{jobs.filter(j => j.status === "pending" || j.status === "accepted").filter(j => {
@@ -219,7 +219,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
               weekEnd.setDate(weekEnd.getDate() + 6);
               return jobDate >= weekStart && jobDate <= weekEnd;
             }).length}</p>
-            <p className="text-caption text-secondary font-medium">À venir</p>
+            <p className="text-caption text-cm-text-soft font-medium">À venir</p>
           </div>
         </div>
         {jobs.filter(j => j.status === "pending" || j.status === "accepted").length > 0 && (
@@ -234,7 +234,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
       <AnimatePresence>
         {showSettings && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <div className="bg-white p-5 rounded-3xl shadow-premium border border-brand-lime/30 space-y-4">
+            <div className="bg-white p-5 rounded-3xl shadow-cm-card border border-brand-lime/30 space-y-4">
 
               {/* Recurring Hours */}
               <div>
@@ -247,10 +247,10 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                     const dayName = ["Dim", "Lun", "Mar", "Mer", "Jeu", "Ven", "Sam"][day];
                     return (
                       <div key={day} className="flex items-start gap-2">
-                        <span className="w-8 text-caption font-medium text-secondary mt-2">{dayName}</span>
+                        <span className="w-8 text-caption font-medium text-cm-text-soft mt-2">{dayName}</span>
                         <div className="flex-1 space-y-1">
                           {daySlots.length === 0 ? (
-                            <p className="text-caption text-secondary/60 italic">Indisponible</p>
+                            <p className="text-caption text-cm-text-soft/60 italic">Indisponible</p>
                           ) : (
                             daySlots.map((slot, i) => (
                               <div key={i} className="flex items-center gap-1">
@@ -262,9 +262,9 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                                     updated[idx] = { ...slot, startTime: e.target.value };
                                     setRecurringSlots(updated);
                                   }}
-                                  className="w-20 text-caption bg-pale-mint/30 rounded-lg px-2 py-1 outline-none"
+                                  className="w-20 text-caption bg-cm-accent-soft/30 rounded-lg px-2 py-1 outline-none"
                                 />
-                                <span className="text-caption text-secondary">à</span>
+                                <span className="text-caption text-cm-text-soft">à</span>
                                 <input
                                   type="time" value={slot.endTime}
                                   onChange={(e) => {
@@ -273,7 +273,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                                     updated[idx] = { ...slot, endTime: e.target.value };
                                     setRecurringSlots(updated);
                                   }}
-                                  className="w-20 text-caption bg-pale-mint/30 rounded-lg px-2 py-1 outline-none"
+                                  className="w-20 text-caption bg-cm-accent-soft/30 rounded-lg px-2 py-1 outline-none"
                                 />
                                 <button
                                   onClick={() => setRecurringSlots((prev) => prev.filter((s) => s !== slot))}
@@ -286,7 +286,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                           )}
                           <button
                             onClick={() => setRecurringSlots((prev) => [...prev, { dayOfWeek: day as any, startTime: "08:00", endTime: "12:00" }])}
-                            className="text-caption font-medium text-brand-lime flex items-center gap-0.5 cursor-pointer"
+                            className="text-caption font-medium text-cm-accent flex items-center gap-0.5 cursor-pointer"
                           >
                             <Plus className="w-3 h-3" /> Ajouter un créneau
                           </button>
@@ -298,7 +298,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
               </div>
 
               {/* Blocked Days */}
-              <div className="border-t border-pale-mint/20 pt-3">
+              <div className="border-t border-cm-border/20 pt-3">
                 <h4 className="font-sans text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-3">
                   <BellOff className="w-4 h-4" /> Jours bloqués
                 </h4>
@@ -306,10 +306,10 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                 {blockedDays.length > 0 && (
                   <div className="space-y-1 mb-3">
                     {blockedDays.map((bd, i) => (
-                      <div key={i} className="flex items-center justify-between bg-pale-mint/30 p-2 rounded-xl">
+                      <div key={i} className="flex items-center justify-between bg-cm-accent-soft/30 p-2 rounded-xl">
                         <div>
                           <span className="text-caption font-medium">{new Date(bd.date).toLocaleDateString("fr-FR")}</span>
-                          <span className="text-caption text-secondary ml-2">{bd.reason}</span>
+                          <span className="text-caption text-cm-text-soft ml-2">{bd.reason}</span>
                         </div>
                         <button onClick={() => setBlockedDays((prev) => prev.filter((_, j) => j !== i))} className="cursor-pointer">
                           <Trash2 className="w-3.5 h-3.5 text-red-400" />
@@ -323,12 +323,12 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                   <input
                     type="date" value={newBlockedDate}
                     onChange={(e) => setNewBlockedDate(e.target.value)}
-                    className="flex-1 text-caption bg-pale-mint/30 rounded-xl px-3 py-2 outline-none"
+                    className="flex-1 text-caption bg-cm-accent-soft/30 rounded-xl px-3 py-2 outline-none"
                   />
                   <input
                     type="text" value={newBlockedReason} placeholder="Motif"
                     onChange={(e) => setNewBlockedReason(e.target.value)}
-                    className="flex-1 text-caption bg-pale-mint/30 rounded-xl px-3 py-2 outline-none"
+                    className="flex-1 text-caption bg-cm-accent-soft/30 rounded-xl px-3 py-2 outline-none"
                   />
                   <button
                     onClick={() => {
@@ -338,9 +338,9 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
                         setNewBlockedReason("");
                       }
                     }}
-                    className="w-12 h-12 rounded-xl bg-brand-lime/20 flex items-center justify-center cursor-pointer"
+                    className="w-12 h-12 rounded-xl bg-cm-accent/20 flex items-center justify-center cursor-pointer"
                   >
-                    <Plus className="w-5 h-5 text-brand-forest" />
+                    <Plus className="w-5 h-5 text-cm-accent" />
                   </button>
                 </div>
               </div>
@@ -350,29 +350,29 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
       </AnimatePresence>
 
       {/* Calendar Header */}
-      <div className="bg-white p-4 rounded-3xl shadow-premium border border-pale-mint/15 space-y-4">
+      <div className="bg-white p-4 rounded-3xl shadow-cm-card border border-cm-border/15 space-y-4">
         <div className="flex items-center justify-between">
           <button
             onClick={prevMonth}
-            className="w-12 h-12 rounded-full bg-pale-mint flex items-center justify-center hover:bg-brand-lime/30 transition-all cursor-pointer"
+            className="w-12 h-12 rounded-full bg-cm-accent-soft flex items-center justify-center hover:bg-cm-accent/30 transition-all cursor-pointer"
           >
-            <ChevronLeft className="w-5 h-5 text-brand-forest" />
+            <ChevronLeft className="w-5 h-5 text-cm-accent" />
           </button>
           <h3 className="font-sans text-base font-extrabold">
             {MONTHS[currentMonth]} {currentYear}
           </h3>
           <button
             onClick={nextMonth}
-            className="w-12 h-12 rounded-full bg-pale-mint flex items-center justify-center hover:bg-brand-lime/30 transition-all cursor-pointer"
+            className="w-12 h-12 rounded-full bg-cm-accent-soft flex items-center justify-center hover:bg-cm-accent/30 transition-all cursor-pointer"
           >
-            <ChevronRight className="w-5 h-5 text-brand-forest" />
+            <ChevronRight className="w-5 h-5 text-cm-accent" />
           </button>
         </div>
 
         {/* Day Headers */}
         <div className="grid grid-cols-7 gap-1">
           {DAYS.map((d) => (
-            <div key={d} className="text-center text-caption font-medium text-secondary uppercase tracking-wider py-1">
+            <div key={d} className="text-center text-caption font-medium text-cm-text-soft uppercase tracking-wider py-1">
               {d}
             </div>
           ))}
@@ -400,13 +400,13 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
             </h4>
             <button
               onClick={() => {
-                const day = parseInt(selectedDate.split("-")[2], 10);
+                const day = parseInt(selectedDate.split("-")[2]!, 10);
                 toggleDayAvailability(day);
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-caption font-medium transition-all cursor-pointer ${
                 availableSlots[selectedDate]
                   ? "bg-green-100 text-green-700"
-                  : "bg-pale-mint text-secondary"
+                  : "bg-cm-accent-soft text-cm-text-soft"
               }`}
             >
               {availableSlots[selectedDate] ? (
@@ -419,17 +419,17 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
 
           {/* Availability Slots */}
           {availableSlots[selectedDate] && (
-            <div className="bg-white p-3 rounded-2xl shadow-premium border border-pale-mint/15 flex flex-wrap gap-2">
+            <div className="bg-white p-3 rounded-2xl shadow-cm-card border border-cm-border/15 flex flex-wrap gap-2">
               {availableSlots[selectedDate].map((slot) => (
                 <span
                   key={slot}
-                  className="text-caption font-medium bg-brand-lime/20 text-brand-forest px-3 py-1.5 rounded-full"
+                  className="text-caption font-medium bg-cm-accent/20 text-cm-accent px-3 py-1.5 rounded-full"
                 >
                   <Clock className="w-3 h-3 inline mr-1" />
                   {slot}
                 </span>
               ))}
-              <span className="text-caption text-secondary italic self-center ml-1">
+              <span className="text-caption text-cm-text-soft italic self-center ml-1">
                 Créneaux disponibles
               </span>
             </div>
@@ -438,28 +438,28 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
           {/* Jobs on this day */}
           {selectedJobs.length > 0 ? (
             <div className="space-y-2">
-              <p className="text-caption font-medium text-secondary">
+              <p className="text-caption font-medium text-cm-text-soft">
                 {selectedJobs.length} intervention{selectedJobs.length > 1 ? "s" : ""}
               </p>
               {selectedJobs.map((job) => (
                 <div
                   key={job.id}
                   onClick={() => onViewJob(job)}
-                  className="bg-white p-4 rounded-2xl shadow-premium border border-pale-mint/15 flex items-center justify-between cursor-pointer hover:bg-pale-mint/30 transition-all active:scale-[0.98]"
+                  className="bg-white p-4 rounded-2xl shadow-cm-card border border-cm-border/15 flex items-center justify-between cursor-pointer hover:bg-cm-accent-soft/30 transition-all active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-pale-mint flex items-center justify-center">
-                      <UserIcon className="w-5 h-5 text-secondary" />
+                    <div className="w-10 h-10 rounded-full bg-cm-accent-soft flex items-center justify-center">
+                      <UserIcon className="w-5 h-5 text-cm-text-soft" />
                     </div>
                     <div>
                       <h5 className="text-xs font-bold">{job.serviceName}</h5>
                       <div className="flex items-center gap-2 mt-0.5">
-                        <span className="text-caption text-secondary flex items-center gap-0.5">
+                        <span className="text-caption text-cm-text-soft flex items-center gap-0.5">
                           <MapPin className="w-3 h-3" /> {job.clientLocation}
                         </span>
                       </div>
                       {job.scheduledTime && (
-                        <span className="text-caption font-medium text-brand-forest flex items-center gap-0.5 mt-0.5">
+                        <span className="text-caption font-medium text-cm-accent flex items-center gap-0.5 mt-0.5">
                           <Clock className="w-3 h-3" /> {job.scheduledTime}
                         </span>
                       )}
@@ -472,9 +472,9 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
               ))}
             </div>
           ) : (
-            <div className="bg-white p-6 rounded-3xl shadow-premium border border-pale-mint/15 text-center">
-              <CalendarIcon className="w-8 h-8 text-secondary/60 mx-auto mb-2" />
-              <p className="text-xs text-secondary font-medium">
+            <div className="bg-white p-6 rounded-3xl shadow-cm-card border border-cm-border/15 text-center">
+              <CalendarIcon className="w-8 h-8 text-cm-text-soft/60 mx-auto mb-2" />
+              <p className="text-xs text-cm-text-soft font-medium">
                 Aucune intervention ce jour
               </p>
             </div>

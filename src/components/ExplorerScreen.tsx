@@ -1,15 +1,15 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
-import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useNavigate, useLocation, useNavigationType } from "react-router-dom";
+import { motion, AnimatePresence } from "motion/react";
+import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown, Menu, ClipboardList, SlidersHorizontal, MessageCircle } from "lucide-react";
 import { ProfessionalDetails, Mission } from "../types";
 import { ProCardSkeleton } from "./ui/Skeleton";
 import VerifiedBadge from "./ui/VerifiedBadge";
 import { useAuthStore } from "../stores/authStore";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, haversineKm, LOCATIONS } from "../stores/locationStore";
-import { findBestMatch } from "../data/serviceCategories";
-import { MOCK_PROS } from "../services/mockData";
 import NotificationPanel from "./NotificationPanel";
+import HamburgerDrawer from "./HamburgerDrawer";
 
 interface ExplorerScreenProps {
   onSelectPro: (pro: ProfessionalDetails) => void;
@@ -19,32 +19,36 @@ interface ExplorerScreenProps {
   onViewActiveMission?: (mission: Mission) => void;
 }
 
-const PROMO_BANNERS = [
-  { id: "first", emoji: "🎉", title: "20% de réduction", desc: "sur votre première réservation" },
-  { id: "garden", emoji: "🌿", title: "Nouveau", desc: "Service de jardinage disponible" },
-  { id: "referral", emoji: "🤝", title: "Parrainage", desc: "Parrainez un ami, gagnez 2 000 FCFA" },
-];
-
-
-
 export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiateAiRequest, activeMissions = [], onViewActiveMission }: ExplorerScreenProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
-  const [showSearchResults, setShowSearchResults] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(() => {
     const seen = localStorage.getItem("howItWorksSeen");
     return !seen;
   });
-  const [promoIndex, setPromoIndex] = useState(0);
+  const [showAllTrusted, setShowAllTrusted] = useState(false);
+  const [showAllNearby, setShowAllNearby] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [showDrawer, setShowDrawer] = useState(false);
+  const [showTaskManager, setShowTaskManager] = useState(false);
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [filterType, setFilterType] = useState<string | null>(null);
+  const [filterRating, setFilterRating] = useState<number>(0);
+  const taskManagerRef = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
+  const navigationType = useNavigationType();
+  const prevPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    const prev = prevPathRef.current;
+    prevPathRef.current = location.pathname;
+    if (location.pathname === "/" && navigationType === "POP" && prev.startsWith("/profile/")) {
+      setShowDrawer(true);
+    }
+  }, [location.pathname, navigationType]);
 
   const user = useAuthStore((s) => s.user);
-  const isPro = useAuthStore((s) => s.isPro);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Marie";
   const unreadNotifs = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
 
@@ -66,15 +70,15 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   }, []);
 
   useEffect(() => {
-    searchRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPromoIndex((prev) => (prev + 1) % PROMO_BANNERS.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
+    if (!showTaskManager) return;
+    const handler = (e: MouseEvent) => {
+      if (taskManagerRef.current && !taskManagerRef.current.contains(e.target as Node)) {
+        setShowTaskManager(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showTaskManager]);
 
   const dismissHowItWorks = () => {
     setShowHowItWorks(false);
@@ -92,12 +96,6 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [nav]);
 
-  const handleSearchNavigation = useCallback(() => {
-    if (searchQuery.trim().length >= 2) {
-      nav(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  }, [searchQuery, nav]);
-
   const userCoord = { lat: storeLat, lng: storeLng };
 
   const sortedByDistance = [...recommendedPros]
@@ -108,31 +106,12 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
       return dA - dB;
     });
 
-  const filteredPros = recommendedPros.filter((pro) => {
-    if (activeCategory && pro.category !== activeCategory) return false;
-    return true;
-  });
-
-  const searchResults = useMemo(() => {
-    if (!searchQuery || searchQuery.length < 2) return [];
-    const q = searchQuery.toLowerCase();
-    const match = findBestMatch(searchQuery);
-    return MOCK_PROS.filter((pro) => {
-      const nameMatch = pro.name.toLowerCase().includes(q);
-      const titleMatch = pro.title.toLowerCase().includes(q);
-      const locationMatch = pro.locationNeighborhood.toLowerCase().includes(q);
-      const subMatch = match && (
-        pro.subCategory?.toLowerCase().includes(match.subName.toLowerCase()) ||
-        pro.title.toLowerCase().includes(match.subName.toLowerCase())
-      );
-      return nameMatch || titleMatch || locationMatch || subMatch;
-    });
-  }, [searchQuery]);
+  const filteredPros = recommendedPros;
 
   const getTier = (completed: number) => {
-    if (completed >= 120) return { label: "Expert", color: "text-cm-text", bg: "bg-cm-accent-soft" };
-    if (completed >= 60) return { label: "Avancé", color: "text-cm-text-soft", bg: "bg-cm-border-soft" };
-    return { label: "Débutant", color: "text-cm-text-muted", bg: "bg-cm-border-soft" };
+    if (completed >= 120) return { label: "Expert", color: "text-gray-700", bg: "bg-gray-100" };
+    if (completed >= 60) return { label: "Avancé", color: "text-gray-500", bg: "bg-gray-100" };
+    return { label: "Débutant", color: "text-gray-400", bg: "bg-gray-50" };
   };
 
   const POPULAR_SUBCATEGORIES = [
@@ -154,7 +133,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   ];
 
   return (
-    <div className="flex flex-col w-full pb-28 min-h-screen bg-cm-bg">
+    <div className="flex flex-col w-full pb-6 min-h-screen bg-cm-bg">
       {refreshing && (
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center py-3 bg-cm-elevated border-b border-cm-border">
           <div className="w-5 h-5 border-2 border-cm-accent border-t-transparent rounded-full animate-spin" />
@@ -166,18 +145,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
       <section className="px-5 pt-5 pb-2">
         <div className="flex items-center justify-between">
           <span className="text-[22px] font-bold text-cm-text tracking-tight">Ça Match</span>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowLocationPicker(true)}
-              className="flex items-center gap-1.5 bg-cm-elevated border border-cm-border rounded-full px-3 h-8 text-[13px] font-medium text-cm-text cursor-pointer cm-scale-btn"
-            >
-              <MapPin className="w-3.5 h-3.5 text-cm-text-soft" />
-              <span className="truncate max-w-[100px] text-cm-text-soft">{neighborhood}</span>
-              {geocodingSource === "nominatim" && (
-                <span className="text-[9px] font-medium text-cm-accent">📍</span>
-              )}
-              <ChevronDown className="w-3 h-3 text-cm-text-soft" />
-            </button>
+            <div className="flex items-center gap-2">
             <button onClick={() => setShowNotifications(true)}
               className="relative w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
               <Bell className="w-4 h-4 text-cm-text" />
@@ -187,7 +155,22 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
                 </span>
               )}
             </button>
+            <button onClick={() => setShowDrawer(true)}
+              className="w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
+              <Menu className="w-4 h-4 text-cm-text" />
+            </button>
           </div>
+        </div>
+        <div className="flex items-center gap-1.5 mt-1">
+          <button onClick={() => setShowLocationPicker(true)}
+            className="flex items-center gap-1.5 text-[13px] font-medium text-cm-text-soft cursor-pointer cm-scale-btn">
+            <MapPin className="w-3.5 h-3.5 text-cm-text-muted" />
+            <span className="truncate max-w-[160px]">{neighborhood}</span>
+            {geocodingSource === "nominatim" && (
+              <span className="text-[9px] font-medium text-cm-accent">📍</span>
+            )}
+            <ChevronDown className="w-3 h-3 text-cm-text-muted" />
+          </button>
         </div>
       </section>
 
@@ -196,107 +179,56 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
         <p className="text-[24px] font-bold text-cm-text mb-1">
           Bonjour, <span className="text-cm-accent">{firstName}</span>
         </p>
-        <p className="text-[14px] text-cm-text-soft mb-5">
+        <p className="text-[14px] text-cm-text-soft mb-2">
           Quel service recherchez-vous ?
         </p>
+
+        {/* Task Manager button */}
+        <div ref={taskManagerRef} className="relative mb-3">
+          <button onClick={() => setShowTaskManager(!showTaskManager)}
+            className="flex items-center gap-1.5 text-[12px] font-medium text-cm-accent bg-cm-accent-soft px-3 py-1.5 rounded-full cm-scale-btn cursor-pointer">
+            <ClipboardList className="w-3.5 h-3.5" />
+            Task Manager
+            <ChevronDown className={`w-3 h-3 transition-transform ${showTaskManager ? "rotate-180" : ""}`} />
+          </button>
+          {showTaskManager && (
+            <div className="absolute left-0 top-full mt-1 z-20 w-56 bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] shadow-cm-md animate-fade-in overflow-hidden">
+              <button onClick={() => { setShowTaskManager(false); nav("/orders/new"); }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-cm-text hover:bg-cm-accent-soft cursor-pointer transition-colors">
+                <span className="w-7 h-7 rounded-full bg-cm-accent-soft flex items-center justify-center text-[14px]">➕</span>
+                Créer une demande
+              </button>
+              {hasActiveJobs && (
+                <>
+                  <div className="h-px bg-cm-border mx-3" />
+                  <button onClick={() => { setShowTaskManager(false); onViewActiveMission?.(activeMission!); }}
+                    className="w-full flex items-center gap-3 px-4 py-3 text-[13px] text-cm-accent hover:bg-cm-accent-soft cursor-pointer transition-colors font-medium">
+                    <MessageCircle className="w-4 h-4" />
+                    Discuter avec le pro
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="relative w-full">
           <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
             <Search className="w-5 h-5 text-cm-text-muted" />
           </div>
           <input
-            ref={searchRef}
             type="text"
-            className="w-full h-13 pl-12 pr-4 text-[16px] bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] outline-none transition-all text-cm-text placeholder-cm-text-muted focus:border-cm-accent"
+            className="w-full h-13 pl-12 pr-12 text-[16px] bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] outline-none transition-all text-cm-text placeholder-cm-text-muted cursor-pointer"
             placeholder="Plombier à Abidjan ?"
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              if (e.target.value.length >= 2) setShowSearchResults(true);
-              if (e.target.value.length === 0) setShowSearchResults(false);
-            }}
-            onFocus={() => { if (searchQuery.length >= 2) setShowSearchResults(true); }}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSearchNavigation(); }}
+            readOnly
+            onFocus={() => nav("/search")}
+            onClick={() => nav("/search")}
           />
+          <button onClick={(e) => { e.stopPropagation(); setShowFilterSheet(true); }}
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer cm-scale-btn">
+            <SlidersHorizontal className="w-4 h-4 text-cm-text-soft" />
+          </button>
         </div>
-
-        {/* Search dropdown overlay */}
-        {showSearchResults && searchQuery.length >= 2 && (
-          <div className="absolute z-20 left-0 right-0 top-full mt-1 animate-fade-in pointer-events-none">
-            <div className="mx-5 bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-lg)] shadow-cm-bento pointer-events-auto max-h-[60vh] flex flex-col overflow-hidden">
-              {/* Header */}
-              <div className="flex items-center justify-between px-4 pt-3 pb-2 shrink-0">
-                <h3 className="text-[13px] font-semibold text-cm-text">
-                  Résultats pour "<span className="text-cm-accent">{searchQuery}</span>"
-                  <span className="text-cm-text-muted font-normal"> ({searchResults.length})</span>
-                </h3>
-                <button onClick={() => { setSearchQuery(""); setShowSearchResults(false); searchRef.current?.focus(); }}
-                  className="text-[11px] font-medium text-cm-text-soft flex items-center gap-0.5 cursor-pointer shrink-0">
-                  <X className="w-3 h-3" /> Effacer
-                </button>
-              </div>
-
-              {/* Results list */}
-              {searchResults.length > 0 ? (
-                <div className="overflow-y-auto px-3 pb-1 space-y-0.5">
-                  {searchResults.slice(0, 10).map((pro) => {
-                    const dist = pro.lat != null && storeLat != null
-                      ? haversineKm({ lat: storeLat, lng: storeLng }, { lat: pro.lat, lng: pro.lng })
-                      : null;
-                    return (
-                      <div key={pro.id} onClick={() => onSelectPro(pro)}
-                        className="flex items-center gap-3 p-2.5 rounded-[var(--radius-cm)] hover:bg-cm-border-soft cursor-pointer transition-colors">
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-cm-border shrink-0">
-                          <img alt={pro.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" src={pro.avatarUrl} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1">
-                            <h4 className="text-[12px] font-semibold text-cm-text truncate">{pro.name}</h4>
-                            {pro.isVerified && <VerifiedBadge />}
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5">
-                              <Star className="w-2.5 h-2.5 fill-cm-accent text-cm-accent" />
-                              {(pro.rating / 10).toFixed(1)}
-                            </span>
-                            <span className="text-[9px] text-cm-text-soft">{pro.title}</span>
-                          </div>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <p className="text-[12px] font-bold text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F</p>
-                          {dist != null && (
-                            <p className="text-[9px] text-cm-text-muted">{dist.toFixed(1)} km</p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {searchResults.length > 10 && (
-                    <p className="text-[10px] text-center text-cm-text-muted py-2">
-                      +{searchResults.length - 10} autres résultats
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="px-4 py-6 text-center">
-                  <p className="text-[12px] text-cm-text-muted">Aucun pro trouvé pour "{searchQuery}"</p>
-                </div>
-              )}
-
-              {/* View all button */}
-              <div className="shrink-0 px-3 pb-3 pt-1">
-                <button onClick={handleSearchNavigation}
-                  className="w-full flex items-center justify-between p-3 bg-cm-accent-soft rounded-[var(--radius-cm)] cursor-pointer cm-scale-btn">
-                  <div className="flex items-center gap-2">
-                    <Search className="w-3.5 h-3.5 text-cm-accent" />
-                    <span className="text-[12px] font-semibold text-cm-accent">Voir tous les résultats</span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-cm-accent shrink-0" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </section>
 
       {/* ---- Home content (always visible) ---- */}
@@ -304,42 +236,54 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
           {/* Active Mission */}
           {hasActiveJobs && (
             <section className="px-5 mb-4">
-              <div className="cm-card overflow-hidden">
+              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 rounded-full bg-cm-accent" />
-                      <span className="text-[11px] font-semibold text-cm-accent">Mission en cours</span>
+                      <div className="w-2 h-2 rounded-full bg-gray-900" />
+                      <span className="text-[11px] font-semibold text-gray-700">Mission en cours</span>
                     </div>
-                    <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-cm-accent-soft text-cm-accent">
+                    <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-700">
                       {activeMission!.status === "en_route" ? "En route" :
-                       activeMission!.status === "in_progress" ? "En cours" : "Accepté"}
+                       activeMission!.status === "in_progress" ? "En cours" :
+                       activeMission!.status === "paid" ? "Payée" : "Acceptée"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 mb-4" onClick={() => onViewActiveMission?.(activeMission!)}>
-                    <div className="w-12 h-12 rounded-full overflow-hidden border border-cm-border shrink-0">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-100 shrink-0">
                       <img src={activeMission!.proAvatar} alt="" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-[14px] font-semibold text-cm-text truncate">{activeMission!.proName}</h3>
-                      <p className="text-[12px] text-cm-text-soft truncate">{activeMission!.title}</p>
-                      <div className="flex items-center gap-1 mt-1">
-                        <MapPin className="w-3 h-3 text-cm-text-muted" />
-                        <span className="text-[11px] text-cm-text-soft truncate">{activeMission!.address}</span>
-                      </div>
+                      <h3 className="text-[14px] font-semibold text-gray-900 truncate">{activeMission!.proName}</h3>
+                      <p className="text-[12px] text-gray-500 truncate">{activeMission!.title}</p>
                     </div>
+                    {activeMission!.status !== "accepted" && (
+                      <button onClick={(e) => { e.stopPropagation(); nav(`/messages/${activeMission!.id}`); }}
+                        className="flex items-center gap-1.5 h-9 px-3.5 bg-gray-900 text-white rounded-full text-[11px] font-semibold cursor-pointer active:scale-95 transition-all">
+                        <MessageCircle className="w-3.5 h-3.5" /> Message
+                      </button>
+                    )}
                   </div>
-                  <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${
-                      activeMission!.status === "accepted" ? "w-1/4 bg-cm-accent" :
-                      activeMission!.status === "en_route" ? "w-1/2 bg-cm-accent" :
-                      "w-3/4 bg-cm-accent"
+                  <div className="flex items-center gap-1 mb-3">
+                    <MapPin className="w-3 h-3 text-gray-400" />
+                    <span className="text-[11px] text-gray-500 truncate">{activeMission!.address}</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full bg-gray-900 transition-all ${
+                      activeMission!.status === "accepted" ? "w-1/6" :
+                      activeMission!.status === "paid" ? "w-2/6" :
+                      activeMission!.status === "in_progress" ? "w-3/6" :
+                      activeMission!.status === "completed" ? "w-4/6" :
+                      activeMission!.status === "client_validation" ? "w-5/6" :
+                      "w-1/6"
                     }`} />
                   </div>
-                  <button onClick={() => onViewActiveMission?.(activeMission!)}
-                    className="w-full mt-3 h-10 bg-cm-accent rounded-[var(--radius-cm)] text-[13px] font-medium text-white cm-scale-btn hover:bg-cm-accent-hover">
-                    Voir les détails
-                  </button>
+                  <div className="flex gap-2 mt-3">
+                    <button onClick={() => onViewActiveMission?.(activeMission!)}
+                      className="flex-1 h-10 bg-gray-900 rounded-xl text-[12px] font-semibold text-white cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all">
+                      Suivre la mission
+                    </button>
+                  </div>
                 </div>
               </div>
             </section>
@@ -348,15 +292,11 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
           {/* Most Requested Subcategories */}
           <section className="px-5 py-2">
             <h2 className="text-[16px] font-bold text-cm-text mb-3">Les plus demandés</h2>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex overflow-x-auto gap-2 flex-nowrap no-scrollbar pb-1">
               {POPULAR_SUBCATEGORIES.map((sub) => (
                 <button
                   key={sub.name}
-                  onClick={() => {
-                    setSearchQuery(sub.name);
-                    setShowSearchResults(true);
-                    searchRef.current?.focus();
-                  }}
+                  onClick={() => nav(`/search?q=${encodeURIComponent(sub.name)}`)}
                   className="flex items-center gap-1.5 px-3.5 py-2 bg-cm-elevated border border-cm-border rounded-full cursor-pointer cm-scale-btn hover:border-cm-accent"
                 >
                   <span className="text-[14px]">{sub.emoji}</span>
@@ -392,30 +332,14 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
             </section>
           )}
 
-          {/* Promo Banner */}
-          <section className="px-5 mb-4">
-            <div className="cm-card p-4">
-              <div className="flex items-center gap-3">
-                <span className="text-[24px]">{PROMO_BANNERS[promoIndex].emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-cm-text">{PROMO_BANNERS[promoIndex].title}</p>
-                  <p className="text-[12px] text-cm-text-soft">{PROMO_BANNERS[promoIndex].desc}</p>
-                </div>
-                <button onClick={() => nav("/search")}
-                  className="shrink-0 text-[12px] font-medium text-cm-accent border border-cm-accent rounded-full px-3 py-1.5 cm-scale-btn">
-                  Voir
-                </button>
-              </div>
-            </div>
-          </section>
-
           {/* Recommended Pros */}
           <section className="py-2">
             <div className="px-5 flex items-center justify-between mb-3">
               <h2 className="text-[16px] font-bold text-cm-text">Prestataires de confiance</h2>
-              <button onClick={() => nav("/search")}
-                className="text-[12px] font-medium text-cm-accent cm-scale-btn">
-                Voir tout <ChevronRight className="w-3 h-3 inline" />
+              <button onClick={() => setShowAllTrusted(!showAllTrusted)}
+                className="text-[12px] font-medium text-cm-accent cm-scale-btn flex items-center gap-0.5">
+                {showAllTrusted ? "Réduire" : "Voir tout"}
+                <ChevronRight className={`w-3 h-3 transition-transform ${showAllTrusted ? "rotate-90" : ""}`} />
               </button>
             </div>
             {loading ? (
@@ -432,37 +356,39 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               </div>
             ) : (
               <div className="px-5 cm-grid-2">
-                {filteredPros.slice(0, 4).map((pro) => {
-                  const tier = getTier(pro.completedInterventions);
+                <AnimatePresence mode="popLayout">
+                {(showAllTrusted ? filteredPros : filteredPros.slice(0, 4)).map((pro) => {
+                  const domainLabel = pro.title || pro.subCategory || "Professionnel";
                   return (
-                    <div key={pro.id} onClick={() => onSelectPro(pro)}
-                      className="cm-card overflow-hidden cursor-pointer flex flex-col">
+                    <motion.div layout key={pro.id} onClick={() => onSelectPro(pro)}
+                      className="bg-white border border-gray-200 rounded-2xl overflow-hidden cursor-pointer flex flex-col hover:border-gray-300 transition-all shadow-sm">
                       <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
                         <img alt={pro.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" src={pro.avatarUrl} />
-                        <div className="absolute top-2 right-2 bg-cm-elevated/90 px-2 py-0.5 rounded-full flex items-center gap-1 text-[11px] font-medium text-cm-text">
-                          <Star className="w-3 h-3" />{(pro.rating / 10).toFixed(1)}
+                        <div className="absolute top-2 right-2 bg-white/90 px-2 py-0.5 rounded-full flex items-center gap-1 text-[11px] font-medium text-gray-700 shadow-sm">
+                          <Star className="w-3 h-3 text-amber-500 fill-amber-500" />{(pro.rating / 10).toFixed(1)}
                         </div>
                       </div>
-                      <div className="p-3 space-y-1">
+                      <div className="p-3 space-y-1.5">
                         <div className="flex items-center gap-1">
-                          <h4 className="font-semibold text-[13px] text-cm-text truncate">{pro.name}</h4>
+                          <h4 className="font-semibold text-[13px] text-gray-900 truncate">{pro.name}</h4>
                           {pro.isVerified && <VerifiedBadge />}
                         </div>
-                        <p className="text-[12px] text-cm-text-soft truncate">{pro.title}</p>
+                        <p className="text-[11px] text-gray-500 truncate">{domainLabel}</p>
                         <div className="flex items-center justify-between pt-1">
                           <div>
-                            <span className="text-[10px] text-cm-text-muted">À partir de</span>
-                            <p className="text-[14px] font-semibold text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F</p>
+                            <span className="text-[9px] text-gray-400">À partir de</span>
+                            <p className="text-[14px] font-bold text-gray-900">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F</p>
                           </div>
                           <button onClick={(e) => { e.stopPropagation(); onSelectPro(pro); }}
-                            className="bg-cm-accent text-white h-8 px-4 rounded-full text-[12px] font-medium cm-scale-btn hover:bg-cm-accent-hover">
+                            className="bg-gray-900 text-white h-8 px-4 rounded-full text-[11px] font-semibold cursor-pointer hover:opacity-90 active:scale-95 transition-all">
                             Voir
                           </button>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
+                </AnimatePresence>
               </div>
             )}
           </section>
@@ -471,9 +397,10 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
           <section className="py-2">
             <div className="px-5 flex items-center justify-between mb-3">
               <h2 className="text-[16px] font-bold text-cm-text">À proximité</h2>
-              <button onClick={() => nav("/search")}
-                className="text-[12px] font-medium text-cm-accent cm-scale-btn">
-                Voir tout <ChevronRight className="w-3 h-3 inline" />
+              <button onClick={() => setShowAllNearby(!showAllNearby)}
+                className="text-[12px] font-medium text-cm-accent cm-scale-btn flex items-center gap-0.5">
+                {showAllNearby ? "Réduire" : "Voir tout"}
+                <ChevronRight className={`w-3 h-3 transition-transform ${showAllNearby ? "rotate-90" : ""}`} />
               </button>
             </div>
             {sortedByDistance.length === 0 ? (
@@ -487,68 +414,108 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
               </div>
             ) : (
               <div className="px-5 space-y-2">
-                {sortedByDistance.slice(0, 3).map((pro) => {
+                <AnimatePresence mode="popLayout">
+                {(showAllNearby ? sortedByDistance : sortedByDistance.slice(0, 3)).map((pro) => {
                   const dist = haversineKm(userCoord, { lat: pro.lat!, lng: pro.lng! });
                   return (
-                    <div key={`nearby-${pro.id}`} onClick={() => onSelectPro(pro)}
-                      className="flex items-center gap-3 p-3.5 cm-card cursor-pointer">
-                      <div className="w-11 h-11 rounded-full overflow-hidden border border-cm-border shrink-0">
+                    <motion.div layout key={`nearby-${pro.id}`} onClick={() => onSelectPro(pro)}
+                      className="flex items-center gap-3 p-3.5 bg-white border border-gray-200 rounded-2xl cursor-pointer hover:border-gray-300 transition-all shadow-sm">
+                      <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-gray-100 shrink-0">
                         <img alt={pro.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" src={pro.avatarUrl} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <h4 className="text-[13px] font-semibold text-cm-text truncate">{pro.name}</h4>
-                          <span className="text-[11px] text-cm-text-muted shrink-0 flex items-center gap-0.5">
+                          <h4 className="text-[13px] font-semibold text-gray-900 truncate">{pro.name}</h4>
+                          <span className="text-[11px] text-gray-400 shrink-0 flex items-center gap-0.5">
                             <MapPin className="w-2.5 h-2.5" />{dist.toFixed(1)} km
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] text-cm-accent font-medium">Disponible</span>
-                          <span className="text-[11px] text-cm-text-muted flex items-center gap-0.5">
-                            <Star className="w-2.5 h-2.5" />{(pro.rating / 10).toFixed(1)}
+                          <span className="text-[11px] text-gray-900 font-medium">Disponible</span>
+                          <span className="text-[11px] text-gray-400 flex items-center gap-0.5">
+                            <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />{(pro.rating / 10).toFixed(1)}
                           </span>
                         </div>
                       </div>
                       <button onClick={(e) => { e.stopPropagation(); onSelectPro(pro); }}
-                        className="shrink-0 text-[12px] font-medium text-cm-accent border border-cm-accent px-4 py-1.5 rounded-full cm-scale-btn">
-                        Contacter
+                        className="shrink-0 text-[12px] font-medium bg-gray-900 text-white px-4 py-1.5 rounded-full cursor-pointer hover:opacity-90 active:scale-95 transition-all">
+                        Voir
                       </button>
-                    </div>
+                    </motion.div>
                   );
                 })}
+                </AnimatePresence>
               </div>
             )}
           </section>
 
-          {/* Become a Pro CTA */}
-          {!isPro && <section className="px-5 py-2 mb-4">
-            <div onClick={() => nav("/profile")}
-              className="border border-cm-border rounded-[var(--radius-cm-lg)] bg-cm-elevated p-5 cursor-pointer cm-scale-btn">
-              <div className="flex items-start gap-3 mb-3">
-                <div className="w-9 h-9 rounded-lg bg-cm-accent-soft flex items-center justify-center shrink-0">
-                  <Briefcase className="w-5 h-5 text-cm-accent" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-[15px] font-semibold text-cm-text">Vous êtes professionnel?</h3>
-                  <p className="text-[12px] text-cm-text-soft mt-0.5">Rejoignez Ça Match et développez votre activité</p>
-                </div>
-              </div>
-              <div className="space-y-1.5 mb-4">
-                {["Accédez à des centaines de clients", "Gérez vos rendez-vous facilement", "Recevez des paiements sécurisés"].map((text) => (
-                  <div key={text} className="flex items-center gap-2 text-[12px] text-cm-text-soft">
-                    <svg className="w-3.5 h-3.5 text-cm-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    {text}
-                  </div>
+        </>
+
+      {/* Hamburger Drawer */}
+      <HamburgerDrawer open={showDrawer} onClose={() => setShowDrawer(false)} />
+
+      {/* Filter Sheet */}
+      {showFilterSheet && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setShowFilterSheet(false)}>
+          <div className="fixed inset-0 bg-cm-overlay" />
+          <div className="relative w-full max-w-md bg-cm-elevated rounded-t-[20px] p-5 pb-10 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-semibold text-cm-text">Filtrer les résultats</h3>
+              <button onClick={() => setShowFilterSheet(false)} className="w-9 h-9 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer">
+                <X className="w-4 h-4 text-cm-text" />
+              </button>
+            </div>
+
+            {/* Type filter */}
+            <div className="mb-5">
+              <p className="text-[13px] font-semibold text-cm-text mb-2.5">Type de service</p>
+              <div className="flex flex-wrap gap-2">
+                {["Maison & Réparations", "Transport & Livraison", "Événements", "Éducation", "Informatique", "Assistance"].map((t) => (
+                  <button key={t} onClick={() => setFilterType(filterType === t ? null : t)}
+                    className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
+                      filterType === t
+                        ? "bg-cm-accent text-white"
+                        : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                    }`}>
+                    {t}
+                  </button>
                 ))}
               </div>
-              <span className="inline-block text-[13px] font-medium text-white bg-cm-accent px-5 py-2.5 rounded-[var(--radius-cm)]">
-                Devenir Professionnel
-              </span>
             </div>
-          </section>}
-        </>
+
+            {/* Rating filter */}
+            <div className="mb-5">
+              <p className="text-[13px] font-semibold text-cm-text mb-2.5">Note minimum</p>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3, 4, 5].map((r) => (
+                  <button key={r} onClick={() => setFilterRating(r)}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
+                      filterRating === r
+                        ? "bg-cm-accent text-white"
+                        : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                    }`}>
+                    {r === 0 ? "Tous" : `${r}★`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Location filter */}
+            <div className="mb-6">
+              <p className="text-[13px] font-semibold text-cm-text mb-2.5">Localisation</p>
+              <div className="flex items-center gap-2 px-4 py-3 bg-cm-border-soft rounded-[var(--radius-cm)]">
+                <MapPin className="w-4 h-4 text-cm-text-muted" />
+                <span className="text-[13px] text-cm-text-soft">{neighborhood}</span>
+              </div>
+            </div>
+
+            <button onClick={() => { setShowFilterSheet(false); nav("/search"); }}
+              className="w-full py-3 bg-cm-accent rounded-[var(--radius-cm)] text-[14px] font-medium text-white cm-scale-btn hover:bg-cm-accent-hover cursor-pointer">
+              Appliquer les filtres
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Notification Panel */}
       <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />
@@ -566,7 +533,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
             </div>
             <div className="space-y-1">
               {LOCATIONS.map((loc) => {
-                const hood = loc.split(",")[1].trim();
+                const hood = loc.split(",")[1]!.trim();
                 const isActive = neighborhood === hood;
                 return (
                   <button key={loc} onClick={() => { setNeighborhood(hood); setShowLocationPicker(false); }}
@@ -614,11 +581,4 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   );
 }
 
-function Briefcase(props: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={props.className}>
-      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
-      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-    </svg>
-  );
-}
+

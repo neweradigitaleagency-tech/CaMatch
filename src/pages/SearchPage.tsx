@@ -1,13 +1,12 @@
 import { useState, useMemo, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Search, X, Star, MapPin, Sparkles, ArrowLeft } from "lucide-react";
+import { Search, X, Star, MapPin, ArrowLeft, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
-import GlassCard from "../components/ui/GlassCard";
 import BentoCard from "../components/ui/BentoCard";
 import VerifiedBadge from "../components/ui/VerifiedBadge";
-import { SERVICE_CATEGORIES, findBestMatch } from "../data/serviceCategories";
+import { SERVICE_CATEGORIES, findBestMatch, smartSearchSuggestions } from "../data/serviceCategories";
 import { MOCK_PROS } from "../services/mockData";
-import { useLocationStore, haversineKm } from "../stores/locationStore";
+import { useLocationStore, haversineKm, LOCATIONS } from "../stores/locationStore";
 import type { ProfessionalDetails } from "../types";
 
 const container = {
@@ -31,6 +30,11 @@ export default function SearchPage() {
   const [typedResults, setTypedResults] = useState<ProfessionalDetails[]>([]);
   const [searched, setSearched] = useState(!!subCategoryParam || !!qParam);
   const [nearbyOnly, setNearbyOnly] = useState(false);
+  const [showFilterSheet, setShowFilterSheet] = useState(false);
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const [filterSubcategory, setFilterSubcategory] = useState<string | null>(null);
+  const [filterRating, setFilterRating] = useState(0);
+  const [filterLocation, setFilterLocation] = useState("");
   const initialized = useRef(false);
 
   if (!initialized.current) {
@@ -55,6 +59,14 @@ export default function SearchPage() {
 
   const storeLat = useLocationStore((s) => s.latitude);
   const storeLng = useLocationStore((s) => s.longitude);
+  const neighborhood = useLocationStore((s) => s.neighborhood);
+  const setNeighborhood = useLocationStore((s) => s.setNeighborhood);
+
+  const availableSubcategories = useMemo(() => {
+    if (!filterCategory) return [];
+    const cat = SERVICE_CATEGORIES.find(c => c.id === filterCategory);
+    return cat?.subcategories || [];
+  }, [filterCategory]);
 
   const initialResults = useMemo(() => {
     if (subCategoryParam) {
@@ -122,26 +134,40 @@ export default function SearchPage() {
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="px-4 pt-3 pb-3">
           <div className="flex items-center gap-2 mb-2">
-            {subCategoryParam && (
-              <button onClick={() => nav(-1)}
-                className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer shrink-0">
-                <ArrowLeft className="w-4 h-4 text-cm-text" />
-              </button>
-            )}
+            <button onClick={() => nav(-1)}
+              className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer shrink-0">
+              <ArrowLeft className="w-4 h-4 text-cm-text" />
+            </button>
           </div>
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted pointer-events-none" />
             <input
               type="text"
               autoFocus={!subCategoryParam}
-              className="w-full h-11 pl-9 pr-10 text-[13px] bg-cm-elevated border border-cm-border rounded-[14px] outline-none transition-all text-cm-text placeholder-cm-text-muted focus:border-cm-accent"
+              className="w-full h-11 pl-9 pr-12 text-[13px] bg-cm-elevated border border-cm-border rounded-[14px] outline-none transition-all text-cm-text placeholder-cm-text-muted focus:border-cm-accent"
               placeholder="Plombier, électricien..."
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
             />
             <div className="absolute right-1.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+              <button onClick={() => setShowFilterSheet(true)}
+                className="w-8 h-8 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer cm-scale-btn">
+                <SlidersHorizontal className="w-4 h-4 text-cm-text-soft" />
+              </button>
             </div>
           </div>
+
+          {/* Subcategory suggestions */}
+          {query.length >= 2 && !searched && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {smartSearchSuggestions(query).map((s) => (
+                <button key={s.subName} onClick={() => { setQuery(s.subName); handleSearch(s.subName); }}
+                  className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full text-[11px] font-medium text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -213,7 +239,7 @@ export default function SearchPage() {
                               <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5 truncate">
                                 <MapPin className="w-2.5 h-2.5 shrink-0" />
                                 {nearbyOnly && pro.lat != null
-                                  ? `${haversineKm({ lat: storeLat, lng: storeLng }, { lat: pro.lat, lng: pro.lng }).toFixed(1)} km`
+                                  ? `${haversineKm({ lat: storeLat!, lng: storeLng! }, { lat: pro.lat!, lng: pro.lng! }).toFixed(1)} km`
                                   : pro.locationNeighborhood.split(",")[0]}
                               </span>
                               <span className="text-[12px] font-bold text-cm-text font-mono">
@@ -298,7 +324,7 @@ export default function SearchPage() {
                             <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5 truncate">
                               <MapPin className="w-2.5 h-2.5 shrink-0" />
                               {nearbyOnly && pro.lat != null
-                                ? `${haversineKm({ lat: storeLat, lng: storeLng }, { lat: pro.lat, lng: pro.lng }).toFixed(1)} km`
+                                ? `${haversineKm({ lat: storeLat!, lng: storeLng! }, { lat: pro.lat!, lng: pro.lng! }).toFixed(1)} km`
                                 : pro.locationNeighborhood.split(",")[0]}
                             </span>
                             <span className="text-[12px] font-bold text-cm-text font-mono">
@@ -314,17 +340,117 @@ export default function SearchPage() {
 
               {/* Bottom CTA */}
               <motion.div variants={itemAnim} className="text-center pb-4">
-                <button
-                  className="inline-flex items-center gap-2 px-5 py-3 bg-cm-accent-soft border border-cm-accent/30 rounded-[14px] text-[13px] font-semibold text-cm-accent cursor-pointer cm-scale-btn"
+                <button type="button" onClick={() => nav("/explorer/request-creation")}
+                  className="inline-flex items-center gap-2 px-5 py-3 bg-gray-900 text-white rounded-[14px] text-[13px] font-semibold cursor-pointer cm-scale-btn hover:opacity-90"
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Je ne sais pas qui contacter
+                  Créer une demande
                 </button>
               </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
+
+      {/* Filter Sheet */}
+      {showFilterSheet && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setShowFilterSheet(false)}>
+          <div className="fixed inset-0 bg-cm-overlay" />
+          <div className="relative w-full max-w-md bg-cm-elevated rounded-t-[20px] p-5 pb-10 animate-slide-up max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="text-[16px] font-semibold text-cm-text">Filtrer</h3>
+              <button onClick={() => setShowFilterSheet(false)} className="w-9 h-9 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer">
+                <X className="w-4 h-4 text-cm-text" />
+              </button>
+            </div>
+
+            {/* Categories */}
+            <div className="mb-5">
+              <p className="text-[13px] font-semibold text-cm-text mb-2.5">Catégorie</p>
+              <div className="flex flex-wrap gap-2">
+                {SERVICE_CATEGORIES.map((cat) => (
+                  <button key={cat.id} onClick={() => {
+                    setFilterCategory(filterCategory === cat.id ? null : cat.id);
+                    setFilterSubcategory(null);
+                  }}
+                    className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
+                      filterCategory === cat.id
+                        ? "bg-cm-accent text-white"
+                        : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                    }`}>
+                    {cat.icon} {cat.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Subcategories */}
+            {filterCategory && availableSubcategories.length > 0 && (
+              <div className="mb-5">
+                <p className="text-[13px] font-semibold text-cm-text mb-2.5">Sous-catégorie</p>
+                <div className="flex flex-wrap gap-2">
+                  {availableSubcategories.map((sub) => (
+                    <button key={sub.name} onClick={() => setFilterSubcategory(filterSubcategory === sub.name ? null : sub.name)}
+                      className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
+                        filterSubcategory === sub.name
+                          ? "bg-cm-accent text-white"
+                          : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                      }`}>
+                      {sub.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Rating */}
+            <div className="mb-5">
+              <p className="text-[13px] font-semibold text-cm-text mb-2.5">Note minimum</p>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3, 4, 5].map((r) => (
+                  <button key={r} onClick={() => setFilterRating(r)}
+                    className={`px-3 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
+                      filterRating === r
+                        ? "bg-cm-accent text-white"
+                        : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                    }`}>
+                    {r === 0 ? "Tous" : `${r}★`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="mb-6">
+              <p className="text-[13px] font-semibold text-cm-text mb-2.5">Localisation</p>
+              <div className="flex flex-wrap gap-2">
+                {LOCATIONS.map((loc) => {
+                  const hood = loc.split(",")[1]?.trim() || loc;
+                  const isActive = (filterLocation || neighborhood) === hood;
+                  return (
+                    <button key={loc} onClick={() => setFilterLocation(isActive ? "" : hood)}
+                      className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
+                        isActive
+                          ? "bg-cm-accent text-white"
+                          : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                      }`}>
+                      {hood}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button onClick={() => {
+              if (filterLocation) setNeighborhood(filterLocation);
+              setShowFilterSheet(false);
+              if (filterSubcategory) nav(`/search?subCategory=${encodeURIComponent(filterSubcategory)}`);
+            }}
+              className="w-full py-3 bg-cm-accent rounded-[var(--radius-cm)] text-[14px] font-medium text-white cm-scale-btn hover:bg-cm-accent-hover cursor-pointer">
+              Appliquer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

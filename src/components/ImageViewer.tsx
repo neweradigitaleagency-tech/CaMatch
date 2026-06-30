@@ -14,7 +14,7 @@ export default function ImageViewer({ images, initialIndex = 0, open, onClose }:
 
   if (!open || images.length === 0) return null;
 
-  const current = images[idx];
+  const current = images[idx]!;
 
   const prev = () => setIdx(i => Math.max(0, i - 1));
   const next = () => setIdx(i => Math.min(images.length - 1, i + 1));

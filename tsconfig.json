@@ -2,7 +2,6 @@
   "exclude": ["scripts"],
   "compilerOptions": {
     "target": "ES2022",
-    "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "module": "ESNext",
     "lib": [
@@ -10,6 +9,8 @@
       "DOM",
       "DOM.Iterable"
     ],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
     "moduleResolution": "bundler",
     "isolatedModules": true,

@@ -64,12 +64,12 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
     <div className="px-5 py-5 pb-32 space-y-5">
       <div className="flex items-center gap-3">
         <button onClick={onBack} className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm cursor-pointer">
-          <ArrowLeft className="w-5 h-5 text-brand-forest" />
+          <ArrowLeft className="w-5 h-5 text-cm-accent" />
         </button>
         <h2 className="font-sans text-lg font-extrabold">Notifications</h2>
       </div>
 
-      <p className="text-caption text-secondary leading-relaxed">
+      <p className="text-caption text-cm-text-soft leading-relaxed">
         Choisissez comment et quand vous souhaitez être notifié. Les notifications urgentes (nouvelle mission, alerte solde) sont toujours envoyées.
       </p>
 
@@ -82,22 +82,22 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
             key={pref.channel}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-3xl shadow-premium border border-pale-mint/15 overflow-hidden"
+            className="bg-white rounded-3xl shadow-cm-card border border-cm-border/15 overflow-hidden"
           >
             {/* Channel Toggle Header */}
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${pref.enabled ? "bg-brand-lime/20" : "bg-gray-50"}`}>
-                  {pref.enabled ? <Icon className="w-5 h-5 text-brand-forest" /> : <BellOff className="w-5 h-5 text-gray-400" />}
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${pref.enabled ? "bg-cm-accent/20" : "bg-gray-50"}`}>
+                  {pref.enabled ? <Icon className="w-5 h-5 text-cm-accent" /> : <BellOff className="w-5 h-5 text-gray-400" />}
                 </div>
                 <div>
                   <h4 className="text-xs font-bold">{config.label}</h4>
-                  <p className="text-caption text-secondary">{config.description}</p>
+                  <p className="text-caption text-cm-text-soft">{config.description}</p>
                 </div>
               </div>
               <button
                 onClick={() => toggleChannel(pref.channel)}
-                className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${pref.enabled ? "bg-brand-lime" : "bg-gray-200"}`}
+                className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${pref.enabled ? "bg-cm-accent" : "bg-gray-200"}`}
               >
                 <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${pref.enabled ? "translate-x-5.5 left-0.5" : "translate-x-0.5 left-0"}`} />
               </button>
@@ -105,16 +105,16 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
 
             {/* Events List */}
             {pref.enabled && (
-              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="border-t border-pale-mint/10 px-4 pb-4 space-y-1 pt-2">
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} className="border-t border-cm-border/10 px-4 pb-4 space-y-1 pt-2">
                 {Object.keys(pref.events).map((eventKey) => (
                   <div key={eventKey} className="flex items-center justify-between py-1.5">
-                    <span className="text-body-sm font-medium text-secondary">
+                    <span className="text-body-sm font-medium text-cm-text-soft">
                       {EVENT_LABELS[eventKey] || eventKey}
                     </span>
                     <button
                       onClick={() => toggleEvent(pref.channel, eventKey)}
                       className={`w-10 h-6 rounded-full transition-colors cursor-pointer ${
-                        (pref.events as any)[eventKey] ? "bg-brand-lime" : "bg-gray-200"
+                        (pref.events as any)[eventKey] ? "bg-cm-accent" : "bg-gray-200"
                       }`}
                     >
                       <div
@@ -131,9 +131,9 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
         );
       })}
 
-      <div className="bg-pale-mint p-4 rounded-2xl flex items-start gap-2">
-        <AlertCircle className="w-4 h-4 text-brand-forest shrink-0 mt-0.5" />
-        <p className="text-caption text-secondary leading-relaxed">
+      <div className="bg-cm-accent-soft p-4 rounded-2xl flex items-start gap-2">
+        <AlertCircle className="w-4 h-4 text-cm-accent shrink-0 mt-0.5" />
+        <p className="text-caption text-cm-text-soft leading-relaxed">
           Les notifications critiques (nouvelle mission avec décompte, alerte de solde faible) sont prioritaires et peuvent contourner vos préférences si nécessaire.
         </p>
       </div>

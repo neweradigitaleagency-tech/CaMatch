@@ -1,5 +1,4 @@
 import { AlertTriangle } from "lucide-react";
-import { Button } from "./index";
 
 interface ErrorStateProps {
   readonly message?: string;
@@ -17,9 +16,9 @@ export default function ErrorState({ message, onRetry }: ErrorStateProps) {
         {message || "Une erreur est survenue"}
       </p>
       {onRetry && (
-        <Button variant="secondary" size="sm" onClick={onRetry}>
+        <button onClick={onRetry} className="h-9 px-5 rounded-xl bg-cm-accent text-cm-text-onAccent text-[13px] font-semibold cursor-pointer active:scale-[0.96] transition-transform">
           Réessayer
-        </Button>
+        </button>
       )}
     </div>
   );

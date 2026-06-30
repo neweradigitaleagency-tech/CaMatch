@@ -46,7 +46,7 @@ export default function AiMatchPricingPage() {
           acceptedAt: new Date().toISOString(),
         };
         setMissions([newMission, ...missions]);
-        nav(`/orders/tracker/${newMission.id}`);
+        nav(`/orders/payment/${newMission.id}`);
       }}
     />
   );

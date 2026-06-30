@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import RequestsListScreen from "../components/RequestsListScreen";
-import ProDashboardScreen from "../components/ProDashboardScreen";
+import { FileText } from "lucide-react";
+import MissionListScreen from "../components/MissionListScreen";
 import { useClientRequests, useClientMissions } from "../hooks/useDatabase";
 import { useAuthStore } from "../stores/authStore";
 import { useRequestStore } from "../stores/requestStore";
@@ -65,47 +65,90 @@ export default function OrdersPage() {
 
   if (!isPro) {
     return (
-      <RequestsListScreen
-        requests={requests}
-        missions={missions}
-        {...commonHandlers}
-      />
+      <div className="min-h-screen bg-cm-bg">
+        <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
+          <div className="flex items-center h-14 px-5">
+            <h1 className="text-[18px] font-bold text-cm-text">Mes commandes</h1>
+          </div>
+        </div>
+        <div className="px-5 pt-4 pb-24">
+          <MissionListScreen
+            tabCounts={{ pending: requests.length, active: missions.filter((m: any) => m.status !== "completed" && m.status !== "cancelled").length, reviews: missions.filter((m: any) => m.status === "completed").length, cancelled: missions.filter((m: any) => m.status === "cancelled").length }}
+            {...commonHandlers}
+          />
+        </div>
+      </div>
     );
   }
 
   return (
-    <ProDashboardScreen
-      pro={currentPro}
-      stats={stats}
-      todayJobs={todayJobs}
-      alerts={alerts}
-      available={isAvailable}
-      onToggleAvailability={toggleAvailability}
-      onViewJob={(job) => navigate(`/orders/tracker/${job.id}`)}
-      onAcceptAlert={(alert) => {
-        const newMission: Mission = {
-          id: "mission_" + Date.now(),
-          requestId: "req_" + Date.now(),
-          clientId: "client_marie",
-          proId: userId || "pro_mock",
-          status: "accepted",
-          title: alert.description.slice(0, 60),
-          description: alert.description,
-          category: alert.category,
-          address: alert.location,
-          budgetXOF: alert.estimatedPriceMinXOF,
-          photos: [],
-          proName: currentPro?.name || "Vous",
-          proAvatar: currentPro?.avatarUrl || "",
-          proPhone: currentPro?.phoneNumber || "",
-          clientName: alert.clientName,
-          clientPhone: alert.clientPhone,
-          createdAt: new Date().toISOString(),
-        };
-        setMissions([newMission, ...storeMissions]);
-        removeAlert(alert.id);
-      }}
-      onDeclineAlert={(alert) => removeAlert(alert.id)}
-    />
+    <div className="min-h-screen bg-cm-bg">
+      <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
+        <div className="flex items-center h-14 px-5">
+          <h1 className="text-[18px] font-bold text-cm-text">Tableau de bord</h1>
+        </div>
+      </div>
+      <div className="px-5 pt-4 pb-24 space-y-4">
+        <div className="flex items-center justify-between bg-cm-elevated border border-cm-border rounded-[14px] p-4">
+          <div>
+            <p className="text-[12px] text-cm-text-muted">Disponible</p>
+            <p className="text-[14px] font-bold text-cm-text">{isAvailable ? "Oui" : "Non"}</p>
+          </div>
+          <button type="button" onClick={toggleAvailability} className={`w-12 h-7 rounded-full transition-colors ${isAvailable ? "bg-green-500" : "bg-cm-border"}`}>
+            <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${isAvailable ? "translate-x-6" : "translate-x-1"}`} />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-cm-elevated border border-cm-border rounded-[14px] p-4">
+            <p className="text-[11px] text-cm-text-muted">Aujourd'hui</p>
+            <p className="text-[20px] font-bold text-cm-text">{stats.todayJobsCount}</p>
+            <p className="text-[10px] text-cm-text-soft">missions</p>
+          </div>
+          <div className="bg-cm-elevated border border-cm-border rounded-[14px] p-4">
+            <p className="text-[11px] text-cm-text-muted">Gains du jour</p>
+            <p className="text-[20px] font-bold text-cm-text font-mono">{stats.todayEarningsXOF.toLocaleString("fr-FR")} F</p>
+          </div>
+        </div>
+
+        {alerts.length > 0 && (
+          <div>
+            <h2 className="text-[13px] font-bold text-cm-text mb-2">Alertes mission</h2>
+            <div className="space-y-2">
+              {alerts.map((alert) => (
+                <div key={alert.id} className="bg-cm-elevated border border-cm-border rounded-[14px] p-4">
+                  <p className="text-[13px] font-bold text-cm-text">{alert.clientName}</p>
+                  <p className="text-[11px] text-cm-text-soft">{alert.description}</p>
+                  <p className="text-[11px] text-cm-text-muted">{alert.location}</p>
+                  <div className="flex gap-2 mt-2">
+                    <button type="button" onClick={() => navigate(`/orders/quote/create/${alert.requestId}`)}
+                      className="flex-1 h-9 text-[11px] font-bold text-cm-accent bg-cm-accent-soft rounded-[10px] flex items-center justify-center gap-1 cursor-pointer">
+                      <FileText className="w-3.5 h-3.5" /> Devis
+                    </button>
+                    <button type="button" onClick={() => { const newMission: Mission = { id: "mission_" + Date.now(), requestId: alert.requestId, clientId: "client_marie", proId: userId || "pro_mock", status: "accepted", title: alert.description.slice(0, 60), description: alert.description, category: alert.category, address: alert.location, budgetXOF: alert.estimatedPriceMinXOF, photos: [], proName: currentPro?.name || "Vous", proAvatar: currentPro?.avatarUrl || "", proPhone: currentPro?.phoneNumber || "", clientName: alert.clientName, clientPhone: alert.clientPhone, createdAt: new Date().toISOString() }; useRequestStore.getState().addMission(newMission); removeAlert(alert.id); }} className="h-9 text-[11px] font-bold text-white bg-green-600 rounded-[10px] px-3 cursor-pointer">Accepter</button>
+                    <button type="button" onClick={() => removeAlert(alert.id)} className="h-9 text-[11px] font-bold text-cm-text bg-cm-border-soft rounded-[10px] px-3 cursor-pointer">Refuser</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {todayJobs.length > 0 && (
+          <div>
+            <h2 className="text-[13px] font-bold text-cm-text mb-2">Missions en cours</h2>
+            <div className="space-y-2">
+              {todayJobs.map((job: any) => (
+                <button type="button" key={job.id} onClick={() => navigate(`/orders/tracker/${job.id}`)} className="w-full text-left bg-cm-elevated border border-cm-border rounded-[14px] p-4">
+                  <p className="text-[13px] font-bold text-cm-text">{job.clientName}</p>
+                  <p className="text-[11px] text-cm-text-soft">{job.serviceName}</p>
+                  <p className="text-[11px] text-cm-text-muted">{job.scheduledDate || "Non planifié"}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

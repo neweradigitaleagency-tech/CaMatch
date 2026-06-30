@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../services/supabase";
 import { useAuthStore } from "../stores/authStore";
 import type { ProfessionalDetails, ClientRequest, Mission, Conversation, ProJob, ProAlert, ProDashboardStats } from "../types";
-import { UserRole } from "../types";
 
 function getUserId(): string {
   const state = useAuthStore.getState();
@@ -19,7 +18,7 @@ function mapPro(row: any): ProfessionalDetails {
     name: fullName || row.business_name || "Professionnel",
     email: row.users?.email || "",
     phoneNumber: row.users?.phone_number || "",
-    role: UserRole.PRO,
+    role: "pro",
     avatarUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`,
     category: "maison-reparations" as const,
     subCategory: row.sub_category || "",
@@ -145,7 +144,6 @@ function mapMission(row: any): Mission {
     clientPhone: "",
     createdAt: row.created_at || "",
     acceptedAt: row.status === "accepted" || row.status === "in_progress" ? row.created_at || undefined : undefined,
-    enRouteAt: row.started_at || undefined,
     inProgressAt: row.started_at || undefined,
   };
 }

@@ -1431,6 +1431,7 @@ export type Database = {
       }
       users: {
         Row: {
+          active_mode: Database["public"]["Enums"]["user_role"]
           created_at: string | null
           email: string | null
           id: string
@@ -1446,6 +1447,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          active_mode?: Database["public"]["Enums"]["user_role"]
           created_at?: string | null
           email?: string | null
           id?: string
@@ -1461,6 +1463,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          active_mode?: Database["public"]["Enums"]["user_role"]
           created_at?: string | null
           email?: string | null
           id?: string

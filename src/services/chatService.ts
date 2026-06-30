@@ -24,13 +24,13 @@ export function containsSensitiveContent(text: string): boolean {
 export async function uploadMedia(
   file: File,
   conversationId: string,
-  type: "image" | "video" | "voice"
+  type: "image" | "video" | "voice" | "document"
 ): Promise<string | null> {
   if (!isSupabaseReady()) {
     return uploadLocal(file);
   }
 
-  const ext = file.name.split(".").pop() || (type === "voice" ? "webm" : type === "video" ? "mp4" : "jpg");
+  const ext = file.name.split(".").pop() || (type === "voice" ? "webm" : type === "video" ? "mp4" : type === "document" ? "pdf" : "jpg");
   const path = `${conversationId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
   const { error } = await supabase.storage
@@ -78,83 +78,105 @@ export async function fetchConversations(userId: string): Promise<Conversation[]
 
   const rows = data as any[];
 
-  const convs = await Promise.all(
-    rows.map(async (row) => {
-      const otherId = row.participant_1 === userId ? row.participant_2 : row.participant_1;
-      const profile = await fetchUserProfile(otherId);
-
-      const { count } = await supabase
-        .from("messages")
-        .select("*", { count: "exact", head: true })
-        .eq("conversation_id", row.id)
-        .eq("sender_id", otherId)
-        .eq("is_read", false);
-
-      const { data: lastMsg } = await supabase
-        .from("messages")
-        .select("content, media_type, created_at")
-        .eq("conversation_id", row.id)
-        .order("created_at", { ascending: false } as any)
-        .limit(1);
-
-      let lastMessageText = "";
-      if (lastMsg && lastMsg.length > 0) {
-        const m = lastMsg[0] as any;
-        lastMessageText = m.content || (m.media_type === "voice" ? "🎤 Message vocal" : m.media_type === "video" ? "🎬 Vidéo" : "📷 Photo");
-      }
-
-      return {
-        id: row.id,
-        participants: [row.participant_1, row.participant_2],
-        missionId: row.job_id || undefined,
-        lastMessage: lastMessageText,
-        lastMessageAt: row.last_message_at || row.created_at,
-        unreadCount: count || 0,
-        otherUserName: profile?.name || otherId.slice(0, 8),
-        otherUserAvatar: profile?.avatarUrl || "",
-      };
-    })
+  const otherIds = rows.map((row) =>
+    row.participant_1 === userId ? row.participant_2 : row.participant_1
   );
+  const profiles = await batchFetchProfiles(otherIds);
+
+  const convIds = rows.map((r) => r.id);
+
+  const [unreadResults, lastMsgResults] = await Promise.all([
+    Promise.all(
+      convIds.map((id) =>
+        supabase
+          .from("messages")
+          .select("*", { count: "exact", head: true })
+          .eq("conversation_id", id)
+          .eq("sender_id", otherIds[convIds.indexOf(id)])
+          .eq("is_read", false)
+      )
+    ),
+    Promise.all(
+      convIds.map((id) =>
+        supabase
+          .from("messages")
+          .select("content, media_type, created_at")
+          .eq("conversation_id", id)
+          .order("created_at", { ascending: false } as any)
+          .limit(1)
+      )
+    ),
+  ]);
+
+  const convs = rows.map((row, i) => {
+    const otherId = otherIds[i];
+    const profile = profiles[otherId];
+    const lastMsg = lastMsgResults[i]?.data as any[] | undefined;
+    const count = unreadResults[i]?.count || 0;
+
+    let lastMessageText = "";
+    if (lastMsg && lastMsg.length > 0) {
+      const m = lastMsg[0] as any;
+      lastMessageText = m.content || (m.media_type === "voice" ? "Message vocal" : m.media_type === "video" ? "Vidéo" : "Photo");
+    }
+
+    return {
+      id: row.id,
+      participants: [row.participant_1, row.participant_2],
+      missionId: row.job_id || undefined,
+      lastMessage: lastMessageText,
+      lastMessageAt: row.last_message_at || row.created_at,
+      unreadCount: count || 0,
+      otherUserName: profile?.name || otherId.slice(0, 8),
+      otherUserAvatar: profile?.avatarUrl || "",
+    };
+  });
 
   return convs;
 }
 
-async function fetchUserProfile(userId: string): Promise<{ name: string; avatarUrl: string } | null> {
+async function batchFetchProfiles(userIds: string[]): Promise<Record<string, { name: string; avatarUrl: string }>> {
+  if (userIds.length === 0) return {};
+
   if (!isSupabaseReady()) {
-    const pro = MOCK_PROS.find((p) => p.id === userId);
-    if (pro) return { name: pro.name, avatarUrl: pro.avatarUrl || "" };
-    return null;
+    const result: Record<string, { name: string; avatarUrl: string }> = {};
+    for (const id of userIds) {
+      const pro = MOCK_PROS.find((p) => p.id === id);
+      if (pro) result[id] = { name: pro.name, avatarUrl: pro.avatarUrl || "" };
+    }
+    return result;
   }
 
-  const { data: pro } = await supabase
-    .from("professional_profiles")
-    .select("first_name, last_name, avatar_url")
-    .eq("user_id", userId)
-    .single();
+  const uniqueIds = [...new Set(userIds)];
+  const result: Record<string, { name: string; avatarUrl: string }> = {};
 
-  if (pro) {
-    const p = pro as any;
-    return {
-      name: `${p.first_name} ${p.last_name}`,
-      avatarUrl: p.avatar_url || "",
+  const [proRows, clientRows] = await Promise.all([
+    supabase
+      .from("professional_profiles")
+      .select("user_id, first_name, last_name, avatar_url")
+      .in("user_id", uniqueIds),
+    supabase
+      .from("client_profiles")
+      .select("user_id, first_name, last_name, avatar_url")
+      .in("user_id", uniqueIds),
+  ]);
+
+  for (const row of (proRows.data || []) as any[]) {
+    result[row.user_id] = {
+      name: `${row.first_name} ${row.last_name}`,
+      avatarUrl: row.avatar_url || "",
     };
   }
-
-  const { data: client } = await supabase
-    .from("client_profiles")
-    .select("first_name, last_name, avatar_url")
-    .eq("user_id", userId)
-    .single();
-
-  if (client) {
-    const c = client as any;
-    return {
-      name: `${c.first_name} ${c.last_name}`,
-      avatarUrl: c.avatar_url || "",
-    };
+  for (const row of (clientRows.data || []) as any[]) {
+    if (!result[row.user_id]) {
+      result[row.user_id] = {
+        name: `${row.first_name} ${row.last_name}`,
+        avatarUrl: row.avatar_url || "",
+      };
+    }
   }
 
-  return null;
+  return result;
 }
 
 // ─── Messages ───
@@ -378,6 +400,20 @@ export function subscribeToConversationList(
         if (latest) onNewConversation(latest);
       }
     )
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "conversations",
+        filter: `participant_2=eq.${userId}`,
+      },
+      async () => {
+        const convs = await fetchConversations(userId);
+        const latest = convs[0];
+        if (latest) onNewConversation(latest);
+      }
+    )
     .subscribe();
 
   return () => {
@@ -399,6 +435,8 @@ export async function ensureStorageBucket(): Promise<void> {
         "image/jpeg", "image/png", "image/webp", "image/gif",
         "video/mp4", "video/webm", "video/quicktime",
         "audio/webm", "audio/mp3", "audio/ogg", "audio/wav",
+        "application/pdf", "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       ],
     } as any);
   }

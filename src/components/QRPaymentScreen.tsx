@@ -13,6 +13,7 @@ const METHOD_ICONS: Record<PaymentMethod, typeof Smartphone> = {
   orange_money: Smartphone,
   mtn_momo: Smartphone,
   wave: CreditCard,
+  moov_money: Smartphone,
 };
 
 export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScreenProps) {

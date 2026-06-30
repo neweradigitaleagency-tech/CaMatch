@@ -97,7 +97,7 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
                       key={n.id}
                       notification={n}
                       icon={<Icon className="w-3.5 h-3.5" />}
-                      colorClass={TYPE_COLORS[n.type] || TYPE_COLORS.info}
+                      colorClass={TYPE_COLORS[n.type] ?? TYPE_COLORS.info!}
                       onMarkRead={() => markRead(n.id)}
                       onClear={() => clearNotification(n.id)}
                     />

@@ -93,6 +93,8 @@ export default function MissionTrackerPage() {
           onOpenInvoice={() => setShowInvoice(true)}
           onUpdateStatus={(status: MissionStatus) => updateMissionStatus(mission.id, status)}
           onReview={(m) => navigate("/orders/review", { state: { mission: m } })}
+          onDispute={(id) => navigate(`/orders/dispute/${id}`)}
+          onCancel={(id) => navigate(`/orders/cancel/${id}`)}
         />
       )}
     </>

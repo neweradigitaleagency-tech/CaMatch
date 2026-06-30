@@ -22,7 +22,11 @@ const ProSelectionPage = lazy(() => import("./pages/client/ProSelectionPage"));
 const RequestDetailPage = lazy(() => import("./pages/client/RequestDetailPage"));
 const MissionTrackerPage = lazy(() => import("./pages/client/MissionTrackerPage"));
 const ReviewPage = lazy(() => import("./pages/client/ReviewPage"));
+const DisputePage = lazy(() => import("./pages/client/DisputePage"));
+const CancellationPage = lazy(() => import("./pages/client/CancellationPage"));
+const ReportPage = lazy(() => import("./pages/client/ReportPage"));
 const QRPaymentPage = lazy(() => import("./pages/client/QRPaymentPage"));
+const EscrowPaymentPage = lazy(() => import("./pages/client/EscrowPaymentPage"));
 const MessagingListPage = lazy(() => import("./pages/client/MessagingListPage"));
 const ChatPage = lazy(() => import("./pages/client/ChatPage"));
 const AppSettingsPage = lazy(() => import("./pages/client/AppSettingsPage"));
@@ -30,6 +34,9 @@ const ClientPaymentsPage = lazy(() => import("./pages/client/ClientPaymentsPage"
 const ClientAddressesPage = lazy(() => import("./pages/client/ClientAddressesPage"));
 const ClientNotificationsPage = lazy(() => import("./pages/client/ClientNotificationsPage"));
 const ClientHelpPage = lazy(() => import("./pages/client/ClientHelpPage"));
+const SearchScreen = lazy(() => import("./screens/SearchScreen"));
+const ProviderProfileScreen = lazy(() => import("./screens/ProviderProfileScreen"));
+const CategorySelectScreen = lazy(() => import("./screens/CategorySelectScreen"));
 const ProEditPage = lazy(() => import("./pages/profile/ProEditPage"));
 const ProVerificationPage = lazy(() => import("./pages/profile/ProVerificationPage"));
 const ProFinancesPage = lazy(() => import("./pages/profile/ProFinancesPage"));
@@ -38,6 +45,8 @@ const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
 const InvoicePage = lazy(() => import("./pages/client/InvoicePage"));
+const QuoteCreatePage = lazy(() => import("./pages/client/QuoteCreatePage"));
+const QuoteReviewPage = lazy(() => import("./pages/client/QuoteReviewPage"));
 const ProMissionListPage = lazy(() => import("./pages/profile/ProMissionListPage"));
 const EditProfilePage = lazy(() => import("./pages/profile/EditProfilePage"));
 const SecurityPage = lazy(() => import("./pages/profile/SecurityPage"));
@@ -134,8 +143,14 @@ function App() {
         <Route path="orders/:id" element={<Suspense fallback={<PageLoader />}><RequestDetailPage /></Suspense>} />
         <Route path="orders/tracker/:id" element={<Suspense fallback={<PageLoader />}><MissionTrackerPage /></Suspense>} />
         <Route path="orders/review" element={<Suspense fallback={<PageLoader />}><ReviewPage /></Suspense>} />
+        <Route path="orders/dispute/:id" element={<Suspense fallback={<PageLoader />}><DisputePage /></Suspense>} />
+        <Route path="orders/cancel/:id" element={<Suspense fallback={<PageLoader />}><CancellationPage /></Suspense>} />
+        <Route path="orders/report" element={<Suspense fallback={<PageLoader />}><ReportPage /></Suspense>} />
         <Route path="orders/qr-payment" element={<Suspense fallback={<PageLoader />}><QRPaymentPage /></Suspense>} />
         <Route path="orders/invoice" element={<Suspense fallback={<PageLoader />}><InvoicePage /></Suspense>} />
+        <Route path="orders/quote/create/:requestId" element={<Suspense fallback={<PageLoader />}><QuoteCreatePage /></Suspense>} />
+        <Route path="orders/quote/:requestId" element={<Suspense fallback={<PageLoader />}><QuoteReviewPage /></Suspense>} />
+        <Route path="orders/payment/:requestId" element={<Suspense fallback={<PageLoader />}><EscrowPaymentPage /></Suspense>} />
         <Route path="profile/pro-missions" element={<Suspense fallback={<PageLoader />}><ProMissionListPage /></Suspense>} />
         <Route path="profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
         <Route path="profile/settings" element={<Suspense fallback={<PageLoader />}><AppSettingsPage /></Suspense>} />
@@ -164,6 +179,9 @@ function App() {
         <Route path="explorer/matching" element={<Suspense fallback={<PageLoader />}><AiMatchPricingPage /></Suspense>} />
         <Route path="explorer/request-creation" element={<Suspense fallback={<PageLoader />}><RequestCreationPage /></Suspense>} />
         <Route path="explorer/pro-selection" element={<Suspense fallback={<PageLoader />}><ProSelectionPage /></Suspense>} />
+        <Route path="explorer/categories" element={<Suspense fallback={<PageLoader />}><CategorySelectScreen /></Suspense>} />
+        <Route path="explorer/search" element={<Suspense fallback={<PageLoader />}><SearchScreen /></Suspense>} />
+        <Route path="explorer/design-provider/:id" element={<Suspense fallback={<PageLoader />}><ProviderProfileScreen /></Suspense>} />
         <Route path="explorer/category/:categoryId" element={<Suspense fallback={<PageLoader />}><CategoryDetailScreen /></Suspense>} />
       </Route>
     </Routes>

@@ -16,8 +16,8 @@ const PLANS = [
     price: 5000,
     period: "/mois",
     features: ["Missions illimitées", "Commission 10%", "Support prioritaire", "Badge vérifié", "Statistiques avancées"],
-    color: "bg-cm-green/10",
-    textColor: "text-cm-green",
+    color: "bg-cm-accent/10",
+    textColor: "text-cm-accent",
     icon: Sparkles,
     popular: true,
   },
@@ -36,10 +36,10 @@ export default function ProSubscriptionPage() {
   const nav = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-brand-cream pb-32">
+    <div className="flex flex-col min-h-screen bg-cm-bg pb-32">
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <button onClick={() => nav("/profile")} className="w-8 h-8 flex items-center justify-center rounded-xl bg-white border border-pale-mint/10 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-secondary" />
+        <button onClick={() => nav("/profile")} className="w-8 h-8 flex items-center justify-center rounded-xl bg-cm-elevated border border-cm-border cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <h1 className="text-lg font-extrabold">Abonnement</h1>
       </div>
@@ -50,10 +50,10 @@ export default function ProSubscriptionPage() {
           return (
             <div
               key={plan.name}
-              className={`relative bg-white rounded-2xl border ${plan.popular ? "border-cm-green" : "border-pale-mint/10"} p-4`}
+              className={`relative bg-white rounded-2xl border ${plan.popular ? "border-cm-accent" : "border-cm-border"} p-4`}
             >
               {plan.popular && (
-                <div className="absolute -top-2.5 right-4 bg-cm-green text-white text-2xs font-bold px-3 py-0.5 rounded-full">
+                <div className="absolute -top-2.5 right-4 bg-cm-accent text-cm-text-onAccent text-2xs font-bold px-3 py-0.5 rounded-full">
                   Populaire
                 </div>
               )}
@@ -62,14 +62,14 @@ export default function ProSubscriptionPage() {
                   <Icon className={`w-5 h-5 ${plan.textColor}`} />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-brand-forest">{plan.name}</p>
-                  <p className="text-lg font-extrabold text-brand-forest">{plan.price.toLocaleString()} F<span className="text-xs font-medium text-secondary/60">{plan.period}</span></p>
+                  <p className="text-sm font-bold text-cm-accent">{plan.name}</p>
+                  <p className="text-lg font-extrabold text-cm-accent">{plan.price.toLocaleString()} F<span className="text-xs font-medium text-cm-text-soft">{plan.period}</span></p>
                 </div>
               </div>
               <ul className="space-y-1.5">
                 {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-2 text-2xs text-secondary/70">
-                    <Check className="w-3 h-3 text-cm-green shrink-0" />
+                  <li key={f} className="flex items-center gap-2 text-2xs text-cm-text-soft">
+                    <Check className="w-3 h-3 text-cm-accent shrink-0" />
                     {f}
                   </li>
                 ))}
@@ -78,8 +78,8 @@ export default function ProSubscriptionPage() {
                 onClick={() => {}}
                 className={`w-full mt-3 h-10 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                   plan.price === 0
-                    ? "bg-pale-mint/30 text-secondary/60 border border-pale-mint/10"
-                    : "bg-cm-green text-white"
+                    ? "bg-cm-accent-soft/40 text-cm-text-muted border border-cm-border"
+                    : "bg-cm-accent text-cm-text-onAccent"
                 }`}
               >
                 {plan.price === 0 ? "Plan actuel" : "S'abonner"}

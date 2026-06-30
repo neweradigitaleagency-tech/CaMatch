@@ -28,7 +28,7 @@ export default function ReviewScreen({ mission, onBack, onSubmit }: ReviewScreen
   const allAfterPhotos = (mission.afterPhotos || []).map(u => ({ url: u, title: "Après" }));
   const allBeforePhotos = (mission.beforePhotos || []).map(u => ({ url: u, title: "Avant" }));
 
-  const ratingLabels = ["", "Mauvais", "Pas top", "Correct", "Très bien", "Excellent !"];
+  const ratingLabels = ["", "Très insuffisant", "Insuffisant", "Médiocre", "Passable", "Correct", "Satisfaisant", "Bon", "Très bon", "Excellent", "Parfait !"];
 
   if (submitted) {
     return (
@@ -96,16 +96,20 @@ export default function ReviewScreen({ mission, onBack, onSubmit }: ReviewScreen
             </div>
           ) : null}
 
-          {/* Stars interactives */}
-          <div className="flex gap-2 mb-3">
-            {[1, 2, 3, 4, 5].map((star) => (
+          {/* Stars interactives — note 1-10 */}
+          <div className="flex gap-1.5 mb-3">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
               <button key={star} onClick={() => setRating(star)} onMouseEnter={() => setHovered(star)} onMouseLeave={() => setHovered(0)}
                 className="cursor-pointer active:scale-90 transition-transform">
-                <Star size={36}
+                <Star size={28}
                   className={`transition-all duration-150 drop-shadow-sm ${
-                    star <= (hovered || rating)
+                    star <= (hovered || rating) && star <= 5
                       ? "fill-cm-accent text-cm-accent"
-                      : "fill-cm-border-soft text-cm-border-soft"
+                      : star <= (hovered || rating) && star <= 7
+                        ? "fill-yellow-500 text-yellow-500"
+                        : star <= (hovered || rating)
+                          ? "fill-green-500 text-green-500"
+                          : "fill-cm-border-soft text-cm-border-soft"
                   }`}
                 />
               </button>

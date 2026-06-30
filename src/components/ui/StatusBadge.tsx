@@ -7,12 +7,22 @@ interface StatusBadgeProps {
 }
 
 const STATUS_STYLES: Record<MissionStatus, string> = {
-  created: "bg-cm-border-soft text-cm-text-muted",
+  draft: "bg-cm-border-soft text-cm-text-muted",
+  published: "bg-cm-accent-soft text-cm-accent border border-cm-accent/30",
+  pending: "bg-amber-50 text-amber-600 border border-amber-200",
   accepted: "bg-cm-accent-soft text-cm-accent border border-cm-accent/30",
-  en_route: "bg-cm-border-soft text-cm-text-soft",
+  refused: "bg-red-50 text-red-600 border border-red-200",
+  paid: "bg-cm-text text-white",
   in_progress: "bg-cm-accent-soft text-cm-accent border border-cm-accent/30",
   completed: "bg-cm-accent text-white",
-  paid: "bg-cm-text text-white",
+  client_validation: "bg-amber-50 text-amber-600 border border-amber-200",
+  disputed: "bg-red-50 text-red-600 border border-red-200",
+  closed: "bg-cm-border-soft text-cm-text-soft",
+  cancelled: "bg-red-50 text-red-600 border border-red-200",
+  refunded: "bg-red-50 text-red-600 border border-red-200",
+  // Legacy
+  created: "bg-cm-border-soft text-cm-text-muted",
+  en_route: "bg-cm-border-soft text-cm-text-soft",
   reviewed: "bg-cm-accent text-white",
 };
 

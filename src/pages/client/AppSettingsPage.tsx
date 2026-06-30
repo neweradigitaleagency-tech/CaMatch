@@ -15,11 +15,11 @@ export default function AppSettingsPage() {
   return (
     <AppSettingsScreen
       isDark={isDark}
-      geminiApiKey={geminiApiKey}
       onToggleDarkMode={toggle}
-      onUpdateApiKey={handleUpdateApiKey}
       onBack={() => nav(-1)}
       onNavigateToHelp={() => nav("/profile/help")}
+      onNavigateToNotifications={() => nav("/profile/notifications")}
+      onNavigateToLanguage={() => nav("/profile/language")}
     />
   );
 }

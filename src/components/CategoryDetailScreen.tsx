@@ -150,5 +150,5 @@ const SUB_ICONS = [
 ];
 
 function getSubIcon(index: number): string {
-  return SUB_ICONS[index % SUB_ICONS.length];
+  return SUB_ICONS[index % SUB_ICONS.length]!;
 }

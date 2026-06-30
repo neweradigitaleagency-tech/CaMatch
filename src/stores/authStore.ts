@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { supabase, isSupabaseReady } from "../services/supabase";
 import type { User } from "@supabase/supabase-js";
-
-export type UserRole = "client" | "pro";
+import type { UserRole } from "../types";
 
 interface AuthState {
   userId: string | null;
   role: UserRole;
   isPro: boolean;
+  activeMode: "client" | "pro";
   isAuthenticated: boolean;
   isLoading: boolean;
   user: User | null;
@@ -21,6 +21,7 @@ interface AuthState {
   setRole: (role: UserRole) => void;
   setUser: (userId: string, role?: UserRole) => void;
   setPro: () => void;
+  updateProfile: (data: { firstName?: string; lastName?: string; email?: string; phone?: string; avatarUrl?: string }) => void;
   logout: () => void;
 }
 
@@ -28,6 +29,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   userId: null,
   role: "client",
   isPro: false,
+  activeMode: "client",
   isAuthenticated: false,
   isLoading: true,
   user: null,
@@ -141,6 +143,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   setRole: (role) => set({ role }),
   setUser: (userId, role = "client") => set({ userId, role, isAuthenticated: true }),
   setPro: () => set({ isPro: true }),
+  updateProfile: (data) => {
+    set((state) => {
+      const current = state.user;
+      if (!current) return state;
+      const meta = { ...current.user_metadata, ...data };
+      return {
+        user: { ...current, user_metadata: meta } as User,
+      };
+    });
+  },
   logout: async () => {
     await get().signOut();
   },

@@ -20,6 +20,10 @@ export const supabase = missingEnv
         autoRefreshToken: true,
         detectSessionInUrl: true,
       },
+      global: {
+        fetch: (url, init) =>
+          fetch(url, { ...init, signal: AbortSignal.timeout(15000) }),
+      },
     });
 
 export function isSupabaseReady(): boolean {
