@@ -1,7 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import ClientHelpScreen from "../../components/ClientHelpScreen";
 
 export default function ClientHelpPage() {
   const nav = useNavigate();
-  return <ClientHelpScreen onBack={() => nav(-1)} />;
+  const loc = useLocation();
+  const fromHamburger = !!loc.state?.fromHamburger;
+  return <ClientHelpScreen onBack={() => fromHamburger ? nav("/", { state: { reopenMenu: true } }) : nav(-1)} />;
 }

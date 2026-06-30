@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate, useLocation, useNavigationType } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown, Menu, ClipboardList, SlidersHorizontal, MessageCircle } from "lucide-react";
 import { ProfessionalDetails, Mission } from "../types";
@@ -37,16 +37,14 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, onInitiat
   const [filterRating, setFilterRating] = useState<number>(0);
   const taskManagerRef = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
-  const navigationType = useNavigationType();
-  const prevPathRef = useRef(location.pathname);
+  const loc = useLocation();
 
   useEffect(() => {
-    const prev = prevPathRef.current;
-    prevPathRef.current = location.pathname;
-    if (location.pathname === "/" && navigationType === "POP" && prev.startsWith("/profile/")) {
+    if (loc.state?.reopenMenu) {
       setShowDrawer(true);
+      window.history.replaceState({}, "");
     }
-  }, [location.pathname, navigationType]);
+  }, [loc.state?.reopenMenu]);
 
   const user = useAuthStore((s) => s.user);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Marie";

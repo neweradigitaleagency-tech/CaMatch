@@ -26,7 +26,7 @@ export default function HamburgerDrawer({ open, onClose }: Props) {
   }, [open, onClose]);
 
   const handleNav = (path: string) => {
-    nav(path);
+    nav(path, { state: { fromHamburger: true } });
     onClose();
   };
 
