@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft, Sparkles, Star, Verified, Navigation, CheckCircle, ChevronRight, UserIcon } from "lucide-react";
+import { ArrowLeft, Star, Verified, Navigation, UserIcon } from "lucide-react";
 import { ProfessionalDetails, type ProCategory } from "../types";
 
 interface ProSelectionScreenProps {
   proList: ProfessionalDetails[];
   category: ProCategory | string;
+  activeRadius?: number;
   onSelectPro: (pro: ProfessionalDetails) => void;
   onViewProfile: (pro: ProfessionalDetails) => void;
   onBack: () => void;
 }
 
-export default function ProSelectionScreen({ proList, category, onSelectPro, onViewProfile, onBack }: ProSelectionScreenProps) {
+export default function ProSelectionScreen({ proList, category, activeRadius, onSelectPro, onViewProfile, onBack }: ProSelectionScreenProps) {
   const [isMatching, setIsMatching] = useState(true);
   const [matchLogIndex, setMatchLogIndex] = useState(0);
 
@@ -51,11 +52,6 @@ export default function ProSelectionScreen({ proList, category, onSelectPro, onV
   };
 
   const sortedPros = [...proList].sort((a, b) => b.rating - a.rating || b.completedInterventions - a.completedInterventions);
-  const bestPro = sortedPros[0];
-
-  const handleAiAutoSelect = () => {
-    if (bestPro) onSelectPro(bestPro);
-  };
 
   return (
     <div className="flex flex-col w-full pb-36 min-h-[85vh] bg-cm-bg relative">
@@ -93,55 +89,21 @@ export default function ProSelectionScreen({ proList, category, onSelectPro, onV
         <main className="px-6 pt-6 flex-grow flex flex-col gap-5">
           <div>
             <h2 className="font-display text-xl font-bold text-cm-text tracking-tight">
-              Pros disponibles pour "{getCategoryLabel(category)}"
+              {getCategoryLabel(category)}{category !== getCategoryLabel(category) ? "s" : ""} disponibles
             </h2>
             <p className="text-cm-text-soft text-xs mt-1">
-              {proList.length} expert{proList.length > 1 ? "s" : ""} trouvé{proList.length > 1 ? "s" : ""} à Cocody et alentours.
+              {proList.length} expert{proList.length > 1 ? "s" : ""} trouvé{proList.length > 1 ? "s" : ""}
+              {activeRadius && activeRadius !== Infinity
+                ? ` dans un rayon de ${activeRadius} km`
+                : activeRadius === Infinity
+                  ? ` (toutes distances confondues)`
+                  : ""}
             </p>
           </div>
 
-          {bestPro && (
-            <div onClick={handleAiAutoSelect}
-              className="bg-cm-text text-white rounded-3xl p-5 shadow-cm-md border-2 border-cm-accent relative overflow-hidden cursor-pointer hover:scale-[1.01] transition-transform duration-200">
-              <div className="absolute -right-6 -bottom-6 text-cm-accent opacity-10">
-                <Sparkles className="w-36 h-36" />
-              </div>
-              <div className="relative z-10 flex flex-col gap-4">
-                <div className="flex justify-between items-start">
-                  <span className="bg-cm-accent text-white text-[11px] font-display font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" /> Recommandé par l'IA
-                  </span>
-                  <div className="flex items-center gap-1 text-xs font-bold text-cm-accent">
-                    <span>Note de match : 98%</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-cm-accent shrink-0">
-                    <img src={bestPro.avatarUrl} alt={bestPro.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-bold text-sm text-white flex items-center gap-1.5">
-                      {bestPro.name}
-                      {bestPro.isVerified && <Verified className="w-4 h-4 text-cm-accent" />}
-                    </h3>
-                    <p className="text-white/80 text-xs mt-0.5">{bestPro.title} • {bestPro.locationNeighborhood}</p>
-                  </div>
-                </div>
-                <p className="text-white/70 text-xs italic leading-relaxed">
-                  "Sélectionné selon sa note de {bestPro.rating / 10}★, sa proximité géographique, et sa ponctualité sur {bestPro.completedInterventions} chantiers."
-                </p>
-                <button onClick={(e) => { e.stopPropagation(); handleAiAutoSelect(); }}
-                  className="w-full py-3 bg-cm-accent text-white font-display font-bold text-xs rounded-xl shadow-cm-sm flex items-center justify-center gap-1 cursor-pointer active:scale-95 hover:opacity-90 transition-all">
-                  <span>Laisser l'IA Choisir & Continuer</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
           <div className="flex flex-col gap-3">
             <h3 className="text-xs font-display font-bold uppercase tracking-wider text-cm-text-soft">
-              Ou sélectionnez un pro manuellement :
+              Professionnels disponibles
             </h3>
             {sortedPros.map((pro) => (
               <div key={pro.id} onClick={() => onSelectPro(pro)}

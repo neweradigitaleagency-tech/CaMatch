@@ -11,9 +11,8 @@ export default function HomePage() {
   return (
     <ExplorerScreen
       recommendedPros={pros}
-      activeMissions={missions.filter((m) => m.status !== "completed" && m.status !== "paid" && m.status !== "reviewed")}
+      activeMissions={missions.filter((m) => !["closed", "cancelled", "disputed", "refunded"].includes(m.status))}
       onSelectPro={(pro) => nav(`/explorer/pro/${pro.id}`)}
-      onInitiateAiRequest={() => nav("/explorer/request-creation")}
       onViewActiveMission={(mission) => nav(`/orders/tracker/${mission.id}`)}
     />
   );

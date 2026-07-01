@@ -1,79 +1,92 @@
+import { useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import ProSelectionScreen from "../../components/ProSelectionScreen";
+import { useRequestStore } from "../../stores/requestStore";
+import type { ProceedDetails } from "../../components/RequestCreationScreen";
+import type { ProfessionalDetails, Mission, Service } from "../../types";
 import { usePros } from "../../hooks/useDatabase";
-import type { ProfessionalDetails, Service } from "../../types";
-import type { AiRequestDetails } from "../../components/RequestCreationScreen";
+import { haversineKm } from "../../stores/locationStore";
 
-function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-function sendBrowserNotification(title: string, body: string) {
-  if (!("Notification" in window) || Notification.permission === "denied") return;
-  if (Notification.permission === "granted") {
-    new Notification(title, { body, icon: "/vite.svg" });
-  } else {
-    Notification.requestPermission().then((perm) => {
-      if (perm === "granted") new Notification(title, { body, icon: "/vite.svg" });
-    });
-  }
-}
+const RADII = [5, 10, 15, 30, 60, Infinity];
 
 export default function ProSelectionPage() {
   const nav = useNavigate();
   const location = useLocation();
-  const details = (location.state as { details: AiRequestDetails & { lat?: number; lng?: number } })?.details;
+  const details = (location.state as { details: ProceedDetails })?.details;
   const category = details?.category || "maison-reparations";
+  const subCategory = details?.subCategory;
   const { data: allPros = [] } = usePros();
 
   const clientLat = details?.lat ?? 5.35;
   const clientLng = details?.lng ?? -4.00;
-  const RADIUS_KM = 15;
 
-  const proList: ProfessionalDetails[] = allPros.filter((p) => {
-    if ((p.category as string) !== category) return false;
-    if (p.availabilityStatus !== "available") return false;
-    if (p.lat !== undefined && p.lng !== undefined) {
-      const dist = haversineKm(clientLat, clientLng, p.lat, p.lng);
-      if (dist > RADIUS_KM) return false;
-    }
-    return true;
-  });
+  const setMissions = useRequestStore((s) => s.setMissions);
+  const missions = useRequestStore((s) => s.missions);
 
-  useEffect(() => {
-    if (proList.length > 0) {
-      sendBrowserNotification(
-        `${proList.length} pro(s) trouvé(s) !`,
-        `${proList.length} professionnel${proList.length > 1 ? "s" : ""} disponible${proList.length > 1 ? "s" : ""} près de chez vous.`,
-      );
+  const { proList, activeRadius } = useMemo(() => {
+    const withSub: ProfessionalDetails[] = allPros.filter((p) => {
+      if ((p.category as string) !== category) return false;
+      if (subCategory && p.subCategory !== subCategory) return false;
+      if (p.availabilityStatus !== "available") return false;
+      return true;
+    });
+
+    const withDistance = withSub.map((p) => ({
+      pro: p,
+      dist: p.lat !== undefined && p.lng !== undefined
+        ? haversineKm({ lat: clientLat, lng: clientLng }, { lat: p.lat, lng: p.lng })
+        : Infinity,
+    })).sort((a, b) => a.dist - b.dist);
+
+    for (const radius of RADII) {
+      const filtered = withDistance.filter((p) => p.dist <= radius);
+      if (filtered.length > 0) {
+        return { proList: filtered.map((p) => p.pro), activeRadius: radius };
+      }
     }
-  }, [proList.length]);
+
+    return { proList: withDistance.map((p) => p.pro), activeRadius: Infinity };
+  }, [allPros, category, subCategory, clientLat, clientLng]);
 
   return (
     <ProSelectionScreen
-      category={category}
+      category={subCategory || category}
       proList={proList}
+      activeRadius={activeRadius}
       onBack={() => nav(-1)}
       onViewProfile={(pro) => nav(`/explorer/pro/${pro.id}`)}
       onSelectPro={(pro) => {
         const ms: Service = {
-          id: "service_ai_" + Date.now(),
+          id: "service_" + Date.now(),
           proId: pro.id,
-          name: details?.subCategory || "Dépannage IA",
-          description: details?.summary || "Intervention diagnostiquée par intelligence artificielle",
-          priceEstimateXOF:
-            Math.round(((details?.estimatedPriceMinXOF || 0) + (details?.estimatedPriceMaxXOF || 10000)) / 2) || pro.hourlyRateXOF * 2,
+          name: subCategory || "Dépannage",
+          description: details?.description?.slice(0, 100) || "Intervention",
+          priceEstimateXOF: details?.budgetMax || pro.hourlyRateXOF * 2,
         };
-        nav("/explorer/matching", { state: { pro, services: [ms] } });
+        const missionId = "mission_" + Date.now();
+        const newMission: Mission = {
+          id: missionId,
+          requestId: "req_" + Date.now(),
+          clientId: "client_marie",
+          proId: pro.id,
+          status: "accepted",
+          title: ms.name,
+          description: ms.description,
+          category: pro.category,
+          subCategory: pro.subCategory,
+          address: pro.locationNeighborhood,
+          budgetXOF: ms.priceEstimateXOF + 5000,
+          photos: [],
+          proName: pro.name,
+          proAvatar: pro.avatarUrl || "",
+          proPhone: pro.phoneNumber,
+          clientName: "Marie",
+          clientPhone: "+225 01 02 03 04",
+          createdAt: new Date().toISOString(),
+          acceptedAt: new Date().toISOString(),
+        };
+        setMissions([newMission, ...missions]);
+        nav(`/orders/payment/${missionId}`);
       }}
     />
   );

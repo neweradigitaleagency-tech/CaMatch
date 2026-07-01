@@ -1,6 +1,6 @@
 import { StrictMode, lazy, Suspense, Component, useState, useEffect, type ReactNode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AppLayout from "./layouts/AppLayout";
 import { useAuthStore } from "./stores/authStore";
@@ -15,7 +15,7 @@ const SearchPage = lazy(() => import("./pages/SearchPage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const ProProfilePage = lazy(() => import("./pages/client/ProProfilePage"));
-const AiMatchPricingPage = lazy(() => import("./pages/client/AiMatchPricingPage"));
+
 const CategoryDetailScreen = lazy(() => import("./components/CategoryDetailScreen"));
 const RequestCreationPage = lazy(() => import("./pages/client/RequestCreationPage"));
 const ProSelectionPage = lazy(() => import("./pages/client/ProSelectionPage"));
@@ -44,6 +44,10 @@ const ProSubscriptionPage = lazy(() => import("./pages/profile/ProSubscriptionPa
 const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
+const ProOnboardingPage = lazy(() => import("./pages/ProOnboardingPage"));
+const ProDashboardPage = lazy(() => import("./pages/ProDashboardPage"));
+const AdminApplicationsPage = lazy(() => import("./pages/admin/AdminApplicationsPage"));
+const AdminApplicationDetail = lazy(() => import("./pages/admin/AdminApplicationDetail"));
 const InvoicePage = lazy(() => import("./pages/client/InvoicePage"));
 const QuoteCreatePage = lazy(() => import("./pages/client/QuoteCreatePage"));
 const QuoteReviewPage = lazy(() => import("./pages/client/QuoteReviewPage"));
@@ -102,14 +106,14 @@ function PageLoader() {
   );
 }
 
-function AuthGate({ children }: { children: React.ReactNode }) {
+function AuthGate({ children }: { children?: React.ReactNode }) {
   const initialized = useAuthStore((s) => s.initialized);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading = useAuthStore((s) => s.isLoading);
 
   if (!initialized || isLoading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/onboarding" replace />;
-  return <>{children}</>;
+  return children ? <>{children}</> : <Outlet />;
 }
 
 function App() {
@@ -133,7 +137,13 @@ function App() {
     <Routes>
       <Route path="/onboarding" element={<Suspense fallback={<PageLoader />}><OnboardingPage /></Suspense>} />
       <Route path="/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
-      <Route element={<AuthGate><AppLayout /></AuthGate>}>
+      <Route element={<AuthGate />}>
+        <Route path="pro/onboarding" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
+        <Route path="pro/onboarding/:step" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
+        <Route path="pro/dashboard" element={<Suspense fallback={<PageLoader />}><ProDashboardPage /></Suspense>} />
+        <Route path="admin/applications" element={<Suspense fallback={<PageLoader />}><AdminApplicationsPage /></Suspense>} />
+        <Route path="admin/applications/:id" element={<Suspense fallback={<PageLoader />}><AdminApplicationDetail /></Suspense>} />
+        <Route element={<AppLayout />}>
         <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
         <Route path="messages" element={<Suspense fallback={<PageLoader />}><MessagingListPage /></Suspense>} />
@@ -173,16 +183,14 @@ function App() {
         <Route path="explorer" element={<Navigate to="/" replace />} />
         <Route path="requests" element={<Navigate to="/orders" replace />} />
         <Route path="requests/*" element={<Navigate to="/orders" replace />} />
-        <Route path="pro/dashboard" element={<Navigate to="/orders" replace />} />
-
         <Route path="explorer/pro/:id" element={<Suspense fallback={<PageLoader />}><ProProfilePage /></Suspense>} />
-        <Route path="explorer/matching" element={<Suspense fallback={<PageLoader />}><AiMatchPricingPage /></Suspense>} />
         <Route path="explorer/request-creation" element={<Suspense fallback={<PageLoader />}><RequestCreationPage /></Suspense>} />
         <Route path="explorer/pro-selection" element={<Suspense fallback={<PageLoader />}><ProSelectionPage /></Suspense>} />
         <Route path="explorer/categories" element={<Suspense fallback={<PageLoader />}><CategorySelectScreen /></Suspense>} />
         <Route path="explorer/search" element={<Suspense fallback={<PageLoader />}><SearchScreen /></Suspense>} />
         <Route path="explorer/design-provider/:id" element={<Suspense fallback={<PageLoader />}><ProviderProfileScreen /></Suspense>} />
         <Route path="explorer/category/:categoryId" element={<Suspense fallback={<PageLoader />}><CategoryDetailScreen /></Suspense>} />
+      </Route>
       </Route>
     </Routes>
   );

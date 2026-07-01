@@ -60,6 +60,20 @@ export interface ProfessionalDetails extends User {
   totalOffers?: number;
   acceptedOffers?: number;
   jobAcceptanceRate?: number;
+  languages?: string[];
+  paymentMethods?: PaymentMethod[];
+  clientCount?: number;
+  offers?: ProOffer[];
+  workingHours?: string;
+  responseTime?: string;
+}
+
+export interface ProOffer {
+  id: string;
+  title: string;
+  description: string;
+  badge: string;
+  badgeColor: string;
 }
 
 export interface Service {
@@ -970,3 +984,81 @@ export interface OnboardingData {
   travelFeeXOF: number;
   avatarLocalUrl?: string;
 }
+
+// ─── Pro Onboarding ───
+
+export type ProApplicationStatus = "NOT_STARTED" | "IN_PROGRESS" | "SUBMITTED" | "UNDER_REVIEW" | "APPROVED" | "REJECTED";
+
+export type OnboardingStepId =
+  | "welcome"
+  | "eligibility"
+  | "categories"
+  | "location"
+  | "info"
+  | "documents"
+  | "portfolio"
+  | "otp-phone"
+  | "otp-email"
+  | "payment"
+  | "cgu"
+  | "review"
+  | "pending";
+
+export interface ProOnboardingData {
+  currentStep: number;
+  maxCompletedStep: number;
+  status: ProApplicationStatus;
+
+  selectedCategoryIds: string[];
+  selectedSubCategories: string[];
+
+  location: { lat: number; lng: number };
+  serviceRadiusKm: number;
+
+  title: string;
+  bio: string;
+  experienceYears: number;
+  hourlyRateXOF: number;
+  travelFeeXOF: number;
+
+  documents: { type: string; url: string; name: string; status: "pending" | "uploaded" | "error" }[];
+
+  portfolioItems: { url: string; caption: string }[];
+
+  phone: string;
+  phoneVerified: boolean;
+  email: string;
+  emailVerified: boolean;
+
+  paymentMethod: PaymentMethod | null;
+  paymentPhone: string;
+
+  cguAccepted: boolean;
+  signature: string | null;
+
+  submittedAt: string | null;
+  reviewedAt: string | null;
+  reviewNotes: string | null;
+}
+
+export const ONBOARDING_STEP_LABELS: Record<OnboardingStepId, string> = {
+  welcome: "Bienvenue",
+  eligibility: "Éligibilité",
+  categories: "Métiers",
+  location: "Localisation",
+  info: "Informations",
+  documents: "Documents",
+  portfolio: "Galerie",
+  "otp-phone": "Téléphone",
+  "otp-email": "Email",
+  payment: "Paiement",
+  cgu: "CGU",
+  review: "Récapitulatif",
+  pending: "En cours",
+};
+
+export const ONBOARDING_STEPS: OnboardingStepId[] = [
+  "welcome", "eligibility", "categories", "location", "info",
+  "documents", "portfolio", "otp-phone", "otp-email",
+  "payment", "cgu", "review", "pending",
+];

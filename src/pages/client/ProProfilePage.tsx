@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import ProfilProScreen from "../../components/ProfilProScreen";
 import { MOCK_PROS, MOCK_SERVICES, MOCK_PORTFOLIO, MOCK_VERIFICATION, getReviewsForPro, getBadgesForXp } from "../../services/mockData";
-import { getProLevelFromJobs } from "../../types";
 import type { Service } from "../../types";
 
 const DEFAULT_SERVICES: Record<string, { name: string; desc: string; price: number }[]> = {
@@ -44,7 +43,6 @@ export default function ProProfilePage() {
   const portfolio = MOCK_PORTFOLIO.filter((p) => p.category === pro.category);
   const reviews = getReviewsForPro(pro.id);
   const xp = pro.completedInterventions * 50;
-  const levelConfig = getProLevelFromJobs(pro.completedInterventions);
   const badges = getBadgesForXp(xp);
 
   return (
@@ -54,9 +52,7 @@ export default function ProProfilePage() {
       portfolio={portfolio}
       verification={MOCK_VERIFICATION}
       reviews={reviews}
-      levelConfig={levelConfig}
       badges={badges}
-      commissionPercent={levelConfig?.commissionPercent}
       onBack={() => nav(-1)}
       onInitiateMatch={(selectedServices) =>
         nav("/explorer/matching", { state: { pro, services: selectedServices } })

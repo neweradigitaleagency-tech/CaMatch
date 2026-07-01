@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FileText } from "lucide-react";
-import MissionListScreen from "../components/MissionListScreen";
+import { ArrowLeft, FileText, MapPin, DollarSign, ArrowUpRight, XCircle, Zap, Star, Hourglass } from "lucide-react";
 import { useClientRequests, useClientMissions } from "../hooks/useDatabase";
 import { useAuthStore } from "../stores/authStore";
 import { useRequestStore } from "../stores/requestStore";
 import { useProStore } from "../stores/proStore";
 import { MOCK_REQUESTS, MOCK_MISSIONS, MOCK_PRO_JOBS, MOCK_PROS } from "../services/mockData";
-import type { Mission, ProAlert, ProDashboardStats } from "../types";
+import StatusBadge from "../components/ui/StatusBadge";
+import type { Mission, ProAlert, ProDashboardStats, ClientRequest, MissionStatus } from "../types";
 
 export default function OrdersPage() {
   const navigate = useNavigate();
@@ -54,28 +54,102 @@ export default function OrdersPage() {
     reviewCount: 76,
   };
 
-  const commonHandlers = {
-    onNewRequest: () => navigate("/orders/new"),
-    onOpenRequest: (request: any) => {
-      const mission = missions.find((m: any) => m.requestId === request.id);
-      navigate(mission ? `/orders/tracker/${mission.id}` : `/orders/${request.id}`);
-    },
-    onOpenMission: (mission: any) => navigate(`/orders/tracker/${mission.id}`),
-  };
-
   if (!isPro) {
+    const activeStatuses: MissionStatus[] = ["pending", "accepted", "paid", "in_progress", "en_route", "client_validation", "disputed"];
+    const activeMissions = missions.filter((m: Mission) => activeStatuses.includes(m.status));
+    const pastMissions = missions.filter((m: Mission) => ["completed", "cancelled", "closed", "refunded"].includes(m.status));
+    const missionRequestIds = new Set(missions.map((m: Mission) => m.requestId));
+    const pendingRequests = requests.filter((r: ClientRequest) => !missionRequestIds.has(r.id));
+
+    const counts = {
+      pending: pendingRequests.length,
+      active: activeMissions.length,
+      reviews: pastMissions.filter((m: Mission) => m.status === "completed" || m.status === "closed").length,
+      cancelled: pastMissions.filter((m: Mission) => m.status === "cancelled").length,
+    };
+
+    const renderCard = (item: Mission | ClientRequest, onClick: () => void, past = false) => {
+      const title = (item as any).title || "";
+      const category = (item as any).category || "";
+      const address = ((item as any).address || "").split(",")[0];
+      const budget = (item as any).budgetXOF || 0;
+      const status = (item as any).status as MissionStatus;
+      return (
+        <button type="button" onClick={onClick}
+          className={`w-full text-left bg-cm-elevated border border-cm-border rounded-[14px] p-4 cursor-pointer hover:border-cm-accent/30 transition-colors active:scale-[0.98] ${past ? "opacity-60" : ""}`}>
+          <div className="flex items-start gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-0.5">
+                <h4 className="font-bold text-[14px] text-cm-text truncate">{title}</h4>
+                <StatusBadge status={status} className="shrink-0" />
+              </div>
+              <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-cm-text-muted">
+                <span>{category}</span>
+                <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{address}</span>
+                <span className="flex items-center gap-0.5 font-bold text-cm-text font-mono"><DollarSign className="w-2.5 h-2.5" />{budget.toLocaleString()} F</span>
+              </div>
+            </div>
+            <ArrowUpRight className="w-4 h-4 text-cm-text-muted shrink-0 mt-1" />
+          </div>
+        </button>
+      );
+    };
+
     return (
       <div className="min-h-screen bg-cm-bg">
         <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
-          <div className="flex items-center h-14 px-5">
+          <div className="flex items-center gap-3 h-14 px-5">
+            <button onClick={() => navigate(-1)}
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95 shrink-0">
+              <ArrowLeft className="w-4 h-4 text-cm-text" />
+            </button>
             <h1 className="text-[18px] font-bold text-cm-text">Mes commandes</h1>
           </div>
         </div>
-        <div className="px-5 pt-4 pb-24">
-          <MissionListScreen
-            tabCounts={{ pending: requests.length, active: missions.filter((m: any) => m.status !== "completed" && m.status !== "cancelled").length, reviews: missions.filter((m: any) => m.status === "completed").length, cancelled: missions.filter((m: any) => m.status === "cancelled").length }}
-            {...commonHandlers}
-          />
+        <div className="px-5 pt-4 pb-24 space-y-4">
+          {/* Stats badges */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-none">
+            {[
+              { key: "pending", label: "En attente", count: counts.pending, icon: Hourglass },
+              { key: "active", label: "Actives", count: counts.active, icon: Zap },
+              { key: "reviews", label: "A évaluer", count: counts.reviews, icon: Star },
+              { key: "cancelled", label: "Annulées", count: counts.cancelled, icon: XCircle },
+            ].map((s) => (
+              <div key={s.key}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cm-elevated border border-cm-border text-[12px] font-medium text-cm-text-soft shrink-0">
+                <s.icon className="w-3.5 h-3.5" />
+                <span className="font-bold text-cm-text">{s.count}</span>
+                {s.label}
+              </div>
+            ))}
+          </div>
+
+          {/* Items */}
+          <div className="space-y-3">
+            {activeMissions.length === 0 && pastMissions.length === 0 && pendingRequests.length === 0 ? (
+              <div className="pt-12 text-center">
+                <p className="text-[13px] text-cm-text-muted">Aucune commande pour le moment</p>
+              </div>
+            ) : (
+              <>
+                {activeMissions.length > 0 && (
+                  <div>
+                    {activeMissions.map((m) => renderCard(m, () => navigate(`/orders/tracker/${m.id}`)))}
+                  </div>
+                )}
+                {pendingRequests.length > 0 && (
+                  <div>
+                    {pendingRequests.map((r) => renderCard(r, () => navigate(`/orders/${r.id}`)))}
+                  </div>
+                )}
+                {pastMissions.length > 0 && (
+                  <div>
+                    {pastMissions.map((m) => renderCard(m, () => navigate(`/orders/tracker/${m.id}`), true))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
     );
