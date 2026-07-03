@@ -6,7 +6,7 @@ export default function ProFinancesPage() {
   const nav = useNavigate();
 
   return (
-    <div className="min-h-screen bg-cm-bg">
+    <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center h-14 px-5 gap-3">
           <button type="button" onClick={() => nav("/profile")} className="p-1 -ml-1">

@@ -1,39 +1,35 @@
 import { useNavigate } from "react-router-dom";
-import ProEditProfileScreen from "../../components/ProEditProfileScreen";
+import ProfilProScreen from "../../components/ProfilProScreen";
+import { MOCK_PROS, MOCK_SERVICES } from "../../services/mockData";
 import { useAuthStore } from "../../stores/authStore";
+import type { ProfessionalDetails } from "../../types";
+import { getReviewsForPro, getBadgesForXp } from "../../services/mockData";
+import { MOCK_PORTFOLIO } from "../../services/mockData";
 
 export default function ProEditPage() {
   const nav = useNavigate();
-  const pro = useAuthStore();
+  const { user } = useAuthStore();
 
-  const meta = pro.user?.user_metadata ?? {};
-  const fallbackPro = {
-    id: pro.userId || "",
-    name: `${meta.firstName ?? ""} ${meta.lastName ?? ""}`.trim(),
-    email: pro.user?.email ?? "",
-    phoneNumber: pro.user?.phone ?? "",
-    role: "pro" as const,
-    avatarUrl: meta.avatarUrl ?? "",
-    category: "maison-reparations" as const,
-    subCategory: "",
-    title: "",
-    bio: "",
-    experienceYears: 0,
-    rating: 0,
-    reviewCount: 0,
-    hourlyRateXOF: 0,
-    locationNeighborhood: "",
-    isVerified: false,
-    completedInterventions: 0,
-    availabilityStatus: "available" as const,
-    createdAt: new Date().toISOString(),
-  };
+  const pro: ProfessionalDetails = (MOCK_PROS.find((p) => p.id === user?.id) || MOCK_PROS[0])!;
+  const services = MOCK_SERVICES.filter((s) => s.proId === pro.id);
+  const portfolio = MOCK_PORTFOLIO.filter((p) => p.category === pro.category);
+  const reviews = getReviewsForPro(pro.id);
+  const xp = pro.completedInterventions * 50;
+  const badges = getBadgesForXp(xp);
 
   return (
-    <ProEditProfileScreen
-      pro={fallbackPro}
-      onSave={() => nav("/pro/profile")}
-      onBack={() => nav("/pro/profile")}
+    <ProfilProScreen
+      mode="owner"
+      pro={pro}
+      services={services}
+      portfolio={portfolio}
+      reviews={reviews}
+      badges={badges}
+      onBack={() => nav(-1)}
+      onSave={(updates) => {
+        console.log("Saving:", updates);
+        nav(-1);
+      }}
     />
   );
 }

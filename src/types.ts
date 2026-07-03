@@ -37,6 +37,7 @@ export interface ProfessionalDetails extends User {
   subCategory: string;
   title: string;
   bio: string;
+  coverUrl?: string;
   experienceYears: number;
   rating: number;
   reviewCount: number;
@@ -74,6 +75,8 @@ export interface ProOffer {
   description: string;
   badge: string;
   badgeColor: string;
+  price?: number;
+  originalPrice?: number;
 }
 
 export interface Service {
@@ -84,51 +87,65 @@ export interface Service {
   priceEstimateXOF: number;
 }
 
-// ─── Mission 13 états (PRD) ───
+// ─── Mission Status (unified) ───
 
 export type MissionStatus =
-  | "draft"
-  | "published"
   | "pending"
   | "accepted"
-  | "refused"
+  | "quote_requested"
+  | "quote_sent"
+  | "quote_accepted"
   | "paid"
   | "in_progress"
   | "completed"
   | "client_validation"
-  | "disputed"
+  | "client_validated"
   | "closed"
   | "cancelled"
   | "refunded"
-  // Legacy (deprecated, kept for backward compat)
-  | "created"
+  | "disputed"
+  | "refused"
+  // Pro-side GPS tracking (use ProJobStatus instead for new code)
   | "en_route"
-  | "reviewed";
+  | "arrived"
+  // Legacy statuses
+  | "created"
+  | "published"
+  | "reviewed"
+  | "draft";
+
+export const MISSION_STATUS_FLOW: MissionStatus[] = [
+  "pending", "accepted", "paid", "in_progress",
+  "completed", "client_validation", "closed",
+];
 
 export const MISSION_STATUS_LABELS: Record<MissionStatus, string> = {
-  draft: "Brouillon",
-  published: "Publiée",
   pending: "En attente",
   accepted: "Acceptée",
-  refused: "Refusée",
+  quote_requested: "En attente de devis",
+  quote_sent: "Devis envoyé",
+  quote_accepted: "Devis accepté",
   paid: "Payée",
   in_progress: "En cours",
   completed: "Terminée",
   client_validation: "Validation client",
-  disputed: "En litige",
+  client_validated: "Validée",
   closed: "Clôturée",
   cancelled: "Annulée",
   refunded: "Remboursée",
+  disputed: "En litige",
+  refused: "Refusée",
+  // Pro-side GPS tracking
+  en_route: "En route",
+  arrived: "Arrivé",
   // Legacy
   created: "Créée",
-  en_route: "En route",
-  reviewed: "Évaluée",
+  published: "Publiée",
+  reviewed: "Avis donné",
+  draft: "Brouillon",
 };
 
-export const MISSION_STATUS_ORDER: MissionStatus[] = [
-  "draft", "published", "pending", "accepted", "paid", "in_progress",
-  "completed", "client_validation", "closed",
-];
+// ─── (Legacy statuses kept in ClientRequest) ───
 
 // ─── Devis / Quote states (W20) ───
 
@@ -280,6 +297,7 @@ export interface ClientRequest {
   status: MissionStatus;
   proId?: string;
   quoteIds?: string[];
+  pricingModel?: "fixed" | "quote";
   scheduledAt?: string;
   lat?: number;
   lng?: number;
@@ -295,6 +313,7 @@ export interface Mission {
   clientId: string;
   proId: string;
   status: MissionStatus;
+  pricingModel?: "fixed" | "quote";
   title: string;
   description: string;
   category: string;
@@ -314,10 +333,12 @@ export interface Mission {
   // Timestamps
   createdAt: string;
   acceptedAt?: string;
-  paidAt?: string;
+  enRouteAt?: string;
+  arrivedAt?: string;
   inProgressAt?: string;
   completedAt?: string;
   clientValidatedAt?: string;
+  paidAt?: string;
   closedAt?: string;
   cancelledAt?: string;
   refundedAt?: string;
@@ -517,7 +538,18 @@ export interface Transaction {
   createdAt: string;
 }
 
-export type ProJobStatus = "pending" | "accepted" | "en_route" | "in_progress" | "completed" | "cancelled";
+export type ProJobStatus =
+  | "pending"
+  | "accepted"
+  | "quote_required"
+  | "en_route"
+  | "arrived"
+  | "photos_taken"
+  | "in_progress"
+  | "completed"
+  | "client_validation"
+  | "closed"
+  | "cancelled";
 
 export interface ProAlert {
   id: string;
@@ -553,6 +585,9 @@ export interface ProJob {
   scheduledDate?: string;
   scheduledTime?: string;
   completedAt?: string;
+  pricingModel?: "fixed" | "quote";
+  beforePhoto?: string;
+  afterPhoto?: string;
 }
 
 export interface ProEarning {
@@ -613,23 +648,27 @@ export interface ProVerification {
 
 // ─── Gamification & Progression ───
 
-export type ProLevel = "débutant" | "avancé" | "expert" | "élite";
+export type ProLevel = "débutant" | "apprenti" | "professionnel" | "expert" | "élite" | "master" | "légende";
 
 export interface ProLevelConfig {
   level: ProLevel;
   minXP: number;
   maxXP: number;
   label: string;
+  emoji: string;
   color: string;
   commissionPercent: number;
   benefits: string[];
 }
 
 export const PRO_LEVELS: ProLevelConfig[] = [
-  { level: "débutant", minXP: 0, maxXP: 599, label: "Débutant", color: "text-cm-text-muted", commissionPercent: 15, benefits: ["Accès aux missions", "Support standard"] },
-  { level: "avancé", minXP: 600, maxXP: 1199, label: "Avancé", color: "text-cm-text-soft", commissionPercent: 12, benefits: ["Commission réduite (12%)", "Visibilité accrue", "Support prioritaire"] },
-  { level: "expert", minXP: 1200, maxXP: 2499, label: "Expert", color: "text-cm-accent", commissionPercent: 8, benefits: ["Commission réduite (8%)", "Badge Expert", "Mise en avant", "Support dédié"] },
-  { level: "élite", minXP: 2500, maxXP: Infinity, label: "Élite", color: "text-yellow-500", commissionPercent: 5, benefits: ["Commission réduite (5%)", "Badge Élite", "Avantage prioritaire", "Accès aux missions premium", "Conciergerie"] },
+  { level: "débutant", minXP: 0, maxXP: 499, label: "Débutant", emoji: "🌱", color: "text-gray-500", commissionPercent: 15, benefits: ["Accès aux missions", "Support standard"] },
+  { level: "apprenti", minXP: 500, maxXP: 1499, label: "Apprenti", emoji: "🔨", color: "text-yellow-600", commissionPercent: 13, benefits: ["Commission réduite (13%)", "Visibilité de base"] },
+  { level: "professionnel", minXP: 1500, maxXP: 3999, label: "Professionnel", emoji: "🛠", color: "text-cm-accent", commissionPercent: 11, benefits: ["Commission réduite (11%)", "Visibilité accrue", "Support prioritaire"] },
+  { level: "expert", minXP: 4000, maxXP: 8999, label: "Expert", emoji: "⭐", color: "text-blue-500", commissionPercent: 9, benefits: ["Commission réduite (9%)", "Badge Expert", "Mise en avant", "Support dédié"] },
+  { level: "élite", minXP: 9000, maxXP: 18999, label: "Élite", emoji: "💎", color: "text-purple-500", commissionPercent: 7, benefits: ["Commission réduite (7%)", "Badge Élite", "Missions prioritaires", "Support premium"] },
+  { level: "master", minXP: 19000, maxXP: 34999, label: "Master", emoji: "👑", color: "text-amber-500", commissionPercent: 5, benefits: ["Commission réduite (5%)", "Badge Master", "Avantage prioritaire", "Accès missions premium", "Conciergerie"] },
+  { level: "légende", minXP: 35000, maxXP: Infinity, label: "Légende", emoji: "🏆", color: "text-yellow-400", commissionPercent: 3, benefits: ["Commission réduite (3%)", "Badge Légende", "Top classement", "Missions exclusives", "Conciergerie VIP", "Invitation événements"] },
 ];
 
 export function getProLevel(xp: number): ProLevelConfig {
@@ -638,6 +677,58 @@ export function getProLevel(xp: number): ProLevelConfig {
 
 export function getProLevelFromJobs(jobs: number): ProLevelConfig {
   return getProLevel(jobs * 50);
+}
+
+export type XPEventType =
+  | "mission_completed"
+  | "review_5star"
+  | "quick_response"
+  | "on_time"
+  | "returning_client"
+  | "urgent_mission"
+  | "profile_100"
+  | "identity_verified"
+  | "portfolio_uploaded"
+  | "streak_10_no_cancellation"
+  | "badge_earned"
+  | "late_cancellation"
+  | "significant_delay"
+  | "bad_review"
+  | "reported";
+
+export interface XPEvent {
+  type: XPEventType;
+  xp: number;
+  label: string;
+  description: string;
+}
+
+export const XP_EVENTS: Record<XPEventType, { xp: number; label: string; description: string }> = {
+  mission_completed: { xp: 100, label: "Mission terminée", description: "+100 XP" },
+  review_5star: { xp: 30, label: "Avis 5★", description: "+30 XP" },
+  quick_response: { xp: 10, label: "Réponse rapide", description: "+10 XP" },
+  on_time: { xp: 15, label: "Arrivé à l'heure", description: "+15 XP" },
+  returning_client: { xp: 20, label: "Client récurrent", description: "+20 XP" },
+  urgent_mission: { xp: 25, label: "Mission urgente acceptée", description: "+25 XP" },
+  profile_100: { xp: 150, label: "Profil complété", description: "+150 XP (unique)" },
+  identity_verified: { xp: 200, label: "Identité vérifiée", description: "+200 XP (unique)" },
+  portfolio_uploaded: { xp: 80, label: "Portfolio uploadé", description: "+80 XP (unique)" },
+  streak_10_no_cancellation: { xp: 100, label: "10 missions sans annulation", description: "+100 XP" },
+  badge_earned: { xp: 50, label: "Badge obtenu", description: "+50 XP" },
+  late_cancellation: { xp: -50, label: "Annulation tardive", description: "-50 XP" },
+  significant_delay: { xp: -20, label: "Retard important", description: "-20 XP" },
+  bad_review: { xp: -30, label: "Mauvaise note", description: "-30 XP" },
+  reported: { xp: -100, label: "Signalement confirmé", description: "-100 XP" },
+};
+
+export interface XPTransaction {
+  id: string;
+  proId: string;
+  eventType: XPEventType;
+  xp: number;
+  label: string;
+  missionId?: string;
+  createdAt: string;
 }
 
 export interface PlanConfig {

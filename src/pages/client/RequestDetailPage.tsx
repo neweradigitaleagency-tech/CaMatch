@@ -10,7 +10,7 @@ export default function RequestDetailPage() {
 
   if (!request) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-brand-cream">
+      <div className="flex items-center justify-center min-h-dynamic bg-brand-cream">
         <p className="text-sm text-secondary">Demande introuvable</p>
       </div>
     );

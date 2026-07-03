@@ -35,7 +35,7 @@ export default function ProDashboardPage() {
   const upcomingCount = MOCK_MISSIONS.filter((m) => m.status === "upcoming").length;
 
   return (
-    <div className="min-h-screen bg-cm-bg">
+    <div className="min-h-dynamic bg-cm-bg">
       <header className="sticky top-0 z-10 bg-white border-b border-cm-border">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">

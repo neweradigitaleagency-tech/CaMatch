@@ -110,12 +110,13 @@ export const useProOnboardingStore = create<ProOnboardingStore>((set, get) => ({
     const now = new Date().toISOString();
     const newData = {
       ...state,
-      status: "SUBMITTED" as ProApplicationStatus,
+      status: "APPROVED" as ProApplicationStatus,
       submittedAt: now,
+      reviewedAt: now,
       currentStep: ONBOARDING_STEP_INDEX_MAP.pending!,
       maxCompletedStep: ONBOARDING_STEP_INDEX_MAP.pending!,
     };
-    saveDraft(newData);
+    clearDraft();
     set(newData);
   },
 

@@ -96,7 +96,7 @@ export default function OrdersPage() {
     };
 
     return (
-      <div className="min-h-screen bg-cm-bg">
+      <div className="min-h-dynamic bg-cm-bg">
         <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
           <div className="flex items-center gap-3 h-14 px-5">
             <button onClick={() => navigate(-1)}
@@ -156,7 +156,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cm-bg">
+    <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center h-14 px-5">
           <h1 className="text-[18px] font-bold text-cm-text">Tableau de bord</h1>

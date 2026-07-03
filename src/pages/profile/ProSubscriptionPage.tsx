@@ -36,7 +36,7 @@ export default function ProSubscriptionPage() {
   const nav = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col min-h-dynamic bg-cm-bg pb-32">
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
         <button onClick={() => nav("/profile")} className="w-8 h-8 flex items-center justify-center rounded-xl bg-cm-elevated border border-cm-border cursor-pointer">
           <ArrowLeft className="w-4 h-4 text-cm-text-soft" />

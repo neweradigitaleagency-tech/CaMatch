@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowLeft, MapPin, DollarSign, Clock, AlertTriangle, Trash2, Navigation, CheckCircle, Zap, Droplets, Wind, Sparkles, Circle } from "lucide-react";
 import { motion } from "motion/react";
-import { ClientRequest, MISSION_STATUS_LABELS, MISSION_STATUS_ORDER } from "../types";
+import { ClientRequest, MISSION_STATUS_LABELS, MISSION_STATUS_FLOW } from "../types";
 import type { MissionStatus } from "../types";
 import ImageViewer from "./ImageViewer";
 
@@ -28,7 +28,7 @@ const DOMAIN_ICONS: Record<string, typeof Zap> = {
   cleaning: Sparkles,
 };
 
-const DISPLAYABLE: MissionStatus[] = MISSION_STATUS_ORDER.filter((s) => s !== "created");
+const DISPLAYABLE: MissionStatus[] = MISSION_STATUS_FLOW.filter((s) => s !== "created");
 
 const STATUS_STEP_ICONS: Record<string, typeof Circle> = {
   accepted: CheckCircle,
@@ -47,7 +47,7 @@ export default function RequestDetailScreen({ request, onBack, onDelete }: Reque
   const CategoryIcon = DOMAIN_ICONS[request.category] || AlertTriangle;
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 bg-cm-elevated border-b border-cm-border sticky top-0 z-10">
         <button onClick={onBack} className="w-12 h-12 flex items-center justify-center rounded-full bg-cm-elevated text-cm-text hover:bg-cm-accent-soft transition-colors border border-cm-border cursor-pointer active:scale-95">
           <ArrowLeft className="w-5 h-5" />

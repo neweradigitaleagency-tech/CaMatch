@@ -39,7 +39,7 @@ export default function EditProfileScreen({ onBack }: EditProfileScreenProps) {
   const inputBase = "w-full h-11 px-4 text-[14px] bg-gray-50 border border-gray-200 rounded-xl text-gray-900 outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-300 transition-all";
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-white pb-8">
+    <div className="flex flex-col w-full min-h-dynamic bg-white pb-8">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-white border-b border-gray-100">
         <button onClick={onBack}
           className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white cursor-pointer active:scale-90 transition-all">

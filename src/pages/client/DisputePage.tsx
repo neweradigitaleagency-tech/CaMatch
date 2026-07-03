@@ -37,7 +37,7 @@ export default function DisputePage() {
 
   if (submitted) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-cm-bg p-6">
+      <div className="flex flex-col items-center justify-center min-h-dynamic bg-cm-bg p-6">
         <div className="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
           <Shield className="w-8 h-8 text-red-500" />
         </div>
@@ -49,7 +49,7 @@ export default function DisputePage() {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
         <button onClick={() => nav(-1)} className="w-11 h-11 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95">
           <ArrowLeft className="w-5 h-5" />
@@ -86,13 +86,15 @@ export default function DisputePage() {
         </div>
       </div>
 
-      <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto">
+      <div className="fixed bottom-20 inset-x-0 px-4 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="max-w-[448px] mx-auto">
         <button onClick={handleSubmit} disabled={!reason}
           className={`w-full py-4 rounded-[14px] text-[13px] font-bold transition-all cursor-pointer flex items-center justify-center gap-2 ${
             reason ? "bg-red-500 text-white active:scale-[0.97]" : "bg-cm-border text-cm-text-soft cursor-not-allowed"
           }`}>
           <Send className="w-4 h-4" /> Soumettre le litige
         </button>
+        </div>
       </div>
     </div>
   );

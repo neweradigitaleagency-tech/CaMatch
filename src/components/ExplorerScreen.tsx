@@ -128,7 +128,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
   const hasActiveFilter = filters.query.length >= 2 || filters.categoryId || filters.subCategory || filters.rating > 0 || filters.location || filters.nearbyOnly;
 
   return (
-    <div className="flex flex-col w-full pb-6 min-h-screen bg-cm-bg">
+    <div className="flex flex-col w-full pb-6 min-h-dynamic bg-cm-bg">
       {refreshing && (
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center py-3 bg-cm-elevated border-b border-cm-border">
           <div className="w-5 h-5 border-2 border-cm-accent border-t-transparent rounded-full animate-spin" />

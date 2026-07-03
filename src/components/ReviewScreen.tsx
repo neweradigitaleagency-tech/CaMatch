@@ -32,7 +32,7 @@ export default function ReviewScreen({ mission, onBack, onSubmit }: ReviewScreen
 
   if (submitted) {
     return (
-      <div className="flex flex-col w-full min-h-screen bg-cm-bg">
+      <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center animate-scale-in">
           <div className="w-20 h-20 rounded-full bg-cm-accent-soft border-2 border-cm-accent flex items-center justify-center mb-6 animate-scale-in">
             <CheckCircle className="w-10 h-10 text-cm-accent" />
@@ -51,7 +51,7 @@ export default function ReviewScreen({ mission, onBack, onSubmit }: ReviewScreen
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
         <button onClick={onBack}
           className="w-11 h-11 flex items-center justify-center rounded-[14px] border border-cm-border bg-cm-elevated text-cm-text cursor-pointer active:scale-95 shadow-cm-sm">
@@ -127,7 +127,8 @@ export default function ReviewScreen({ mission, onBack, onSubmit }: ReviewScreen
         </GlassCard>
       </div>
 
-      <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto">
+      <div className="fixed bottom-20 inset-x-0 px-4 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="max-w-[448px] mx-auto">
         <button onClick={handleSubmit} disabled={rating === 0}
           className={`w-full h-13 rounded-[14px] text-[13px] font-bold transition-all active:scale-[0.97] cursor-pointer flex items-center justify-center gap-2 ${
             rating > 0
@@ -136,6 +137,7 @@ export default function ReviewScreen({ mission, onBack, onSubmit }: ReviewScreen
           }`}>
           <Star className="w-4 h-4" /> Publier mon évaluation
         </button>
+        </div>
       </div>
 
       <ImageViewer

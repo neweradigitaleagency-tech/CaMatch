@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import GlassCard from "./ui/GlassCard";
 import EmptyState from "./ui/EmptyState";
 import StatusBadge from "./ui/StatusBadge";
-import { MISSION_STATUS_ORDER, MissionStatus } from "../types";
+import { MISSION_STATUS_FLOW, MissionStatus } from "../types";
 import type { ClientRequest, Mission } from "../types";
 
 const TABS = [
@@ -34,7 +34,7 @@ export default function MissionListScreen({ tabCounts, onNewRequest, onOpenReque
   const [tab, setTab] = useState("pending");
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
         <div className="flex items-center gap-3">
           <h1 className="text-[15px] font-bold text-cm-text">Mes missions</h1>
@@ -112,7 +112,7 @@ function ListItem({ item }: { item: { type: "request" | "mission"; data: ClientR
   const iconColor = getPhaseIconColor(status, item.type);
   const iconBg = getPhaseIconBg(status, item.type);
 
-  const phaseIdx = MISSION_STATUS_ORDER.indexOf(status);
+  const phaseIdx = MISSION_STATUS_FLOW.indexOf(status);
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
@@ -153,7 +153,7 @@ function ListItem({ item }: { item: { type: "request" | "mission"; data: ClientR
             </div>
             {item.type === "mission" && phaseIdx >= 0 && (
               <div className="flex items-center gap-1 mt-2">
-                {MISSION_STATUS_ORDER.slice(1, 6).map((s, i) => {
+                {MISSION_STATUS_FLOW.slice(1, 6).map((s, i) => {
                   const done = i <= phaseIdx - 1;
                   const current = i === phaseIdx - 1;
                   return (

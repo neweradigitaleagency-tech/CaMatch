@@ -276,7 +276,7 @@ export default function RequestCreationScreen({ onBack, onProceedToMatching, onS
   const inputBase = "w-full h-11 px-4 text-[13px] font-bold bg-cm-elevated border border-cm-border rounded-xl text-cm-text outline-none focus:border-cm-text";
 
   return (
-    <div className="flex flex-col w-full min-h-screen pb-8 bg-cm-bg">
+    <div className="flex flex-col w-full min-h-dynamic pb-8 bg-cm-bg">
       <header className="flex items-center gap-3 px-5 pt-3 pb-4 sticky top-0 z-10 bg-cm-bg">
         <button onClick={goPrev}
           className="w-9 h-9 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95 shrink-0">

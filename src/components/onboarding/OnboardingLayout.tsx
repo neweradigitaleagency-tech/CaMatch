@@ -39,7 +39,7 @@ export default function OnboardingLayout({
   const activeGroup = currentGroup >= 0 ? currentGroup : STEPS.length - 1;
 
   return (
-    <div className="min-h-screen bg-cm-bg flex flex-col">
+    <div className="min-h-dynamic bg-cm-bg flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="flex items-center gap-3 px-4 h-14">
@@ -85,7 +85,7 @@ export default function OnboardingLayout({
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-4 py-4 pb-24">
+      <main className="flex-1 px-4 py-4 pb-[max(96px,env(safe-area-inset-bottom,96px))]">
         <motion.div
           key={currentStep}
           initial={{ opacity: 0, x: 20 }}
@@ -98,17 +98,17 @@ export default function OnboardingLayout({
       </main>
 
       {/* Bottom navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-cm-bg/80 backdrop-blur-xl border-t border-cm-border/40">
-        <div className="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-cm-bg/80 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
+        <div className="max-w-[448px] mx-auto px-4 py-3 flex items-center gap-3">
           {onBack && (
             <button onClick={onBack}
-              className="h-11 px-5 rounded-[14px] text-[13px] font-medium text-cm-text border border-cm-border bg-cm-elevated cursor-pointer hover:bg-cm-accent-soft transition-colors active:scale-[0.97]">
+              className="h-12 px-5 rounded-[14px] text-[13px] font-medium text-cm-text border border-cm-border bg-cm-elevated cursor-pointer hover:bg-cm-accent-soft transition-colors active:scale-[0.97]">
               {backLabel}
             </button>
           )}
           {!hideNext && onNext && (
             <button onClick={onNext} disabled={disableNext || loading}
-              className={`flex-1 h-11 rounded-[14px] text-[13px] font-bold text-white cursor-pointer transition-all active:scale-[0.97] flex items-center justify-center gap-2 ${
+              className={`flex-1 h-12 rounded-[14px] text-[13px] font-bold text-white cursor-pointer transition-all active:scale-[0.97] flex items-center justify-center gap-2 ${
                 disableNext || loading
                   ? "bg-cm-border-soft text-cm-text-muted cursor-not-allowed"
                   : "bg-cm-accent hover:opacity-90"

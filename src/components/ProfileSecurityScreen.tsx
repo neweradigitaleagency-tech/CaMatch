@@ -34,7 +34,7 @@ export default function ProfileSecurityScreen({ onBack }: ProfileSecurityScreenP
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-gray-50 pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-white border-b border-gray-100">
         <button onClick={onBack}
           className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white cursor-pointer active:scale-90 transition-all">

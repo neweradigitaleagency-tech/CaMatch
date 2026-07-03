@@ -81,7 +81,7 @@ export default function QuoteCreatePage() {
   };
 
   return (
-    <div className="min-h-screen bg-cm-bg pb-24">
+    <div className="min-h-dynamic bg-cm-bg pb-24">
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="px-4 pt-3 pb-3">
           <div className="flex items-center gap-2 mb-2">

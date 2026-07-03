@@ -31,7 +31,7 @@ export default function EscrowPaymentPage() {
 
   if (!mission) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+      <div className="flex flex-col items-center justify-center min-h-dynamic bg-gray-50 p-4">
         <p className="text-[14px] text-gray-500">Mission introuvable</p>
         <button onClick={() => nav("/orders")} className="mt-4 text-gray-900 text-[13px] font-bold">Retour aux missions</button>
       </div>
@@ -52,7 +52,7 @@ export default function EscrowPaymentPage() {
 
   if (done) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
+      <div className="flex flex-col items-center justify-center min-h-dynamic bg-gray-50 p-6">
         <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
           <Check className="w-8 h-8 text-green-600" />
         </div>
@@ -70,7 +70,7 @@ export default function EscrowPaymentPage() {
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-gray-50 pb-32">
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-10">
         <button onClick={() => nav(-1)} className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-gray-700 hover:bg-gray-100 transition-colors border border-gray-200 cursor-pointer active:scale-95">
           <ArrowLeft className="w-5 h-5" />
@@ -151,7 +151,8 @@ export default function EscrowPaymentPage() {
         )}
       </div>
 
-      <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto">
+      <div className="fixed bottom-20 inset-x-0 px-4 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="max-w-[448px] mx-auto">
         <button onClick={handlePay} disabled={!selectedMethod}
           className={`w-full h-13 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
             !selectedMethod
@@ -166,6 +167,7 @@ export default function EscrowPaymentPage() {
             <><DollarSign className="w-4 h-4" /> Payer avec {selectedMethod ? PAYMENT_METHOD_LABELS[selectedMethod] : "..."}</>
           )}
         </button>
+        </div>
       </div>
     </div>
   );

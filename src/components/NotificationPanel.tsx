@@ -60,8 +60,8 @@ export default function NotificationPanel({ open, onClose }: NotificationPanelPr
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
-            className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-md bg-cm-elevated rounded-t-[20px] flex flex-col shadow-2xl"
-            style={{ maxHeight: "85vh" }}
+            className="fixed bottom-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-[448px] bg-cm-elevated rounded-t-[20px] flex flex-col shadow-2xl pb-[env(safe-area-inset-bottom,0px)]"
+            style={{ maxHeight: "85dvh" }}
           >
             <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-cm-border shrink-0">
               <div className="flex items-center gap-2">

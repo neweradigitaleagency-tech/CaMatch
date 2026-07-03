@@ -47,6 +47,7 @@ export default function ProProfilePage() {
 
   return (
     <ProfilProScreen
+      mode="client"
       pro={pro}
       services={services}
       portfolio={portfolio}
@@ -54,9 +55,6 @@ export default function ProProfilePage() {
       reviews={reviews}
       badges={badges}
       onBack={() => nav(-1)}
-      onInitiateMatch={(selectedServices) =>
-        nav("/explorer/matching", { state: { pro, services: selectedServices } })
-      }
     />
   );
 }

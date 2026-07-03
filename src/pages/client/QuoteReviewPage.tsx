@@ -60,7 +60,7 @@ export default function QuoteReviewPage() {
 
   if (!quote || !currentVersion) {
     return (
-      <div className="min-h-screen bg-cm-bg flex items-center justify-center p-6">
+      <div className="min-h-dynamic bg-cm-bg flex items-center justify-center p-6">
         <div className="text-center">
           <FileText className="w-12 h-12 text-cm-text-muted mx-auto mb-3" />
           <p className="text-[14px] font-semibold text-cm-text mb-1">Devis introuvable</p>
@@ -75,7 +75,7 @@ export default function QuoteReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cm-bg pb-24">
+    <div className="min-h-dynamic bg-cm-bg pb-24">
       {/* Header */}
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="px-4 pt-3 pb-3">

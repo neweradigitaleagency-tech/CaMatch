@@ -44,7 +44,7 @@ export default function CategoryDetailScreen() {
 
   if (!category) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-6 bg-cm-bg">
+      <div className="min-h-dynamic flex flex-col items-center justify-center gap-4 p-6 bg-cm-bg">
         <span className="text-[48px]">🔍</span>
         <h2 className="text-[18px] font-extrabold text-cm-text text-center">
           Catégorie introuvable
@@ -58,7 +58,7 @@ export default function CategoryDetailScreen() {
   }
 
   return (
-    <div className="min-h-screen bg-cm-bg pb-24">
+    <div className="min-h-dynamic bg-cm-bg pb-24">
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="flex items-center gap-3 px-4 h-14">
           <button onClick={() => nav(-1)}

@@ -30,7 +30,7 @@ export default function InvoiceScreen({ mission, invoice, onBack }: InvoiceScree
   ];
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
         <button onClick={onBack}
           className="w-10 h-10 flex items-center justify-center rounded-full text-cm-text hover:bg-cm-accent-soft transition-colors cursor-pointer active:scale-95">

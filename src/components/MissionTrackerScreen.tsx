@@ -47,7 +47,7 @@ export default function MissionTrackerScreen({
   const nav = useNavigate();
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-gray-50 pb-8">
+    <div className="flex flex-col w-full min-h-dynamic bg-gray-50 pb-8">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-white border-b border-gray-100">
         <button onClick={onBack}

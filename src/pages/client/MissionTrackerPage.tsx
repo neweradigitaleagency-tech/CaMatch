@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MissionTrackerScreen from "../../components/MissionTrackerScreen";
 import ProControlPanel from "../../components/ProControlPanel";
 import InvoiceScreen from "../../components/InvoiceScreen";
 import { useRequestStore } from "../../stores/requestStore";
+import { useProStore } from "../../stores/proStore";
 import { useChatStore } from "../../stores/chatStore";
 import { useAuthStore } from "../../stores/authStore";
+import { findConversation, createConversation } from "../../services/chatService";
 import { useNotifications } from "../../hooks/useNotifications";
-import { MOCK_PRO_JOBS } from "../../services/mockData";
-import type { MissionStatus, Invoice } from "../../types";
+import { MOCK_PRO_JOBS, MOCK_PRO_ALERTS } from "../../services/mockData";
+import type { MissionStatus, Invoice, ProJobStatus } from "../../types";
 
 const MOCK_INVOICE: Invoice = {
   id: "INV-2026-001",
@@ -45,15 +47,26 @@ export default function MissionTrackerPage() {
   const isPro = useAuthStore((s) => s.isPro);
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === id));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
+  const proJobs = useProStore((s) => s.jobs);
+  const setProJobs = useProStore((s) => s.setJobs);
+  const updateProJobStatus = useProStore((s) => s.updateJobStatus);
   const conversations = useChatStore((s) => s.conversations);
   const [showInvoice, setShowInvoice] = useState(false);
 
   const { sendLocalNotification } = useNotifications();
-  const proJob = isPro ? MOCK_PRO_JOBS.find((j) => j.id === id) : null;
+
+  useEffect(() => {
+    if (isPro && proJobs.length === 0) {
+      setProJobs(MOCK_PRO_JOBS);
+      useProStore.getState().setAlerts(MOCK_PRO_ALERTS);
+    }
+  }, [isPro, proJobs.length, setProJobs]);
+
+  const proJob = isPro ? proJobs.find((j) => j.id === id) || MOCK_PRO_JOBS.find((j) => j.id === id) : null;
 
   if (!mission && !proJob) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-cm-bg">
+      <div className="flex items-center justify-center min-h-dynamic bg-cm-bg">
         <p className="text-sm text-cm-text-soft">Mission introuvable</p>
       </div>
     );
@@ -63,7 +76,10 @@ export default function MissionTrackerPage() {
     return (
       <ProControlPanel
         job={proJob}
-        onUpdateStatus={(jobId, status) => console.log("Pro job status update:", jobId, status)}
+        onUpdateStatus={(jobId, status) => {
+          updateProJobStatus(jobId, status);
+          sendLocalNotification("Statut mis à jour", `Mission ${status === "photos_taken" ? "photos prises" : status}`);
+        }}
         onComplete={() => navigate("/orders")}
         onNotification={sendLocalNotification}
       />
@@ -72,7 +88,7 @@ export default function MissionTrackerPage() {
 
   if (!mission) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-cm-bg">
+      <div className="flex items-center justify-center min-h-dynamic bg-cm-bg">
         <p className="text-sm text-cm-text-soft">Mission introuvable</p>
       </div>
     );
@@ -86,9 +102,29 @@ export default function MissionTrackerPage() {
         <MissionTrackerScreen
           mission={mission}
           onBack={() => navigate(-1)}
-          onOpenChat={() => {
+          onOpenChat={async () => {
+            if (!mission) return;
             const conv = conversations.find((c) => c.missionId === mission.id);
-            if (conv) navigate(`/messages/${conv.id}`);
+            if (conv) {
+              navigate(`/messages/${conv.id}`);
+              return;
+            }
+            const userId = useAuthStore.getState().userId;
+            if (userId && mission.proId) {
+              const existing = await findConversation(userId, mission.proId);
+              if (existing) {
+                navigate(`/messages/${existing}`);
+              } else {
+                const created = await createConversation({
+                  participant1: userId,
+                  participant2: mission.proId,
+                  jobId: mission.id,
+                });
+                if (created) {
+                  navigate(`/messages/${created}`);
+                }
+              }
+            }
           }}
           onOpenInvoice={() => setShowInvoice(true)}
           onUpdateStatus={(status: MissionStatus) => updateMissionStatus(mission.id, status)}

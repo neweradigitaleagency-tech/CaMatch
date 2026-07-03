@@ -28,7 +28,7 @@ export default function ChatPage() {
 
   if (!conversation || !conversationId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-cm-bg">
+      <div className="flex items-center justify-center min-h-dynamic bg-cm-bg">
         <p className="text-sm text-cm-text-soft">Conversation introuvable</p>
       </div>
     );

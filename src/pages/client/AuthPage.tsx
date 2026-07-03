@@ -134,7 +134,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-cm-bg flex flex-col">
+    <div className="min-h-dynamic bg-cm-bg flex flex-col">
       <div className="px-4 pt-3 pb-1">
         <button onClick={() => nav(-1)}
           className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-white/80 border border-gray-200 cursor-pointer shrink-0">

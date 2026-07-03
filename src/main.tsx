@@ -45,7 +45,22 @@ const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
 const ProOnboardingPage = lazy(() => import("./pages/ProOnboardingPage"));
-const ProDashboardPage = lazy(() => import("./pages/ProDashboardPage"));
+const ProDashboardScreen = lazy(() => import("./components/ProDashboardScreen"));
+const ProServicesPage = lazy(() => import("./pages/pro/ProServicesPage"));
+const ProRevenusPage = lazy(() => import("./pages/pro/ProRevenusPage"));
+const ProWalletPage = lazy(() => import("./pages/pro/ProWalletPage"));
+const ProMessagesPage = lazy(() => import("./pages/pro/ProMessagesPage"));
+const ProMissionDetailPage = lazy(() => import("./pages/pro/ProMissionDetailPage"));
+const ProGalleryPage = lazy(() => import("./pages/pro/ProGalleryPage"));
+const ProStatsPage = lazy(() => import("./pages/pro/ProStatsPage"));
+const ProBadgesPage = lazy(() => import("./pages/pro/ProBadgesPage"));
+const ProMissionsPage = lazy(() => import("./pages/pro/ProMissionsPage"));
+const ProPreviewPage = lazy(() => import("./pages/profile/ProPreviewPage"));
+const MatchingScreen = lazy(() => import("./pages/explorer/MatchingScreen"));
+const ProSecurityPage = lazy(() => import("./pages/pro/ProSecurityPage"));
+const ProSettingsPage = lazy(() => import("./pages/pro/ProSettingsPage"));
+const ProSupportPage = lazy(() => import("./pages/pro/ProSupportPage"));
+const ProAboutPage = lazy(() => import("./pages/pro/ProAboutPage"));
 const AdminApplicationsPage = lazy(() => import("./pages/admin/AdminApplicationsPage"));
 const AdminApplicationDetail = lazy(() => import("./pages/admin/AdminApplicationDetail"));
 const InvoicePage = lazy(() => import("./pages/client/InvoicePage"));
@@ -71,7 +86,7 @@ class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boole
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-cm-bg">
+        <div className="min-h-dynamic flex items-center justify-center p-6 bg-cm-bg">
           <div className="text-center max-w-xs">
             <div className="w-14 h-14 rounded-[16px] bg-cm-accent-soft flex items-center justify-center mx-auto mb-4">
               <span className="text-[24px]">!</span>
@@ -97,7 +112,7 @@ class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boole
 
 function PageLoader() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cm-bg">
+    <div className="min-h-dynamic flex items-center justify-center bg-cm-bg">
       <div className="flex flex-col items-center gap-3">
         <div className="w-8 h-8 border-2 border-cm-border-soft border-t-cm-text rounded-full animate-spin" />
         <p className="text-[12px] text-cm-text-muted">Chargement...</p>
@@ -140,7 +155,25 @@ function App() {
       <Route element={<AuthGate />}>
         <Route path="pro/onboarding" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
         <Route path="pro/onboarding/:step" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
-        <Route path="pro/dashboard" element={<Suspense fallback={<PageLoader />}><ProDashboardPage /></Suspense>} />
+        <Route path="pro/dashboard" element={<Suspense fallback={<PageLoader />}><ProDashboardScreen /></Suspense>} />
+        <Route path="pro/services" element={<Suspense fallback={<PageLoader />}><ProServicesPage /></Suspense>} />
+        <Route path="pro/revenues" element={<Suspense fallback={<PageLoader />}><ProRevenusPage /></Suspense>} />
+        <Route path="pro/wallet" element={<Suspense fallback={<PageLoader />}><ProWalletPage /></Suspense>} />
+        <Route path="pro/messages" element={<Suspense fallback={<PageLoader />}><ProMessagesPage /></Suspense>} />
+        <Route path="pro/messages/:conversationId" element={<Suspense fallback={<PageLoader />}><ProMessagesPage /></Suspense>} />
+        <Route path="pro/mission/:id" element={<Suspense fallback={<PageLoader />}><ProMissionDetailPage /></Suspense>} />
+        <Route path="pro/missions" element={<Suspense fallback={<PageLoader />}><ProMissionsPage /></Suspense>} />
+        <Route path="pro/preview" element={<Navigate to="/profile/pro-preview" replace />} />
+        <Route path="pro/gallery" element={<Suspense fallback={<PageLoader />}><ProGalleryPage /></Suspense>} />
+        <Route path="pro/stats" element={<Suspense fallback={<PageLoader />}><ProStatsPage /></Suspense>} />
+        <Route path="pro/badges" element={<Suspense fallback={<PageLoader />}><ProBadgesPage /></Suspense>} />
+        <Route path="pro/security" element={<Suspense fallback={<PageLoader />}><ProSecurityPage /></Suspense>} />
+        <Route path="pro/settings" element={<Suspense fallback={<PageLoader />}><ProSettingsPage /></Suspense>} />
+        <Route path="pro/support" element={<Suspense fallback={<PageLoader />}><ProSupportPage /></Suspense>} />
+        <Route path="pro/about" element={<Suspense fallback={<PageLoader />}><ProAboutPage /></Suspense>} />
+        <Route path="pro/edit" element={<Navigate to="/profile/pro-edit" replace />} />
+        <Route path="pro/planning" element={<Navigate to="/profile/pro-planning" replace />} />
+        <Route path="pro/notifications" element={<Navigate to="/profile/pro-notifications" replace />} />
         <Route path="admin/applications" element={<Suspense fallback={<PageLoader />}><AdminApplicationsPage /></Suspense>} />
         <Route path="admin/applications/:id" element={<Suspense fallback={<PageLoader />}><AdminApplicationDetail /></Suspense>} />
         <Route element={<AppLayout />}>
@@ -190,6 +223,10 @@ function App() {
         <Route path="explorer/search" element={<Suspense fallback={<PageLoader />}><SearchScreen /></Suspense>} />
         <Route path="explorer/design-provider/:id" element={<Suspense fallback={<PageLoader />}><ProviderProfileScreen /></Suspense>} />
         <Route path="explorer/category/:categoryId" element={<Suspense fallback={<PageLoader />}><CategoryDetailScreen /></Suspense>} />
+        <Route path="explorer/matching" element={<Suspense fallback={<PageLoader />}><MatchingScreen /></Suspense>} />
+        <Route path="explorer/matching/success" element={<Suspense fallback={<PageLoader />}><MatchingScreen /></Suspense>} />
+
+        <Route path="profile/pro-preview" element={<Suspense fallback={<PageLoader />}><ProPreviewPage /></Suspense>} />
       </Route>
       </Route>
     </Routes>

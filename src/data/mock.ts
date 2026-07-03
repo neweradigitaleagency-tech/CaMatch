@@ -1,3 +1,6 @@
+import type { ProfessionalDetails } from "../types";
+import { MOCK_PROS } from "../services/mockData";
+
 export interface MockProvider {
   id: string;
   name: string;
@@ -13,92 +16,42 @@ export interface MockProvider {
   yearsExp: number;
 }
 
-export const abidjanProviders: MockProvider[] = [
-  {
-    id: "p1",
-    name: "Kouamé Jean",
-    category: "Plomberie",
-    rating: 4.8,
-    reviewCount: 127,
-    price: 5000,
-    distance: "1,2 km",
-    lat: 5.362,
-    lng: -4.018,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
-    skills: ["Plomberie", "Chauffage", "Dépannage"],
-    yearsExp: 8,
-  },
-  {
-    id: "p2",
-    name: "Diarrassouba Moussa",
-    category: "Électricité",
-    rating: 4.6,
-    reviewCount: 93,
-    price: 4500,
-    distance: "2,0 km",
-    lat: 5.366,
-    lng: -4.006,
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",
-    skills: ["Électricité", "Domotique", "Câblage"],
-    yearsExp: 12,
-  },
-  {
-    id: "p3",
-    name: "N'Guessan Awa",
-    category: "Nettoyage",
-    rating: 4.9,
-    reviewCount: 210,
-    price: 3000,
-    distance: "0,8 km",
-    lat: 5.358,
-    lng: -4.012,
-    image: "https://images.unsplash.com/photo-1554151228-14d9def656e4?w=200&h=200&fit=crop",
-    skills: ["Nettoyage", "Repassage", "Désinfection"],
-    yearsExp: 5,
-  },
-  {
-    id: "p4",
-    name: "Touré Ibrahim",
-    category: "Menuiserie",
-    rating: 4.7,
-    reviewCount: 65,
-    price: 8000,
-    distance: "3,5 km",
-    lat: 5.373,
-    lng: -4.025,
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop",
-    skills: ["Menuiserie", "Ébénisterie", "Montage"],
-    yearsExp: 15,
-  },
-  {
-    id: "p5",
-    name: "Koffi Aimé",
-    category: "Peinture",
-    rating: 4.5,
-    reviewCount: 41,
-    price: 6000,
-    distance: "1,8 km",
-    lat: 5.352,
-    lng: -4.008,
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&h=200&fit=crop",
-    skills: ["Peinture", "Revêtement", "Décoration"],
-    yearsExp: 10,
-  },
-  {
-    id: "p6",
-    name: "Fofana Mamadou",
-    category: "Jardinage",
-    rating: 4.4,
-    reviewCount: 33,
-    price: 4000,
-    distance: "2,5 km",
-    lat: 5.355,
-    lng: -4.03,
-    image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=200&h=200&fit=crop",
-    skills: ["Jardinage", "Élagage", "Tonte"],
-    yearsExp: 7,
-  },
-];
+const CATEGORY_MAP: Record<string, string> = {
+  "maison-reparations": "maison_reparations",
+  "transport-livraison": "transport_livraison",
+  evenements: "evenements",
+  "education-formation": "education_formation",
+  "social-media-informatique": "social_media_informatique",
+  "assistance-services": "assistance_services",
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  "maison-reparations": "Maison & Réparations",
+  "transport-livraison": "Transport & Livraison",
+  evenements: "Événements",
+  "education-formation": "Éducation & Formation",
+  "social-media-informatique": "Social Media & Informatique",
+  "assistance-services": "Assistance & Services",
+};
+
+function proToMockProvider(pro: ProfessionalDetails, idx: number): MockProvider {
+  return {
+    id: pro.id,
+    name: pro.name,
+    category: CATEGORY_LABELS[pro.category] || pro.category,
+    rating: pro.rating / 10,
+    reviewCount: pro.reviewCount,
+    price: pro.hourlyRateXOF,
+    distance: `${(1 + (idx % 5) * 0.8).toFixed(1).replace(".", ",")} km`,
+    lat: pro.lat || (5.35 + (idx % 10) * 0.015),
+    lng: pro.lng || (-4.01 - (idx % 8) * 0.012),
+    image: pro.avatarUrl || "",
+    skills: [pro.subCategory, CATEGORY_LABELS[pro.category] || pro.category].filter(Boolean),
+    yearsExp: pro.experienceYears,
+  };
+}
+
+export const abidjanProviders: MockProvider[] = MOCK_PROS.map(proToMockProvider);
 
 export const categories = [
   { id: "plomberie", label: "Plomberie", icon: "💧" },

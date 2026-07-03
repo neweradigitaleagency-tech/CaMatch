@@ -1,13 +1,28 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon, Camera, X, Image } from "lucide-react";
-import type { ProJob, MissionStatus } from "../types";
+import type { ProJob, MissionStatus, ProJobStatus } from "../types";
 import { useAuthStore } from "../stores/authStore";
 import { createConversation, findConversation } from "../services/chatService";
 import MapView from "./ui/MapView";
 import { useRequestStore } from "../stores/requestStore";
 
-type ProStep = "idle" | "accepted" | "en_route" | "arrived" | "photos_before" | "in_progress" | "photos_after" | "completed";
+type ProStep = "idle" | "accepted" | "en_route" | "arrived" | "photos_taken" | "in_progress" | "photos_after" | "completed";
+
+function statusToStep(status: ProJobStatus): ProStep {
+  switch (status) {
+    case "pending": return "idle";
+    case "accepted": return "accepted";
+    case "en_route": return "en_route";
+    case "arrived": return "arrived";
+    case "photos_taken": return "photos_taken";
+    case "in_progress": return "in_progress";
+    case "completed":
+    case "client_validation":
+    case "closed": return "completed";
+    default: return "idle";
+  }
+}
 
 interface ProControlPanelProps {
   job: ProJob;
@@ -19,7 +34,7 @@ interface ProControlPanelProps {
 export default function ProControlPanel({
   job, onUpdateStatus, onComplete, onNotification,
 }: ProControlPanelProps) {
-  const [step, setStep] = useState<ProStep>("idle");
+  const [step, setStep] = useState<ProStep>(() => statusToStep(job.status));
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [gpsActive, setGpsActive] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -69,6 +84,13 @@ export default function ProControlPanel({
     return () => { stopGpsTracking(); };
   }, [stopGpsTracking]);
 
+  useEffect(() => {
+    const next = statusToStep(job.status);
+    if (next !== "completed") {
+      setStep(next);
+    }
+  }, [job.status]);
+
   const handleAcceptMission = async () => {
     setStep("accepted");
     onUpdateStatus(job.id, "accepted");
@@ -115,6 +137,8 @@ export default function ProControlPanel({
         urls.push(reader.result as string);
         if (urls.length === files.length) {
           setBeforePhotos((prev) => [...prev, ...urls]);
+          setStep("photos_taken");
+          onUpdateStatus(job.id, "photos_taken");
         }
       };
       reader.readAsDataURL(f);
@@ -187,7 +211,7 @@ export default function ProControlPanel({
   }
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       {/* Client info */}
       <div className="mx-5 mt-5 mb-4 bg-cm-elevated rounded-[14px] p-4 flex items-center gap-3 border border-cm-border">
         <div className="w-10 h-10 rounded-full bg-cm-accent-soft flex items-center justify-center shrink-0">
@@ -292,7 +316,7 @@ export default function ProControlPanel({
             </motion.button>
           )}
 
-          {step === "arrived" && beforePhotos.length > 0 && (
+          {step === "photos_taken" && (
             <motion.button key="start-work" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               onClick={handleStartIntervention}
               className="w-full py-5 bg-cm-accent text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md">

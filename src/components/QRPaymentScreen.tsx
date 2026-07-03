@@ -36,7 +36,7 @@ export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScr
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 bg-cm-elevated border-b border-cm-border sticky top-0 z-10">
         <button onClick={onBack} className="w-12 h-12 flex items-center justify-center rounded-full bg-cm-elevated text-cm-text hover:bg-cm-accent-soft transition-colors border border-cm-border cursor-pointer active:scale-95">
           <ArrowLeft className="w-5 h-5" />
@@ -120,7 +120,8 @@ export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScr
         )}
       </div>
 
-      <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto">
+      <div className="fixed bottom-20 inset-x-0 px-4 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="max-w-[448px] mx-auto">
         <button onClick={handleConfirm} disabled={!selectedMethod}
           className={`w-full h-13 rounded-2xl text-xs font-display font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
             selectedMethod
@@ -135,6 +136,7 @@ export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScr
             <><DollarSign className="w-4 h-4" /> Payer avec {selectedMethod ? PAYMENT_METHOD_LABELS[selectedMethod] : "..."}</>
           )}
         </button>
+        </div>
       </div>
     </div>
   );

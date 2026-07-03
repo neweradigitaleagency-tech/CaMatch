@@ -20,7 +20,7 @@ export default function MessagingScreen({ conversations, onBack, onOpenConversat
   const sorted = [...filtered].sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-center px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
         <h1 className="text-[15px] font-bold text-cm-text">Messages</h1>
       </header>
@@ -232,7 +232,7 @@ export function ChatScreen({
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-24">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-24">
       <header className="flex items-center justify-between px-4 py-3 bg-cm-elevated border-b border-cm-border sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <button onClick={onBack}
@@ -315,8 +315,8 @@ export function ChatScreen({
         <div ref={chatEndRef} />
       </div>
 
-      <div className="fixed bottom-20 left-4 right-4 max-w-md mx-auto">
-        <div className="bg-cm-elevated border border-cm-border rounded-[16px] shadow-cm-md px-3 py-2 flex items-center gap-2">
+      <div className="fixed bottom-20 inset-x-0 px-4 pb-[env(safe-area-inset-bottom,0px)]">
+        <div className="bg-cm-elevated border border-cm-border rounded-[16px] shadow-cm-md px-3 py-2 flex items-center gap-2 max-w-[448px] mx-auto">
           <button onClick={() => setShowMediaPicker(!showMediaPicker)}
             className="w-10 h-10 rounded-[12px] border border-cm-border bg-cm-elevated flex items-center justify-center shrink-0 cursor-pointer hover:bg-cm-accent-soft">
             <ImagePlus className="w-4 h-4 text-cm-text" />

@@ -93,7 +93,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
   const isAuthenticated = (authMode === "phone" && otpVerified) || (authMode === "email" && emailDone);
 
   return (
-    <div className="min-h-screen bg-cm-bg flex flex-col">
+    <div className="min-h-dynamic bg-cm-bg flex flex-col">
       <div className="flex-1 flex flex-col justify-center px-6 max-w-sm mx-auto w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-cm-accent flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cm-accent/20">

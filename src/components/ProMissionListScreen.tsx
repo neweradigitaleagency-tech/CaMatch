@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { ArrowLeft, CalendarDays, MapPin, DollarSign, UserIcon, ChevronRight, Clock } from "lucide-react";
 import StatusBadge from "./ui/StatusBadge";
 import type { Mission, MissionStatus } from "../types";
-import { MISSION_STATUS_ORDER } from "../types";
+import { MISSION_STATUS_FLOW } from "../types";
 
 interface ProMissionListScreenProps {
   missions: Mission[];
@@ -14,7 +14,7 @@ interface ProMissionListScreenProps {
 type TabFilter = "all" | "active" | "completed";
 
 const ACTIVE_STATUSES: MissionStatus[] = ["accepted", "en_route", "in_progress"];
-const COMPLETED_STATUSES: MissionStatus[] = ["completed", "paid", "reviewed"];
+const COMPLETED_STATUSES: MissionStatus[] = ["completed", "paid", "client_validated"];
 
 function formatXOF(amount: number): string {
   return amount.toLocaleString("fr-FR") + " FCFA";
@@ -28,7 +28,7 @@ function formatDate(iso: string): string {
 }
 
 function getCurrentStepIndex(status: MissionStatus): number {
-  return MISSION_STATUS_ORDER.indexOf(status);
+  return MISSION_STATUS_FLOW.indexOf(status);
 }
 
 export default function ProMissionListScreen({ missions, onBack, onSelectMission }: ProMissionListScreenProps) {
@@ -42,7 +42,7 @@ export default function ProMissionListScreen({ missions, onBack, onSelectMission
   });
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-cm-bg pb-32">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
         <button onClick={onBack}
           className="w-10 h-10 flex items-center justify-center rounded-full text-cm-text hover:bg-cm-accent-soft transition-colors cursor-pointer active:scale-95">
