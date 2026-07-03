@@ -46,7 +46,7 @@ export default function ProServicesPage() {
                 <h3 className="text-[14px] font-bold text-cm-text truncate">{svc.name}</h3>
                 <p className="text-[11px] text-cm-text-muted mt-0.5 line-clamp-2">{svc.description}</p>
                 <p className="text-[13px] font-bold text-cm-accent mt-1 font-mono">
-                  {svc.priceEstimateXOF.toLocaleString("fr-FR")} FCFA
+                  {svc.priceEstimateXOF.toLocaleString("fr-FR")} F
                 </p>
               </div>
               <button

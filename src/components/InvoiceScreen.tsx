@@ -11,7 +11,7 @@ interface InvoiceScreenProps {
 }
 
 function formatXOF(amount: number): string {
-  return amount.toLocaleString("fr-FR") + " FCFA";
+  return amount.toLocaleString("fr-FR") + " F";
 }
 
 function formatDate(iso: string): string {

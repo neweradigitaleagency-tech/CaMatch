@@ -34,7 +34,7 @@ export default function ProRevenusPage() {
         >
           <p className="text-[11px] text-cm-text-muted mb-1">Solde disponible</p>
           <p className="text-[28px] font-bold text-cm-text font-mono">
-            {MOCK_FINANCE_SUMMARY.availableBalanceXOF.toLocaleString("fr-FR")} FCFA
+            {MOCK_FINANCE_SUMMARY.availableBalanceXOF.toLocaleString("fr-FR")} F
           </p>
           <div className="flex items-center gap-1.5 mt-2">
             {trend ? (
@@ -43,7 +43,7 @@ export default function ProRevenusPage() {
               <TrendingDown className="w-4 h-4 text-red-500" />
             )}
             <span className={`text-[12px] font-medium ${trend ? "text-green-500" : "text-red-500"}`}>
-              {trend ? "+" : ""}{(current - prev).toLocaleString("fr-FR")} FCFA vs mois dernier
+              {trend ? "+" : ""}{(current - prev).toLocaleString("fr-FR")} F vs mois dernier
             </span>
           </div>
         </motion.div>
@@ -79,7 +79,7 @@ export default function ProRevenusPage() {
             >
               <p className="text-[12px] font-medium text-cm-text">{MONTH_LABELS[i]} 2026</p>
               <span className="text-[13px] font-bold font-mono text-cm-text">
-                {val.toLocaleString("fr-FR")} FCFA
+                {val.toLocaleString("fr-FR")} F
               </span>
             </div>
           ))}

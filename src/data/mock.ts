@@ -76,5 +76,5 @@ export const categoryImages: Record<string, string> = {
 };
 
 export function formatPrice(cfa: number): string {
-  return `${cfa.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FCFA`;
+  return `${cfa.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} F`;
 }

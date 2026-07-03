@@ -451,7 +451,7 @@ export default function RequestCreationScreen({ onBack, onProceedToMatching, onS
 
             {needsMaterials && (
               <div>
-                <label className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider mb-1 block">Coût estimé des matériaux (FCFA)</label>
+                <label className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider mb-1 block">Coût estimé des matériaux (F)</label>
                 <div className="relative">
                     <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
                     <input type="number" value={materialsCost} onChange={(e) => setMaterialsCost(Number(e.target.value))}
@@ -472,7 +472,7 @@ export default function RequestCreationScreen({ onBack, onProceedToMatching, onS
             </div>
 
             <div>
-              <label className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider mb-2 block">Votre budget max (FCFA)</label>
+              <label className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider mb-2 block">Votre budget max (F)</label>
               <div className="relative">
                     <Coins className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
                     <input type="number" value={budget} onChange={(e) => setBudget(Number(e.target.value))}

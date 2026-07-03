@@ -33,11 +33,11 @@ export default function ProWalletPage() {
             <p className="text-[11px] text-cm-text-muted">Solde disponible</p>
           </div>
           <p className="text-[28px] font-bold text-cm-text font-mono">
-            {MOCK_FINANCE_SUMMARY.availableBalanceXOF.toLocaleString("fr-FR")} FCFA
+            {MOCK_FINANCE_SUMMARY.availableBalanceXOF.toLocaleString("fr-FR")} F
           </p>
           <div className="flex items-center gap-3 mt-3 text-[11px] text-cm-text-muted">
-            <span>Total gagné: {MOCK_FINANCE_SUMMARY.totalEarningsXOF.toLocaleString("fr-FR")} FCFA</span>
-            <span>Retiré: {MOCK_FINANCE_SUMMARY.totalWithdrawnXOF.toLocaleString("fr-FR")} FCFA</span>
+            <span>Total gagné: {MOCK_FINANCE_SUMMARY.totalEarningsXOF.toLocaleString("fr-FR")} F</span>
+            <span>Retiré: {MOCK_FINANCE_SUMMARY.totalWithdrawnXOF.toLocaleString("fr-FR")} F</span>
           </div>
         </motion.div>
 

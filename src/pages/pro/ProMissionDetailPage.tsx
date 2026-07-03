@@ -90,7 +90,7 @@ export default function ProMissionDetailPage() {
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-cm-border">
             <div>
               <p className="text-[12px] font-bold text-cm-text">Total</p>
-              <p className="text-[18px] font-bold text-cm-accent font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} FCFA</p>
+              <p className="text-[18px] font-bold text-cm-accent font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} F</p>
             </div>
             <div className="text-right">
               <p className="text-[12px] font-medium text-cm-text">{job.clientName}</p>

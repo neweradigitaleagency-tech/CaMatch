@@ -30,7 +30,7 @@ function SkeletonBlock({ className = "" }: { className?: string }) {
 }
 
 function formatXOF(amount: number): string {
-  return amount.toLocaleString("fr-FR") + " FCFA";
+  return amount.toLocaleString("fr-FR") + " F";
 }
 
 const STATUS_FLOW = ["accepted", "en_route", "arrived", "photos_taken", "in_progress", "completed", "client_validation"] as const;
@@ -696,7 +696,7 @@ export default function ProDashboardScreen() {
             <span className="text-[28px] font-extrabold text-gray-900 font-mono">
               {displayFinance.available.toLocaleString("fr-FR")}
             </span>
-            <span className="text-[12px] font-medium text-gray-500 mb-1">F CFA</span>
+            <span className="text-[12px] font-medium text-gray-500 mb-1">F</span>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mb-4">

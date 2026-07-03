@@ -86,7 +86,7 @@ export default function ProStatsPage() {
           transition={{ delay: 0.05 }}
           className="bg-cm-elevated border border-cm-border rounded-[14px] p-4"
         >
-          <BarChart data={MOCK_REVENUE_HISTORY} label="Revenus (FCFA)" />
+          <BarChart data={MOCK_REVENUE_HISTORY} label="Revenus (F)" />
         </motion.div>
 
         <motion.div

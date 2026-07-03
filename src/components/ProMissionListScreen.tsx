@@ -17,7 +17,7 @@ const ACTIVE_STATUSES: MissionStatus[] = ["accepted", "en_route", "in_progress"]
 const COMPLETED_STATUSES: MissionStatus[] = ["completed", "paid", "client_validated"];
 
 function formatXOF(amount: number): string {
-  return amount.toLocaleString("fr-FR") + " FCFA";
+  return amount.toLocaleString("fr-FR") + " F";
 }
 
 function formatDate(iso: string): string {

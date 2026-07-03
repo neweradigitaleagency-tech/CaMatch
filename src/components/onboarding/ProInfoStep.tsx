@@ -51,7 +51,7 @@ export default function ProInfoStep({ title, bio, experienceYears, hourlyRateXOF
             />
           </div>
           <div>
-            <label className="text-[12px] font-semibold text-cm-text mb-1.5 block">Taux horaire (F CFA)</label>
+            <label className="text-[12px] font-semibold text-cm-text mb-1.5 block">Taux horaire (F)</label>
             <input
               type="number"
               min={1000}
@@ -64,7 +64,7 @@ export default function ProInfoStep({ title, bio, experienceYears, hourlyRateXOF
         </div>
 
         <div>
-          <label className="text-[12px] font-semibold text-cm-text mb-1.5 block">Frais de déplacement (F CFA)</label>
+          <label className="text-[12px] font-semibold text-cm-text mb-1.5 block">Frais de déplacement (F)</label>
           <input
             type="number"
             min={0}
