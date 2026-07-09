@@ -37,11 +37,9 @@ function persist(notifications: AppNotification[]) {
 
 let notifCounter = 0;
 
-export const useNotificationStore = create<NotificationState>((set, get) => ({
+export const useNotificationStore = create<NotificationState>((set) => ({
   notifications: loadPersisted(),
-  get unreadCount() {
-    return get().notifications.filter((n) => !n.read).length;
-  },
+  unreadCount: loadPersisted().filter((n) => !n.read).length,
 
   addNotification: (notif) => {
     notifCounter += 1;
@@ -54,7 +52,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set((state) => {
       const updated = [n, ...state.notifications].slice(0, 100);
       persist(updated);
-      return { notifications: updated };
+      return { notifications: updated, unreadCount: updated.filter((x) => !x.read).length };
     });
   },
 
@@ -64,7 +62,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         n.id === id ? { ...n, read: true } : n
       );
       persist(updated);
-      return { notifications: updated };
+      return { notifications: updated, unreadCount: updated.filter((x) => !x.read).length };
     });
   },
 
@@ -72,7 +70,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set((state) => {
       const updated = state.notifications.map((n) => ({ ...n, read: true }));
       persist(updated);
-      return { notifications: updated };
+      return { notifications: updated, unreadCount: 0 };
     });
   },
 
@@ -80,7 +78,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     set((state) => {
       const updated = state.notifications.filter((n) => n.id !== id);
       persist(updated);
-      return { notifications: updated };
+      return { notifications: updated, unreadCount: updated.filter((x) => !x.read).length };
     });
   },
 }));

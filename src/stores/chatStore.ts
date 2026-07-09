@@ -1,11 +1,14 @@
 import { create } from "zustand";
-import type { Message, Conversation, MediaAttachment } from "../types";
+import type { Message, Conversation, MediaAttachment, ConversationState } from "../types";
 import { useNotificationStore } from "./notificationStore";
 import {
   fetchConversations,
   fetchMessages,
+  fetchConversationState,
   sendMessage,
+  insertSystemEvent,
   markMessagesAsRead,
+  updateConversationState,
   subscribeToConversation,
   subscribeToConversationList,
   uploadMedia,
@@ -15,12 +18,14 @@ interface ChatState {
   conversations: Conversation[];
   messages: Record<string, Message[]>;
   activeConversationId: string | null;
+  conversationState: Record<string, { state: ConversationState; metadata: Conversation["metadata"] }>;
   loading: boolean;
   error: string | null;
 
   initialize: (userId: string) => Promise<void>;
   loadConversations: (userId: string) => Promise<void>;
   loadMessages: (conversationId: string, userId: string) => Promise<void>;
+  loadConversationState: (conversationId: string) => Promise<void>;
   sendTextMessage: (conversationId: string, senderId: string, text: string) => Promise<void>;
   sendMediaMessage: (
     conversationId: string,
@@ -30,6 +35,8 @@ interface ChatState {
   ) => Promise<void>;
   markRead: (convId: string, userId: string) => void;
   setActiveConversation: (id: string | null) => void;
+  updateState: (convId: string, state: ConversationState) => void;
+  getConversationByMission: (missionId: string) => Conversation | undefined;
   cleanup: () => void;
 }
 
@@ -37,6 +44,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
   conversations: [],
   messages: {},
   activeConversationId: null,
+  conversationState: {},
   loading: false,
   error: null,
 
@@ -58,14 +66,31 @@ export const useChatStore = create<ChatState>((set, get) => ({
   loadMessages: async (conversationId: string, userId: string) => {
     set({ loading: true, error: null, activeConversationId: conversationId });
     try {
-      const msgs = await fetchMessages(conversationId);
-      set((state) => ({
-        messages: { ...state.messages, [conversationId]: msgs },
+      const [msgs, state] = await Promise.all([
+        fetchMessages(conversationId),
+        fetchConversationState(conversationId),
+      ]);
+
+      set((prev) => ({
+        messages: { ...prev.messages, [conversationId]: msgs },
+        conversationState: state
+          ? { ...prev.conversationState, [conversationId]: state }
+          : prev.conversationState,
         loading: false,
       }));
+
       markMessagesAsRead(conversationId, userId);
     } catch (err) {
       set({ error: "Erreur de chargement", loading: false });
+    }
+  },
+
+  loadConversationState: async (conversationId: string) => {
+    const state = await fetchConversationState(conversationId);
+    if (state) {
+      set((prev) => ({
+        conversationState: { ...prev.conversationState, [conversationId]: state },
+      }));
     }
   },
 
@@ -76,8 +101,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
       id: `optimistic_${Date.now()}`,
       conversationId,
       senderId,
+      type: "text",
       text,
       photos: [],
+      riskScore: 0,
+      moderationAction: "none",
       createdAt: new Date().toISOString(),
       status: "sent",
     };
@@ -131,9 +159,12 @@ export const useChatStore = create<ChatState>((set, get) => ({
       id: `optimistic_${Date.now()}`,
       conversationId,
       senderId,
+      type: mediaType,
       text,
       photos: mediaType === "image" ? [url] : [],
       media,
+      riskScore: 0,
+      moderationAction: "none",
       createdAt: new Date().toISOString(),
       status: "sent",
     };
@@ -150,7 +181,7 @@ export const useChatStore = create<ChatState>((set, get) => ({
       };
     });
 
-    const result = await sendMessage({ conversationId, senderId, text, media });
+    const result = await sendMessage({ conversationId, senderId, type: mediaType, text, media });
     if (result) {
       set((state) => {
         const convMessages = (state.messages[conversationId] || []).filter(
@@ -174,7 +205,26 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   setActiveConversation: (id) => set({ activeConversationId: id }),
 
+  updateState: (convId, state) => {
+    updateConversationState(convId, state);
+    set((prev) => ({
+      conversations: prev.conversations.map((c) =>
+        c.id === convId ? { ...c, state } : c
+      ),
+    }));
+  },
+
+  getConversationByMission: (missionId: string) => {
+    return get().conversations.find((c) => c.missionId === missionId);
+  },
+
   cleanup: () => {
-    set({ conversations: [], messages: {}, activeConversationId: null, error: null });
+    set({
+      conversations: [],
+      messages: {},
+      conversationState: {},
+      activeConversationId: null,
+      error: null,
+    });
   },
 }));

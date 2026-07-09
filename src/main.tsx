@@ -3,8 +3,11 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AppLayout from "./layouts/AppLayout";
+import AdminLayout from "./components/admin/AdminLayout";
 import { useAuthStore } from "./stores/authStore";
+import { useAdminAuthStore } from "./stores/adminAuthStore";
 import "./index.css";
+import "./styles/admin.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 2, staleTime: 30_000 } } });
 
@@ -61,8 +64,42 @@ const ProSecurityPage = lazy(() => import("./pages/pro/ProSecurityPage"));
 const ProSettingsPage = lazy(() => import("./pages/pro/ProSettingsPage"));
 const ProSupportPage = lazy(() => import("./pages/pro/ProSupportPage"));
 const ProAboutPage = lazy(() => import("./pages/pro/ProAboutPage"));
+const ProProfessionalIdentityPage = lazy(() => import("./pages/pro/ProProfessionalIdentityPage"));
+const ProPaymentMethodsPage = lazy(() => import("./pages/pro/ProPaymentMethodsPage"));
+const ProWithdrawPage = lazy(() => import("./pages/pro/ProWithdrawPage"));
+const ProWithdrawalsPage = lazy(() => import("./pages/pro/ProWithdrawalsPage"));
+const ProBankAccountsPage = lazy(() => import("./pages/pro/ProBankAccountsPage"));
+const ProCurrencyPage = lazy(() => import("./pages/pro/ProCurrencyPage"));
+const ProTimezonePage = lazy(() => import("./pages/pro/ProTimezonePage"));
+const ProAppearancePage = lazy(() => import("./pages/pro/ProAppearancePage"));
+const ProPrivacyPage = lazy(() => import("./pages/pro/ProPrivacyPage"));
+const ProPhonePage = lazy(() => import("./pages/pro/ProPhonePage"));
+const ProEmailPage = lazy(() => import("./pages/pro/ProEmailPage"));
+const AdminLoginPage = lazy(() => import("./pages/admin/AdminLoginPage"));
+const AdminDashboardPage = lazy(() => import("./pages/admin/AdminDashboardPage"));
 const AdminApplicationsPage = lazy(() => import("./pages/admin/AdminApplicationsPage"));
 const AdminApplicationDetail = lazy(() => import("./pages/admin/AdminApplicationDetail"));
+const AdminClientsPage = lazy(() => import("./pages/admin/AdminClientsPage"));
+const AdminClientDetailPage = lazy(() => import("./pages/admin/AdminClientDetailPage"));
+const AdminProsPage = lazy(() => import("./pages/admin/AdminProsPage"));
+const AdminProDetailPage = lazy(() => import("./pages/admin/AdminProDetailPage"));
+const AdminVerificationsPage = lazy(() => import("./pages/admin/AdminVerificationsPage"));
+const AdminMissionsPage = lazy(() => import("./pages/admin/AdminMissionsPage"));
+const AdminSupportPage = lazy(() => import("./pages/admin/AdminSupportPage"));
+const AdminReportsPage = lazy(() => import("./pages/admin/AdminReportsPage"));
+const AdminPaymentsPage = lazy(() => import("./pages/admin/AdminPaymentsPage"));
+const AdminNotificationsPage = lazy(() => import("./pages/admin/AdminNotificationsPage"));
+const AdminAnalyticsPage = lazy(() => import("./pages/admin/AdminAnalyticsPage"));
+const AdminSettingsPage = lazy(() => import("./pages/admin/AdminSettingsPage"));
+const AdminLogsPage = lazy(() => import("./pages/admin/AdminLogsPage"));
+const AdminMissionDetailPage = lazy(() => import("./pages/admin/AdminMissionDetailPage"));
+const AdminSupportTicketDetail = lazy(() => import("./pages/admin/AdminSupportTicketDetail"));
+const AdminNotificationCreatePage = lazy(() => import("./pages/admin/AdminNotificationCreatePage"));
+const AdminCategoriesPage = lazy(() => import("./pages/admin/AdminCategoriesPage"));
+const AdminPromotionsPage = lazy(() => import("./pages/admin/AdminPromotionsPage"));
+const AdminCMSPage = lazy(() => import("./pages/admin/AdminCMSPage"));
+const AdminRolesPage = lazy(() => import("./pages/admin/AdminRolesPage"));
+const AdminFraudPage = lazy(() => import("./pages/admin/AdminFraudPage"));
 const InvoicePage = lazy(() => import("./pages/client/InvoicePage"));
 const QuoteCreatePage = lazy(() => import("./pages/client/QuoteCreatePage"));
 const QuoteReviewPage = lazy(() => import("./pages/client/QuoteReviewPage"));
@@ -71,6 +108,27 @@ const EditProfilePage = lazy(() => import("./pages/profile/EditProfilePage"));
 const SecurityPage = lazy(() => import("./pages/profile/SecurityPage"));
 const LanguagePage = lazy(() => import("./pages/profile/LanguagePage"));
 const TermsPage = lazy(() => import("./pages/profile/TermsPage"));
+
+const SubscriptionDashboardPage = lazy(() => import("./pages/subscription/SubscriptionDashboardPage"));
+const SubscriptionPlansPage = lazy(() => import("./pages/subscription/SubscriptionPlansPage"));
+const SubscriptionPaymentPage = lazy(() => import("./pages/subscription/SubscriptionPaymentPage"));
+const SubscriptionHistoryPage = lazy(() => import("./pages/subscription/SubscriptionHistoryPage"));
+const SubscriptionInvoicesPage = lazy(() => import("./pages/subscription/SubscriptionInvoicesPage"));
+const SubscriptionComparePage = lazy(() => import("./pages/subscription/SubscriptionComparePage"));
+const SubscriptionSuccessPage = lazy(() => import("./pages/subscription/SubscriptionSuccessPage"));
+
+const ProSubscriptionDashboardPage = lazy(() => import("./pages/pro/ProSubscriptionDashboardPage"));
+const ProSubscriptionPlansPage = lazy(() => import("./pages/pro/ProSubscriptionPlansPage"));
+const ProBoostPage = lazy(() => import("./pages/pro/ProBoostPage"));
+const ProCreditsPage2 = lazy(() => import("./pages/pro/ProCreditsPage"));
+
+const AdminSubscriptionsPage = lazy(() => import("./pages/admin/AdminSubscriptionsPage"));
+const AdminPlansPage = lazy(() => import("./pages/admin/AdminPlansPage"));
+const AdminFeaturesPage = lazy(() => import("./pages/admin/AdminFeaturesPage"));
+const AdminInvoicesPage = lazy(() => import("./pages/admin/AdminInvoicesPage"));
+const AdminCouponsPage = lazy(() => import("./pages/admin/AdminCouponsPage"));
+const AdminRevenueAnalyticsPage = lazy(() => import("./pages/admin/AdminRevenueAnalyticsPage"));
+const AdminFeatureFlagsPage = lazy(() => import("./pages/admin/AdminFeatureFlagsPage"));
 
 class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
@@ -131,6 +189,33 @@ function AuthGate({ children }: { children?: React.ReactNode }) {
   return children ? <>{children}</> : <Outlet />;
 }
 
+function AdminAuthGate({ children }: { children?: React.ReactNode }) {
+  const initialized = useAdminAuthStore((s) => s.initialized);
+  const isAuthenticated = useAdminAuthStore((s) => s.isAuthenticated);
+  const isLoading = useAdminAuthStore((s) => s.isLoading);
+
+  if (!initialized || isLoading) return <PageLoader />;
+  if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
+  return children ? <>{children}</> : <Outlet />;
+}
+
+function AdminInitGate({ children }: { children?: React.ReactNode }) {
+  const initialize = useAdminAuthStore((s) => s.initialize);
+  const initialized = useAdminAuthStore((s) => s.initialized);
+  const [ready, setReady] = useState(!initialized);
+
+  useEffect(() => {
+    if (!initialized) {
+      initialize().finally(() => setReady(true));
+    } else {
+      setReady(true);
+    }
+  }, []);
+
+  if (!ready) return <PageLoader />;
+  return children ? <>{children}</> : <Outlet />;
+}
+
 function App() {
   const initialize = useAuthStore((s) => s.initialize);
   const initialized = useAuthStore((s) => s.initialized);
@@ -152,6 +237,48 @@ function App() {
     <Routes>
       <Route path="/onboarding" element={<Suspense fallback={<PageLoader />}><OnboardingPage /></Suspense>} />
       <Route path="/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
+
+      {/* Admin routes — separate auth from regular users */}
+      <Route element={<AdminInitGate />}>
+        <Route path="/admin/login" element={<Suspense fallback={<PageLoader />}><AdminLoginPage /></Suspense>} />
+        <Route element={<AdminAuthGate />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin/dashboard" element={<Suspense fallback={<PageLoader />}><AdminDashboardPage /></Suspense>} />
+            <Route path="/admin/clients" element={<Suspense fallback={<PageLoader />}><AdminClientsPage /></Suspense>} />
+            <Route path="/admin/clients/:id" element={<Suspense fallback={<PageLoader />}><AdminClientDetailPage /></Suspense>} />
+            <Route path="/admin/pros" element={<Suspense fallback={<PageLoader />}><AdminProsPage /></Suspense>} />
+            <Route path="/admin/pros/:id" element={<Suspense fallback={<PageLoader />}><AdminProDetailPage /></Suspense>} />
+            <Route path="/admin/verifications" element={<Suspense fallback={<PageLoader />}><AdminVerificationsPage /></Suspense>} />
+            <Route path="/admin/missions" element={<Suspense fallback={<PageLoader />}><AdminMissionsPage /></Suspense>} />
+            <Route path="/admin/support" element={<Suspense fallback={<PageLoader />}><AdminSupportPage /></Suspense>} />
+            <Route path="/admin/reports" element={<Suspense fallback={<PageLoader />}><AdminReportsPage /></Suspense>} />
+            <Route path="/admin/payments" element={<Suspense fallback={<PageLoader />}><AdminPaymentsPage /></Suspense>} />
+            <Route path="/admin/notifications" element={<Suspense fallback={<PageLoader />}><AdminNotificationsPage /></Suspense>} />
+            <Route path="/admin/analytics" element={<Suspense fallback={<PageLoader />}><AdminAnalyticsPage /></Suspense>} />
+            <Route path="/admin/settings" element={<Suspense fallback={<PageLoader />}><AdminSettingsPage /></Suspense>} />
+            <Route path="/admin/logs" element={<Suspense fallback={<PageLoader />}><AdminLogsPage /></Suspense>} />
+            <Route path="/admin/missions/:id" element={<Suspense fallback={<PageLoader />}><AdminMissionDetailPage /></Suspense>} />
+            <Route path="/admin/support/:id" element={<Suspense fallback={<PageLoader />}><AdminSupportTicketDetail /></Suspense>} />
+            <Route path="/admin/notifications/create" element={<Suspense fallback={<PageLoader />}><AdminNotificationCreatePage /></Suspense>} />
+            <Route path="/admin/categories" element={<Suspense fallback={<PageLoader />}><AdminCategoriesPage /></Suspense>} />
+            <Route path="/admin/promotions" element={<Suspense fallback={<PageLoader />}><AdminPromotionsPage /></Suspense>} />
+            <Route path="/admin/cms" element={<Suspense fallback={<PageLoader />}><AdminCMSPage /></Suspense>} />
+            <Route path="/admin/roles" element={<Suspense fallback={<PageLoader />}><AdminRolesPage /></Suspense>} />
+            <Route path="/admin/fraud" element={<Suspense fallback={<PageLoader />}><AdminFraudPage /></Suspense>} />
+            <Route path="/admin/applications" element={<Suspense fallback={<PageLoader />}><AdminApplicationsPage /></Suspense>} />
+            <Route path="/admin/applications/:id" element={<Suspense fallback={<PageLoader />}><AdminApplicationDetail /></Suspense>} />
+            <Route path="/admin/subscriptions" element={<Suspense fallback={<PageLoader />}><AdminSubscriptionsPage /></Suspense>} />
+            <Route path="/admin/plans" element={<Suspense fallback={<PageLoader />}><AdminPlansPage /></Suspense>} />
+            <Route path="/admin/features" element={<Suspense fallback={<PageLoader />}><AdminFeaturesPage /></Suspense>} />
+            <Route path="/admin/invoices" element={<Suspense fallback={<PageLoader />}><AdminInvoicesPage /></Suspense>} />
+            <Route path="/admin/coupons" element={<Suspense fallback={<PageLoader />}><AdminCouponsPage /></Suspense>} />
+            <Route path="/admin/analytics/revenue" element={<Suspense fallback={<PageLoader />}><AdminRevenueAnalyticsPage /></Suspense>} />
+            <Route path="/admin/feature-flags" element={<Suspense fallback={<PageLoader />}><AdminFeatureFlagsPage /></Suspense>} />
+          </Route>
+        </Route>
+      </Route>
+
+      {/* User routes */}
       <Route element={<AuthGate />}>
         <Route path="pro/onboarding" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
         <Route path="pro/onboarding/:step" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
@@ -171,11 +298,24 @@ function App() {
         <Route path="pro/settings" element={<Suspense fallback={<PageLoader />}><ProSettingsPage /></Suspense>} />
         <Route path="pro/support" element={<Suspense fallback={<PageLoader />}><ProSupportPage /></Suspense>} />
         <Route path="pro/about" element={<Suspense fallback={<PageLoader />}><ProAboutPage /></Suspense>} />
+        <Route path="pro/professional-identity" element={<Suspense fallback={<PageLoader />}><ProProfessionalIdentityPage /></Suspense>} />
+        <Route path="pro/payment-methods" element={<Suspense fallback={<PageLoader />}><ProPaymentMethodsPage /></Suspense>} />
+        <Route path="pro/withdraw" element={<Suspense fallback={<PageLoader />}><ProWithdrawPage /></Suspense>} />
+        <Route path="pro/withdrawals" element={<Suspense fallback={<PageLoader />}><ProWithdrawalsPage /></Suspense>} />
+        <Route path="pro/bank-accounts" element={<Suspense fallback={<PageLoader />}><ProBankAccountsPage /></Suspense>} />
+        <Route path="pro/currency" element={<Suspense fallback={<PageLoader />}><ProCurrencyPage /></Suspense>} />
+        <Route path="pro/timezone" element={<Suspense fallback={<PageLoader />}><ProTimezonePage /></Suspense>} />
+        <Route path="pro/appearance" element={<Suspense fallback={<PageLoader />}><ProAppearancePage /></Suspense>} />
+        <Route path="pro/privacy" element={<Suspense fallback={<PageLoader />}><ProPrivacyPage /></Suspense>} />
+        <Route path="pro/phone" element={<Suspense fallback={<PageLoader />}><ProPhonePage /></Suspense>} />
+        <Route path="pro/email" element={<Suspense fallback={<PageLoader />}><ProEmailPage /></Suspense>} />
+        <Route path="pro/subscription" element={<Suspense fallback={<PageLoader />}><ProSubscriptionDashboardPage /></Suspense>} />
+        <Route path="pro/subscription/plans" element={<Suspense fallback={<PageLoader />}><ProSubscriptionPlansPage /></Suspense>} />
+        <Route path="pro/boost" element={<Suspense fallback={<PageLoader />}><ProBoostPage /></Suspense>} />
+        <Route path="pro/credits" element={<Suspense fallback={<PageLoader />}><ProCreditsPage2 /></Suspense>} />
         <Route path="pro/edit" element={<Navigate to="/profile/pro-edit" replace />} />
         <Route path="pro/planning" element={<Navigate to="/profile/pro-planning" replace />} />
         <Route path="pro/notifications" element={<Navigate to="/profile/pro-notifications" replace />} />
-        <Route path="admin/applications" element={<Suspense fallback={<PageLoader />}><AdminApplicationsPage /></Suspense>} />
-        <Route path="admin/applications/:id" element={<Suspense fallback={<PageLoader />}><AdminApplicationDetail /></Suspense>} />
         <Route element={<AppLayout />}>
         <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
@@ -212,6 +352,21 @@ function App() {
         <Route path="profile/pro-planning" element={<Suspense fallback={<PageLoader />}><ProPlanningPage /></Suspense>} />
         <Route path="profile/pro-notifications" element={<Suspense fallback={<PageLoader />}><ProNotificationsPage /></Suspense>} />
         <Route path="profile/pro-help" element={<Suspense fallback={<PageLoader />}><ProHelpPage /></Suspense>} />
+        <Route path="subscription/plans" element={<Suspense fallback={<PageLoader />}><SubscriptionPlansPage /></Suspense>} />
+        <Route path="subscription/compare" element={<Suspense fallback={<PageLoader />}><SubscriptionComparePage /></Suspense>} />
+        <Route path="subscription/success" element={<Suspense fallback={<PageLoader />}><SubscriptionSuccessPage /></Suspense>} />
+
+        <Route path="settings/subscription" element={<Suspense fallback={<PageLoader />}><SubscriptionDashboardPage /></Suspense>} />
+        <Route path="settings/subscription/plans" element={<Suspense fallback={<PageLoader />}><SubscriptionPlansPage /></Suspense>} />
+        <Route path="settings/subscription/payment" element={<Suspense fallback={<PageLoader />}><SubscriptionPaymentPage /></Suspense>} />
+        <Route path="settings/subscription/history" element={<Suspense fallback={<PageLoader />}><SubscriptionHistoryPage /></Suspense>} />
+        <Route path="settings/subscription/invoices" element={<Suspense fallback={<PageLoader />}><SubscriptionInvoicesPage /></Suspense>} />
+
+        <Route path="client/subscription" element={<Suspense fallback={<PageLoader />}><SubscriptionDashboardPage /></Suspense>} />
+        <Route path="client/subscription/plans" element={<Suspense fallback={<PageLoader />}><SubscriptionPlansPage /></Suspense>} />
+        <Route path="client/subscription/payment" element={<Suspense fallback={<PageLoader />}><SubscriptionPaymentPage /></Suspense>} />
+        <Route path="client/subscription/history" element={<Suspense fallback={<PageLoader />}><SubscriptionHistoryPage /></Suspense>} />
+        <Route path="client/subscription/invoices" element={<Suspense fallback={<PageLoader />}><SubscriptionInvoicesPage /></Suspense>} />
 
         <Route path="explorer" element={<Navigate to="/" replace />} />
         <Route path="requests" element={<Navigate to="/orders" replace />} />

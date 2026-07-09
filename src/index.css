@@ -56,7 +56,12 @@ html {
   scroll-behavior: smooth;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
+  overflow-x: hidden;
   background-color: var(--cm-bg);
   color: var(--cm-text);
   font-family: "Inter", system-ui, -apple-system, sans-serif;

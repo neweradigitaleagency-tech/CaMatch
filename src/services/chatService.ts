@@ -1,22 +1,56 @@
 import { supabase, isSupabaseReady } from "./supabase";
-import type { Message, Conversation, MediaAttachment } from "../types";
+import type { Message, Conversation, MediaAttachment, ConversationState, MessageType, ModerationAction } from "../types";
 import { MOCK_CONVERSATIONS, MOCK_MESSAGES, MOCK_PROS } from "./mockData";
 
 const STORAGE_BUCKET = "chat_media";
 
-// ─── Phone/email filter ───
+// ─── Platform security: detect payment bypass / contact sharing ───
 
-const PHONE_REGEX = /(\+?\d[\d\s.-]{7,}\d)/g;
-const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+const PLATFORM_PATTERNS: { pattern: RegExp; label: string; severity: number }[] = [
+  { pattern: /whatsapp/i, label: "whatsapp", severity: 2 },
+  { pattern: /telegram/i, label: "telegram", severity: 2 },
+  { pattern: /signal/i, label: "signal", severity: 3 },
+  { pattern: /instagram/i, label: "instagram", severity: 1 },
+  { pattern: /snapchat/i, label: "snapchat", severity: 1 },
+  { pattern: /facebook/i, label: "facebook", severity: 1 },
+  { pattern: /discord/i, label: "discord", severity: 2 },
+  { pattern: /messenger/i, label: "messenger", severity: 1 },
+  { pattern: /écris-moi en privé/i, label: "private_contact", severity: 3 },
+  { pattern: /appelle-moi/i, label: "private_contact", severity: 3 },
+  { pattern: /je te paie en dehors/i, label: "off_platform_payment", severity: 5 },
+  { pattern: /paiement (hors|en dehors|direct)/i, label: "off_platform_payment", severity: 5 },
+  { pattern: /(\+?\d[\d\s.-]{7,}\d)/g, label: "phone", severity: 3 },
+  { pattern: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, label: "email", severity: 3 },
+  { pattern: /\b(?:FR\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{3})\b/i, label: "iban", severity: 5 },
+  { pattern: /\b\d{16}\b/g, label: "card_number", severity: 5 },
+];
 
-export function filterSensitiveContent(text: string): string {
-  return text
-    .replace(PHONE_REGEX, "[contact masqué]")
-    .replace(EMAIL_REGEX, "[email masqué]");
+interface SafetyCheckResult {
+  sanitized: string;
+  riskScore: number;
+  flaggedTerms: string[];
+  action: ModerationAction;
 }
 
-export function containsSensitiveContent(text: string): boolean {
-  return PHONE_REGEX.test(text) || EMAIL_REGEX.test(text);
+export function checkMessageSafety(text: string): SafetyCheckResult {
+  let sanitized = text;
+  const flaggedTerms: string[] = [];
+  let riskScore = 0;
+
+  for (const { pattern, label, severity } of PLATFORM_PATTERNS) {
+    if (pattern.test(text)) {
+      flaggedTerms.push(label);
+      riskScore += severity;
+      sanitized = sanitized.replace(pattern, `[${label} masqué]`);
+    }
+  }
+
+  let action: ModerationAction = "none";
+  if (riskScore >= 8) action = "blocked";
+  else if (riskScore >= 5) action = "warned";
+  else if (riskScore >= 3) action = "reported";
+
+  return { sanitized, riskScore, flaggedTerms, action };
 }
 
 // ─── Upload helpers ───
@@ -24,13 +58,13 @@ export function containsSensitiveContent(text: string): boolean {
 export async function uploadMedia(
   file: File,
   conversationId: string,
-  type: "image" | "video" | "voice" | "document"
+  type: "image" | "video" | "voice"
 ): Promise<string | null> {
   if (!isSupabaseReady()) {
     return uploadLocal(file);
   }
 
-  const ext = file.name.split(".").pop() || (type === "voice" ? "webm" : type === "video" ? "mp4" : type === "document" ? "pdf" : "jpg");
+  const ext = file.name.split(".").pop() || (type === "voice" ? "webm" : type === "video" ? "mp4" : "jpg");
   const path = `${conversationId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
   const { error } = await supabase.storage
@@ -100,7 +134,7 @@ export async function fetchConversations(userId: string): Promise<Conversation[]
       convIds.map((id) =>
         supabase
           .from("messages")
-          .select("content, media_type, created_at")
+          .select("content, type, media_type, created_at")
           .eq("conversation_id", id)
           .order("created_at", { ascending: false } as any)
           .limit(1)
@@ -117,13 +151,39 @@ export async function fetchConversations(userId: string): Promise<Conversation[]
     let lastMessageText = "";
     if (lastMsg && lastMsg.length > 0) {
       const m = lastMsg[0] as any;
-      lastMessageText = m.content || (m.media_type === "voice" ? "Message vocal" : m.media_type === "video" ? "Vidéo" : "Photo");
+      if (m.content) lastMessageText = m.content;
+      else if (m.type === "voice") lastMessageText = "🎤 Message vocal";
+      else if (m.type === "video") lastMessageText = "🎬 Vidéo";
+      else if (m.type === "image") lastMessageText = "📷 Photo";
+      else if (m.type === "system") lastMessageText = "🔔 Notification";
+      else if (m.type === "event") lastMessageText = "";
+      else lastMessageText = "📎 Fichier";
     }
+
+    const meta = typeof row.metadata === "object" && row.metadata !== null
+      ? row.metadata : {};
 
     return {
       id: row.id,
       participants: [row.participant_1, row.participant_2],
-      missionId: row.job_id || undefined,
+      missionId: row.job_id || "",
+      state: (row.state || "waiting") as ConversationState,
+      metadata: {
+        mission_phase: (meta as any).mission_phase || undefined,
+        flags: {
+          dispute: !!(meta as any).flags?.dispute,
+          support_joined: !!(meta as any).flags?.support_joined,
+          pinned: !!(meta as any).flags?.pinned,
+        },
+        job_snapshot: {
+          category: (meta as any).job_snapshot?.category || "",
+          location: (meta as any).job_snapshot?.location || "",
+          price_estimate: (meta as any).job_snapshot?.price_estimate || 0,
+          currency: (meta as any).job_snapshot?.currency || "XOF",
+          service_type: (meta as any).job_snapshot?.service_type || "on_demand",
+        },
+        created_from: (meta as any).created_from || "manual",
+      },
       lastMessage: lastMessageText,
       lastMessageAt: row.last_message_at || row.created_at,
       unreadCount: count || 0,
@@ -202,9 +262,9 @@ export async function fetchMessages(conversationId: string): Promise<Message[]> 
 
 function mapRowToMessage(row: any): Message {
   const media: MediaAttachment[] = [];
-  if (row.media_url && row.media_type && row.media_type !== "none") {
+  if (row.media_url && row.type && ["image", "video", "voice", "pdf"].includes(row.type)) {
     media.push({
-      type: row.media_type,
+      type: row.type,
       url: row.media_url,
       duration: row.media_duration || undefined,
     });
@@ -213,10 +273,14 @@ function mapRowToMessage(row: any): Message {
   return {
     id: row.id,
     conversationId: row.conversation_id,
-    senderId: row.sender_id,
+    senderId: row.sender_id || null,
+    type: (row.type || "text") as MessageType,
     text: row.content || "",
-    photos: row.media_type === "image" && row.media_url ? [row.media_url] : [],
+    photos: row.type === "image" && row.media_url ? [row.media_url] : [],
     media: media.length > 0 ? media : undefined,
+    metadata: row.metadata || undefined,
+    riskScore: row.risk_score || 0,
+    moderationAction: row.moderation_action || "none",
     createdAt: row.created_at || new Date().toISOString(),
     status: row.is_read ? "read" : row.created_at ? "delivered" : "sent",
   };
@@ -227,12 +291,14 @@ function mapRowToMessage(row: any): Message {
 export async function sendMessage(params: {
   conversationId: string;
   senderId: string;
+  type?: MessageType;
   text: string;
   media?: MediaAttachment[];
+  metadata?: Record<string, unknown>;
 }): Promise<Message | null> {
-  const text = filterSensitiveContent(params.text);
+  const safety = checkMessageSafety(params.text);
+  const type = params.type || "text";
   const mediaItem = params.media?.[0];
-  const mediaType = mediaItem?.type || "none";
   const mediaUrl = mediaItem?.url || null;
   const mediaDuration = mediaItem?.duration || null;
 
@@ -241,9 +307,13 @@ export async function sendMessage(params: {
       id: `local_${Date.now()}`,
       conversationId: params.conversationId,
       senderId: params.senderId,
-      text,
-      photos: mediaType === "image" && mediaUrl ? [mediaUrl] : [],
+      type,
+      text: safety.sanitized,
+      photos: type === "image" && mediaUrl ? [mediaUrl] : [],
       media: params.media,
+      metadata: params.metadata,
+      riskScore: safety.riskScore,
+      moderationAction: safety.action,
       createdAt: new Date().toISOString(),
       status: "sent",
     };
@@ -254,10 +324,14 @@ export async function sendMessage(params: {
     .insert({
       conversation_id: params.conversationId,
       sender_id: params.senderId,
-      content: text,
-      media_type: mediaType,
+      type,
+      content: safety.sanitized,
+      media_type: type === "image" || type === "video" || type === "voice" || type === "pdf" ? type : null,
       media_url: mediaUrl,
       media_duration: mediaDuration,
+      metadata: params.metadata || null,
+      risk_score: safety.riskScore,
+      moderation_action: safety.action,
       is_read: false,
     } as any)
     .select()
@@ -268,12 +342,61 @@ export async function sendMessage(params: {
     return null;
   }
 
-  // Update conversation's last_message_at
   await supabase
     .from("conversations")
     .update({
       last_message_at: new Date().toISOString(),
     } as any)
+    .eq("id", params.conversationId);
+
+  return mapRowToMessage(data);
+}
+
+// ─── System event message (backend-driven) ───
+
+export async function insertSystemEvent(params: {
+  conversationId: string;
+  event: string;
+  content: string;
+  metadata?: Record<string, unknown>;
+}): Promise<Message | null> {
+  if (!isSupabaseReady()) {
+    return {
+      id: `event_${Date.now()}`,
+      conversationId: params.conversationId,
+      senderId: null,
+      type: "event",
+      text: params.content,
+      photos: [],
+      metadata: { event: params.event, ...params.metadata },
+      riskScore: 0,
+      moderationAction: "none",
+      createdAt: new Date().toISOString(),
+      status: "delivered",
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("messages")
+    .insert({
+      conversation_id: params.conversationId,
+      sender_id: null,
+      type: "event",
+      content: params.content,
+      metadata: { event: params.event, ...params.metadata },
+      is_read: false,
+    } as any)
+    .select()
+    .single();
+
+  if (error) {
+    console.error("insertSystemEvent error:", error.message);
+    return null;
+  }
+
+  await supabase
+    .from("conversations")
+    .update({ last_message_at: new Date().toISOString() } as any)
     .eq("id", params.conversationId);
 
   return mapRowToMessage(data);
@@ -292,12 +415,86 @@ export async function markMessagesAsRead(conversationId: string, userId: string)
     .eq("is_read", false);
 }
 
-// ─── Create conversation ───
+// ─── Update conversation state ───
+
+export async function updateConversationState(
+  conversationId: string,
+  state: ConversationState,
+  metadata?: Partial<Conversation["metadata"]>
+): Promise<void> {
+  if (!isSupabaseReady()) return;
+
+  const updates: any = { state };
+
+  if (metadata) {
+    const { data: current } = await supabase
+      .from("conversations")
+      .select("metadata")
+      .eq("id", conversationId)
+      .single();
+
+    const existingMeta = (current as any)?.metadata || {};
+    updates.metadata = {
+      ...existingMeta,
+      ...metadata,
+      flags: { ...existingMeta.flags, ...metadata.flags },
+      job_snapshot: { ...existingMeta.job_snapshot, ...metadata.job_snapshot },
+    };
+  }
+
+  await supabase
+    .from("conversations")
+    .update(updates as any)
+    .eq("id", conversationId);
+}
+
+// ─── Fetch conversation (with state + metadata) ───
+
+export async function fetchConversationState(conversationId: string): Promise<{
+  state: ConversationState;
+  metadata: Conversation["metadata"];
+} | null> {
+  if (!isSupabaseReady()) return null;
+
+  const { data, error } = await supabase
+    .from("conversations")
+    .select("state, metadata")
+    .eq("id", conversationId)
+    .single();
+
+  if (error || !data) return null;
+
+  const row = data as any;
+  const meta = typeof row.metadata === "object" && row.metadata !== null ? row.metadata : {};
+
+  return {
+    state: row.state || "waiting",
+    metadata: {
+      mission_phase: meta.mission_phase || undefined,
+      flags: {
+        dispute: !!meta.flags?.dispute,
+        support_joined: !!meta.flags?.support_joined,
+        pinned: !!meta.flags?.pinned,
+      },
+      job_snapshot: {
+        category: meta.job_snapshot?.category || "",
+        location: meta.job_snapshot?.location || "",
+        price_estimate: meta.job_snapshot?.price_estimate || 0,
+        currency: meta.job_snapshot?.currency || "XOF",
+        service_type: meta.job_snapshot?.service_type || "on_demand",
+      },
+      created_from: meta.created_from || "manual",
+    },
+  };
+}
+
+// ─── Create conversation (Edge Function only — kept for dev fallback) ───
 
 export async function createConversation(params: {
   participant1: string;
   participant2: string;
-  jobId?: string;
+  jobId: string;
+  metadata?: Partial<Conversation["metadata"]>;
 }): Promise<string | null> {
   if (!isSupabaseReady()) {
     return `conv_mock_${Date.now()}`;
@@ -308,7 +505,9 @@ export async function createConversation(params: {
     .insert({
       participant_1: params.participant1,
       participant_2: params.participant2,
-      job_id: params.jobId || null,
+      job_id: params.jobId,
+      state: "waiting",
+      metadata: params.metadata || {},
     } as any)
     .select()
     .single();
@@ -325,13 +524,15 @@ export async function createConversation(params: {
 
 export async function findConversation(
   userId1: string,
-  userId2: string
+  userId2: string,
+  jobId: string
 ): Promise<string | null> {
   if (!isSupabaseReady()) {
     const found = MOCK_CONVERSATIONS.find(
       (c) =>
-        (c.participants[0] === userId1 && c.participants[1] === userId2) ||
-        (c.participants[0] === userId2 && c.participants[1] === userId1)
+        c.missionId === jobId &&
+        ((c.participants[0] === userId1 && c.participants[1] === userId2) ||
+         (c.participants[0] === userId2 && c.participants[1] === userId1))
     );
     return found?.id || null;
   }
@@ -339,6 +540,7 @@ export async function findConversation(
   const { data, error } = await supabase
     .from("conversations")
     .select("id")
+    .eq("job_id", jobId)
     .or(
       `and(participant_1.eq.${userId1},participant_2.eq.${userId2}),` +
       `and(participant_1.eq.${userId2},participant_2.eq.${userId1})`

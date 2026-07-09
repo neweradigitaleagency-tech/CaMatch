@@ -34,7 +34,9 @@ export type SubscriptionTier = "standard" | "verified" | "pro" | "pro_plus";
 
 export interface ProfessionalDetails extends User {
   category: ProCategory;
+  categories: string[];
   subCategory: string;
+  subCategories: string[];
   title: string;
   bio: string;
   coverUrl?: string;
@@ -376,15 +378,56 @@ export interface Review {
   createdAt: string;
 }
 
-// ─── Message & Conversation ───
+// ─── Messaging: Mission-Centric Chat ───
 
-export type MediaType = "image" | "video" | "voice" | "document" | "none";
+// ── Conversation lifecycle ──
+
+export type ConversationState =
+  | "waiting"
+  | "active"
+  | "locked"
+  | "read_only"
+  | "archived";
+
+export type MissionPhase =
+  | "accepted"
+  | "on_site"
+  | "working"
+  | "completed";
+
+export interface ConversationMetadata {
+  mission_phase?: MissionPhase;
+  flags: {
+    dispute: boolean;
+    support_joined: boolean;
+    pinned: boolean;
+  };
+  job_snapshot: {
+    category: string;
+    location: string;
+    price_estimate: number;
+    currency: string;
+    service_type: "on_demand" | "scheduled";
+  };
+  created_from: "job_accept" | "manual";
+}
+
+// ── Message taxonomy ──
+
+export type MessageType =
+  | "text" | "image" | "video" | "voice" | "pdf" | "location"
+  | "quote" | "invoice" | "payment" | "system" | "event";
+
+export type MessageStatus = "sent" | "delivered" | "read";
+
+export type ModerationAction =
+  | "none" | "warned" | "blocked" | "reported" | "auto_escalated";
 
 export interface MediaAttachment {
-  type: MediaType;
+  type: MessageType;
   url: string;
   thumbnailUrl?: string;
-  duration?: number; // seconds (for video/voice)
+  duration?: number;
   fileName?: string;
   fileSize?: number;
 }
@@ -392,24 +435,70 @@ export interface MediaAttachment {
 export interface Message {
   id: string;
   conversationId: string;
-  senderId: string;
+  senderId: string | null;
+  type: MessageType;
   text: string;
   photos: string[];
   media?: MediaAttachment[];
   location?: { lat: number; lng: number; label: string };
+  metadata?: Record<string, unknown>;
+  riskScore: number;
+  moderationAction: ModerationAction;
   createdAt: string;
-  status?: "sent" | "delivered" | "read";
+  status: MessageStatus;
 }
+
+export interface SystemEvent {
+  id: string;
+  conversationId: string;
+  event: string;
+  content: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+// ── Conversation ──
 
 export interface Conversation {
   id: string;
   participants: string[];
-  missionId?: string;
+  missionId: string;
+  state: ConversationState;
+  metadata: ConversationMetadata;
   lastMessage: string;
   lastMessageAt: string;
   unreadCount: number;
   otherUserName: string;
   otherUserAvatar: string;
+  otherUserRating?: number;
+  otherUserVerified?: boolean;
+  otherUserOnline?: boolean;
+}
+
+// ── Message content helpers ──
+
+export function isSystemMessage(msg: Message): boolean {
+  return msg.type === "system" || msg.type === "event";
+}
+
+export function isMediaMessage(msg: Message): boolean {
+  return ["image", "video", "voice", "pdf"].includes(msg.type);
+}
+
+export function getMessageLabel(msg: Message): string {
+  const labels: Record<string, string> = {
+    image: "📷 Photo",
+    video: "🎬 Vidéo",
+    voice: "🎤 Message vocal",
+    pdf: "📄 Document",
+    location: "📍 Localisation",
+    quote: "📋 Devis",
+    invoice: "🧾 Facture",
+    payment: "💳 Paiement",
+    system: "🔔 Notification",
+    event: "",
+  };
+  return labels[msg.type] || msg.text;
 }
 
 // ─── Pricing & Availability (Pro) ───
@@ -1034,7 +1123,47 @@ export interface Invoice {
 
 // ─── In-App Call ───
 
-export type CallStatus = "ringing" | "connecting" | "connected" | "ended";
+export type CallType = "audio" | "video";
+
+export type CallStatus =
+  | "dialing" | "ringing" | "connecting" | "connected"
+  | "ended" | "missed" | "declined" | "failed";
+
+export type CallEventType =
+  | "ringing_started" | "call_accepted" | "media_established"
+  | "network_switched" | "call_ended" | "reconnecting" | "dropped";
+
+export interface Call {
+  id: string;
+  conversationId: string;
+  callerId: string;
+  receiverId: string;
+  type: CallType;
+  status: CallStatus;
+  startedAt: string | null;
+  endedAt: string | null;
+  durationSecs: number | null;
+  createdAt: string;
+}
+
+export interface CallParticipant {
+  id: string;
+  callId: string;
+  userId: string;
+  joinedAt: string | null;
+  leftAt: string | null;
+  isMuted: boolean;
+  isVideoEnabled: boolean;
+}
+
+export interface CallEvent {
+  id: string;
+  callId: string;
+  userId: string | null;
+  eventType: CallEventType;
+  payload: Record<string, unknown> | null;
+  createdAt: string;
+}
 
 export interface CallSession {
   id: string;
@@ -1044,8 +1173,9 @@ export interface CallSession {
   callerAvatar: string;
   calleeName: string;
   calleeAvatar: string;
+  type: CallType;
   status: CallStatus;
-  durationMs: number;
+  durationSecs: number;
   startedAt: string;
   endedAt?: string;
   isIncoming: boolean;

@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown, Menu, ClipboardList, SlidersHorizontal, MessageCircle, Phone, Check } from "lucide-react";
-import { ProfessionalDetails, Mission, MissionStatus } from "../types";
+import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown, Menu, ClipboardList, SlidersHorizontal, MessageCircle, Sparkles, ArrowRight } from "lucide-react";
+import { ProfessionalDetails, Mission } from "../types";
 import { ProCardSkeleton } from "./ui/Skeleton";
 import ProCard from "./ui/ProCard";
+import MissionActiveCard from "./MissionActiveCard";
 import FilterSheet from "./FilterSheet";
 import { useAuthStore } from "../stores/authStore";
+import { useChatStore } from "../stores/chatStore";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, haversineKm, LOCATIONS } from "../stores/locationStore";
 import { smartSearchSuggestions } from "../data/serviceCategories";
@@ -19,9 +21,10 @@ interface ExplorerScreenProps {
   recommendedPros: ProfessionalDetails[];
   activeMissions?: Mission[];
   onViewActiveMission?: (mission: Mission) => void;
+  showPremiumCard?: boolean;
 }
 
-export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMissions = [], onViewActiveMission }: ExplorerScreenProps) {
+export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMissions = [], onViewActiveMission, showPremiumCard }: ExplorerScreenProps) {
   const [loading, setLoading] = useState(true);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(() => {
@@ -50,6 +53,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
   const user = useAuthStore((s) => s.user);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Marie";
   const unreadNotifs = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
+  const conversations = useChatStore((s) => s.conversations);
 
   const storeLat = useLocationStore((s) => s.latitude);
   const storeLng = useLocationStore((s) => s.longitude);
@@ -63,8 +67,10 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
   const userCoord = { lat: storeLat, lng: storeLng };
   const { filters, setFilter, resetFilters, filteredPros, nearbyPros } = useProFilters(recommendedPros, userCoord);
 
-  const activeMission = activeMissions.find(m => ["accepted", "paid", "in_progress", "completed", "client_validation"].includes(m.status));
+  const activeMission = activeMissions.find(m => ["accepted", "paid", "in_progress", "completed", "client_validation", "en_route", "arrived", "client_validated", "disputed"].includes(m.status));
   const hasActiveJobs = !!activeMission;
+  const activePro = activeMission ? recommendedPros.find(p => p.id === activeMission.proId) : undefined;
+  const activeConversation = activeMission ? conversations.find(c => c.missionId === activeMission.id) : undefined;
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
@@ -179,69 +185,15 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
         </p>
 
         {/* Active Mission card */}
-        {hasActiveJobs && (
-          <div className="mb-3 bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-            <div className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-[11px] font-semibold text-gray-700">Mission en cours</span>
-                </div>
-                <span className="text-[11px] font-medium px-3 py-0.5 rounded-full bg-gray-900 text-white">
-                  {activeMission!.status === "paid" ? "Payée" :
-                   activeMission!.status === "in_progress" ? "En cours" :
-                   activeMission!.status === "completed" ? "Terminée" :
-                   activeMission!.status === "client_validation" ? "Review" :
-                   activeMission!.status === "closed" ? "Clôturée" : "Acceptée"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between mb-4 px-1">
-                {["Payée", "En cours", "Terminée", "Review", "Clôturée"].map((label, i) => {
-                  const statuses: MissionStatus[] = ["paid", "in_progress", "completed", "client_validation", "closed"];
-                  const idx = statuses.indexOf(activeMission!.status);
-                  const done = i < idx;
-                  const active = i === idx;
-                  return (
-                    <div key={label} className="flex flex-col items-center flex-1">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        done ? "bg-gray-900" : active ? "bg-gray-900 shadow-sm" : "bg-gray-100"
-                      }`}>
-                        {done ? <Check className="w-3 h-3 text-white" /> : active ? <div className="w-1.5 h-1.5 rounded-full bg-white" /> : null}
-                      </div>
-                      <span className={`text-[8px] mt-1 font-semibold text-center leading-tight ${
-                        active ? "text-gray-900 font-bold" : done ? "text-gray-600" : "text-gray-300"
-                      }`}>{label}</span>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-100 shrink-0">
-                  <img src={activeMission!.proAvatar} alt="" className="w-full h-full object-cover" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-[14px] font-semibold text-gray-900 truncate">{activeMission!.proName}</h3>
-                  <p className="text-[12px] text-gray-500 truncate">{activeMission!.title}</p>
-                </div>
-              </div>
-              {activeMission!.status !== "accepted" && (
-                <div className="flex gap-2 mb-3">
-                  <button onClick={(e) => { e.stopPropagation(); nav(`/messages/${activeMission!.id}`); }}
-                    className="flex-1 flex items-center justify-center gap-1.5 h-10 bg-gray-900 text-white rounded-xl text-[12px] font-semibold cursor-pointer active:scale-95 transition-all hover:opacity-90">
-                    <MessageCircle className="w-4 h-4" /> Message
-                  </button>
-                  <a href={`tel:${activeMission!.proPhone}`}
-                    className="flex items-center justify-center gap-1.5 h-10 px-5 bg-emerald-500 text-white rounded-xl text-[12px] font-semibold active:scale-95 transition-all hover:opacity-90">
-                    <Phone className="w-4 h-4" /> Appel
-                  </a>
-                </div>
-              )}
-              <button onClick={() => onViewActiveMission?.(activeMission!)}
-                className="w-full h-10 bg-gray-900 rounded-xl text-[12px] font-semibold text-white cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all">
-                Suivre la mission
-              </button>
-            </div>
-          </div>
+        {activeMission && (
+          <MissionActiveCard
+            mission={activeMission}
+            conversationId={activeConversation?.id}
+            proRating={activePro?.rating}
+            proReviewCount={activePro?.reviewCount}
+            proTitle={activePro?.title || activePro?.subCategory}
+            onViewDetails={(m) => onViewActiveMission?.(m)}
+          />
         )}
 
         {/* Task Manager button */}
@@ -309,6 +261,25 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
       {/* ---- Home content ---- */}
       {!hasActiveFilter ? (
         <>
+          {/* Premium upsell card */}
+          {showPremiumCard && (
+            <section className="px-5 pb-2 pt-1">
+              <button onClick={() => nav("/settings/subscription/plans")}
+                className="w-full bg-gradient-to-br from-amber-50 to-amber-100/60 border border-amber-200 rounded-[18px] p-4 text-left cursor-pointer active:scale-[0.98] transition-transform hover:shadow-sm">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center">
+                    <Sparkles className="w-4 h-4 text-white" />
+                  </div>
+                  <p className="text-[14px] font-bold text-gray-900">Passez à Ça Match Plus</p>
+                </div>
+                <p className="text-[12px] text-gray-600 ml-12">Trouvez le bon professionnel 2x plus rapidement.</p>
+                <div className="flex items-center gap-1 text-[12px] font-semibold text-amber-600 mt-1.5 ml-12">
+                  Découvrir <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
+            </section>
+          )}
+
           {/* Most Requested Subcategories */}
           <section className="px-5 py-2">
             <h2 className="text-[16px] font-bold text-cm-text mb-3">Les plus demandés</h2>

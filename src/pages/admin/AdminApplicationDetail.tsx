@@ -1,191 +1,183 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, CheckCircle, XCircle, Eye, Download, MessageSquare } from "lucide-react";
-import type { ProApplicationStatus } from "../../types";
-
-const MOCK_APP = {
-  id: "app1",
-  name: "Yao Cissé",
-  phone: "+225 07 5966 509",
-  email: "yao.cisse@email.com",
-  categories: ["Plombier", "Électricien"],
-  location: "Cocody, Abidjan",
-  radiusKm: 15,
-  experienceYears: 5,
-  title: "Plombier professionnel",
-  bio: "Je suis plombier avec 5 ans d'expérience dans l'installation et la réparation.",
-  hourlyRateXOF: 15000,
-  travelFeeXOF: 5000,
-  documents: [
-    { name: "CNI (Recto)", type: "identity" },
-    { name: "CNI (Verso)", type: "identity" },
-    { name: "Diplôme plomberie", type: "diploma" },
-  ],
-  submittedAt: "2026-06-28T10:00:00Z",
-};
+import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import { getApplicationById, updateApplicationStatus } from "../../services/admin/applications.service"
+import type { ProApplication } from "../../services/admin/applications.service"
+import { usePermissions } from "../../hooks/usePermissions"
+import { getCategoryLabel } from "../../constants/admin/categoryLabels"
+import { ArrowLeft, CheckCircle, XCircle, Eye, MessageSquare } from "lucide-react"
 
 export default function AdminApplicationDetail() {
-  const nav = useNavigate();
-  const [status, setStatus] = useState<ProApplicationStatus>("SUBMITTED");
-  const [notes, setNotes] = useState("");
-  const [showConfirm, setShowConfirm] = useState<ProApplicationStatus | null>(null);
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const { hasPermission, admin } = usePermissions()
+  const canReview = hasPermission("applications.review")
 
-  const handleAction = (action: ProApplicationStatus) => {
-    setShowConfirm(action);
-  };
+  const [app, setApp] = useState<ProApplication | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [notes, setNotes] = useState("")
+  const [showConfirm, setShowConfirm] = useState<string | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
 
-  const confirmAction = () => {
-    if (showConfirm) setStatus(showConfirm);
-    setShowConfirm(null);
-  };
+  useEffect(() => {
+    if (!id) return
+    setLoading(true)
+    getApplicationById(id)
+      .then((data) => {
+        if (!data) { setError("Candidature introuvable."); return }
+        setApp(data)
+        setNotes(data.notes ?? "")
+      })
+      .catch(() => setError("Impossible de charger la candidature."))
+      .finally(() => setLoading(false))
+  }, [id])
+
+  const handleAction = async (action: string) => {
+    if (!app || !canReview || !admin?.id) return
+    setActionLoading(true)
+    const newStatus = action === "approve" ? "APPROVED" : action === "reject" ? "REJECTED" : "UNDER_REVIEW"
+    const ok = await updateApplicationStatus(app.id, newStatus, admin.id, notes)
+    setActionLoading(false)
+    setShowConfirm(null)
+    if (ok) {
+      setApp({ ...app, status: newStatus, notes, reviewer_name: admin.email ?? "Admin" })
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-dynamic bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (error || !app) {
+    return (
+      <div className="min-h-dynamic bg-gray-50 flex flex-col items-center justify-center gap-4">
+        <p className="text-[13px] text-gray-500">{error ?? "Candidature introuvable."}</p>
+        <button onClick={() => navigate("/admin/applications")}
+          className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg cursor-pointer">
+          Retour
+        </button>
+      </div>
+    )
+  }
 
   return (
-    <div className="min-h-dynamic bg-gray-50">
-      <header className="sticky top-0 z-10 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-3 px-4 h-14">
-          <button onClick={() => nav("/admin/applications")}
-            className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
-            <ArrowLeft className="w-4 h-4 text-gray-700" />
-          </button>
-          <h1 className="text-[16px] font-bold text-gray-900">{MOCK_APP.name}</h1>
+    <div className="max-w-2xl mx-auto space-y-4 animate-fade-in">
+      <div className="flex items-center gap-3">
+        <button onClick={() => navigate("/admin/applications")}
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-gray-700" />
+        </button>
+        <div>
+          <h1 className="text-[18px] font-bold text-gray-900">{app.name}</h1>
+          <p className="text-[12px] text-gray-500">{app.email} · {app.phone}</p>
         </div>
-      </header>
-
-      <div className="px-4 py-4 space-y-4">
-        {/* Status badge */}
-        <div className="bg-white border border-gray-200 rounded-[14px] p-4">
-          <div className="flex items-center gap-2 mb-3">
-            <Eye className="w-4 h-4 text-cm-accent" />
-            <span className="text-[12px] font-semibold text-cm-text">Détails de la candidature</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 text-[12px]">
-            {[
-              { label: "Téléphone", value: MOCK_APP.phone },
-              { label: "Email", value: MOCK_APP.email },
-              { label: "Localisation", value: MOCK_APP.location },
-              { label: "Rayon", value: `${MOCK_APP.radiusKm} km` },
-            ].map((d) => (
-              <div key={d.label}>
-                <p className="text-cm-text-muted">{d.label}</p>
-                <p className="text-cm-text font-medium">{d.value}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="bg-white border border-gray-200 rounded-[14px] p-4">
-          <p className="text-[12px] text-cm-text-muted mb-2">Métiers</p>
-          <div className="flex flex-wrap gap-1.5">
-            {MOCK_APP.categories.map((cat) => (
-              <span key={cat} className="px-2.5 py-1 bg-cm-accent-soft text-cm-accent rounded-full text-[11px] font-medium">
-                {cat}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* Pro info */}
-        <div className="bg-white border border-gray-200 rounded-[14px] p-4">
-          <p className="text-[12px] font-semibold text-cm-text mb-2">Informations professionnelles</p>
-          <div className="space-y-1.5 text-[12px]">
-            {[
-              { label: "Titre", value: MOCK_APP.title },
-              { label: "Bio", value: MOCK_APP.bio },
-              { label: "Expérience", value: `${MOCK_APP.experienceYears} ans` },
-              { label: "Taux horaire", value: `${MOCK_APP.hourlyRateXOF.toLocaleString("fr-FR")} F` },
-              { label: "Frais déplacement", value: `${MOCK_APP.travelFeeXOF.toLocaleString("fr-FR")} F` },
-            ].map((d) => (
-              <div key={d.label} className="flex items-start justify-between">
-                <span className="text-cm-text-muted">{d.label}</span>
-                <span className="text-cm-text font-medium text-right max-w-[60%]">{d.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Documents */}
-        <div className="bg-white border border-gray-200 rounded-[14px] p-4">
-          <p className="text-[12px] font-semibold text-cm-text mb-2">Documents</p>
-          <div className="space-y-2">
-            {MOCK_APP.documents.map((doc, i) => (
-              <div key={i} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-[10px]">
-                <span className="text-[12px] text-cm-text">{doc.name}</span>
-                <button className="flex items-center gap-1 text-[11px] text-cm-accent font-medium cursor-pointer">
-                  <Download className="w-3.5 h-3.5" /> Voir
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Notes & Actions */}
-        <div className="bg-white border border-gray-200 rounded-[14px] p-4">
-          <label className="text-[12px] font-semibold text-cm-text mb-2 flex items-center gap-1.5">
-            <MessageSquare className="w-3.5 h-3.5" /> Notes de révision
-          </label>
-          <textarea
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ajouter une note..."
-            rows={3}
-            className="w-full text-[13px] bg-gray-50 border border-gray-200 rounded-[10px] p-3 outline-none text-gray-900 placeholder-gray-400 resize-none"
-          />
-        </div>
-
-        {/* Action buttons */}
-        {status !== "APPROVED" && status !== "REJECTED" && (
-          <div className="flex gap-3 pb-4">
-            <button onClick={() => handleAction("APPROVED")}
-              className="flex-1 h-12 bg-green-600 rounded-[16px] text-[14px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer hover:bg-green-700 active:scale-[0.97] transition-all">
-              <CheckCircle className="w-4 h-4" /> Approuver
-            </button>
-            <button onClick={() => handleAction("REJECTED")}
-              className="flex-1 h-12 bg-red-500 rounded-[16px] text-[14px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer hover:bg-red-600 active:scale-[0.97] transition-all">
-              <XCircle className="w-4 h-4" /> Rejeter
-            </button>
-          </div>
-        )}
-
-        {status === "APPROVED" && (
-          <div className="flex items-center justify-center gap-2 p-4 bg-green-50 border border-green-200 rounded-[14px]">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-            <span className="text-[13px] font-semibold text-green-600">Approuvée</span>
-          </div>
-        )}
-        {status === "REJECTED" && (
-          <div className="flex items-center justify-center gap-2 p-4 bg-red-50 border border-red-200 rounded-[14px]">
-            <XCircle className="w-5 h-5 text-red-500" />
-            <span className="text-[13px] font-semibold text-red-500">Rejetée</span>
-          </div>
-        )}
       </div>
 
-      {/* Confirm dialog */}
+      <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
+        <div className="flex items-center gap-2">
+          <Eye className="w-4 h-4 text-gray-500" />
+          <span className="text-[13px] font-semibold text-gray-900">Détails de la candidature</span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 text-[12px]">
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-gray-500">Localisation</p>
+            <p className="text-gray-900 font-medium">{app.location}</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-gray-500">Métiers</p>
+            <p className="text-gray-900 font-medium">{app.categories.map((c) => getCategoryLabel(c)).join(", ")}</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-gray-500">Expérience</p>
+            <p className="text-gray-900 font-medium">{app.experience_years} ans</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-gray-500">Taux horaire</p>
+            <p className="text-gray-900 font-medium">{app.hourly_rate.toLocaleString("fr-FR")} F</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-gray-500">Statut</p>
+            <p className="text-gray-900 font-medium">{app.status === "SUBMITTED" ? "Soumise" : app.status === "UNDER_REVIEW" ? "En révision" : app.status === "APPROVED" ? "Approuvée" : "Rejetée"}</p>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-gray-500">Documents</p>
+            <p className="text-gray-900 font-medium">{app.documents_count} fichier{app.documents_count !== 1 ? "s" : ""}</p>
+          </div>
+        </div>
+      </div>
+
+      {app.title && (
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <p className="text-[12px] font-semibold text-gray-900 mb-1">{app.title}</p>
+          <p className="text-[12px] text-gray-500">{app.bio}</p>
+        </div>
+      )}
+
+      <div className="bg-white border border-gray-200 rounded-xl p-4">
+        <label className="text-[12px] font-semibold text-gray-900 mb-2 flex items-center gap-1.5">
+          <MessageSquare className="w-3.5 h-3.5" /> Notes de révision
+        </label>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Ajouter une note..."
+          rows={3}
+          className="w-full text-[13px] bg-gray-50 border border-gray-200 rounded-lg p-3 outline-none text-gray-900 placeholder-gray-400 resize-none"
+        />
+      </div>
+
+      {app.status !== "APPROVED" && app.status !== "REJECTED" && canReview && (
+        <div className="flex gap-3">
+          <button onClick={() => setShowConfirm("approve")} disabled={actionLoading}
+            className="flex-1 h-11 bg-green-600 rounded-xl text-[13px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer hover:bg-green-700 disabled:opacity-50 transition-colors">
+            <CheckCircle className="w-4 h-4" /> Approuver
+          </button>
+          <button onClick={() => setShowConfirm("reject")} disabled={actionLoading}
+            className="flex-1 h-11 bg-red-500 rounded-xl text-[13px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer hover:bg-red-600 disabled:opacity-50 transition-colors">
+            <XCircle className="w-4 h-4" /> Rejeter
+          </button>
+        </div>
+      )}
+
+      {app.status === "APPROVED" && (
+        <div className="flex items-center justify-center gap-2 p-4 bg-green-50 border border-green-200 rounded-xl">
+          <CheckCircle className="w-5 h-5 text-green-600" />
+          <span className="text-[13px] font-semibold text-green-600">Approuvée</span>
+        </div>
+      )}
+      {app.status === "REJECTED" && (
+        <div className="flex items-center justify-center gap-2 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <XCircle className="w-5 h-5 text-red-500" />
+          <span className="text-[13px] font-semibold text-red-500">Rejetée</span>
+        </div>
+      )}
+
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 pb-8">
-          <div className="bg-white rounded-[20px] px-6 py-5 mx-4 w-full max-w-sm shadow-xl">
-            <h3 className="text-[16px] font-bold text-cm-text text-center mb-2">
-              {showConfirm === "APPROVED" ? "Approuver cette candidature ?" : "Rejeter cette candidature ?"}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl px-6 py-5 mx-4 w-full max-w-sm shadow-xl">
+            <h3 className="text-[15px] font-bold text-gray-900 text-center mb-2">
+              {showConfirm === "approve" ? "Approuver cette candidature ?" : "Rejeter cette candidature ?"}
             </h3>
-            <p className="text-[13px] text-cm-text-soft text-center mb-5">
+            <p className="text-[12px] text-gray-500 text-center mb-5">
               Cette action enverra une notification au professionnel.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setShowConfirm(null)}
-                className="flex-1 h-11 rounded-[14px] text-[13px] font-semibold text-cm-text border border-cm-border cursor-pointer">
+                className="flex-1 h-11 rounded-xl text-[13px] font-semibold text-gray-600 border border-gray-200 cursor-pointer">
                 Annuler
               </button>
-              <button onClick={confirmAction}
-                className={`flex-1 h-11 rounded-[14px] text-[13px] font-bold text-white cursor-pointer ${
-                  showConfirm === "APPROVED" ? "bg-green-600" : "bg-red-500"
-                }`}>
-                Confirmer
+              <button onClick={() => handleAction(showConfirm)}
+                className={`flex-1 h-11 rounded-xl text-[13px] font-bold text-white cursor-pointer ${showConfirm === "approve" ? "bg-green-600" : "bg-red-500"}`}>
+                {actionLoading ? "..." : "Confirmer"}
               </button>
             </div>
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -1,4 +1,5 @@
-import { ArrowLeft, Sun, Moon, Globe, Bell, HelpCircle, Info, ChevronRight } from "lucide-react";
+import { ArrowLeft, Sun, Moon, Globe, Bell, HelpCircle, Info, ChevronRight, CreditCard } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface AppSettingsScreenProps {
   isDark: boolean;
@@ -12,6 +13,7 @@ interface AppSettingsScreenProps {
 export default function AppSettingsScreen({
   isDark, onToggleDarkMode, onBack, onNavigateToHelp, onNavigateToNotifications, onNavigateToLanguage,
 }: AppSettingsScreenProps) {
+  const nav = useNavigate();
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-gray-50 pb-8">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-white border-b border-gray-100">
@@ -74,6 +76,21 @@ export default function AppSettingsScreen({
             <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
           </button>
         )}
+
+        {/* Abonnement */}
+        <button onClick={() => nav("/settings/subscription")}
+          className="w-full bg-white border border-gray-200 rounded-2xl p-4 flex items-center justify-between shadow-sm cursor-pointer hover:bg-gray-50 transition-colors text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center">
+              <CreditCard className="w-4 h-4 text-gray-900" />
+            </div>
+            <div>
+              <p className="text-[13px] font-semibold text-gray-900">Abonnement</p>
+              <p className="text-[11px] text-gray-400">Gérer votre formule d'abonnement</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+        </button>
 
         {/* Aide */}
         {onNavigateToHelp && (

@@ -111,7 +111,7 @@ export default function MissionTrackerPage() {
             }
             const userId = useAuthStore.getState().userId;
             if (userId && mission.proId) {
-              const existing = await findConversation(userId, mission.proId);
+              const existing = await findConversation(userId, mission.proId, mission.id);
               if (existing) {
                 navigate(`/messages/${existing}`);
               } else {

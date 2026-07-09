@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
-import { ArrowLeft, Bell, Globe, Moon, Eye, Trash2 } from "lucide-react";
+import { ArrowLeft, Bell, Globe, Moon, Eye, Trash2, CreditCard } from "lucide-react";
 import { useState } from "react";
 
 function Toggle({ enabled, onChange }: { enabled: boolean; onChange: () => void }) {
@@ -106,7 +106,24 @@ export default function ProSettingsPage() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.08 }}
+          className="bg-cm-elevated border border-cm-border rounded-[14px] p-5"
+        >
+          <h2 className="text-[13px] font-bold text-cm-text mb-3">Abonnement</h2>
+          <motion.button
+            onClick={() => nav("/pro/subscription")}
+            className="w-full flex items-center gap-3 px-3 py-3 bg-cm-bg rounded-[10px] cursor-pointer active:scale-[0.97]"
+          >
+            <CreditCard className="w-4 h-4 text-cm-accent" />
+            <span className="text-[12px] font-semibold text-cm-text flex-1 text-left">Gérer mon abonnement</span>
+            <span className="text-[10px] text-cm-text-soft">Actif</span>
+          </motion.button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
           className="bg-cm-elevated border border-cm-border rounded-[14px] p-5"
         >
           <h2 className="text-[13px] font-bold text-cm-text mb-3">Compte</h2>

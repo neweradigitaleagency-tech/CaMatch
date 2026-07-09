@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, X, Star, MapPin, ArrowLeft, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
@@ -39,7 +39,8 @@ export default function SearchPage() {
   const neighborhood = useLocationStore((s) => s.neighborhood);
   const setNeighborhood = useLocationStore((s) => s.setNeighborhood);
 
-  if (!initialized.current) {
+  useEffect(() => {
+    if (initialized.current) return;
     initialized.current = true;
     const searchTerm = qParam || subCategoryParam;
     if (searchTerm) {
@@ -57,7 +58,7 @@ export default function SearchPage() {
       });
       setTypedResults(filtered);
     }
-  }
+  }, []);
 
   const userCoord = { lat: storeLat, lng: storeLng };
   const { filters, setFilter, resetFilters, filteredPros } = useProFilters(MOCK_PROS, userCoord);
@@ -97,12 +98,6 @@ export default function SearchPage() {
     }
     return list.sort((a, b) => b.rating - a.rating).slice(0, 8);
   }, [subCategoryParam]);
-
-  const getTier = (completed: number) => {
-    if (completed >= 120) return { label: "Expert", color: "text-cm-accent", bg: "bg-cm-accent-soft" };
-    if (completed >= 60) return { label: "Avancé", color: "text-cm-text-soft", bg: "bg-cm-border-soft" };
-    return { label: "Débutant", color: "text-cm-text-muted", bg: "bg-cm-border-soft" };
-  };
 
   const hasActiveFilter = filters.nearbyOnly || displayPros.length > 0;
 

@@ -98,7 +98,7 @@ export default function ProControlPanel({
 
     const currentUserId = useAuthStore.getState().userId;
     if (currentUserId && job.clientId) {
-      const existing = await findConversation(currentUserId, job.clientId);
+      const existing = await findConversation(currentUserId, job.clientId, job.id);
       if (!existing) {
         await createConversation({
           participant1: currentUserId,

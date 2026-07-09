@@ -1,9 +1,10 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  ChevronLeft, ArrowRight, Check, Sparkles,
-  Smartphone, Mail, Lock, Eye, EyeOff, MessageCircle,
+  ChevronLeft, ArrowRight, Check, Sparkles, Crown,
+  Smartphone, Mail, Lock, Eye, EyeOff, MessageCircle, Star,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
 
 type AuthMode = "phone" | "email";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
+  const nav = useNavigate();
   const signInWithPhone = useAuthStore((s) => s.signInWithPhone);
   const verifyOtp = useAuthStore((s) => s.verifyOtp);
   const signInWithEmail = useAuthStore((s) => s.signInWithEmail);
@@ -35,6 +37,9 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // After success: show discover view, then optionally premium upsell
+  const [step, setStep] = useState<"auth" | "discover" | "premium">("auth");
 
   const handlePhoneSubmit = async () => {
     setError("");
@@ -66,6 +71,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
         otpRefs.current[0]?.focus();
       } else {
         setOtpVerified(true);
+        setStep("discover");
       }
     }
   };
@@ -88,6 +94,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
     }
     setLoading(false);
     setEmailDone(true);
+    setStep("discover");
   };
 
   const isAuthenticated = (authMode === "phone" && otpVerified) || (authMode === "email" && emailDone);
@@ -96,23 +103,32 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
     <div className="min-h-dynamic bg-cm-bg flex flex-col">
       <div className="flex-1 flex flex-col justify-center px-6 max-w-sm mx-auto w-full">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-cm-accent flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cm-accent/20">
-            <Sparkles className="w-8 h-8 text-white" />
+          <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg ${
+            step === "premium" ? "bg-amber-500 shadow-amber-500/20" : "bg-cm-accent shadow-cm-accent/20"
+          }`}>
+            {step === "premium" ? (
+              <Crown className="w-8 h-8 text-white" />
+            ) : (
+              <Sparkles className="w-8 h-8 text-white" />
+            )}
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Ça Match</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            {step === "premium" ? "Passez à Premium" : "Ça Match"}
+          </h1>
           <p className="text-xs text-cm-text-soft mt-1">
-            {!isAuthenticated
-              ? "Connectez-vous pour commencer"
-              : "Prêt à explorer"}
+            {step === "auth" && "Connectez-vous pour commencer"}
+            {step === "discover" && "Prêt à explorer"}
+            {step === "premium" && "Débloquez toutes les fonctionnalités"}
           </p>
         </div>
 
         <AnimatePresence mode="wait">
-          {!isAuthenticated ? (
+          {step === "auth" ? (
             <motion.div
               key="auth"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               className="space-y-4"
             >
               <div className="flex rounded-xl bg-cm-accent-soft/50 p-1">
@@ -255,11 +271,12 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
                 </p>
               </div>
             </motion.div>
-          ) : (
+          ) : step === "discover" ? (
             <motion.div
-              key="success"
+              key="discover"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
               className="text-center space-y-4 pt-4"
             >
               <div className="w-16 h-16 rounded-full bg-cm-accent flex items-center justify-center mx-auto">
@@ -268,10 +285,65 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
               <h2 className="text-xl font-extrabold">Connecté !</h2>
               <p className="text-xs text-cm-text-soft">Vous êtes prêt à découvrir les pros près de chez vous.</p>
               <button
-                onClick={onComplete}
-                className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:brightness-105 transition-all active:scale-[0.98] cursor-pointer"
+                onClick={() => setStep("premium")}
+                className="w-full h-12 bg-amber-500 text-white font-bold text-sm rounded-xl hover:brightness-105 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
               >
-                Découvrir
+                <Crown className="w-4 h-4" /> Découvrir Premium
+              </button>
+              <button
+                onClick={onComplete}
+                className="w-full h-10 text-xs text-cm-text-soft/60 hover:text-cm-text-soft transition-colors cursor-pointer"
+              >
+                Continuer gratuitement
+              </button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="premium"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              className="space-y-4 pt-2"
+            >
+              <div className="bg-amber-50 border border-amber-200 rounded-[20px] p-5 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center">
+                    <Star className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[15px] font-bold text-gray-900">Ça Match Plus</p>
+                    <p className="text-[11px] text-gray-500">Trouvez 2x plus rapidement</p>
+                  </div>
+                </div>
+                <ul className="space-y-2">
+                  {[
+                    "Professionnels vérifiés en priorité",
+                    "Matching IA avancé",
+                    "Support prioritaire 24/7",
+                  ].map((item) => (
+                    <li key={item} className="flex items-center gap-2 text-[12px] text-gray-700">
+                      <Check className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[24px] font-extrabold text-gray-900">4 900</span>
+                  <span className="text-[12px] text-gray-500 font-medium">F/mois</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => nav("/subscription/plans")}
+                className="w-full h-12 bg-amber-500 text-white font-bold text-sm rounded-xl hover:brightness-105 transition-all active:scale-[0.98] cursor-pointer"
+              >
+                Voir toutes les formules
+              </button>
+              <button
+                onClick={onComplete}
+                className="w-full h-10 text-xs text-cm-text-soft/60 hover:text-cm-text-soft transition-colors cursor-pointer"
+              >
+                Continuer gratuitement
               </button>
             </motion.div>
           )}

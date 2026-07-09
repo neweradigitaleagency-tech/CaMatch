@@ -6,12 +6,13 @@ import {
   CheckCircle, Phone, BarChart3, Target,
   UserIcon, DollarSign, Award, Bell, Settings,
   MessageCircle, Navigation, XCircle, Check,
-  FileText, Camera,
+  FileText, Camera, Lock,
 } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 import { useProStore } from "../stores/proStore";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useChatStore } from "../stores/chatStore";
+import { useSubscriptionStore } from "../stores/subscriptionStore";
 import { findConversation, createConversation } from "../services/chatService";
 import NotificationPanel from "./NotificationPanel";
 import PhotoCaptureModal from "./PhotoCaptureModal";
@@ -195,6 +196,22 @@ export default function ProDashboardScreen() {
 
   const pro = MOCK_PROS[5]!;
   const firstName = pro.name.split(" ")[0] ?? pro.name;
+  const userId = useAuthStore((s) => s.userId);
+  const currentSubscription = useSubscriptionStore((s) => s.currentSubscription);
+  const availablePlans = useSubscriptionStore((s) => s.availablePlans);
+  const fetchCurrent = useSubscriptionStore((s) => s.fetchCurrent);
+  const fetchPlans = useSubscriptionStore((s) => s.fetchPlans);
+
+  useEffect(() => {
+    if (userId) {
+      fetchCurrent(userId);
+      fetchPlans("PRO");
+    }
+  }, [userId, fetchCurrent, fetchPlans]);
+
+  const currentPlan = availablePlans.find((p) => p.id === currentSubscription?.plan_id);
+  const isFree = !currentSubscription || !currentPlan || currentPlan.price_monthly === 0;
+  const proProfileViews = 230; // would come from analytics
   const rating = (pro.rating / 10).toFixed(1);
   const level = getProLevel(pro.completedInterventions * 100);
   const nextLevel = PRO_LEVELS[PRO_LEVELS.indexOf(level) + 1];
@@ -354,7 +371,7 @@ export default function ProDashboardScreen() {
   const openChatForJob = async (job: typeof MOCK_PRO_JOBS[0]) => {
     const currentUserId = useAuthStore.getState().userId;
     if (!currentUserId || !job.clientId) return;
-    const existing = await findConversation(currentUserId, job.clientId);
+    const existing = await findConversation(currentUserId, job.clientId, job.id);
     if (existing) {
       nav(`/pro/messages/${existing}`);
     } else {
@@ -678,6 +695,29 @@ export default function ProDashboardScreen() {
           </div>
         </motion.div>
 
+        {/* ─── Premium upsell card ─── */}
+        {isFree && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
+            className="bg-gradient-to-br from-amber-50 to-amber-100/60 border border-amber-200 rounded-[20px] p-4 shadow-sm mb-4">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[14px] font-bold text-gray-900">Augmentez votre visibilité</p>
+                <p className="text-[11px] text-gray-500">Votre profil a été vu {proProfileViews} fois.</p>
+              </div>
+            </div>
+            <p className="text-[12px] text-gray-600 mb-3">
+              Passez à une formule Premium pour apparaître plus haut dans les recherches et recevoir plus de demandes.
+            </p>
+            <button onClick={() => nav("/pro/subscription/plans")}
+              className="flex items-center gap-1.5 h-10 px-4 bg-amber-500 text-white text-[12px] font-bold rounded-xl cursor-pointer active:scale-[0.97] transition-transform hover:brightness-105 shadow-sm">
+              <Star className="w-3.5 h-3.5" /> Booster mon profil
+            </button>
+          </motion.div>
+        )}
+
         {/* ─── Revenue Section ─── */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
           className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm mb-4">
@@ -767,56 +807,77 @@ export default function ProDashboardScreen() {
           </div>
         </motion.div>
 
-        {/* ─── Performance ─── */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-          className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <BarChart3 className="w-4 h-4 text-gray-900" />
-            <span className="text-[14px] font-bold text-gray-900">Performance</span>
-          </div>
+        {/* ─── Performance (Premium feature) ─── */}
+        {isFree ? (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="bg-white border border-amber-200 rounded-[20px] p-4 shadow-sm mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="w-4 h-4 text-amber-500" />
+              <span className="text-[14px] font-bold text-gray-900">Analytics</span>
+            </div>
+            <div className="bg-amber-50 rounded-[14px] p-4 text-center mb-3">
+              <Lock className="w-8 h-8 text-amber-400 mx-auto mb-2" />
+              <p className="text-[13px] font-semibold text-gray-900 mb-1">Statistiques Premium</p>
+              <p className="text-[11px] text-gray-600 mb-3">
+                Passez à une formule supérieure pour accéder à vos analytics, suivi de revenus et indicateurs de performance.
+              </p>
+              <button onClick={() => nav("/pro/subscription/plans")}
+                className="h-9 px-4 bg-amber-500 text-white text-[11px] font-bold rounded-xl cursor-pointer active:scale-[0.97] transition-transform hover:brightness-105 shadow-sm">
+                Passer Premium
+              </button>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm mb-4">
+            <div className="flex items-center gap-2 mb-3">
+              <BarChart3 className="w-4 h-4 text-gray-900" />
+              <span className="text-[14px] font-bold text-gray-900">Performance</span>
+            </div>
 
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {[
-              { label: "Cette semaine", value: "+620 XP", icon: TrendingUp, color: "text-gray-900", bg: "bg-gray-100" },
-              { label: "Missions", value: `${MOCK_DASH_DATA.missionsTrend}%`, icon: CalendarDays, color: "text-blue-600", bg: "bg-blue-50" },
-              { label: "Avis", value: `${MOCK_DASH_DATA.ratingTrend}%`, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
-            ].map((m) => {
-              const Icon = m.icon;
-              return (
-                <div key={m.label} className={`${m.bg} rounded-[12px] p-3 text-center`}>
-                  <Icon className={`w-4 h-4 ${m.color} mx-auto mb-1`} />
-                  <p className="text-[14px] font-extrabold text-gray-900">{m.value}</p>
-                  <p className="text-[8px] text-gray-500 uppercase tracking-wider">{m.label}</p>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              {[
+                { label: "Cette semaine", value: "+620 XP", icon: TrendingUp, color: "text-gray-900", bg: "bg-gray-100" },
+                { label: "Missions", value: `${MOCK_DASH_DATA.missionsTrend}%`, icon: CalendarDays, color: "text-blue-600", bg: "bg-blue-50" },
+                { label: "Avis", value: `${MOCK_DASH_DATA.ratingTrend}%`, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
+              ].map((m) => {
+                const Icon = m.icon;
+                return (
+                  <div key={m.label} className={`${m.bg} rounded-[12px] p-3 text-center`}>
+                    <Icon className={`w-4 h-4 ${m.color} mx-auto mb-1`} />
+                    <p className="text-[14px] font-extrabold text-gray-900">{m.value}</p>
+                    <p className="text-[8px] text-gray-500 uppercase tracking-wider">{m.label}</p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="space-y-2">
+              <div className="bg-gray-50 rounded-[12px] p-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
+                  <Target className="w-4 h-4 text-amber-500" />
                 </div>
-              );
-            })}
-          </div>
-
-          <div className="space-y-2">
-            <div className="bg-gray-50 rounded-[12px] p-3 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
-                <Target className="w-4 h-4 text-amber-500" />
+                <div className="flex-1">
+                  <p className="text-[11px] font-medium text-gray-700">Encore <span className="font-bold text-gray-900">{nextLevel ? nextLevelXp : 0} XP</span> pour {nextLevel?.label ?? "le max"}</p>
+                  <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1.5 overflow-hidden">
+                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${xpPercent}%` }} />
+                  </div>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-[11px] font-medium text-gray-700">Encore <span className="font-bold text-gray-900">{nextLevel ? nextLevelXp : 0} XP</span> pour {nextLevel?.label ?? "le max"}</p>
-                <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1.5 overflow-hidden">
-                  <div className="h-full bg-amber-500 rounded-full" style={{ width: `${xpPercent}%` }} />
+              <div className="bg-gray-50 rounded-[12px] p-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
+                  <Star className="w-4 h-4 text-green-500" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[11px] font-medium text-gray-700">Encore <span className="font-bold text-gray-900">{3 - (pro.reviewCount % 3)} avis 5★</span> pour le badge Premium</p>
+                  <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1.5 overflow-hidden">
+                    <div className="h-full bg-green-500 rounded-full" style={{ width: `${(pro.reviewCount % 3) / 3 * 100}%` }} />
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="bg-gray-50 rounded-[12px] p-3 flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
-                <Star className="w-4 h-4 text-green-500" />
-              </div>
-              <div className="flex-1">
-                <p className="text-[11px] font-medium text-gray-700">Encore <span className="font-bold text-gray-900">{3 - (pro.reviewCount % 3)} avis 5★</span> pour le badge Premium</p>
-                <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1.5 overflow-hidden">
-                  <div className="h-full bg-green-500 rounded-full" style={{ width: `${(pro.reviewCount % 3) / 3 * 100}%` }} />
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
 
         {/* ─── Quick Actions ─── */}
         <div className="grid grid-cols-2 gap-2 mb-4">

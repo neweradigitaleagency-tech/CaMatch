@@ -21,7 +21,9 @@ function mapPro(row: any): ProfessionalDetails {
     role: "pro",
     avatarUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`,
     category: "maison-reparations" as const,
+    categories: row.categories || ["maison-reparations"],
     subCategory: row.sub_category || "",
+    subCategories: row.sub_categories || [],
     title: row.business_name || "",
     bio: row.bio || "",
     experienceYears: Math.floor((row.total_jobs || 0) / 15),
@@ -78,11 +80,11 @@ function mapRequest(row: any): ClientRequest {
     title: `Intervention ${row.category === "electrician" ? "électrique" : row.category === "plumber" ? "plomberie" : row.category === "ac_refrigeration" ? "climatisation" : "menuiserie"}`,
     description: row.description || "",
     photos: row.media_urls || [],
-    category: row.category === "electrician" ? "electricity"
-      : row.category === "plumber" ? "plumbing"
-      : row.category === "ac_refrigeration" ? "ac"
-      : row.category === "carpenter" ? "carpenter"
-      : "carpenter",
+    category: row.category === "electrician" ? "électricien"
+      : row.category === "plumber" ? "plombier"
+      : row.category === "ac_refrigeration" ? "climatisation"
+      : row.category === "carpenter" ? "menuisier"
+      : "menuisier",
     address: row.address || "",
     budgetXOF: row.estimated_price_max || 0,
     urgency: urgencyMap[row.urgency] || "flexible",
@@ -127,11 +129,11 @@ function mapMission(row: any): Mission {
     status: statusMap[row.status] || "created",
     title: `Intervention ${row.category}`,
     description: row.description || "",
-    category: row.category === "electrician" ? "electricity"
-      : row.category === "plumber" ? "plumbing"
-      : row.category === "ac_refrigeration" ? "ac"
-      : row.category === "carpenter" ? "carpenter"
-      : "carpenter",
+    category: row.category === "electrician" ? "électricien"
+      : row.category === "plumber" ? "plombier"
+      : row.category === "ac_refrigeration" ? "climatisation"
+      : row.category === "carpenter" ? "menuisier"
+      : "menuisier",
     address: row.address || "",
     budgetXOF: row.estimated_price_max || 0,
     photos: row.media_urls || [],
@@ -258,10 +260,28 @@ export function useProDashboard() {
 
 function mapConversation(row: any, currentUserId: string): Conversation {
   const otherId = row.participant_1 === currentUserId ? row.participant_2 : row.participant_1;
+  const meta = typeof row.metadata === "object" && row.metadata !== null ? row.metadata : {};
   return {
     id: row.id,
     participants: [row.participant_1, row.participant_2],
-    missionId: row.job_id || undefined,
+    missionId: row.job_id || "",
+    state: (row.state || "waiting") as Conversation["state"],
+    metadata: {
+      mission_phase: meta.mission_phase || undefined,
+      flags: {
+        dispute: !!meta.flags?.dispute,
+        support_joined: !!meta.flags?.support_joined,
+        pinned: !!meta.flags?.pinned,
+      },
+      job_snapshot: {
+        category: meta.job_snapshot?.category || "",
+        location: meta.job_snapshot?.location || "",
+        price_estimate: meta.job_snapshot?.price_estimate || 0,
+        currency: meta.job_snapshot?.currency || "XOF",
+        service_type: meta.job_snapshot?.service_type || "on_demand",
+      },
+      created_from: meta.created_from || "manual",
+    },
     lastMessage: row.last_message || "",
     lastMessageAt: row.last_message_at || row.created_at || "",
     unreadCount: row.unread_count || 0,

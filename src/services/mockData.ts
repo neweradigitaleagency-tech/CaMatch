@@ -181,7 +181,11 @@ const PROS_DATA: ProfessionalDetails[] = [
   { id: "pro158", name: "Soro Sidibé", email: "soro.sidibe_a@gmail.com", phoneNumber: "+225 07 5563 738",   role: "pro", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face", category: "assistance-services", subCategory: "Courses", title: "Expert Courses", bio: "", experienceYears: 11, rating: 43, reviewCount: 8, hourlyRateXOF: 8150, locationNeighborhood: "Abobo, Abidjan", isVerified: true, completedInterventions: 122, availabilityStatus: "available", createdAt: "2026-06-18T05:25:00Z" },
   { id: "pro159", name: "Lanciné Berthé", email: "lancine.berthe@gmail.com", phoneNumber: "+225 07 1741 593",   role: "pro", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face", category: "assistance-services", subCategory: "Accompagnement administratif", title: "Accompagnement administratif", bio: "", experienceYears: 9, rating: 46, reviewCount: 68, hourlyRateXOF: 9872, locationNeighborhood: "Abobo, Abidjan", isVerified: true, completedInterventions: 46, availabilityStatus: "available", createdAt: "2026-06-18T05:25:00Z" },
   { id: "pro160", name: "Djakaridja Kouyaté", email: "djakaridja.kouyate_a@gmail.com", phoneNumber: "+225 07 8202 233",   role: "pro", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face", category: "assistance-services", subCategory: "Accompagnement administratif", title: "Expert Accompagnement administratif", bio: "", experienceYears: 14, rating: 42, reviewCount: 22, hourlyRateXOF: 21845, locationNeighborhood: "Zone 4, Abidjan", isVerified: true, completedInterventions: 13, availabilityStatus: "available", createdAt: "2026-06-18T05:25:00Z" },
-];
+].map((p) => ({
+  ...p,
+  categories: [p.category],
+  subCategories: p.subCategory ? [p.subCategory] : [],
+})) as ProfessionalDetails[];
 
 const NEIGHBORHOOD_COORDS: Record<string, { lat: number; lng: number }> = {
   Cocody: { lat: 5.360, lng: -4.008 },
@@ -223,9 +227,9 @@ export const MOCK_SERVICES: Service[] = [
 ];
 
 export const MOCK_REQUESTS: ClientRequest[] = [
-  { id: "cr1", clientId: "client_marie", title: "Climatisation ne refroidit plus", description: "Le split ne souffle que de l'air chaud, besoin d'un diagnostic et recharge fréon si nécessaire.", photos: [], category: "ac", address: "Cocody Riviera 3, Abidjan", budgetXOF: 35000, urgency: "today", status: "accepted", proId: "pro3", createdAt: "2026-06-17T08:00:00Z", updatedAt: "2026-06-17T09:00:00Z" },
-  { id: "cr2", clientId: "client_marie", title: "Prise électrique grillée", description: "Prise dans la chambre principale ne fonctionne plus et fait des étincelles.", photos: [], category: "electricity", address: "Cocody Riviera 3, Abidjan", budgetXOF: 12000, urgency: "immediate", status: "created", createdAt: "2026-06-18T06:00:00Z", updatedAt: "2026-06-18T06:00:00Z" },
-  { id: "cr3", clientId: "client_marie", title: "Fabrication bibliothèque sur mesure", description: "Bibliothèque en bois massif sur mesure pour salon. Dimensions: 2m x 1.5m. Finition laquée.", photos: [], category: "carpenter", address: "Cocody Angré, Abidjan", budgetXOF: 80000, urgency: "this_week", status: "created", createdAt: "2026-06-18T07:00:00Z", updatedAt: "2026-06-18T07:00:00Z" },
+  { id: "cr1", clientId: "client_marie", title: "Climatisation ne refroidit plus", description: "Le split ne souffle que de l'air chaud, besoin d'un diagnostic et recharge fréon si nécessaire.", photos: [], category: "climatisation", address: "Cocody Riviera 3, Abidjan", budgetXOF: 35000, urgency: "today", status: "accepted", proId: "pro3", createdAt: "2026-06-17T08:00:00Z", updatedAt: "2026-06-17T09:00:00Z" },
+  { id: "cr2", clientId: "client_marie", title: "Prise électrique grillée", description: "Prise dans la chambre principale ne fonctionne plus et fait des étincelles.", photos: [], category: "électricien", address: "Cocody Riviera 3, Abidjan", budgetXOF: 12000, urgency: "immediate", status: "created", createdAt: "2026-06-18T06:00:00Z", updatedAt: "2026-06-18T06:00:00Z" },
+  { id: "cr3", clientId: "client_marie", title: "Fabrication bibliothèque sur mesure", description: "Bibliothèque en bois massif sur mesure pour salon. Dimensions: 2m x 1.5m. Finition laquée.", photos: [], category: "menuisier", address: "Cocody Angré, Abidjan", budgetXOF: 80000, urgency: "this_week", status: "created", createdAt: "2026-06-18T07:00:00Z", updatedAt: "2026-06-18T07:00:00Z" },
 ];
 
 export const MOCK_MISSIONS: Mission[] = [
@@ -250,21 +254,45 @@ export const MOCK_MISSIONS: Mission[] = [
   },
 ];
 
+const MOCK_METADATA_JOB = {
+  flags: { dispute: false, support_joined: false, pinned: false },
+  job_snapshot: { category: "electricity", location: "Cocody Riviera 2", price_estimate: 17000, currency: "XOF", service_type: "on_demand" as const },
+  created_from: "job_accept" as const,
+};
+
 export const MOCK_CONVERSATIONS: Conversation[] = [
-  { id: "conv1", participants: ["client_marie", "pro3"], missionId: "m1", lastMessage: "J'arrive dans 15 minutes", lastMessageAt: "2026-06-17T09:45:00Z", unreadCount: 2, otherUserName: "Mamadou K.", otherUserAvatar: MOCK_PROS[2]!.avatarUrl ?? "" },
-  { id: "conv2", participants: ["client_marie", "pro6"], lastMessage: "Le disjoncteur est changé", lastMessageAt: "2026-06-16T14:00:00Z", unreadCount: 0, otherUserName: "Drissa Tounkara", otherUserAvatar: MOCK_PROS[5]!.avatarUrl ?? "" },
+  {
+    id: "conv1", participants: ["client_marie", "pro3"],
+    missionId: "m1", state: "active", metadata: { mission_phase: "working", ...MOCK_METADATA_JOB },
+    lastMessage: "J'arrive dans 15 minutes", lastMessageAt: "2026-06-17T09:45:00Z",
+    unreadCount: 2, otherUserName: "Mamadou K.", otherUserAvatar: MOCK_PROS[2]!.avatarUrl ?? "",
+  },
+  {
+    id: "conv2", participants: ["client_marie", "pro6"],
+    missionId: "m2",     state: "read_only", metadata: { mission_phase: "completed", ...MOCK_METADATA_JOB },
+    lastMessage: "Le disjoncteur est changé", lastMessageAt: "2026-06-16T14:00:00Z",
+    unreadCount: 0, otherUserName: "Drissa Tounkara", otherUserAvatar: MOCK_PROS[5]!.avatarUrl ?? "",
+  },
 ];
+
+function mockMsg(overrides: Partial<Message> & { id: string; conversationId: string; senderId: string; text: string }): Message {
+  return {
+    type: "text", photos: [], riskScore: 0, moderationAction: "none",
+    createdAt: new Date().toISOString(), status: "read",
+    ...overrides,
+  };
+}
 
 export const MOCK_MESSAGES: Record<string, Message[]> = {
   conv1: [
-    { id: "msg1", conversationId: "conv1", senderId: "pro3", text: "Bonjour Marie, je suis en route pour votre intervention.", photos: [], createdAt: "2026-06-17T09:30:00Z", status: "read" },
-    { id: "msg2", conversationId: "conv1", senderId: "client_marie", text: "Parfait, je vous attends !", photos: [], createdAt: "2026-06-17T09:35:00Z", status: "read" },
-    { id: "msg3", conversationId: "conv1", senderId: "pro3", text: "J'arrive dans 15 minutes. Le trafic est un peu dense sur le boulevard.", photos: [], createdAt: "2026-06-17T09:45:00Z", status: "read" },
+    mockMsg({ id: "msg1", conversationId: "conv1", senderId: "pro3", text: "Bonjour Marie, je suis en route pour votre intervention.", createdAt: "2026-06-17T09:30:00Z" }),
+    mockMsg({ id: "msg2", conversationId: "conv1", senderId: "client_marie", text: "Parfait, je vous attends !", createdAt: "2026-06-17T09:35:00Z" }),
+    mockMsg({ id: "msg3", conversationId: "conv1", senderId: "pro3", text: "J'arrive dans 15 minutes. Le trafic est un peu dense sur le boulevard.", createdAt: "2026-06-17T09:45:00Z" }),
   ],
   conv2: [
-    { id: "msg4", conversationId: "conv2", senderId: "pro6", text: "Bonjour Madame, je viens de finir de vérifier le disjoncteur général.", photos: [], createdAt: "2026-06-16T13:30:00Z", status: "read" },
-    { id: "msg5", conversationId: "conv2", senderId: "client_marie", text: "Merci Drissa ! Tout va bien maintenant ?", photos: [], createdAt: "2026-06-16T13:40:00Z", status: "read" },
-    { id: "msg6", conversationId: "conv2", senderId: "pro6", text: "Le disjoncteur est changé", photos: [], createdAt: "2026-06-16T14:00:00Z", status: "read" },
+    mockMsg({ id: "msg4", conversationId: "conv2", senderId: "pro6", text: "Bonjour Madame, je viens de finir de vérifier le disjoncteur général.", createdAt: "2026-06-16T13:30:00Z" }),
+    mockMsg({ id: "msg5", conversationId: "conv2", senderId: "client_marie", text: "Merci Drissa ! Tout va bien maintenant ?", createdAt: "2026-06-16T13:40:00Z" }),
+    mockMsg({ id: "msg6", conversationId: "conv2", senderId: "pro6", text: "Le disjoncteur est changé", createdAt: "2026-06-16T14:00:00Z" }),
   ],
 };
 
