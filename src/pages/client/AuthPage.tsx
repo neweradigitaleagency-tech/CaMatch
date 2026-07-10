@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, MessageCircle, ArrowLeft } from "lucide-react";
+import { Phone, Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, MessageCircle, ArrowLeft, User, Briefcase, Building2 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
 import { supabase, isSupabaseReady } from "../../services/supabase";
 
@@ -14,6 +14,7 @@ export default function AuthPage() {
   const signInWithEmail = useAuthStore((s) => s.signInWithEmail);
   const signUpWithEmail = useAuthStore((s) => s.signUpWithEmail);
   const setUser = useAuthStore((s) => s.setUser);
+  const setPro = useAuthStore((s) => s.setPro);
 
   const [mode, setMode] = useState<AuthMode>("phone");
   const [phoneStep, setPhoneStep] = useState<PhoneStep>("phone-input");
@@ -36,6 +37,17 @@ export default function AuthPage() {
   const goToClient = () => {
     setUser("demo", "client");
     nav("/", { replace: true });
+  };
+
+  const goToSupplier = () => {
+    setUser("supplier-1", "client");
+    nav("/supplier/dashboard", { replace: true });
+  };
+
+  const goToPro = () => {
+    setUser("demo", "client");
+    setPro();
+    nav("/pro/dashboard", { replace: true });
   };
 
   useEffect(() => {
@@ -196,7 +208,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                className="w-full h-12 bg-cm-accent text-cm-text-onAccent font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -234,7 +246,7 @@ export default function AuthPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                className="w-full h-12 bg-cm-accent text-cm-text-onAccent font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -295,7 +307,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+              className="w-full h-12 bg-cm-accent text-cm-text-onAccent font-bold text-sm rounded-xl hover:bg-cm-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
             >
               {loading ? (
                 <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -326,12 +338,19 @@ export default function AuthPage() {
         </div>
       </div>
 
-      <div className="px-6 pb-8">
-        <button
-          onClick={goToClient}
-          className="w-full h-10 text-xs text-cm-text-muted hover:text-cm-text-soft transition-colors cursor-pointer"
-        >
-          Mode démo — Continuer sans compte
+      <div className="px-6 pb-8 space-y-2">
+        <p className="text-[10px] text-cm-text-muted text-center">Accès rapide — Mode démo</p>
+        <button onClick={goToClient}
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-border hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <User className="w-4 h-4 text-cm-text-muted" /> Mode démo Client
+        </button>
+        <button onClick={goToPro}
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-border hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <Briefcase className="w-4 h-4 text-cm-text-muted" /> Mode démo Pro
+        </button>
+        <button onClick={goToSupplier}
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-accent/30 hover:bg-cm-accent/5 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <Building2 className="w-4 h-4 text-cm-accent" /> Mode démo Fournisseur
         </button>
       </div>
     </div>

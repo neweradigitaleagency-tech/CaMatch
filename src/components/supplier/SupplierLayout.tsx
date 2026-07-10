@@ -1,0 +1,104 @@
+import { useState } from "react"
+import { Outlet, NavLink, useNavigate } from "react-router-dom"
+import {
+  LayoutDashboard, Package, ClipboardList, MapPin, BarChart3, User, Menu, X, LogOut, Building2, Wallet, Scale, Truck, Banknote
+} from "lucide-react"
+import { useSupplierProfile } from "../../hooks/supplier/useSupplierProfile"
+import { useAuthStore } from "../../stores/authStore"
+
+const NAV_ITEMS = [
+  { label: "Dashboard", href: "/supplier/dashboard", icon: LayoutDashboard },
+  { label: "Produits", href: "/supplier/products", icon: Package },
+  { label: "Commandes", href: "/supplier/orders", icon: ClipboardList },
+  { label: "Paiements", href: "/supplier/payments", icon: Wallet },
+  { label: "Litiges", href: "/supplier/disputes", icon: Scale },
+  { label: "Suivi livraisons", href: "/supplier/deliveries", icon: Truck },
+  { label: "Zones livraison", href: "/supplier/delivery-zones", icon: MapPin },
+  { label: "Solde", href: "/supplier/balance", icon: Banknote },
+  { label: "Statistiques", href: "/supplier/stats", icon: BarChart3 },
+  { label: "Profil", href: "/supplier/profile", icon: User },
+]
+
+export default function SupplierLayout() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const navigate = useNavigate()
+  const logout = useAuthStore((s) => s.logout)
+  const { data: profile } = useSupplierProfile()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/")
+  }
+
+  return (
+    <div className="min-h-dynamic bg-gray-50 flex">
+      {mobileOpen && (
+        <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />
+      )}
+      <aside className={`fixed top-0 left-0 bottom-0 z-40 flex flex-col bg-gray-900 w-[260px] transition-transform duration-200
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+        <div className="flex items-center gap-3 h-14 px-4 border-b border-white/10">
+          <div className="w-7 h-7 rounded-full bg-cm-green flex items-center justify-center text-white text-[11px] font-bold shrink-0">
+            Ç
+          </div>
+          <span className="text-white text-[14px] font-bold whitespace-nowrap">Portail Fournisseur</span>
+          <button onClick={() => setMobileOpen(false)} className="ml-auto w-7 h-7 flex items-center justify-center text-white/50 hover:text-white cursor-pointer lg:hidden">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {profile && (
+          <div className="px-4 py-3 border-b border-white/10">
+            <p className="text-white text-[13px] font-semibold truncate">{profile.companyName}</p>
+            <p className="text-white/50 text-[11px]">{profile.city}</p>
+          </div>
+        )}
+
+        <nav className="flex-1 py-3 overflow-y-auto space-y-0.5 px-2">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon
+            return (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                onClick={() => setMobileOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 h-10 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
+                    isActive ? "bg-white/10 text-white" : "text-white/60 hover:bg-white/5 hover:text-white"
+                  }`
+                }
+              >
+                <Icon className="w-[18px] h-[18px] shrink-0" />
+                <span>{item.label}</span>
+              </NavLink>
+            )
+          })}
+        </nav>
+
+        <div className="border-t border-white/10 p-3">
+          <button onClick={handleLogout}
+            className="flex items-center gap-3 px-3 h-10 w-full rounded-lg text-[13px] font-medium text-white/50 hover:bg-white/5 hover:text-white cursor-pointer transition-colors">
+            <LogOut className="w-[18px] h-[18px]" />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </aside>
+
+      <div className="flex-1 flex flex-col min-h-screen lg:ml-[260px]">
+        <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 lg:px-6 sticky top-0 z-20">
+          <button onClick={() => setMobileOpen(true)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer lg:hidden">
+            <Menu className="w-5 h-5 text-gray-700" />
+          </button>
+          <div className="flex items-center gap-2 ml-auto">
+            <Building2 className="w-4 h-4 text-gray-400" />
+            <span className="text-[12px] text-gray-500">{profile?.companyName ?? "Fournisseur"}</span>
+          </div>
+        </header>
+        <main className="flex-1 p-4 lg:p-6 max-w-[1400px] w-full mx-auto">
+          <Outlet />
+        </main>
+      </div>
+    </div>
+  )
+}
