@@ -168,7 +168,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
                     <button
                       onClick={handlePhoneSubmit}
                       disabled={phone.length < 8 || loading}
-                      className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                      className="w-full h-12 bg-cm-accent text-cm-text-onAccent font-bold text-sm rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                     >
                       {loading ? (
                         <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -243,7 +243,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
                   <button
                     onClick={handleEmailSubmit}
                     disabled={loading}
-                    className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+                    className="w-full h-12 bg-cm-accent text-cm-text-onAccent font-bold text-sm rounded-xl hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -227,7 +227,7 @@ export default function MissionActiveCard({
                 onClick={handleChatClick}
                 className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 cursor-pointer transition-all active:scale-90 ${
                   status === "arrived"
-                    ? "bg-cm-accent text-white shadow-cm-sm"
+                    ? "bg-cm-accent text-cm-text-onAccent shadow-cm-sm"
                     : "bg-cm-accent-soft text-cm-text hover:bg-cm-border"
                 }`}
                 aria-label="Message"

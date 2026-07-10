@@ -96,7 +96,7 @@ export default function SubscriptionSuccessPage() {
         >
           <button
             onClick={() => nav(type === "pro" ? "/pro/subscription" : "/settings/subscription")}
-            className="w-full h-12 bg-cm-accent text-white font-bold text-sm rounded-xl hover:brightness-105 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
+            className="w-full h-12 bg-cm-accent text-cm-text-onAccent font-bold text-sm rounded-xl hover:brightness-105 transition-all active:scale-[0.98] cursor-pointer flex items-center justify-center gap-2"
           >
             Gérer mon abonnement <ArrowRight className="w-4 h-4" />
           </button>

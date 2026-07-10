@@ -349,7 +349,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
                   ))}
                 </div>
                 <button onClick={dismissHowItWorks}
-                  className="w-full py-2.5 bg-cm-accent rounded-[var(--radius-cm)] text-[13px] font-medium text-white cm-scale-btn hover:bg-cm-accent-hover">
+                  className="w-full py-2.5 bg-cm-accent rounded-[var(--radius-cm)] text-[13px] font-medium text-cm-text-onAccent cm-scale-btn hover:bg-cm-accent-hover">
                   J'ai compris
                 </button>
               </div>

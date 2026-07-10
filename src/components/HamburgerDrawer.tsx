@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   ArrowLeft, ChevronRight, LogOut, Award, Clock, Camera, Mail, IdCard,
   UserIcon, CalendarDays, Wallet, MessageCircle, HelpCircle, Settings,
-  DollarSign, CreditCard, Shield, Bell, Eye, Moon, Globe, Smartphone,
+  Coins, CreditCard, Shield, Bell, Eye, Moon, Globe, Smartphone,
   KeyRound, Monitor, Trash2, Send, AlertTriangle, Info, FileText,
   Landmark, TrendingUp, MapPin, Star, BadgeCheck, Plus
 } from "lucide-react";
@@ -61,7 +61,11 @@ export default function HamburgerDrawer({ open, onClose, isPro = false, proName,
     if (!open) return;
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", handler);
-    return () => document.removeEventListener("keydown", handler);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handler);
+      document.body.style.overflow = "";
+    };
   }, [open, onClose]);
 
   const handleNav = (path: string) => {
@@ -80,27 +84,43 @@ export default function HamburgerDrawer({ open, onClose, isPro = false, proName,
   };
 
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          ref={drawerRef}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-50 bg-white overflow-y-auto"
-        >
-          <div className="w-full max-w-[448px] mx-auto relative min-h-dynamic px-4 pb-8">
-            <button onClick={onClose}
-              className="mt-3 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
-              <ArrowLeft className="w-5 h-5 text-gray-900" />
-            </button>
+    <>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-50 bg-black/40"
+            onClick={onClose}
+          />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="drawer"
+            ref={drawerRef}
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            className="fixed top-0 left-0 bottom-0 z-50 w-full max-w-sm bg-white overflow-y-auto shadow-2xl rounded-r-[var(--radius-cm-xl)]"
+          >
+            <div className="relative min-h-dynamic px-4 pb-8">
+              <button onClick={onClose}
+                className="mt-3 w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
+                <ArrowLeft className="w-5 h-5 text-gray-900" />
+              </button>
 
-            {isPro ? <ProMenu proName={proName || firstName} proTitle={proTitle} proAvatarUrl={proAvatarUrl} proPhone={proPhone || phone} handleNav={handleNav} handleLogout={handleLogout} /> : <ClientMenu firstName={firstName} phone={phone} avatarUrl={avatarUrl} handleNav={handleNav} handleLogout={handleLogout} setPro={setPro} missions={missions} />}
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+              {isPro ? <ProMenu proName={proName || firstName} proTitle={proTitle} proAvatarUrl={proAvatarUrl} proPhone={proPhone || phone} handleNav={handleNav} handleLogout={handleLogout} /> : <ClientMenu firstName={firstName} phone={phone} avatarUrl={avatarUrl} handleNav={handleNav} handleLogout={handleLogout} setPro={setPro} missions={missions} />}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 
@@ -137,7 +157,6 @@ function ProMenu({ proName, proTitle, proAvatarUrl, proPhone, handleNav, handleL
           </div>
         </div>
         {proTitle && <span className="text-[13px] font-medium text-gray-500">{proTitle}</span>}
-        <span className="text-[12px] text-gray-400 mt-0.5">{proPhone}</span>
       </div>
 
       <div className="grid grid-cols-4 gap-2 mb-6">
@@ -153,7 +172,7 @@ function ProMenu({ proName, proTitle, proAvatarUrl, proPhone, handleNav, handleL
         <MenuItem icon={IdCard} label="Identité professionnelle" onClick={() => handleNav("/pro/professional-identity")} />
         <MenuItem icon={Shield} label="Vérifications" onClick={() => handleNav("/profile/pro-verification")} />
         <MenuItem icon={CreditCard} label="Moyens de paiement" onClick={() => handleNav("/pro/payment-methods")} />
-        <MenuItem icon={DollarSign} label="Retirer mes revenus" onClick={() => handleNav("/pro/withdraw")} />
+        <MenuItem icon={Coins} label="Retirer mes revenus" onClick={() => handleNav("/pro/withdraw")} />
       </div>
 
       <SectionHeader emoji="💰" label="Paiements" />
@@ -168,7 +187,7 @@ function ProMenu({ proName, proTitle, proAvatarUrl, proPhone, handleNav, handleL
       <div className="bg-gray-50 rounded-2xl overflow-hidden mb-2">
         <MenuItem icon={Bell} label="Notifications" onClick={() => handleNav("/profile/pro-notifications")} />
         <MenuItem icon={Globe} label="Langue" onClick={() => handleNav("/profile/language")} />
-        <MenuItem icon={DollarSign} label="Devise" onClick={() => handleNav("/pro/currency")} />
+        <MenuItem icon={Coins} label="Devise" onClick={() => handleNav("/pro/currency")} />
         <MenuItem icon={Clock} label="Fuseau horaire" onClick={() => handleNav("/pro/timezone")} />
         <MenuItem icon={Moon} label="Mode sombre" onClick={() => handleNav("/pro/appearance")} />
         <MenuItem icon={Eye} label="Confidentialité" onClick={() => handleNav("/pro/privacy")} />

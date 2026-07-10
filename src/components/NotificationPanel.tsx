@@ -1,11 +1,11 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, Bell, MessageSquare, CheckCircle, DollarSign, Star, AlertTriangle } from "lucide-react";
+import { X, Bell, MessageSquare, CheckCircle, Coins, Star, AlertTriangle } from "lucide-react";
 import { useNotificationStore, type AppNotification } from "../stores/notificationStore";
 
 const TYPE_ICONS: Record<string, typeof Bell> = {
   mission: CheckCircle,
   message: MessageSquare,
-  payment: DollarSign,
+  payment: Coins,
   review: Star,
   promo: Bell,
   info: AlertTriangle,

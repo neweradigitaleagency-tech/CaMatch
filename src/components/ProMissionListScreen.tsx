@@ -1,9 +1,32 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, CalendarDays, MapPin, DollarSign, UserIcon, ChevronRight, Clock } from "lucide-react";
-import StatusBadge from "./ui/StatusBadge";
+import { ArrowLeft, CalendarDays, MapPin, Coins, UserIcon } from "lucide-react";
 import type { Mission, MissionStatus } from "../types";
 import { MISSION_STATUS_FLOW } from "../types";
+
+const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string }> = {
+  pending:        { border: "border-l-amber-400",  dot: "bg-amber-400",  badge: "bg-amber-50 text-amber-700" },
+  accepted:       { border: "border-l-emerald-500", dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700" },
+  quote_requested:{ border: "border-l-violet-500",  dot: "bg-violet-500", badge: "bg-violet-50 text-violet-700" },
+  quote_sent:     { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
+  quote_accepted: { border: "border-l-teal-500",    dot: "bg-teal-500",   badge: "bg-teal-50 text-teal-700" },
+  paid:           { border: "border-l-emerald-500", dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700" },
+  en_route:       { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
+  arrived:        { border: "border-l-sky-500",     dot: "bg-sky-500",    badge: "bg-sky-50 text-sky-700" },
+  in_progress:    { border: "border-l-orange-500",  dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700" },
+  completed:      { border: "border-l-gray-400",    dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600" },
+  client_validation: { border: "border-l-teal-500", dot: "bg-teal-500",  badge: "bg-teal-50 text-teal-700" },
+  client_validated:{ border: "border-l-emerald-500",dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700" },
+  closed:         { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+  cancelled:      { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
+  disputed:       { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
+  refunded:       { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
+  refused:        { border: "border-l-red-300",     dot: "bg-red-300",    badge: "bg-red-50 text-red-500" },
+  draft:          { border: "border-l-gray-300",    dot: "bg-gray-300",   badge: "bg-gray-100 text-gray-500" },
+  published:      { border: "border-l-blue-400",    dot: "bg-blue-400",   badge: "bg-blue-50 text-blue-600" },
+  created:        { border: "border-l-gray-300",    dot: "bg-gray-300",   badge: "bg-gray-100 text-gray-500" },
+  reviewed:       { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+};
 
 interface ProMissionListScreenProps {
   missions: Mission[];
@@ -76,61 +99,111 @@ export default function ProMissionListScreen({ missions, onBack, onSelectMission
           </div>
         )}
 
-        {filtered.map((mission, idx) => {
-          const stepIdx = getCurrentStepIndex(mission.status);
-          return (
-            <motion.button
-              key={mission.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.05 }}
-              onClick={() => onSelectMission(mission)}
-              className="w-full text-left bg-cm-elevated rounded-2xl p-4 border border-cm-border cursor-pointer active:scale-[0.98] transition-all hover:border-cm-text/20"
-            >
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full bg-cm-accent-soft flex items-center justify-center">
-                    <UserIcon className="w-4 h-4 text-cm-accent" />
-                  </div>
-                  <div>
-                    <p className="text-[14px] font-display font-bold text-cm-text">{mission.clientName || mission.proName}</p>
-                    <p className="text-[11px] text-cm-text-soft flex items-center gap-1">
-                      <CalendarDays className="w-3 h-3" />
-                      {formatDate(mission.createdAt)}
-                    </p>
-                  </div>
-                </div>
-                <StatusBadge status={mission.status} />
-              </div>
-
-              <p className="text-[13px] text-cm-text ml-10.5 mb-2 line-clamp-1">{mission.title}</p>
-
-              <div className="flex items-center gap-3 ml-10.5">
-                <span className="flex items-center gap-1 text-[11px] font-mono text-cm-text-soft">
-                  <MapPin className="w-3 h-3" />
-                  {mission.address}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between mt-3 ml-10.5">
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[12px] font-mono font-bold text-cm-text">
-                    {formatXOF(mission.budgetXOF)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  {["accepted", "en_route", "in_progress", "completed"].map((s, i) => (
-                    <div key={s}
-                      className={`w-1.5 h-1.5 rounded-full ${
-                        i <= stepIdx ? "bg-cm-accent" : "bg-cm-border"
-                      }`}
+        {(() => {
+          const jobs = filtered;
+          return jobs.map((mission, idx) => {
+            const cfg = STATUS_CONFIG[mission.status]!;
+            return (
+              <div key={mission.id} className="relative flex gap-3">
+                {/* Timeline column */}
+                <div className="flex flex-col items-center w-5 shrink-0">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15, delay: idx * 0.06 }}
+                    className={`w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 ${cfg.dot}`}
+                  />
+                  {idx < jobs.length - 1 && (
+                    <motion.div
+                      initial={{ scaleY: 0 }}
+                      animate={{ scaleY: 1 }}
+                      transition={{ duration: 0.3, delay: idx * 0.06 + 0.08 }}
+                      className="w-0.5 flex-1 min-h-[16px] bg-gray-200 origin-top"
                     />
-                  ))}
+                  )}
                 </div>
+
+                {/* Card */}
+                <motion.button
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.06, type: "spring", damping: 20, stiffness: 200 }}
+                  onClick={() => onSelectMission(mission)}
+                  className={`flex-1 text-left bg-cm-elevated rounded-2xl p-4 cursor-pointer shadow-sm ${cfg.border} hover:shadow-md active:scale-[0.98] transition-all`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-cm-accent-soft flex items-center justify-center">
+                        <UserIcon className="w-4 h-4 text-cm-accent" />
+                      </div>
+                      <div>
+                        <p className="text-[14px] font-display font-bold text-cm-text">{mission.clientName || mission.proName}</p>
+                        <p className="text-[11px] text-cm-text-soft flex items-center gap-1">
+                          <CalendarDays className="w-3 h-3" />
+                          {formatDate(mission.createdAt)}
+                        </p>
+                      </div>
+                    </div>
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 15, delay: idx * 0.06 + 0.12 }}
+                      className={`inline-flex items-center h-6 px-2.5 rounded-[9999px] text-[11px] font-semibold ${cfg.badge}`}
+                    >
+                      {mission.status === "pending" ? "En attente" :
+                       mission.status === "accepted" ? "Acceptée" :
+                       mission.status === "quote_requested" ? "En attente de devis" :
+                       mission.status === "quote_sent" ? "Devis envoyé" :
+                       mission.status === "quote_accepted" ? "Devis accepté" :
+                       mission.status === "paid" ? "Payée" :
+                       mission.status === "in_progress" ? "En cours" :
+                       mission.status === "completed" ? "Terminée" :
+                       mission.status === "client_validation" ? "Validation client" :
+                       mission.status === "client_validated" ? "Validée" :
+                       mission.status === "closed" ? "Clôturée" :
+                       mission.status === "cancelled" ? "Annulée" :
+                       mission.status === "refunded" ? "Remboursée" :
+                       mission.status === "disputed" ? "En litige" :
+                       mission.status === "refused" ? "Refusée" :
+                       mission.status === "en_route" ? "En route" :
+                       mission.status === "arrived" ? "Arrivé" :
+                       mission.status}
+                    </motion.span>
+                  </div>
+
+                  <p className="text-[13px] text-cm-text ml-10.5 mb-2 line-clamp-1">{mission.title}</p>
+
+                  <div className="flex items-center gap-3 ml-10.5">
+                    <span className="flex items-center gap-1 text-[11px] font-mono text-cm-text-soft">
+                      <MapPin className="w-3 h-3" />
+                      {mission.address}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-3 ml-10.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[12px] font-mono font-bold text-cm-text">
+                        {formatXOF(mission.budgetXOF)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {["accepted", "en_route", "in_progress", "completed"].map((s, i) => {
+                        const flowIdx = getCurrentStepIndex(mission.status);
+                        return (
+                          <div key={s}
+                            className={`w-1.5 h-1.5 rounded-full ${
+                              i <= flowIdx ? "bg-cm-accent" : "bg-cm-border"
+                            }`}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </motion.button>
               </div>
-            </motion.button>
-          );
-        })}
+            );
+          });
+        })()}
       </div>
     </div>
   );

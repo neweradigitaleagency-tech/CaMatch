@@ -94,7 +94,7 @@ export default function InvoiceScreen({ mission, invoice, onBack }: InvoiceScree
                 <button key={`after-${i}`} onClick={() => setViewerIndex(invoice.beforePhotos.length + i)}
                   className="relative rounded-xl overflow-hidden aspect-[4/3] border border-cm-border cursor-pointer group">
                   <img src={url} alt="" className="w-full h-full object-cover" />
-                  <span className="absolute top-2 left-2 text-[10px] font-mono bg-cm-accent/80 text-white px-2 py-0.5 rounded-full">Après</span>
+                  <span className="absolute top-2 left-2 text-[10px] font-mono bg-cm-accent/80 text-cm-text-onAccent px-2 py-0.5 rounded-full">Après</span>
                 </button>
               ))}
             </div>

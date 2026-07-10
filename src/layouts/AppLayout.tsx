@@ -26,7 +26,8 @@ export default function AppLayout() {
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-dynamic text-cm-text flex flex-col font-sans cm-viewport shadow-2xl border-x border-cm-border bg-cm-bg`}>
+    <div className="min-h-dynamic text-cm-text flex flex-col font-sans cm-viewport shadow-2xl border-x border-cm-border bg-cm-bg pb-safe">
+      <div className="h-1 shrink-0 bg-gradient-to-r from-cm-accent to-cm-forest" />
       <main className={`flex-grow ${isChatRoute ? "flex flex-col" : "overflow-y-auto"}`}>
         <ErrorBoundary>
           {isChatRoute ? (

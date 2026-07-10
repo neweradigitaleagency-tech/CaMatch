@@ -5,7 +5,7 @@ import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, AreaChart, Area,
 } from "recharts"
-import { TrendingUp, DollarSign, Activity, Users } from "lucide-react"
+import { TrendingUp, Coins, Activity, Users } from "lucide-react"
 import KPICard from "../../components/admin/ui/KPICard"
 import AdminSkeleton from "../../components/admin/ui/AdminSkeleton"
 import ErrorState from "../../components/admin/ui/ErrorState"
@@ -93,7 +93,7 @@ export default function AdminRevenueAnalyticsPage() {
       ) : (
         <div className="grid grid-cols-4 gap-3">
           <KPICard label="MRR (Revenu mensuel récurrent)" value={formatXOF(mrr)} icon={<TrendingUp className="w-4 h-4" />} />
-          <KPICard label="ARR (Revenu annuel)" value={formatXOF(arr)} icon={<DollarSign className="w-4 h-4" />} />
+          <KPICard label="ARR (Revenu annuel)" value={formatXOF(arr)} icon={<Coins className="w-4 h-4" />} />
           <KPICard label="Taux d'attrition moyen" value={`${avgChurn}%`} icon={<Activity className="w-4 h-4" />} trend={{ value: Math.round(avgChurn), positive: avgChurn < 5 }} />
           <KPICard label="LTV (Valeur moyenne/client)" value={formatXOF(avgRevenuePerUser)} icon={<Users className="w-4 h-4" />} />
         </div>

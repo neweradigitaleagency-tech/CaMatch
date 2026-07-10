@@ -44,7 +44,7 @@ export default function WelcomeStep({ onStart }: WelcomeStepProps) {
       </div>
 
       <button onClick={onStart}
-        className="w-full h-12 bg-cm-accent rounded-[16px] text-[15px] font-bold text-white cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all shadow-lg">
+        className="w-full h-12 bg-cm-accent rounded-[16px] text-[15px] font-bold text-cm-text-onAccent cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all shadow-lg">
         Commencer
       </button>
 

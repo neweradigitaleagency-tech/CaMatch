@@ -85,7 +85,7 @@ export default function MessagingScreen({ conversations, onBack, onOpenConversat
                     <img src={conv.otherUserAvatar} alt="" className="w-full h-full object-cover" />
                   </div>
                   {conv.unreadCount > 0 && (
-                    <div className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-cm-accent text-[10px] font-bold flex items-center justify-center text-white border-2 border-cm-bg">
+                    <div className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-cm-accent text-[10px] font-bold flex items-center justify-center text-cm-text-onAccent border-2 border-cm-bg">
                       {conv.unreadCount}
                     </div>
                   )}

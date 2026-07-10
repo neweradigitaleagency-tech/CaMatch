@@ -30,7 +30,7 @@ export default function EligibilityStep({ onComplete }: EligibilityStepProps) {
       </div>
 
       <button onClick={() => onComplete(true)}
-        className="w-full h-12 bg-cm-accent rounded-[16px] text-[14px] font-bold text-white cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all">
+        className="w-full h-12 bg-cm-accent rounded-[16px] text-[14px] font-bold text-cm-text-onAccent cursor-pointer hover:opacity-90 active:scale-[0.97] transition-all">
         Je remplis toutes les conditions
       </button>
     </div>

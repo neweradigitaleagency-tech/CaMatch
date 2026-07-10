@@ -6,7 +6,7 @@ import {
   Calendar as CalendarIcon,
   Clock,
   MapPin,
-  DollarSign,
+  Coins,
   UserIcon,
   Power,
   Bell,
@@ -136,7 +136,7 @@ export default function ProScheduleScreen({ jobs, onViewJob }: Props) {
             isSelected
               ? "bg-cm-accent text-cm-accent"
               : isToday(day)
-              ? "bg-cm-accent text-white"
+              ? "bg-cm-accent text-cm-text-onAccent"
               : "hover:bg-cm-accent-soft"
           }`}
         >

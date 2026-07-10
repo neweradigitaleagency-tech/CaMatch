@@ -113,7 +113,7 @@ export default function QuoteReviewPage() {
               <button key={v.id} onClick={() => setSelectedVersionIdx(i)}
                 className={`px-3 py-1.5 rounded-full text-[11px] font-medium whitespace-nowrap cursor-pointer cm-scale-btn ${
                   selectedVersionIdx === i
-                    ? "bg-cm-accent text-white"
+                    ? "bg-cm-accent text-cm-text-onAccent"
                     : "bg-cm-elevated border border-cm-border text-cm-text-soft"
                 }`}>
                 Version {v.version}

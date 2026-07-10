@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { ArrowLeft, FileText, MapPin, DollarSign, ArrowUpRight, XCircle, Zap, Star, Hourglass } from "lucide-react";
+import { ArrowLeft, FileText, MapPin, Coins, ArrowUpRight, XCircle, Zap, Star, Hourglass } from "lucide-react";
 import { useClientRequests, useClientMissions } from "../hooks/useDatabase";
 import { useAuthStore } from "../stores/authStore";
 import { useRequestStore } from "../stores/requestStore";
@@ -86,7 +86,7 @@ export default function OrdersPage() {
               <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-cm-text-muted">
                 <span>{category}</span>
                 <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{address}</span>
-                <span className="flex items-center gap-0.5 font-bold text-cm-text font-mono"><DollarSign className="w-2.5 h-2.5" />{budget.toLocaleString()} F</span>
+                <span className="flex items-center gap-0.5 font-bold text-cm-text font-mono"><Coins className="w-2.5 h-2.5" />{budget.toLocaleString()} F</span>
               </div>
             </div>
             <ArrowUpRight className="w-4 h-4 text-cm-text-muted shrink-0 mt-1" />

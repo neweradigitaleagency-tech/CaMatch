@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Star, Heart, Loader2, Check, MapPin } from "lucide-react";
 import { motion } from "motion/react";
 import type { ProfessionalDetails, ProCategory } from "../../types";
+import TouchFeedback from "../TouchFeedback";
 
 interface ProCardProps {
   pro: ProfessionalDetails;
@@ -77,7 +78,7 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
         layout
         whileHover={{ y: -3, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="bg-white border border-gray-200 rounded-[20px] overflow-hidden cursor-pointer flex flex-col hover:border-gray-300 shadow-sm group"
+        className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-card)] overflow-hidden cursor-pointer flex flex-col hover:border-cm-accent/30 shadow-cm-card group"
         aria-label={`Profil de ${pro.name}`}
         role="button"
         tabIndex={0}
@@ -93,28 +94,28 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
             src={pro.avatarUrl}
             alt={pro.name}
             referrerPolicy="no-referrer"
-            className="w-10 h-10 rounded-full object-cover border-[3px] border-white shadow-md bg-gray-200"
+            className="w-10 h-10 rounded-[var(--radius-cm-squircle)] object-cover border-[3px] border-cm-elevated shadow-cm-card bg-cm-surface"
           />
         </div>
         <div className="pt-6 px-3 pb-3 flex flex-col flex-1">
           <div className="flex items-start justify-between gap-1 mb-2">
             <div className="min-w-0">
-              <h4 className="text-[12px] font-black text-gray-900 line-clamp-1 leading-tight">{pro.name}</h4>
-              <p className="text-[9px] font-bold mt-0.5 text-gray-500 line-clamp-1">{pro.title || pro.subCategory}</p>
+              <h4 className="text-[12px] font-black text-cm-text line-clamp-1 leading-tight">{pro.name}</h4>
+              <p className="text-[9px] font-bold mt-0.5 text-cm-text-soft line-clamp-1">{pro.title || pro.subCategory}</p>
             </div>
             {pro.isVerified && <VerifiedBadgeSVG className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />}
           </div>
-          <div className="flex items-center gap-2 py-1.5 px-2 rounded-xl bg-gray-50 mb-2">
-            <span className="flex items-center gap-1 text-[9px] font-black text-gray-700"><Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />{rating.toFixed(1)}</span>
-            <span className="text-[9px] font-black text-gray-400">·</span>
-            <span className="text-[9px] font-black text-gray-700">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F/h</span>
-            <span className="text-[9px] font-black text-gray-400">·</span>
-            <span className="text-[9px] font-black text-gray-700">{pro.reviewCount}+</span>
+          <div className="flex items-center gap-2 py-1.5 px-2 rounded-[var(--radius-cm-lg)] bg-cm-surface mb-2">
+            <span className="flex items-center gap-1 text-[9px] font-black text-cm-text"><Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />{rating.toFixed(1)}</span>
+            <span className="text-[9px] font-black text-cm-text-soft">·</span>
+            <span className="text-[9px] font-black text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F/h</span>
+            <span className="text-[9px] font-black text-cm-text-soft">·</span>
+            <span className="text-[9px] font-black text-cm-text">{pro.reviewCount}+</span>
           </div>
           <button
             onClick={handleButtonClick}
             disabled={btnState !== "idle"}
-            className="w-full py-1.5 rounded-xl text-[9px] font-black tracking-wide bg-gray-900 text-white hover:bg-gray-800 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all mt-auto"
+            className="w-full py-1.5 rounded-[var(--radius-cm-lg)] text-[9px] font-black tracking-wide bg-cm-accent text-cm-text-onAccent active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all mt-auto"
             aria-label={`Contacter ${pro.name}`}
           >
             {btnState === "loading" ? <Loader2 className="w-3 h-3 animate-spin mx-auto" /> : btnState === "done" ? <Check className="w-3 h-3 mx-auto" /> : "Voir"}
@@ -130,98 +131,96 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
       layout
       whileHover={{ y: -6, scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      className={`relative rounded-[24px] overflow-hidden cursor-pointer flex flex-col shadow-sm hover:shadow-md transition-all duration-300 ${
-        isDark ? "bg-[#0B0C0E] text-white border border-white/5" : "bg-white text-gray-900 border border-gray-100"
+      className={`relative rounded-[var(--radius-cm-bento)] overflow-hidden cursor-pointer flex flex-col shadow-cm-card hover:shadow-cm-card-hov transition-all duration-300 ${
+        isDark ? "bg-[#0B0C0E] text-white border border-white/5" : "bg-cm-elevated text-cm-text border border-cm-border"
       }`}
       aria-label={`Profil de ${pro.name}`}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onClick?.(); }}
     >
-      {/* Banner */}
       <div className="relative h-20 w-full overflow-hidden shrink-0">
         <BannerGradient category={pro.category} />
         <div className="absolute inset-0 opacity-15 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white/40 via-transparent to-transparent" />
         <StatusPill pro={pro} />
       </div>
 
-      {/* Avatar overlapping banner */}
       <div className="absolute top-11 left-3.5 z-10">
         <img
           src={pro.avatarUrl}
           alt={pro.name}
           referrerPolicy="no-referrer"
-          className={`w-12 h-12 rounded-full object-cover border-[3px] ${isDark ? "border-[#0B0C0E]" : "border-white"} shadow-md bg-gray-200`}
+          className={`w-12 h-12 rounded-[var(--radius-cm-squircle)] object-cover border-[3px] ${isDark ? "border-[#0B0C0E]" : "border-cm-elevated"} shadow-cm-card bg-cm-surface`}
         />
       </div>
 
-      {/* Card content */}
       <div className="pt-6 px-3.5 pb-3.5 flex flex-col flex-1">
-        {/* Header row: Name + Heart */}
         <div className="flex items-start justify-between gap-1 mb-2.5">
           <div className="min-w-0 flex-1">
-            <h4 className={`text-[13px] font-black tracking-tight leading-none line-clamp-1 ${isDark ? "text-white" : "text-gray-900"}`}>
+            <h4 className={`text-[13px] font-black tracking-tight leading-none line-clamp-1 ${isDark ? "text-white" : "text-cm-text"}`}>
               {pro.name}
             </h4>
-            <p className={`text-[10px] font-bold mt-1 line-clamp-1 ${isDark ? "text-zinc-400" : "text-gray-500"}`}>
+            <p className={`text-[10px] font-bold mt-1 line-clamp-1 ${isDark ? "text-zinc-400" : "text-cm-text-soft"}`}>
               {pro.title || pro.subCategory}
             </p>
           </div>
           <div className="flex items-center gap-1 shrink-0 mt-0.5">
             {pro.isVerified && <VerifiedBadgeSVG className="w-4 h-4 text-blue-500" />}
-            <button
-              onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
-              className={`w-7 h-7 rounded-full flex items-center justify-center transition-all active:scale-90 shrink-0 ${
-                isDark ? "bg-zinc-800/80 hover:bg-zinc-700/80" : "bg-gray-100 hover:bg-gray-200"
-              }`}
-              aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
-            >
-              <Heart className={`w-3 h-3 transition-colors ${liked ? "fill-red-500 text-red-500" : isDark ? "text-zinc-300" : "text-gray-600"}`} />
-            </button>
+            <TouchFeedback>
+              <button
+                onClick={(e) => { e.stopPropagation(); setLiked(!liked); }}
+                className={`w-7 h-7 rounded-full flex items-center justify-center transition-all shrink-0 ${
+                  isDark ? "bg-zinc-800/80 hover:bg-zinc-700/80" : "bg-cm-elevated hover:bg-cm-border"
+                }`}
+                aria-label={liked ? "Retirer des favoris" : "Ajouter aux favoris"}
+              >
+                <Heart className={`w-3 h-3 transition-colors ${liked ? "fill-red-500 text-red-500" : isDark ? "text-zinc-300" : "text-cm-text-soft"}`} />
+              </button>
+            </TouchFeedback>
           </div>
         </div>
 
-        {/* Stats row */}
-        <div className={`grid grid-cols-3 gap-0.5 py-2 px-1 rounded-2xl mb-3 h-12 items-center justify-items-center text-center ${
-          isDark ? "bg-zinc-900/60" : "bg-amber-50/60"
+        <div className={`grid grid-cols-3 gap-0.5 py-2 px-1 rounded-[var(--radius-cm-lg)] mb-3 h-12 items-center justify-items-center text-center ${
+          isDark ? "bg-zinc-900/60" : "bg-cm-surface"
         }`}>
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-0.5">
               <StarRating rating={rating} size="xs" />
             </div>
-            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-gray-400"}`}>Note</span>
+            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Note</span>
           </div>
-          <div className={`flex flex-col items-center border-x w-full ${isDark ? "border-zinc-800" : "border-gray-200/50"}`}>
-            <span className={`text-[10px] font-black ${isDark ? "text-zinc-200" : "text-gray-800"}`}>
+          <div className={`flex flex-col items-center border-x w-full ${isDark ? "border-zinc-800" : "border-cm-border/50"}`}>
+            <span className={`text-[10px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
               {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
             </span>
-            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-gray-400"}`}>Tarif/h</span>
+            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Tarif/h</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className={`text-[10px] font-black ${isDark ? "text-zinc-200" : "text-gray-800"}`}>
+            <span className={`text-[10px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
               {pro.reviewCount}+
             </span>
-            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-gray-400"}`}>Avis</span>
+            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Avis</span>
           </div>
         </div>
 
-        {/* CTA */}
-        <button
-          onClick={handleButtonClick}
-          disabled={btnState !== "idle"}
-          className={`w-full py-2.5 rounded-xl text-[10px] font-black tracking-wide transition-all active:scale-95 text-center shrink-0 mt-auto ${
-            isDark ? "bg-white text-gray-900 hover:bg-zinc-100" : "bg-gray-900 text-white hover:bg-gray-800"
-          } disabled:opacity-60 disabled:cursor-not-allowed`}
-          aria-label={`Contacter ${pro.name}`}
-        >
-          {btnState === "loading" ? (
-            <Loader2 className="w-4 h-4 animate-spin mx-auto" />
-          ) : btnState === "done" ? (
-            <Check className="w-4 h-4 mx-auto" />
-          ) : (
-            "Prendre RDV"
-          )}
-        </button>
+        <TouchFeedback>
+          <button
+            onClick={handleButtonClick}
+            disabled={btnState !== "idle"}
+            className={`w-full py-2.5 rounded-[var(--radius-cm-lg)] text-[10px] font-black tracking-wide transition-all active:scale-95 text-center shrink-0 mt-auto ${
+              isDark ? "bg-white text-gray-900 hover:bg-zinc-100" : "bg-cm-accent text-cm-text-onAccent"
+            } disabled:opacity-60 disabled:cursor-not-allowed`}
+            aria-label={`Contacter ${pro.name}`}
+          >
+            {btnState === "loading" ? (
+              <Loader2 className="w-4 h-4 animate-spin mx-auto" />
+            ) : btnState === "done" ? (
+              <Check className="w-4 h-4 mx-auto" />
+            ) : (
+              "Prendre RDV"
+            )}
+          </button>
+        </TouchFeedback>
       </div>
     </motion.div>
   );

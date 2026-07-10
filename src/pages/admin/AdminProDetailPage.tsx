@@ -8,7 +8,7 @@ import { formatXOF } from "../../utils/admin/formatCurrency"
 import {
   ArrowLeft, Mail, Phone, Calendar, Shield, Briefcase, Star, Clock,
   MapPin, Award, CheckCircle, XCircle, FileText, MessageSquare,
-  Circle, Wallet, DollarSign, User, ShieldAlert, Scan, CreditCard,
+  Circle, Wallet, Coins, User, ShieldAlert, Scan, CreditCard,
 } from "lucide-react"
 import { getCategoryLabel } from "../../constants/admin/categoryLabels"
 import type { ProProfile } from "../../services/admin/pros.service"
@@ -144,7 +144,7 @@ export default function AdminProDetailPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard icon={<Star className="w-4 h-4" />} label="Note" value={`${pro.rating.toFixed(1)} / 5`} />
         <StatCard icon={<Briefcase className="w-4 h-4" />} label="Missions" value={String(pro.total_jobs)} />
-        <StatCard icon={<DollarSign className="w-4 h-4" />} label="Revenu total" value={formatXOF(pro.total_earned)} />
+        <StatCard icon={<Coins className="w-4 h-4" />} label="Revenu total" value={formatXOF(pro.total_earned)} />
         <StatCard icon={<Wallet className="w-4 h-4" />} label="Portefeuille" value={formatXOF(pro.wallet_balance ?? 0)} />
       </div>
 

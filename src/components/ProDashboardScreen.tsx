@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Star, Users, CalendarDays, TrendingUp, Clock, MapPin, Wallet,
   CheckCircle, Phone, BarChart3, Target,
-  UserIcon, DollarSign, Award, Bell, Settings,
+  UserIcon, Coins, Award, Bell, Settings,
   MessageCircle, Navigation, XCircle, Check,
   FileText, Camera, Lock,
 } from "lucide-react";
@@ -64,6 +64,32 @@ const FLOW_BUTTON_ICONS: Record<string, string> = {
   client_validation: "⏳",
 };
 
+const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string }> = {
+  pending:        { border: "border-l-amber-400",  dot: "bg-amber-400",  badge: "bg-amber-50 text-amber-700" },
+  accepted:       { border: "border-l-emerald-500", dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700" },
+  quote_required: { border: "border-l-violet-500",  dot: "bg-violet-500", badge: "bg-violet-50 text-violet-700" },
+  en_route:       { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
+  arrived:        { border: "border-l-sky-500",     dot: "bg-sky-500",    badge: "bg-sky-50 text-sky-700" },
+  in_progress:    { border: "border-l-orange-500",  dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700" },
+  completed:      { border: "border-l-gray-400",    dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600" },
+  client_validation: { border: "border-l-teal-500", dot: "bg-teal-500",  badge: "bg-teal-50 text-teal-700" },
+  closed:         { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+  cancelled:      { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  pending: "Nouvelle",
+  accepted: "Acceptée",
+  quote_required: "Devis requis",
+  en_route: "En route",
+  arrived: "Arrivé",
+  in_progress: "En cours",
+  completed: "Terminée",
+  client_validation: "Validation",
+  closed: "Clôturée",
+  cancelled: "Annulée",
+};
+
 function MissionDetailSheet({ open, onClose, alert, onAccept, onRefuse }: {
   open: boolean;
   onClose: () => void;
@@ -87,47 +113,40 @@ function MissionDetailSheet({ open, onClose, alert, onAccept, onRefuse }: {
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[24px] max-h-[85vh] overflow-y-auto"
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[448px] bg-cm-elevated rounded-t-[var(--radius-cm-xl)] max-h-[85vh] overflow-y-auto shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 mb-4" />
+            <div className="w-10 h-1 bg-cm-border rounded-full mx-auto mt-3 mb-4" />
             <div className="px-5 pb-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-[20px]">👤</div>
+                <div className="w-12 h-12 rounded-full bg-cm-surface flex items-center justify-center text-[20px]">👤</div>
                 <div>
-                  <p className="text-[15px] font-bold text-gray-900">{alert.clientName}</p>
-                  <div className="flex items-center gap-1 text-[12px] text-gray-500">
-                    <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                    <span>4.9</span>
-                    <span className="mx-1">·</span>
-                    <ShieldCheck className="w-3 h-3 text-green-500" />
-                    <span>Vérifié</span>
-                  </div>
+                  <p className="text-[15px] font-bold text-cm-text">{alert.clientName}</p>
                 </div>
               </div>
 
-              <p className="text-[13px] font-bold text-gray-900 mb-1">{alert.description}</p>
-              <div className="flex items-center gap-2 text-[12px] text-gray-500 mb-4">
+              <p className="text-[13px] font-bold text-cm-text mb-1">{alert.description}</p>
+              <div className="flex items-center gap-2 text-[12px] text-cm-text-soft mb-4">
                 <MapPin className="w-3 h-3" />
                 <span>{alert.location}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 mb-4">
-                <div className="bg-gray-50 rounded-xl p-3 text-center">
-                  <p className="text-[10px] text-gray-500">Distance</p>
-                  <p className="text-[14px] font-bold text-gray-900">2,3 km</p>
+                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
+                  <p className="text-[10px] text-cm-text-soft">Distance</p>
+                  <p className="text-[14px] font-bold text-cm-text">2,3 km</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-3 text-center">
-                  <p className="text-[10px] text-gray-500">Temps estimé</p>
-                  <p className="text-[14px] font-bold text-gray-900">~7 min</p>
+                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
+                  <p className="text-[10px] text-cm-text-soft">Temps estimé</p>
+                  <p className="text-[14px] font-bold text-cm-text">~7 min</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-3 text-center">
-                  <p className="text-[10px] text-gray-500">Budget</p>
-                  <p className="text-[14px] font-bold text-gray-900">{alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} - {alert.estimatedPriceMaxXOF.toLocaleString("fr-FR")} F</p>
+                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
+                  <p className="text-[10px] text-cm-text-soft">Budget</p>
+                  <p className="text-[14px] font-bold text-cm-text">{alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} - {alert.estimatedPriceMaxXOF.toLocaleString("fr-FR")} F</p>
                 </div>
-                <div className="bg-gray-50 rounded-xl p-3 text-center">
-                  <p className="text-[10px] text-gray-500">Urgence</p>
-                  <p className={`text-[14px] font-bold ${alert.urgency === "high" ? "text-red-500" : "text-amber-500"}`}>
+                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
+                  <p className="text-[10px] text-cm-text-soft">Urgence</p>
+                  <p className={`text-[14px] font-bold ${alert.urgency === "high" ? "text-cm-error" : "text-cm-amber"}`}>
                     {alert.urgency === "high" ? "Urgent" : "Normal"}
                   </p>
                 </div>
@@ -135,11 +154,11 @@ function MissionDetailSheet({ open, onClose, alert, onAccept, onRefuse }: {
 
               <div className="flex gap-3 mt-4">
                 <button onClick={() => { onRefuse(); onClose(); }}
-                  className="flex-1 h-12 rounded-[14px] border-2 border-red-200 text-red-500 text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-red-50 flex items-center justify-center gap-2">
+                  className="flex-1 h-12 rounded-[var(--radius-cm-lg)] border-2 border-cm-error/20 text-cm-error text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-error/5 flex items-center justify-center gap-2">
                   <XCircle className="w-4 h-4" /> Refuser
                 </button>
                 <button onClick={() => { onAccept(); onClose(); }}
-                  className="flex-1 h-12 rounded-[14px] bg-gray-900 text-white text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-gray-800 flex items-center justify-center gap-2 shadow-md">
+                  className="flex-1 h-12 rounded-[var(--radius-cm-lg)] bg-cm-accent text-cm-text-onAccent text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-accent-hover flex items-center justify-center gap-2 shadow-cm-btn">
                   <Check className="w-4 h-4" /> Accepter
                 </button>
               </div>
@@ -504,10 +523,7 @@ export default function ProDashboardScreen() {
                   <p className="text-[14px] font-bold text-gray-900">{activeJob.clientName}</p>
                   <p className="text-[11px] text-gray-500">{activeJob.clientLocation}</p>
                 </div>
-                <div className="ml-auto flex items-center gap-1 text-[12px] text-gray-500">
-                  <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                  <span>4.9</span>
-                </div>
+                <div className="ml-auto"></div>
               </div>
 
               <div className="flex gap-2 mb-3">
@@ -556,7 +572,12 @@ export default function ProDashboardScreen() {
               </div>
 
               {/* Progression button */}
-              {activeJob.status === "client_validation" ? (
+              {activeJob.status === "quote_required" ? (
+                <button onClick={() => nav("/orders/quote/create/" + activeJob.id.replace("job-", ""))}
+                  className="w-full mt-3 h-11 rounded-[12px] bg-violet-600 text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-violet-700 shadow-sm">
+                  📄 Créer un devis
+                </button>
+              ) : activeJob.status === "client_validation" ? (
                 <div className="w-full mt-3 h-11 rounded-[12px] bg-gray-100 text-gray-400 text-[12px] font-bold flex items-center justify-center gap-2">
                   <Clock className="w-3.5 h-3.5" /> En attente de validation du client
                 </div>
@@ -594,12 +615,6 @@ export default function ProDashboardScreen() {
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5">
                       <p className="text-[14px] font-bold text-gray-900">{alert.clientName}</p>
-                      <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                      <span className="text-[11px] font-bold text-gray-600">4.9</span>
-                      <ShieldCheck className="w-3 h-3 text-green-500" />
-                    </div>
-                    <div className="flex items-center gap-2 text-[11px] text-gray-500 mt-0.5">
-                      <span>{alert.category}</span>
                     </div>
                   </div>
                 </div>
@@ -614,7 +629,7 @@ export default function ProDashboardScreen() {
                     <Clock className="w-3 h-3 text-gray-400" /> 7 min
                   </span>
                   <span className="flex items-center gap-1 font-bold text-gray-900 ml-auto">
-                    <DollarSign className="w-3 h-3" /> {alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} F
+                    <Coins className="w-3 h-3" /> {alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} F
                   </span>
                 </div>
 
@@ -776,34 +791,72 @@ export default function ProDashboardScreen() {
             </button>
           </div>
 
-          <div className="space-y-2">
-            {MOCK_PRO_JOBS.filter((j) => missionFilter === "all" || j.status === missionFilter || (missionFilter === "upcoming" && j.status === "pending")).slice(0, 3).map((job) => (
-              <div key={job.id} onClick={() => nav(`/pro/missions`)}
-                className="bg-white border border-gray-200 rounded-[16px] p-3.5 cursor-pointer active:scale-[0.99] transition-transform shadow-sm">
-                <div className="flex items-start justify-between mb-1.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      <UserIcon className="w-4 h-4 text-gray-700" />
+          <div className="relative">
+            {(() => {
+              const jobs = MOCK_PRO_JOBS.filter((j) => missionFilter === "all" || j.status === missionFilter || (missionFilter === "upcoming" && j.status === "pending")).slice(0, 3);
+              return jobs.map((job, i) => {
+                const cfg = STATUS_CONFIG[job.status]!;
+                const label = STATUS_LABEL[job.status] || job.status;
+                return (
+                  <div key={job.id} className="relative flex gap-3 mb-2">
+                    {/* Timeline column */}
+                    <div className="flex flex-col items-center w-5 shrink-0">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 15, delay: i * 0.08 }}
+                        className={`w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 ${cfg.dot}`}
+                      />
+                      {i < jobs.length - 1 && (
+                        <motion.div
+                          initial={{ scaleY: 0 }}
+                          animate={{ scaleY: 1 }}
+                          transition={{ duration: 0.3, delay: i * 0.08 + 0.1 }}
+                          className="w-0.5 flex-1 min-h-[16px] bg-gray-200 origin-top"
+                        />
+                      )}
                     </div>
-                    <div>
-                      <p className="text-[13px] font-bold text-gray-900">{job.clientName}</p>
-                      <p className="text-[10px] text-gray-500">{job.clientLocation.split(",")[0]}</p>
-                    </div>
+
+                    {/* Card */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.08, type: "spring", damping: 20, stiffness: 200 }}
+                      onClick={() => nav(`/pro/missions`)}
+                      className={`flex-1 bg-white rounded-[16px] p-3.5 cursor-pointer shadow-sm ${cfg.border} hover:shadow-md active:scale-[0.99] transition-all`}
+                    >
+                      <div className="flex items-start justify-between mb-1.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+                            <UserIcon className="w-4 h-4 text-gray-700" />
+                          </div>
+                          <div>
+                            <p className="text-[13px] font-bold text-gray-900">{job.clientName}</p>
+                            <p className="text-[10px] text-gray-500">{job.clientLocation.split(",")[0]}</p>
+                          </div>
+                        </div>
+                        <span className="text-[13px] font-extrabold text-gray-900 font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
+                      </div>
+                      <p className="text-[11px] text-gray-600 line-clamp-1 ml-10.5">{job.serviceName}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-2 ml-10.5">
+                        {job.scheduledDate && (
+                          <span>{new Date(job.scheduledDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
+                        )}
+                        {job.scheduledTime && <span>· {job.scheduledTime}</span>}
+                        <motion.span
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 15, delay: i * 0.08 + 0.15 }}
+                          className={`ml-auto px-2 py-0.5 rounded-full text-[10px] font-medium ${cfg.badge}`}
+                        >
+                          {label}
+                        </motion.span>
+                      </div>
+                    </motion.div>
                   </div>
-                  <span className="text-[13px] font-extrabold text-gray-900 font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
-                </div>
-                <p className="text-[11px] text-gray-600 line-clamp-1 ml-10.5">{job.serviceName}</p>
-                <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-2 ml-10.5">
-                  {job.scheduledDate && (
-                    <span>{new Date(job.scheduledDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
-                  )}
-                  {job.scheduledTime && <span>· {job.scheduledTime}</span>}
-                  <span className="ml-auto px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 font-medium">
-                    {job.status === "pending" ? "Nouvelle" : job.status === "accepted" ? "Acceptée" : job.status === "quote_required" ? "Devis requis" : job.status === "en_route" ? "En route" : job.status === "arrived" ? "Arrivé" : job.status === "in_progress" ? "En cours" : job.status === "completed" ? "Terminée" : job.status === "client_validation" ? "Validation" : job.status === "closed" ? "Clôturée" : job.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+                );
+              });
+            })()}
           </div>
         </motion.div>
 

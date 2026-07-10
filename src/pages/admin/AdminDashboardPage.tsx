@@ -10,7 +10,7 @@ import ErrorState from "../../components/admin/ui/ErrorState"
 import { formatXOF, formatCompactNumber } from "../../utils/admin/formatCurrency"
 import {
   AlertTriangle, ShieldCheck, CreditCard, MessageSquare, Flag,
-  Users, Briefcase, DollarSign, CalendarDays, Clock, Target,
+  Users, Briefcase, Coins, CalendarDays, Clock, Target,
   CheckCircle2, TrendingUp, Timer, UserCheck,
 } from "lucide-react"
 import { getCategoryLabel } from "../../constants/admin/categoryLabels"
@@ -32,7 +32,7 @@ const ACTIVITY_ICONS: Record<string, { icon: React.ComponentType<{ className?: s
   new_pro: { icon: Briefcase, bg: "bg-blue-100", text: "text-blue-600" },
   new_client: { icon: Users, bg: "bg-green-100", text: "text-green-600" },
   new_mission: { icon: Target, bg: "bg-amber-100", text: "text-amber-600" },
-  new_payment: { icon: DollarSign, bg: "bg-emerald-100", text: "text-emerald-600" },
+  new_payment: { icon: Coins, bg: "bg-emerald-100", text: "text-emerald-600" },
   new_report: { icon: Flag, bg: "bg-red-100", text: "text-red-600" },
 }
 
@@ -137,7 +137,7 @@ function KPIsSection({ stats }: { stats: DashboardStats }) {
     { label: "Missions aujourd'hui", value: String(stats.today.missions_today), trend: stats.trends.missions, icon: <CalendarDays className="w-4 h-4" /> },
     { label: "En cours", value: String(stats.today.missions_in_progress), icon: <Target className="w-4 h-4" /> },
     { label: "Terminées", value: String(stats.today.missions_completed), icon: <CheckCircle2 className="w-4 h-4" /> },
-    { label: "CA aujourd'hui", value: formatXOF(stats.today.revenue_today), trend: stats.trends.revenue, icon: <DollarSign className="w-4 h-4" /> },
+    { label: "CA aujourd'hui", value: formatXOF(stats.today.revenue_today), trend: stats.trends.revenue, icon: <Coins className="w-4 h-4" /> },
     { label: "Revenus plateforme", value: formatXOF(stats.today.platform_revenue), icon: <TrendingUp className="w-4 h-4" /> },
     { label: "Taux réussite", value: `${stats.today.success_rate}%`, icon: <CheckCircle2 className="w-4 h-4" /> },
     { label: "Temps réponse", value: `${stats.today.avg_response_time} min`, icon: <Timer className="w-4 h-4" /> },

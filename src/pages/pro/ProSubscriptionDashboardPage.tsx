@@ -157,7 +157,7 @@ export default function ProSubscriptionDashboardPage() {
                   <p className="text-[12px] text-cm-text-soft text-center">Aucun boost actif</p>
                   <button
                     onClick={() => nav("/pro/boost")}
-                    className="h-8 px-4 bg-cm-accent text-white text-[11px] font-semibold rounded-full cursor-pointer"
+                    className="h-8 px-4 bg-cm-accent text-cm-text-onAccent text-[11px] font-semibold rounded-full cursor-pointer"
                   >
                     Activer un boost
                   </button>

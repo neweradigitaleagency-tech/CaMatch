@@ -93,7 +93,7 @@ export default function ProDashboardPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-2.5 py-1 rounded-full text-[10px] font-medium cursor-pointer transition-colors ${
-                  filter === f ? "bg-cm-accent text-white" : "bg-gray-100 text-gray-600"
+                  filter === f ? "bg-cm-accent text-cm-text-onAccent" : "bg-gray-100 text-gray-600"
                 }`}
               >
                 {f === "all" ? "Toutes" : f === "upcoming" ? "À venir" : "Terminées"}

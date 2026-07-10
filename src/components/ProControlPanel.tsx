@@ -295,7 +295,7 @@ export default function ProControlPanel({
           {step === "accepted" && (
             <motion.button key="en_route" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
               onClick={handleStartTrip}
-              className="w-full py-5 bg-cm-accent text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md hover:bg-cm-accent-hover">
+              className="w-full py-5 bg-cm-accent text-cm-text-onAccent rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md hover:bg-cm-accent-hover">
               <Navigation className="w-6 h-6" /> Je suis en route
             </motion.button>
           )}
@@ -319,7 +319,7 @@ export default function ProControlPanel({
           {step === "photos_taken" && (
             <motion.button key="start-work" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               onClick={handleStartIntervention}
-              className="w-full py-5 bg-cm-accent text-white rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md">
+              className="w-full py-5 bg-cm-accent text-cm-text-onAccent rounded-[16px] text-[16px] font-bold flex items-center justify-center gap-3 cursor-pointer active:scale-[0.97] transition-transform shadow-cm-md">
               <CheckCircle className="w-6 h-6" /> Commencer l'intervention
             </motion.button>
           )}

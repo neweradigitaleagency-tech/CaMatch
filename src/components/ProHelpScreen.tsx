@@ -9,7 +9,7 @@ import {
   Mail,
   FileText,
   Shield,
-  DollarSign,
+  Coins,
   UserCheck,
   Clock,
   ArrowLeft,
@@ -80,7 +80,7 @@ export default function ProHelpScreen({ onBack }: Props) {
             key={cat.id}
             onClick={() => setActiveCategory(cat.id)}
             className={`shrink-0 px-3.5 py-1.5 rounded-full text-caption font-medium transition-all cursor-pointer ${
-              activeCategory === cat.id ? "bg-cm-accent text-white" : "bg-white text-cm-text-soft border border-cm-border/30"
+              activeCategory === cat.id ? "bg-cm-accent text-cm-text-onAccent" : "bg-white text-cm-text-soft border border-cm-border/30"
             }`}
           >
             {cat.label}

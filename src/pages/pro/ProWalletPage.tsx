@@ -16,7 +16,7 @@ export default function ProWalletPage() {
             </button>
             <h1 className="text-[18px] font-bold text-cm-text">Portefeuille</h1>
           </div>
-          <button className="flex items-center gap-1.5 px-4 py-2 bg-cm-accent text-white text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-cm-accent text-cm-text-onAccent text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
             <Send className="w-3.5 h-3.5" />
             <span>Retirer</span>
           </button>

@@ -20,7 +20,7 @@ export default function ProRevenusPage() {
             </button>
             <h1 className="text-[18px] font-bold text-cm-text">Revenus</h1>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-cm-accent text-white text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-cm-accent text-cm-text-onAccent text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
             <Download className="w-3.5 h-3.5" />
             <span>Exporter</span>
           </button>

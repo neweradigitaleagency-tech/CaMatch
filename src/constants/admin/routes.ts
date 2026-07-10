@@ -57,6 +57,9 @@ export const ADMIN_ROUTES = {
   COUPONS: "/admin/coupons",
   REVENUE_ANALYTICS: "/admin/analytics/revenue",
   FEATURE_FLAGS: "/admin/feature-flags",
+  SUPPLIERS: "/admin/suppliers",
+  SUPPLIER_DETAIL: "/admin/suppliers/:id",
+  SUPPLIER_APPLICATIONS: "/admin/suppliers/applications",
 } as const
 
 export interface NavItem {
@@ -93,4 +96,5 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
   { label: "Revenus", href: ADMIN_ROUTES.REVENUE_ANALYTICS, icon: BarChart3, permission: "analytics.read" },
   { label: "Paramètres", href: ADMIN_ROUTES.SETTINGS, icon: Settings, permission: "settings.read" },
   { label: "Logs", href: ADMIN_ROUTES.LOGS, icon: ScrollText, permission: "logs.read" },
+  { label: "Fournisseurs", href: ADMIN_ROUTES.SUPPLIERS, icon: Building2, permission: "suppliers.read" },
 ]

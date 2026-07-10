@@ -365,3 +365,4 @@ export type Permission =
   | "coupon.manage"
   | "refund.manage"
   | "feature_flags.read" | "feature_flags.manage"
+  | "suppliers.read" | "suppliers.validate" | "suppliers.suspend"

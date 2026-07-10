@@ -235,7 +235,7 @@ export default function QuoteCreatePage() {
 
         {/* Submit */}
         <button onClick={handleSubmit}
-          className="w-full h-12 bg-cm-accent rounded-[14px] text-[14px] font-bold text-white flex items-center justify-center gap-2 cm-scale-btn hover:bg-cm-accent-hover cursor-pointer">
+          className="w-full h-12 bg-cm-accent rounded-[14px] text-[14px] font-bold text-cm-text-onAccent flex items-center justify-center gap-2 cm-scale-btn hover:bg-cm-accent-hover cursor-pointer">
           <Send className="w-4 h-4" />
           Envoyer le devis
         </button>

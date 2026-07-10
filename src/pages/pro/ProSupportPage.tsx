@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
-import { ArrowLeft, ChevronDown, MessageCircle, Phone, Send, AlertTriangle, HelpCircle, Clock, MapPin, DollarSign, UserIcon } from "lucide-react";
+import { ArrowLeft, ChevronDown, MessageCircle, Phone, Send, AlertTriangle, HelpCircle, Clock, MapPin, Coins, UserIcon } from "lucide-react";
 import { useState } from "react";
 import { useProStore } from "../../stores/proStore";
 import { MOCK_PRO_JOBS, MOCK_PRO_ALERTS } from "../../services/mockData";
@@ -91,7 +91,7 @@ export default function ProSupportPage() {
                     <p className="text-[11px] text-cm-text-muted ml-9 mb-1">{job.description}</p>
                     <div className="flex items-center gap-3 text-[10px] text-cm-text-muted ml-9 mb-2">
                       <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.clientLocation}</span>
-                      <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
+                      <span className="flex items-center gap-1"><Coins className="w-3 h-3" />{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
                       <span>{getRelativeTime(job.createdAt)}</span>
                     </div>
                     <div className="flex gap-2 ml-9">
@@ -149,7 +149,7 @@ export default function ProSupportPage() {
               className="w-full h-11 px-4 text-[13px] bg-cm-bg border border-cm-border rounded-[12px] outline-none text-cm-text placeholder-cm-text-muted" />
             <textarea placeholder="Votre message" value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })}
               rows={3} className="w-full px-4 py-3 text-[13px] bg-cm-bg border border-cm-border rounded-[12px] outline-none text-cm-text placeholder-cm-text-muted resize-none" />
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-cm-accent text-white text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
+            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-cm-accent text-cm-text-onAccent text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
               <Send className="w-3.5 h-3.5" /> Envoyer
             </button>
           </div>

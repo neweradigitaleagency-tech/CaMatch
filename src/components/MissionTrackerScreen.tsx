@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import {
-  ArrowLeft, CheckCircle, MapPin, Navigation, Star, MessageSquare, DollarSign, Camera,
+  ArrowLeft, CheckCircle, MapPin, Navigation, Star, MessageSquare, Coins, Camera,
   Zap, Droplets, Wind, Sparkles, AlertTriangle, Circle, Shield, ThumbsUp, ThumbsDown, X,
   Clock, Home, User, FileText,
 } from "lucide-react";
@@ -24,7 +24,7 @@ const PIPELINE_STEPS: MissionStatus[] = ["accepted", "paid", "in_progress", "com
 
 const STEP_ICONS: Record<string, typeof Circle> = {
   accepted: CheckCircle,
-  paid: DollarSign,
+  paid: Coins,
   in_progress: Zap,
   completed: CheckCircle,
   client_validation: Camera,

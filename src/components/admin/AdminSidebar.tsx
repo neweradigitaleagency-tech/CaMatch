@@ -32,16 +32,22 @@ export default function AdminSidebar({ collapsed, onToggle, mobileOpen, onMobile
           ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
       >
         <div className="flex items-center h-14 px-4 border-b border-white/10 gap-3">
-          <div className="w-7 h-7 rounded-full bg-[var(--admin-accent)] flex items-center justify-center text-white text-[11px] font-bold shrink-0">
-            Ç
-          </div>
-          {!collapsed && (
-            <span className="text-white text-[14px] font-bold whitespace-nowrap">Ça Match Admin</span>
+          {collapsed ? (
+            <button onClick={onToggle} className="flex-1 flex items-center justify-center text-white/50 hover:text-white cursor-pointer">
+              <Menu className="w-5 h-5" />
+            </button>
+          ) : (
+            <>
+              <button onClick={onToggle} className="w-7 h-7 rounded-full bg-[var(--admin-accent)] flex items-center justify-center text-white text-[11px] font-bold shrink-0 cursor-pointer">
+                Ç
+              </button>
+              <span className="text-white text-[14px] font-bold whitespace-nowrap">Ça Match Admin</span>
+              <button onClick={onToggle} className="ml-auto w-7 h-7 flex items-center justify-center text-white/50 hover:text-white cursor-pointer lg:flex hidden">
+                <Menu className="w-4 h-4" />
+              </button>
+            </>
           )}
-          <button onClick={onToggle} className="ml-auto w-7 h-7 flex items-center justify-center text-white/50 hover:text-white cursor-pointer lg:flex hidden">
-            <Menu className="w-4 h-4" />
-          </button>
-          <button onClick={onMobileClose} className="ml-auto w-7 h-7 flex items-center justify-center text-white/50 hover:text-white cursor-pointer lg:hidden">
+          <button onClick={onMobileClose} className="w-7 h-7 flex items-center justify-center text-white/50 hover:text-white cursor-pointer lg:hidden">
             <X className="w-4 h-4" />
           </button>
         </div>

@@ -44,7 +44,7 @@ export default function FilterSheet({ open, filters, onSetFilter, onClose }: Fil
                 }}
                 className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
                   filters.categoryId === cat.id
-                    ? "bg-cm-accent text-white"
+                    ? "bg-cm-accent text-cm-text-onAccent"
                     : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
                 }`}
               >
@@ -65,7 +65,7 @@ export default function FilterSheet({ open, filters, onSetFilter, onClose }: Fil
                   onClick={() => onSetFilter("subCategory", filters.subCategory === sub.name ? null : sub.name)}
                   className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
                     filters.subCategory === sub.name
-                      ? "bg-cm-accent text-white"
+                      ? "bg-cm-accent text-cm-text-onAccent"
                       : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
                   }`}
                 >
@@ -86,7 +86,7 @@ export default function FilterSheet({ open, filters, onSetFilter, onClose }: Fil
                 onClick={() => onSetFilter("rating", r)}
                 className={`px-3 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
                   filters.rating === r
-                    ? "bg-cm-accent text-white"
+                    ? "bg-cm-accent text-cm-text-onAccent"
                     : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
                 }`}
               >
@@ -109,7 +109,7 @@ export default function FilterSheet({ open, filters, onSetFilter, onClose }: Fil
                   onClick={() => onSetFilter("location", isActive ? "" : hood)}
                   className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer cm-scale-btn transition-colors ${
                     isActive
-                      ? "bg-cm-accent text-white"
+                      ? "bg-cm-accent text-cm-text-onAccent"
                       : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
                   }`}
                 >

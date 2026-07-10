@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "motion/react";
-import { ArrowLeft, Check, Shield, DollarSign, Smartphone, CreditCard } from "lucide-react";
+import { ArrowLeft, Check, Shield, Coins, Smartphone, CreditCard } from "lucide-react";
 import { useRequestStore } from "../../stores/requestStore";
 import { useEscrowStore } from "../../stores/escrowStore";
 import type { PaymentMethod } from "../../types";
@@ -164,7 +164,7 @@ export default function EscrowPaymentPage() {
           {confirming ? (
             <><Shield className="w-4 h-4" /> Confirmer le paiement sécurisé</>
           ) : (
-            <><DollarSign className="w-4 h-4" /> Payer avec {selectedMethod ? PAYMENT_METHOD_LABELS[selectedMethod] : "..."}</>
+            <><Coins className="w-4 h-4" /> Payer avec {selectedMethod ? PAYMENT_METHOD_LABELS[selectedMethod] : "..."}</>
           )}
         </button>
         </div>

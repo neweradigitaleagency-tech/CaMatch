@@ -73,7 +73,7 @@ export default function OtpStep({ type, value, verified, onValueChange, onVerify
           {!sent && (
             <button onClick={sendCode} disabled={!value}
               className={`text-[12px] font-semibold px-3 py-1.5 rounded-full cursor-pointer ${
-                value ? "bg-cm-accent text-white" : "bg-cm-border-soft text-cm-text-muted cursor-not-allowed"
+                value ? "bg-cm-accent text-cm-text-onAccent" : "bg-cm-border-soft text-cm-text-muted cursor-not-allowed"
               }`}>
               Envoyer
             </button>

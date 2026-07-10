@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, MapPin, DollarSign, Clock, AlertTriangle, Trash2, Navigation, CheckCircle, Zap, Droplets, Wind, Sparkles, Circle } from "lucide-react";
+import { ArrowLeft, MapPin, Coins, Clock, AlertTriangle, Trash2, Navigation, CheckCircle, Zap, Droplets, Wind, Sparkles, Circle } from "lucide-react";
 import { motion } from "motion/react";
 import { ClientRequest, MISSION_STATUS_LABELS, MISSION_STATUS_FLOW } from "../types";
 import type { MissionStatus } from "../types";
@@ -77,7 +77,7 @@ export default function RequestDetailScreen({ request, onBack, onDelete }: Reque
               <span className="text-cm-text">{request.address}</span>
             </div>
             <div className="flex items-center gap-2">
-              <DollarSign className="w-3.5 h-3.5 text-cm-text-soft/60" />
+              <Coins className="w-3.5 h-3.5 text-cm-text-soft/60" />
               <span className="font-bold text-cm-text font-mono">{request.budgetXOF.toLocaleString()} F</span>
             </div>
             <div className="flex items-center gap-2">

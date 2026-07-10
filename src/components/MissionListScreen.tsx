@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Plus, XCircle, Zap, Star, Hourglass, MapPin, DollarSign, Navigation, AlertTriangle, Check } from "lucide-react";
+import { Plus, XCircle, Zap, Star, Hourglass, MapPin, Coins, Navigation, AlertTriangle, Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import GlassCard from "./ui/GlassCard";
 import EmptyState from "./ui/EmptyState";
@@ -149,7 +149,7 @@ function ListItem({ item }: { item: { type: "request" | "mission"; data: ClientR
             <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-cm-text-muted">
               <span>{rd.category || ""}</span>
               <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{(rd.address || "").split(",")[0]}</span>
-              <span className="flex items-center gap-0.5 font-bold text-cm-text font-mono"><DollarSign className="w-2.5 h-2.5" />{(rd.budgetXOF || 0).toLocaleString()} F</span>
+              <span className="flex items-center gap-0.5 font-bold text-cm-text font-mono"><Coins className="w-2.5 h-2.5" />{(rd.budgetXOF || 0).toLocaleString()} F</span>
             </div>
             {item.type === "mission" && phaseIdx >= 0 && (
               <div className="flex items-center gap-1 mt-2">

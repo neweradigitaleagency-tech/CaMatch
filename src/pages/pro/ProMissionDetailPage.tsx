@@ -94,7 +94,6 @@ export default function ProMissionDetailPage() {
             </div>
             <div className="text-right">
               <p className="text-[12px] font-medium text-cm-text">{job.clientName}</p>
-              <p className="text-[11px] text-cm-text-muted">{job.clientPhone}</p>
             </div>
           </div>
         </motion.div>
@@ -116,7 +115,7 @@ export default function ProMissionDetailPage() {
                     <div className="flex flex-col items-center">
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold ${
-                          done ? "bg-cm-accent text-white" : "bg-cm-border text-cm-text-muted"
+                          done ? "bg-cm-accent text-cm-text-onAccent" : "bg-cm-border text-cm-text-muted"
                         }`}
                       >
                         {done ? <CheckCircle className="w-4 h-4" /> : i + 1}
@@ -147,7 +146,7 @@ export default function ProMissionDetailPage() {
             </>
           )}
           {job.status !== "completed" && job.status !== "client_validation" && job.status !== "closed" && job.status !== "cancelled" && (
-            <button className="flex-1 px-4 py-2.5 bg-cm-accent text-white text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
+            <button className="flex-1 px-4 py-2.5 bg-cm-accent text-cm-text-onAccent text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
               {job.status === "in_progress" ? "Terminer" : "Contacter"}
             </button>
           )}

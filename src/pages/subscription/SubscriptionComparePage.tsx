@@ -146,7 +146,7 @@ export default function SubscriptionComparePage() {
         >
           <button
             onClick={() => nav("/subscription/plans")}
-            className="h-12 px-8 bg-cm-accent text-white text-[13px] font-bold rounded-xl hover:brightness-105 transition-all active:scale-[0.97] cursor-pointer shadow-sm"
+            className="h-12 px-8 bg-cm-accent text-cm-text-onAccent text-[13px] font-bold rounded-xl hover:brightness-105 transition-all active:scale-[0.97] cursor-pointer shadow-sm"
           >
             Choisir une formule
           </button>

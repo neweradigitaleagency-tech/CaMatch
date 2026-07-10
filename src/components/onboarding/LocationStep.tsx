@@ -51,7 +51,7 @@ export default function LocationStep({
                 onClick={() => findNearest(name)}
                 className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium cursor-pointer transition-colors ${
                   isActive
-                    ? "bg-cm-accent text-white"
+                    ? "bg-cm-accent text-cm-text-onAccent"
                     : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
                 }`}
               >

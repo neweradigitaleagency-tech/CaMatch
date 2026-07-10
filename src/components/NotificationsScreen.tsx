@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowLeft, Check, X, Bell, AlertCircle, MessageSquare, Star, DollarSign } from "lucide-react";
+import { ArrowLeft, Check, X, Bell, AlertCircle, MessageSquare, Star, Coins } from "lucide-react";
 
 interface Notification {
   id: string;
@@ -58,7 +58,7 @@ export default function NotificationsScreen({ onBack, notifications, markAllRead
               <button type="button" key={f.key} onClick={() => setActiveFilter(f.key)}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all cursor-pointer active:scale-95 ${
                   isActive
-                    ? "bg-cm-accent text-white shadow-sm"
+                    ? "bg-cm-accent text-cm-text-onAccent shadow-sm"
                     : "bg-cm-elevated border border-cm-border text-cm-text-muted"
                 }`}>
                 {f.label}
@@ -81,7 +81,7 @@ export default function NotificationsScreen({ onBack, notifications, markAllRead
               <div className="w-8 h-8 rounded-[10px] bg-cm-accent-soft flex items-center justify-center shrink-0">
                 {n.type === "message" ? <MessageSquare className="w-4 h-4 text-cm-accent" />
                   : n.type === "review" ? <Star className="w-4 h-4 text-cm-accent" />
-                  : n.type === "payment" ? <DollarSign className="w-4 h-4 text-cm-accent" />
+                  : n.type === "payment" ? <Coins className="w-4 h-4 text-cm-accent" />
                   : <Bell className="w-4 h-4 text-cm-accent" />}
               </div>
               <div className="flex-1 min-w-0">

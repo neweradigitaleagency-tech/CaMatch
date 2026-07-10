@@ -91,7 +91,7 @@ export default function CategoryPickerStep({ selectedCategoryIds, selectedSubCat
                           onClick={() => toggleSub(sub.name)}
                           className={`px-3 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-colors ${
                             isSelected
-                              ? "bg-cm-accent text-white"
+                              ? "bg-cm-accent text-cm-text-onAccent"
                               : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
                           }`}
                         >

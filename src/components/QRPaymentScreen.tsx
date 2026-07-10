@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { ArrowLeft, Check, Shield, DollarSign, Smartphone, Building, CreditCard } from "lucide-react";
+import { ArrowLeft, Check, Shield, Coins, Smartphone, Building, CreditCard } from "lucide-react";
 import { Mission, PaymentMethod, PAYMENT_METHOD_LABELS } from "../types";
 
 interface QRPaymentScreenProps {
@@ -126,14 +126,14 @@ export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScr
           className={`w-full h-13 rounded-2xl text-xs font-display font-bold transition-all active:scale-95 cursor-pointer flex items-center justify-center gap-2 ${
             selectedMethod
               ? confirming
-                ? "bg-cm-accent text-white shadow-cm-sm"
+                ? "bg-cm-accent text-cm-text-onAccent shadow-cm-sm"
                 : "bg-cm-text text-cm-bg shadow-cm-sm"
               : "bg-cm-border text-cm-text-soft/50 cursor-not-allowed"
           }`}>
           {confirming ? (
             <>Confirmer le paiement de {mission.budgetXOF.toLocaleString()} F</>
           ) : (
-            <><DollarSign className="w-4 h-4" /> Payer avec {selectedMethod ? PAYMENT_METHOD_LABELS[selectedMethod] : "..."}</>
+            <><Coins className="w-4 h-4" /> Payer avec {selectedMethod ? PAYMENT_METHOD_LABELS[selectedMethod] : "..."}</>
           )}
         </button>
         </div>
