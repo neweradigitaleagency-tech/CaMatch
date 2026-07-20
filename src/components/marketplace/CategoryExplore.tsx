@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react"
+import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { ArrowLeft, Search, Package, MapPin, SlidersHorizontal, X, ChevronRight, ChevronDown } from "lucide-react"
@@ -71,6 +71,15 @@ export default function CategoryExplore() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
+  const [localMin, setLocalMin] = useState(params.min)
+  const [localMax, setLocalMax] = useState(params.max)
+  const priceTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    setLocalMin(params.min)
+    setLocalMax(params.max)
+  }, [params.min, params.max])
+
   const updateParam = useCallback((key: string, value: string) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
@@ -80,6 +89,13 @@ export default function CategoryExplore() {
     })
     setVisibleCount(ITEMS_PER_PAGE)
   }, [setSearchParams])
+
+  const updatePriceParam = useCallback((key: string, value: string) => {
+    if (priceTimer.current) clearTimeout(priceTimer.current)
+    priceTimer.current = setTimeout(() => {
+      updateParam(key, value)
+    }, 300)
+  }, [updateParam])
 
   const currentVertical = vertical && vertical !== "toutes" ? (vertical as MarketplaceVertical) : null
   const category = currentVertical ? MARKETPLACE_CATEGORIES.find((c) => c.vertical === currentVertical) : null
@@ -339,10 +355,10 @@ export default function CategoryExplore() {
         <div className="mb-4">
           <p className="text-[11px] font-semibold text-[#1A1A1A] mb-2">Prix</p>
           <div className="flex items-center gap-2">
-            <input type="number" value={params.min} onChange={(e) => updateParam("min", e.target.value)}
+            <input type="number" value={localMin} onChange={(e) => { setLocalMin(e.target.value); updatePriceParam("min", e.target.value) }}
               placeholder="Min" className="w-full h-10 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:border-[#243318]" />
             <span className="text-[11px] text-[#6B7280]">→</span>
-            <input type="number" value={params.max} onChange={(e) => updateParam("max", e.target.value)}
+            <input type="number" value={localMax} onChange={(e) => { setLocalMax(e.target.value); updatePriceParam("max", e.target.value) }}
               placeholder="Max" className="w-full h-10 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:border-[#243318]" />
           </div>
         </div>

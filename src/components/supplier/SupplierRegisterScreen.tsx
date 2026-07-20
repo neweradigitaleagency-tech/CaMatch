@@ -1,6 +1,6 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useNavigate } from "react-router-dom"
-import { ArrowLeft, Building2, Upload, CheckCircle } from "lucide-react"
+import { ArrowLeft, Building2, Upload, CheckCircle, FileText, X } from "lucide-react"
 import { useBackNavigation } from "../../hooks/useBackNavigation"
 import { useAuthStore } from "../../stores/authStore"
 import { useCreateSupplierApplication } from "../../hooks/supplier/useSupplierProfile"
@@ -25,8 +25,22 @@ export default function SupplierRegisterScreen() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState("")
 
+  const [documents, setDocuments] = useState<{ name: string; size: number }[]>([])
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const toggleDeliveryCity = (c: string) => {
     setDeliveryCities((prev) => prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c])
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    const newDocs = files.map((f) => ({ name: f.name, size: f.size }))
+    setDocuments((prev) => [...prev, ...newDocs].slice(0, 5))
+    e.target.value = ""
+  }
+
+  const removeDoc = (name: string) => {
+    setDocuments((prev) => prev.filter((d) => d.name !== name))
   }
 
   const handleSubmit = async () => {
@@ -156,11 +170,26 @@ export default function SupplierRegisterScreen() {
             </div>
             <div className="pt-2">
               <label className="text-[12px] font-medium text-gray-700 block mb-2">Documents légaux</label>
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors">
+              <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png" multiple className="hidden" onChange={handleFileChange} />
+              <div onClick={() => fileInputRef.current?.click()}
+                className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 cursor-pointer transition-colors">
                 <Upload className="w-6 h-6 text-gray-400 mx-auto mb-2" />
                 <p className="text-[12px] text-gray-500">Ajoutez votre registre de commerce</p>
                 <p className="text-[10px] text-gray-400 mt-1">PDF, JPG — max 5 Mo</p>
               </div>
+              {documents.length > 0 && (
+                <div className="mt-2 space-y-1.5">
+                  {documents.map((d) => (
+                    <div key={d.name} className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                      <FileText className="w-4 h-4 text-gray-400 shrink-0" />
+                      <span className="text-[11px] text-gray-600 flex-1 truncate">{d.name}</span>
+                      <button onClick={() => removeDoc(d.name)} className="cursor-pointer">
+                        <X className="w-3.5 h-3.5 text-gray-400 hover:text-red-500" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <div className="flex gap-2 pt-2">
               <button onClick={() => setStep(1)}

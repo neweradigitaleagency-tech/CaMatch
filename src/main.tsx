@@ -339,11 +339,9 @@ function App() {
         </Route>
       </Route>
 
-      {/* Supplier registration — public route */}
-      <Route path="/supplier/register" element={<Suspense fallback={<PageLoader />}><SupplierRegisterPage /></Suspense>} />
-
-      {/* Supplier portal — protected */}
+      {/* Supplier portal & registration — protected */}
       <Route element={<AuthGate />}>
+        <Route path="/supplier/register" element={<Suspense fallback={<PageLoader />}><SupplierRegisterPage /></Suspense>} />
         <Route element={<SupplierLayout />}>
           <Route path="/supplier/dashboard" element={<Suspense fallback={<PageLoader />}><SupplierDashboardPage /></Suspense>} />
           <Route path="/supplier/products" element={<Suspense fallback={<PageLoader />}><SupplierProductsPage /></Suspense>} />

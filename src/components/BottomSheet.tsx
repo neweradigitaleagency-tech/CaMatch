@@ -21,7 +21,7 @@ export default function BottomSheet({ open, onClose, title, children, maxHeight 
   return (
     <AnimatePresence>
       {open && (
-        <>
+        <div key="bottom-sheet-group">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -51,7 +51,7 @@ export default function BottomSheet({ open, onClose, title, children, maxHeight 
               {children}
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );
