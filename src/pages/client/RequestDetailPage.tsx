@@ -1,10 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import RequestDetailScreen from "../../components/RequestDetailScreen";
 import { useRequestStore } from "../../stores/requestStore";
 
 export default function RequestDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const request = useRequestStore((s) => s.requests.find((r) => r.id === id));
   const removeRequest = useRequestStore((s) => s.removeRequest);
 
@@ -19,7 +21,7 @@ export default function RequestDetailPage() {
   return (
     <RequestDetailScreen
       request={request}
-      onBack={() => navigate(-1)}
+      onBack={goBack}
       onDelete={(id) => {
         removeRequest(id);
         navigate("/orders");

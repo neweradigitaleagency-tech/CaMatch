@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../hooks/useBackNavigation";
 import { useEffect } from "react";
 import { ArrowLeft, FileText, MapPin, Coins, ArrowUpRight, XCircle, Zap, Star, Hourglass } from "lucide-react";
 import { useClientRequests, useClientMissions } from "../hooks/useDatabase";
@@ -11,6 +12,7 @@ import type { Mission, ProAlert, ProDashboardStats, ClientRequest, MissionStatus
 
 export default function OrdersPage() {
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/");
   const isPro = useAuthStore((s) => s.isPro);
   const userId = useAuthStore((s) => s.userId);
 
@@ -99,9 +101,9 @@ export default function OrdersPage() {
       <div className="min-h-dynamic bg-cm-bg">
         <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
           <div className="flex items-center gap-3 h-14 px-5">
-            <button onClick={() => navigate(-1)}
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95 shrink-0">
-              <ArrowLeft className="w-4 h-4 text-cm-text" />
+            <button onClick={goBack}
+              className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95 shrink-0">
+              <ArrowLeft className="w-4 h-4 text-[#2B2B2B]" />
             </button>
             <h1 className="text-[18px] font-bold text-cm-text">Mes commandes</h1>
           </div>

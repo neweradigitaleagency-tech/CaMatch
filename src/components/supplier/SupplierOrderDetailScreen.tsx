@@ -1,10 +1,11 @@
 import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { ArrowLeft, CheckCircle, XCircle, Truck, Package, AlertCircle } from "lucide-react"
+import { ArrowLeft, CheckCircle, XCircle, Truck, Package, AlertCircle, Phone, MessageSquare, Scale, MapPin } from "lucide-react"
 import { useSupplierOrder, useUpdateOrderStatus } from "../../hooks/supplier/useSupplierOrders"
 import { getStatusLabel, getStatusColor, ORDER_STATUS_TRANSITIONS } from "../../services/supplier/orders.service"
 import { formatXOF } from "../../utils/format"
 import type { MaterialOrderStatus } from "../../types/supplier"
+import { MOCK_DELIVERIES, MOCK_DISPUTES } from "../../data/supplier-mocks"
 
 const ACTION_BUTTONS: Record<string, { label: string; icon: typeof CheckCircle; nextStatus: MaterialOrderStatus; color: string }[]> = {
   PENDING_SUPPLIER: [
@@ -65,6 +66,9 @@ export default function SupplierOrderDetailScreen() {
 
   const statusKey = order.status as keyof typeof ACTION_BUTTONS
   const actions = ACTION_BUTTONS[statusKey] ?? []
+
+  const linkedDelivery = MOCK_DELIVERIES.find((d) => d.orderId === order.id)
+  const linkedDispute = MOCK_DISPUTES.find((d) => d.orderId === order.id)
 
   return (
     <div className="max-w-2xl mx-auto space-y-4">
@@ -156,6 +160,28 @@ export default function SupplierOrderDetailScreen() {
           <p className="text-[12px] text-gray-900 mt-1">{order.notes}</p>
         </div>
       )}
+
+      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-gray-900">🔗 Liens associés</h2>
+        <div className="flex gap-2 flex-wrap">
+          {linkedDelivery && (
+            <button onClick={() => navigate(`/supplier/deliveries/${linkedDelivery.id}`)}
+              className="flex items-center gap-1.5 h-9 px-4 bg-blue-50 text-blue-700 text-[12px] font-medium rounded-lg hover:bg-blue-100 cursor-pointer transition-colors">
+              <Truck className="w-3.5 h-3.5" /> Voir la livraison
+            </button>
+          )}
+          {linkedDispute && (
+            <button onClick={() => navigate(`/supplier/disputes/${linkedDispute.id}`)}
+              className="flex items-center gap-1.5 h-9 px-4 bg-red-50 text-red-700 text-[12px] font-medium rounded-lg hover:bg-red-100 cursor-pointer transition-colors">
+              <Scale className="w-3.5 h-3.5" /> Voir le litige
+            </button>
+          )}
+          <button onClick={() => window.location.href = `tel:${order.clientName ? "N/A" : ""}`}
+            className="flex items-center gap-1.5 h-9 px-4 bg-gray-50 text-gray-700 text-[12px] font-medium rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+            <Phone className="w-3.5 h-3.5" /> Contacter le client
+          </button>
+        </div>
+      </div>
 
       {actions.length > 0 && (
         <div className="space-y-2">

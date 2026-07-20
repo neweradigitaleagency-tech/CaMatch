@@ -1,17 +1,27 @@
 import { create } from "zustand";
 import { supabase, isSupabaseReady } from "../services/supabase";
+import { getAdminProfile } from "../services/admin/admin.service";
 import type { User } from "@supabase/supabase-js";
 import type { UserRole } from "../types";
+import type { AdminUser } from "../types/admin";
 
 interface AuthState {
+  // User auth
   userId: string | null;
   role: UserRole;
   isPro: boolean;
-  activeMode: "client" | "pro";
+  activeMode: "client" | "pro" | "supplier";
+  availableModes: ("client" | "pro" | "supplier")[];
   isAuthenticated: boolean;
   isLoading: boolean;
   user: User | null;
   initialized: boolean;
+
+  // Admin auth (merged)
+  admin: AdminUser | null;
+  permissions: string[];
+  error: string | null;
+
   initialize: () => Promise<void>;
   signInWithPhone: (phone: string) => Promise<{ error: string | null }>;
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
@@ -21,8 +31,18 @@ interface AuthState {
   setRole: (role: UserRole) => void;
   setUser: (userId: string, role?: UserRole) => void;
   setPro: () => void;
+  setActiveMode: (mode: "client" | "pro" | "supplier") => void;
+  setAvailableModes: (modes: ("client" | "pro" | "supplier")[]) => void;
   updateProfile: (data: { firstName?: string; lastName?: string; email?: string; phone?: string; avatarUrl?: string }) => void;
   logout: () => void;
+
+  // Admin-specific
+  adminLogin: (email: string, password: string) => Promise<{ error: string | null }>;
+  adminDemoLogin: () => void;
+  adminLogout: () => Promise<void>;
+  hasPermission: (perm: string) => boolean;
+  hasAnyPermission: (perms: string[]) => boolean;
+  hasAllPermissions: (perms: string[]) => boolean;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -30,10 +50,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   role: "client",
   isPro: false,
   activeMode: "client",
+  availableModes: ["client"],
   isAuthenticated: false,
   isLoading: true,
   user: null,
   initialized: false,
+
+  admin: null,
+  permissions: [],
+  error: null,
 
   initialize: async () => {
     if (!isSupabaseReady()) {
@@ -78,6 +103,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             isPro: false,
             isAuthenticated: false,
             isLoading: false,
+            admin: null,
+            permissions: [],
           });
         }
       });
@@ -137,12 +164,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       role: "client",
       isPro: false,
       isAuthenticated: false,
+      admin: null,
+      permissions: [],
     });
   },
 
   setRole: (role) => set({ role }),
   setUser: (userId, role = "client") => set({ userId, role, isAuthenticated: true }),
   setPro: () => set({ isPro: true }),
+  setActiveMode: (mode) => set({ activeMode: mode }),
+  setAvailableModes: (modes) => set({ availableModes: modes }),
   updateProfile: (data) => {
     set((state) => {
       const current = state.user;
@@ -155,5 +186,75 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
   logout: async () => {
     await get().signOut();
+  },
+
+  // Admin-specific
+  adminLogin: async (email: string, password: string) => {
+    set({ error: null, isLoading: true });
+    if (!isSupabaseReady()) {
+      set({ isLoading: false, error: "Supabase non configuré" });
+      return { error: "Supabase non configuré" };
+    }
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error || !data.user) {
+        set({ isLoading: false, error: error?.message ?? "Identifiants incorrects" });
+        return { error: error?.message ?? "Identifiants incorrects" };
+      }
+      const admin = await getAdminProfile();
+      if (!admin) {
+        await supabase.auth.signOut();
+        set({ isLoading: false, error: "Accès non autorisé" });
+        return { error: "Accès non autorisé — vous n'êtes pas administrateur" };
+      }
+      const permissions = admin.permissions;
+      set({ admin, permissions, isAuthenticated: true, isLoading: false, error: null });
+      await supabase.from("users").update({ last_login_at: new Date().toISOString() }).eq("id", data.user.id);
+      return { error: null };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Erreur de connexion";
+      set({ isLoading: false, error: msg });
+      return { error: msg };
+    }
+  },
+
+  adminDemoLogin: () => {
+    const demoAdmin: AdminUser = {
+      id: "admin-demo",
+      email: "admin@camatch.ci",
+      firstname: "Admin",
+      lastname: "Démo",
+      status: "active",
+      is_active: true,
+      created_at: new Date().toISOString(),
+      roles: [{ id: "role-admin", name: "Super Admin", permissions: { all: true }, is_system: true }],
+      permissions: ["all"],
+    };
+    set({ admin: demoAdmin, permissions: ["all"], isAuthenticated: true, isLoading: false, error: null });
+  },
+
+  adminLogout: async () => {
+    if (isSupabaseReady()) {
+      await supabase.auth.signOut();
+    }
+    set({ admin: null, permissions: [], error: null });
+  },
+
+  hasPermission: (perm: string) => {
+    const { permissions } = get();
+    if (permissions.includes("all")) return true;
+    return permissions.includes(perm);
+  },
+
+  hasAnyPermission: (perms: string[]) => {
+    const { permissions } = get();
+    if (permissions.includes("all")) return true;
+    return perms.some((p) => permissions.includes(p));
+  },
+
+  hasAllPermissions: (perms: string[]) => {
+    const { permissions } = get();
+    if (permissions.includes("all")) return true;
+    return perms.every((p) => permissions.includes(p));
   },
 }));

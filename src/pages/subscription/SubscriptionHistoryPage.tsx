@@ -24,18 +24,22 @@ const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   pending: "En attente",
   authorized: "Autorisé",
   captured: "Capturé",
+  completed: "Terminé",
   failed: "Échoué",
   refunded: "Remboursé",
   partially_refunded: "Remboursé partiellement",
+  cancelled: "Annulé",
 }
 
 const PAYMENT_STATUS_COLORS: Record<PaymentStatus, string> = {
   pending: "bg-amber-50 text-amber-600 border-amber-200",
   authorized: "bg-blue-50 text-blue-600 border-blue-200",
   captured: "bg-emerald-50 text-emerald-600 border-emerald-200",
+  completed: "bg-emerald-50 text-emerald-600 border-emerald-200",
   failed: "bg-red-50 text-red-600 border-red-200",
   refunded: "bg-gray-100 text-gray-500 border-gray-200",
   partially_refunded: "bg-gray-100 text-gray-500 border-gray-200",
+  cancelled: "bg-gray-100 text-gray-500 border-gray-200",
 }
 
 export default function SubscriptionHistoryPage() {
@@ -52,7 +56,7 @@ export default function SubscriptionHistoryPage() {
     if (userId) fetchAll(userId)
   }, [userId])
 
-  const handleBack = () => fromHamburger ? nav("/", { state: { reopenMenu: true } }) : nav(-1)
+  const handleBack = () => nav("/", { state: { reopenMenu: true } })
 
   if (error) {
     return (
@@ -193,7 +197,7 @@ function PaymentItem({ payment, index }: { payment: Payment; index: number }) {
             {format(new Date(payment.created_at), "dd MMM yyyy", { locale: fr })}
             {" • "}
             {payment.provider === "orange_money" ? "Orange Money"
-              : payment.provider === "mtn_money" ? "MTN Mobile Money"
+              : payment.provider === "mtn_momo" ? "MTN Mobile Money"
               : payment.provider.charAt(0).toUpperCase() + payment.provider.slice(1)}
           </p>
         </div>

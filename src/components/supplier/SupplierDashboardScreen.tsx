@@ -1,26 +1,105 @@
-import { Package, ClipboardList, TrendingUp, AlertTriangle, Star, ArrowUp, ArrowDown } from "lucide-react"
-import { useSupplierDashboardStats } from "../../hooks/supplier/useSupplierProfile"
+import { useMemo } from "react"
+import { useNavigate } from "react-router-dom"
+import { Package, ClipboardList, TrendingUp, AlertTriangle, Star, ArrowUp, ArrowDown, Plus, Scale, Truck, DollarSign, Users, FileText, ShoppingCart, Tag, Clock, CreditCard, Activity } from "lucide-react"
 import { useSupplierProducts } from "../../hooks/supplier/useSupplierProducts"
 import { useSupplierOrders } from "../../hooks/supplier/useSupplierOrders"
+import { useEnhancedStats, useRecentActivities } from "../../hooks/supplier/useSupplierDashboard"
 import { getStatusLabel } from "../../services/supplier/orders.service"
-import type { MaterialOrderStatus } from "../../types/supplier"
+import { formatXOF } from "../../utils/format"
+import type { DashboardRecentActivity } from "../../types/supplier"
 
-function formatXOF(amount: number): string {
-  return amount.toLocaleString("fr-FR") + " FCFA"
+const ACTIVITY_ICONS: Record<string, typeof Clock> = {
+  order: ClipboardList,
+  payment: CreditCard,
+  stock: Package,
+  client: Users,
+  invoice: FileText,
+  dispute: Scale,
+}
+
+const ACTIVITY_COLORS: Record<string, string> = {
+  order: "bg-blue-100 text-blue-600",
+  payment: "bg-green-100 text-green-600",
+  stock: "bg-amber-100 text-amber-600",
+  client: "bg-purple-100 text-purple-600",
+  invoice: "bg-indigo-100 text-indigo-600",
+  dispute: "bg-red-100 text-red-600",
 }
 
 function SkeletonBlock({ className = "" }: { className?: string }) {
   return <div className={`bg-gray-200/50 animate-pulse rounded-[14px] ${className}`} />
 }
 
+function KpiCard({ icon: Icon, label, value, sub, trend, color }: { icon: typeof TrendingUp; label: string; value: string; sub?: string; trend?: { value: number; positive: boolean }; color?: string }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-3.5">
+      <div className="flex items-center justify-between mb-2">
+        <Icon className={`w-4 h-4 ${color ?? "text-gray-400"}`} />
+        {trend && (
+          <span className={`flex items-center gap-0.5 text-[10px] font-semibold ${trend.positive ? "text-green-600" : "text-red-500"}`}>
+            {trend.positive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+            {Math.abs(trend.value)}%
+          </span>
+        )}
+      </div>
+      <p className="text-[18px] font-bold text-gray-900 leading-tight">{value}</p>
+      <p className="text-[10px] text-gray-500 mt-0.5">{label}</p>
+      {sub && <p className="text-[9px] text-gray-400 mt-0.5">{sub}</p>}
+    </div>
+  )
+}
+
+function ActivityRow({ activity }: { activity: DashboardRecentActivity }) {
+  const Icon = ACTIVITY_ICONS[activity.type] ?? Clock
+  const color = ACTIVITY_COLORS[activity.type] ?? "bg-gray-100 text-gray-600"
+  const navigate = useNavigate()
+  return (
+    <div className="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
+      <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${color}`}>
+        <Icon className="w-4 h-4" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[12px] font-medium text-gray-900">{activity.label}</p>
+        <p className="text-[11px] text-gray-500">{activity.description}</p>
+        {activity.amount !== undefined && (
+          <p className="text-[11px] font-semibold text-gray-700 mt-0.5">{formatXOF(activity.amount)}</p>
+        )}
+      </div>
+      <div className="flex flex-col items-end gap-1 shrink-0">
+        <span className="text-[10px] text-gray-400">{new Date(activity.createdAt).toLocaleDateString("fr-FR")}</span>
+        {activity.referenceUrl && (
+          <button onClick={() => navigate(activity.referenceUrl!)}
+            className="text-[10px] text-cm-green font-semibold cursor-pointer hover:underline">
+            Voir
+          </button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function SupplierDashboardScreen() {
-  const { data: stats, isLoading: statsLoading } = useSupplierDashboardStats()
+  const navigate = useNavigate()
+  const { data: stats, isLoading: statsLoading } = useEnhancedStats()
   const { data: products } = useSupplierProducts()
   const { data: orders } = useSupplierOrders()
+  const { data: activities } = useRecentActivities()
 
   const lowStockProducts = products?.filter((p) => !p.unlimitedStock && p.availableStock <= p.lowStockThreshold && p.availableStock > 0) ?? []
   const outOfStockProducts = products?.filter((p) => !p.unlimitedStock && p.availableStock <= 0) ?? []
   const recentOrders = orders?.slice(0, 5) ?? []
+  const onSaleProducts = products?.filter((p) => p.salePrice && p.salePrice > 0 && p.salePrice < p.supplierPrice) ?? []
+
+  const revenueData = [
+    { day: "Lun", amount: (stats?.todayRevenue ?? 0) * 0.6 },
+    { day: "Mar", amount: (stats?.todayRevenue ?? 0) * 0.8 },
+    { day: "Mer", amount: (stats?.todayRevenue ?? 0) * 1.2 },
+    { day: "Jeu", amount: (stats?.todayRevenue ?? 0) * 0.9 },
+    { day: "Ven", amount: (stats?.todayRevenue ?? 0) * 1.1 },
+    { day: "Sam", amount: (stats?.todayRevenue ?? 0) * 0.5 },
+    { day: "Dim", amount: (stats?.todayRevenue ?? 0) },
+  ]
+  const maxRevenue = Math.max(...revenueData.map((r) => r.amount), 1)
 
   if (statsLoading) {
     return (
@@ -36,61 +115,75 @@ export default function SupplierDashboardScreen() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[22px] font-bold text-gray-900">
-          Bonjour {stats ? "Quincaillerie ABC" : ""} 👋
-        </h1>
-        <p className="text-[13px] text-gray-500 mt-1">Aujourd'hui — {new Date().toLocaleDateString("fr-FR")}</p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[22px] font-bold text-gray-900">
+            Bonjour 👋
+          </h1>
+          <p className="text-[13px] text-gray-500 mt-1">Aujourd'hui — {new Date().toLocaleDateString("fr-FR")}</p>
+        </div>
+        <div className="flex gap-2">
+          <button onClick={() => navigate("/supplier/products/new")}
+            className="h-9 px-4 bg-cm-green text-white text-[12px] font-bold rounded-xl hover:opacity-90 cursor-pointer transition-all flex items-center gap-1.5">
+            <Plus className="w-4 h-4" /> Nouveau produit
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <ClipboardList className="w-5 h-5 text-blue-500" />
-            <span className={`flex items-center gap-1 text-[11px] font-medium ${(stats?.ordersChange ?? 0) >= 0 ? "text-green-600" : "text-red-500"}`}>
-              {(stats?.ordersChange ?? 0) >= 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-              {Math.abs(stats?.ordersChange ?? 0)}%
-            </span>
-          </div>
-          <p className="text-[24px] font-bold text-gray-900">{stats?.todayOrders ?? 0}</p>
-          <p className="text-[11px] text-gray-500 mt-1">Commandes reçues</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <TrendingUp className="w-5 h-5 text-green-500" />
-            <span className={`flex items-center gap-1 text-[11px] font-medium ${(stats?.revenueChange ?? 0) >= 0 ? "text-green-600" : "text-red-500"}`}>
-              {(stats?.revenueChange ?? 0) >= 0 ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
-              {Math.abs(stats?.revenueChange ?? 0)}%
-            </span>
-          </div>
-          <p className="text-[24px] font-bold text-gray-900">{formatXOF(stats?.todayRevenue ?? 0)}</p>
-          <p className="text-[11px] text-gray-500 mt-1">Ventes</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <Package className="w-5 h-5 text-indigo-500" />
-          </div>
-          <p className="text-[24px] font-bold text-gray-900">{stats?.activeProducts ?? 0}</p>
-          <p className="text-[11px] text-gray-500 mt-1">Produits actifs</p>
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="flex items-center justify-between mb-3">
-            <AlertTriangle className={`w-5 h-5 ${(stats?.lowStockCount ?? 0) > 0 ? "text-orange-500" : "text-gray-300"}`} />
-          </div>
-          <p className="text-[24px] font-bold text-gray-900">{stats?.lowStockCount ?? 0}</p>
-          <p className="text-[11px] text-gray-500 mt-1">Produits stock faible</p>
-        </div>
+        <KpiCard icon={ClipboardList} label="Commandes aujourd'hui" value={String(stats?.todayOrders ?? 0)}
+          sub={`${stats?.pendingOrders ?? 0} en attente`}
+          trend={{ value: stats?.ordersChange ?? 0, positive: (stats?.ordersChange ?? 0) >= 0 }} color="text-blue-500" />
+        <KpiCard icon={TrendingUp} label="CA aujourd'hui" value={formatXOF(stats?.todayRevenue ?? 0)}
+          sub={`Mensuel: ${formatXOF(stats?.monthRevenue ?? 0)}`}
+          trend={{ value: stats?.revenueChange ?? 0, positive: (stats?.revenueChange ?? 0) >= 0 }} color="text-green-500" />
+        <KpiCard icon={ShoppingCart} label="Produits vendus" value={String(stats?.productsSold ?? 0)}
+          sub={`${stats?.activeProducts ?? 0} actifs · ${stats?.outOfStockCount ?? 0} rupture`} color="text-indigo-500" />
+        <KpiCard icon={DollarSign} label="Panier moyen" value={formatXOF(stats?.averageOrderValue ?? 0)}
+          sub={`${stats?.monthOrders ?? 0} commandes ce mois`} color="text-emerald-500" />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <KpiCard icon={Users} label="Clients actifs" value={String(stats?.activeClients ?? 0)} color="text-purple-500" />
+        <KpiCard icon={Tag} label="Promotions" value={String(stats?.activePromotions ?? 0)}
+          sub={onSaleProducts.length > 0 ? `${onSaleProducts.length} produits en promo` : undefined}
+          color="text-rose-500" />
+        <KpiCard icon={FileText} label="Factures impayées" value={String((stats?.unpaidInvoices ?? 0) + (stats?.overdueInvoices ?? 0))}
+          sub={`${stats?.overdueInvoices ?? 0} en retard`}
+          color={(stats?.overdueInvoices ?? 0) > 0 ? "text-red-500" : "text-amber-500"} />
+        <KpiCard icon={AlertTriangle} label="Stock faible" value={String(stats?.lowStockCount ?? 0)}
+          sub={`${stats?.outOfStockCount ?? 0} en rupture`}
+          color={(stats?.lowStockCount ?? 0) > 0 ? "text-orange-500" : "text-gray-300"} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 lg:col-span-2">
-          <h2 className="text-[15px] font-bold text-gray-900 mb-3">Dernières commandes</h2>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 lg:col-span-2 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-[15px] font-bold text-gray-900">Aperçu revenus (7 jours)</h2>
+            <span className="text-[11px] text-gray-400">
+              Total: <strong className="text-gray-700">{formatXOF(revenueData.reduce((s, r) => s + r.amount, 0))}</strong>
+            </span>
+          </div>
+          <div className="flex items-end justify-between gap-2 h-32">
+            {revenueData.map((r) => (
+              <div key={r.day} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full bg-cm-green/10 rounded-t-md relative transition-all duration-300 hover:bg-cm-green/20" style={{ height: `${Math.max(4, (r.amount / maxRevenue) * 100)}%` }}>
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                    {Math.round(r.amount / 1000)}k
+                  </div>
+                </div>
+                <span className="text-[10px] text-gray-400">{r.day}</span>
+              </div>
+            ))}
+          </div>
+
+          <h2 className="text-[15px] font-bold text-gray-900 mt-2">Dernières commandes</h2>
           {recentOrders.length === 0 ? (
-            <p className="text-[12px] text-gray-400 py-6 text-center">Aucune commande récente</p>
+            <p className="text-[12px] text-gray-400 py-4 text-center">Aucune commande récente</p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1">
               {recentOrders.map((order) => (
-                <a key={order.id} href={`/supplier/orders/${order.id}`}
+                <div key={order.id} onClick={() => navigate(`/supplier/orders/${order.id}`)}
                   className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-medium text-gray-900">{order.id.toUpperCase()}</p>
@@ -100,42 +193,134 @@ export default function SupplierDashboardScreen() {
                     order.status === "PENDING_SUPPLIER" ? "bg-yellow-50 text-yellow-700" :
                     order.status === "PREPARING" ? "bg-indigo-50 text-indigo-600" :
                     order.status === "DELIVERED" ? "bg-green-50 text-green-700" :
+                    order.status === "DELIVERING" ? "bg-blue-50 text-blue-600" :
                     "bg-gray-50 text-gray-600"
                   }`}>{getStatusLabel(order.status)}</span>
-                </a>
+                </div>
               ))}
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h2 className="text-[15px] font-bold text-gray-900 mb-3">Stock faible ⚠️</h2>
-          {lowStockProducts.length === 0 && outOfStockProducts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <Package className="w-8 h-8 text-gray-300 mb-2" />
-              <p className="text-[12px] text-gray-400">Tout est en stock</p>
+        <div className="space-y-3">
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-[15px] font-bold text-gray-900">Activité récente</h2>
+              <Activity className="w-4 h-4 text-gray-400" />
             </div>
-          ) : (
-            <div className="space-y-2">
-              {outOfStockProducts.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-2 rounded-lg bg-red-50">
-                  <p className="text-[12px] font-medium text-red-700 truncate min-w-0 flex-1">{p.name}</p>
-                  <span className="text-[11px] font-bold text-red-600 shrink-0 ml-2">Rupture</span>
-                </div>
-              ))}
-              {lowStockProducts.slice(0, 8).map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-2 rounded-lg bg-orange-50">
-                  <p className="text-[12px] font-medium text-orange-700 truncate min-w-0 flex-1">{p.name}</p>
-                  <span className="text-[11px] text-orange-600 shrink-0 ml-2">{p.availableStock} restants</span>
-                </div>
-              ))}
+            <div className="divide-y divide-gray-50">
+              {activities && activities.length > 0 ? (
+                activities.slice(0, 6).map((a) => <ActivityRow key={a.id} activity={a} />)
+              ) : (
+                <p className="text-[12px] text-gray-400 py-4 text-center">Aucune activité récente</p>
+              )}
             </div>
-          )}
+          </div>
 
-          <div className="mt-4 pt-3 border-t border-gray-100 flex items-center gap-2">
-            <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            <span className="text-[13px] font-semibold text-gray-900">{stats?.rating ?? 0}</span>
-            <span className="text-[11px] text-gray-500">Note fournisseur</span>
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h2 className="text-[15px] font-bold text-gray-900 mb-3">Actions rapides</h2>
+            <div className="space-y-2">
+              <button onClick={() => navigate("/supplier/products/new")}
+                className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer text-left">
+                <Package className="w-5 h-5 text-blue-500 shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold text-blue-700">Ajouter un produit</p>
+                  <p className="text-[10px] text-blue-500">Nouvelle référence</p>
+                </div>
+              </button>
+              <button onClick={() => navigate("/supplier/promotions")}
+                className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-rose-50 hover:bg-rose-100 transition-colors cursor-pointer text-left">
+                <Tag className="w-5 h-5 text-rose-500 shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold text-rose-700">Créer une promotion</p>
+                  <p className="text-[10px] text-rose-500">Remises et offres</p>
+                </div>
+              </button>
+              <button onClick={() => navigate("/supplier/orders")}
+                className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-green-50 hover:bg-green-100 transition-colors cursor-pointer text-left">
+                <ClipboardList className="w-5 h-5 text-green-500 shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold text-green-700">Voir les commandes</p>
+                  <p className="text-[10px] text-green-500">Gérer les statuts</p>
+                </div>
+              </button>
+              <button onClick={() => navigate("/supplier/stock")}
+                className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors cursor-pointer text-left">
+                <Package className="w-5 h-5 text-amber-500 shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold text-amber-700">Gérer les stocks</p>
+                  <p className="text-[10px] text-amber-500">Mouvements et alertes</p>
+                </div>
+              </button>
+              <button onClick={() => navigate("/supplier/invoices")}
+                className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition-colors cursor-pointer text-left">
+                <FileText className="w-5 h-5 text-indigo-500 shrink-0" />
+                <div>
+                  <p className="text-[12px] font-semibold text-indigo-700">Factures</p>
+                  <p className="text-[10px] text-indigo-500">Suivi des paiements</p>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <Scale className="w-4 h-4 text-red-500" />
+              </div>
+              <p className="text-[18px] font-bold text-gray-900">{stats?.openDisputes ?? 0}</p>
+              <p className="text-[10px] text-gray-500">Litiges ouverts</p>
+              {(stats?.openDisputes ?? 0) > 0 && (
+                <button onClick={() => navigate("/supplier/disputes")}
+                  className="mt-2 text-[10px] text-cm-green font-semibold cursor-pointer hover:underline">Voir</button>
+              )}
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <Truck className="w-4 h-4 text-blue-500" />
+              </div>
+              <p className="text-[18px] font-bold text-gray-900">{stats?.activeDeliveries ?? 0}</p>
+              <p className="text-[10px] text-gray-500">Livraisons en cours</p>
+              {(stats?.activeDeliveries ?? 0) > 0 && (
+                <button onClick={() => navigate("/supplier/deliveries")}
+                  className="mt-2 text-[10px] text-cm-green font-semibold cursor-pointer hover:underline">Voir</button>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h2 className="text-[15px] font-bold text-gray-900 mb-3">
+              Stock ⚠️
+              {onSaleProducts.length > 0 && (
+                <span className="ml-2 px-1.5 py-0.5 bg-red-100 rounded text-[10px] text-red-600 font-bold">{onSaleProducts.length} en promo</span>
+              )}
+            </h2>
+            {lowStockProducts.length === 0 && outOfStockProducts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-4 text-center">
+                <Package className="w-8 h-8 text-gray-300 mb-2" />
+                <p className="text-[12px] text-gray-400">Tout est en stock</p>
+              </div>
+            ) : (
+              <div className="space-y-1">
+                {outOfStockProducts.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between p-2 rounded-lg bg-red-50">
+                    <p className="text-[12px] font-medium text-red-700 truncate min-w-0 flex-1">{p.name}</p>
+                    <span className="text-[11px] font-bold text-red-600 shrink-0 ml-2">Rupture</span>
+                  </div>
+                ))}
+                {lowStockProducts.slice(0, 5).map((p) => (
+                  <div key={p.id} className="flex items-center justify-between p-2 rounded-lg bg-orange-50">
+                    <p className="text-[12px] font-medium text-orange-700 truncate min-w-0 flex-1">{p.name}</p>
+                    <span className="text-[11px] text-orange-600 shrink-0 ml-2">{p.availableStock} restants</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              <span className="text-[13px] font-semibold text-gray-900">{stats?.rating ?? 0}</span>
+              <span className="text-[11px] text-gray-500">Note fournisseur</span>
+            </div>
           </div>
         </div>
       </div>

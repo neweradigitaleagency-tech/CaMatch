@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getUserById, updateUserStatus } from "../../services/admin/users.service"
+import { getTrustScores } from "../../services/admin/trust.service"
+import type { UnifiedTrustScore } from "../../services/admin/trust.service"
 import { usePermissions } from "../../hooks/usePermissions"
 import StatusBadge from "../../components/admin/ui/StatusBadge"
 import ErrorState from "../../components/admin/ui/ErrorState"
+import TrustScoreCard from "../../components/admin/TrustScoreCard"
 import { formatXOF } from "../../utils/admin/formatCurrency"
 import { getCategoryLabel } from "../../constants/admin/categoryLabels"
 import {
@@ -30,7 +33,9 @@ export default function AdminClientDetailPage() {
   const navigate = useNavigate()
   const { hasPermission } = usePermissions()
   const [user, setUser] = useState<UserProfile | null>(null)
+  const [trustScores, setTrustScores] = useState<UnifiedTrustScore | null>(null)
   const [loading, setLoading] = useState(true)
+  const [trustLoading, setTrustLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
@@ -39,16 +44,21 @@ export default function AdminClientDetailPage() {
     setLoading(true)
     setError(null)
     try {
-      const data = await getUserById(id)
+      const [data, scores] = await Promise.all([
+        getUserById(id),
+        getTrustScores(id),
+      ])
       if (data) {
         setUser(data)
       } else {
         setError("Utilisateur introuvable")
       }
+      if (scores) setTrustScores(scores)
     } catch {
       setError("Impossible de charger le profil")
     } finally {
       setLoading(false)
+      setTrustLoading(false)
     }
   }, [id])
 
@@ -180,6 +190,8 @@ export default function AdminClientDetailPage() {
           </>
         ) : null}
       </div>
+
+      <TrustScoreCard scores={trustScores ?? { overall: 0, kyc: 0, activity: 0, payment_reliability: 0, fraud_score: 0, fraud_flags: 0, last_assessed: new Date().toISOString() }} loading={trustLoading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Section title="Informations générales">

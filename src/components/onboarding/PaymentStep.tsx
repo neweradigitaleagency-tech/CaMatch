@@ -1,14 +1,14 @@
 import { Check } from "lucide-react";
-import type { PaymentMethod } from "../../types";
+import type { UnifiedPaymentMethod } from "../../types/payment";
 
 interface PaymentStepProps {
-  paymentMethod: PaymentMethod | null;
+  paymentMethod: UnifiedPaymentMethod | null;
   paymentPhone: string;
-  onMethodChange: (method: PaymentMethod) => void;
+  onMethodChange: (method: UnifiedPaymentMethod) => void;
   onPhoneChange: (phone: string) => void;
 }
 
-const METHODS: { id: PaymentMethod; label: string; color: string }[] = [
+const METHODS: { id: UnifiedPaymentMethod; label: string; color: string }[] = [
   { id: "orange_money", label: "Orange Money", color: "#FF7900" },
   { id: "mtn_momo", label: "MTN MoMo", color: "#FFCC00" },
   { id: "wave", label: "Wave", color: "#1E90FF" },

@@ -1,31 +1,33 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, Shield, Coins, Smartphone, CreditCard } from "lucide-react";
 import { useRequestStore } from "../../stores/requestStore";
 import { useEscrowStore } from "../../stores/escrowStore";
-import type { PaymentMethod } from "../../types";
-import { PAYMENT_METHOD_LABELS } from "../../types";
+import type { UnifiedPaymentMethod } from "../../types/payment";
+import { PAYMENT_METHOD_LABELS } from "../../types/payment";
 
-const METHOD_ICONS: Record<PaymentMethod, typeof Smartphone> = {
+const METHOD_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   orange_money: Smartphone,
   mtn_momo: Smartphone,
   wave: CreditCard,
   moov_money: Smartphone,
 };
 
-const METHODS: PaymentMethod[] = ["orange_money", "mtn_momo", "wave"];
+const METHODS: UnifiedPaymentMethod[] = ["orange_money", "mtn_momo", "wave"];
 
 export default function EscrowPaymentPage() {
   const { requestId } = useParams();
   const nav = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const missions = useRequestStore((s) => s.missions);
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
   const holdPayment = useEscrowStore((s) => s.holdPayment);
 
   const mission = missions.find((m) => m.id === requestId || m.requestId === requestId);
 
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<UnifiedPaymentMethod | null>(null);
   const [confirming, setConfirming] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -72,8 +74,8 @@ export default function EscrowPaymentPage() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-gray-50 pb-32">
       <header className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 sticky top-0 z-10">
-        <button onClick={() => nav(-1)} className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-gray-700 hover:bg-gray-100 transition-colors border border-gray-200 cursor-pointer active:scale-95">
-          <ArrowLeft className="w-5 h-5" />
+        <button             onClick={goBack} className="w-11 h-11 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95">
+          <ArrowLeft className="w-5 h-5 text-[#2B2B2B]" />
         </button>
         <h1 className="font-bold text-sm text-gray-900">Paiement sécurisé</h1>
         <div className="w-9 h-9" />
@@ -110,7 +112,7 @@ export default function EscrowPaymentPage() {
           <div className="space-y-2">
             <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Moyen de paiement</p>
             {METHODS.map((m) => {
-              const Icon = METHOD_ICONS[m];
+              const Icon = METHOD_ICONS[m]!;
               const selected = selectedMethod === m;
               return (
                 <button key={m} onClick={() => { setSelectedMethod(m); setConfirming(false); }}

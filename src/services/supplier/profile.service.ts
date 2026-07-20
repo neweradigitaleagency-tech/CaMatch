@@ -1,4 +1,3 @@
-import { supabase, isSupabaseReady } from "../supabase"
 import type { SupplierProfile, SupplierDashboardStats, SupplierApplication } from "../../types/supplier"
 import { MOCK_SUPPLIERS, MOCK_APPLICATIONS, getMockSupplier, getMockSupplierStats } from "../../data/supplier-mocks"
 
@@ -8,10 +7,7 @@ function delay(ms = 300): Promise<void> {
 
 export async function getSupplierProfile(userId: string): Promise<SupplierProfile | null> {
   await delay()
-  if (!isSupabaseReady()) return getMockSupplier(userId) ?? null
-  const { data } = await supabase.from("supplier_profiles" as never).select("*" as never).eq("user_id" as never, userId).single()
-  if (!data) return null
-  return mapProfile(data as any)
+  return getMockSupplier(userId) ?? null
 }
 
 export async function getSupplierProfileByUserId(userId: string): Promise<SupplierProfile | null> {
@@ -20,53 +16,22 @@ export async function getSupplierProfileByUserId(userId: string): Promise<Suppli
 
 export async function updateSupplierProfile(userId: string, updates: Partial<SupplierProfile>): Promise<boolean> {
   await delay()
-  if (!isSupabaseReady()) return true
-  const db: Record<string, unknown> = {}
-  if (updates.companyName !== undefined) db.company_name = updates.companyName
-  if (updates.ownerName !== undefined) db.owner_name = updates.ownerName
-  if (updates.phone !== undefined) db.phone = updates.phone
-  if (updates.email !== undefined) db.email = updates.email
-  if (updates.address !== undefined) db.address = updates.address
-  if (updates.city !== undefined) db.city = updates.city
-  if (updates.logoUrl !== undefined) db.logo_url = updates.logoUrl
-  if (updates.photoUrl !== undefined) db.photo_url = updates.photoUrl
-  const { error } = await supabase.from("supplier_profiles" as never).update(db as never).eq("user_id" as never, userId)
-  return !error
+  return true
 }
 
 export async function getSupplierDashboardStats(userId: string): Promise<SupplierDashboardStats> {
   await delay()
-  if (!isSupabaseReady()) return getMockSupplierStats(userId)
-  return { todayOrders: 0, todayRevenue: 0, activeProducts: 0, lowStockCount: 0, rating: 0, pendingOrders: 0, preparingOrders: 0, revenueChange: 0, ordersChange: 0 }
+  return getMockSupplierStats(userId)
 }
 
 export async function getSupplierApplication(userId: string): Promise<SupplierApplication | null> {
   await delay()
-  if (!isSupabaseReady()) return MOCK_APPLICATIONS.find((a) => a.userId === userId) ?? null
-  const { data } = await supabase.from("supplier_applications" as never).select("*" as never).eq("user_id" as never, userId).single()
-  if (!data) return null
-  return mapApplication(data as any)
+  return MOCK_APPLICATIONS.find((a) => a.userId === userId) ?? null
 }
 
 export async function createSupplierApplication(app: Omit<SupplierApplication, "id" | "status" | "createdAt" | "updatedAt">): Promise<string | null> {
   await delay()
-  if (!isSupabaseReady()) return "mock-id"
-  const db = {
-    user_id: app.userId,
-    company_name: app.companyName,
-    owner_name: app.ownerName,
-    phone: app.phone,
-    email: app.email,
-    address: app.address,
-    city: app.city,
-    legal_docs_urls: app.legalDocsUrls,
-    photo_url: app.photoUrl,
-    logo_url: app.logoUrl,
-    delivery_cities: app.deliveryCities,
-  }
-  const { data, error } = await supabase.from("supplier_applications" as never).insert(db as never).select("id" as never).single()
-  if (error) return null
-  return (data as any)?.id ?? null
+  return "mock-id"
 }
 
 export async function getSupplierByUserId(userId: string): Promise<SupplierProfile | null> {

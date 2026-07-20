@@ -145,10 +145,10 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
       {/* Header */}
       <section className="px-5 pt-5 pb-2">
         <div className="flex items-center justify-between">
-          <span className="text-[22px] font-bold text-cm-text tracking-tight">Ça Match</span>
+          <img src="/logo.svg" alt="Ça Match" className="h-8" />
             <div className="flex items-center gap-2">
             <button onClick={() => setShowNotifications(true)}
-              className="relative w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
+              className="relative w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
               <Bell className="w-4 h-4 text-cm-text" />
               {unreadNotifs > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-cm-error rounded-full flex items-center justify-center text-[10px] font-bold text-white border-2 border-cm-elevated px-0.5">
@@ -157,7 +157,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
               )}
             </button>
             <button onClick={() => setShowDrawer(true)}
-              className="w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
+              className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer cm-scale-btn shrink-0">
               <Menu className="w-4 h-4 text-cm-text" />
             </button>
           </div>
@@ -240,7 +240,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
             onFocus={() => { if (!filters.query) nav("/search"); }}
           />
           <button onClick={(e) => { e.stopPropagation(); setShowFilterSheet(true); }}
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer cm-scale-btn">
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer cm-scale-btn">
             <SlidersHorizontal className="w-4 h-4 text-cm-text-soft" />
           </button>
         </div>
@@ -481,7 +481,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
           <div className="relative w-full max-w-md bg-cm-elevated rounded-t-[20px] p-5 pb-10 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[15px] font-semibold text-cm-text">Changer de localisation</h3>
-              <button onClick={() => setShowLocationPicker(false)} className="w-9 h-9 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer">
+              <button onClick={() => setShowLocationPicker(false)} className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer">
                 <X className="w-4 h-4 text-cm-text" />
               </button>
             </div>

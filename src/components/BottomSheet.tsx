@@ -42,7 +42,7 @@ export default function BottomSheet({ open, onClose, title, children, maxHeight 
               <div className="flex items-center justify-between px-5 pt-4 pb-3 border-b border-cm-border shrink-0">
                 <h2 className="text-[16px] font-bold text-cm-text">{title}</h2>
                 <button onClick={onClose}
-                  className="w-8 h-8 rounded-full bg-cm-border-soft flex items-center justify-center cursor-pointer active:scale-90 transition-all">
+                  className="w-8 h-8 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-all">
                   <X className="w-4 h-4 text-cm-text" />
                 </button>
               </div>

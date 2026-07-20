@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../hooks/useBackNavigation";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 
 const CHANNELS = [
@@ -11,6 +12,7 @@ const CHANNELS = [
 
 export default function ClientNotificationSettingsScreen() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/");
   const [channels, setChannels] = useState(CHANNELS.map(ch => ({ ...ch, enabled: true })));
 
   const toggle = (key: string) => {
@@ -20,7 +22,7 @@ export default function ClientNotificationSettingsScreen() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
-        <button type="button" onClick={() => window.history.length > 2 ? nav(-1) : nav("/")}
+        <button type="button" onClick={goBack}
           className="w-9 h-9 flex items-center justify-center rounded-[12px] border border-cm-border bg-cm-elevated cursor-pointer active:scale-90 transition-all">
           <ArrowLeft className="w-4 h-4 text-cm-text" />
         </button>

@@ -8,20 +8,26 @@ import AdminLayout from "./components/admin/AdminLayout";
 import SupplierLayout from "./components/supplier/SupplierLayout";
 import { useAuthStore } from "./stores/authStore";
 import { useAdminAuthStore } from "./stores/adminAuthStore";
+import RequireMode from "./components/auth/RequireMode";
 import "./index.css";
 import "./styles/admin.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 2, staleTime: 30_000 } } });
 
 const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
-const AuthPage = lazy(() => import("./pages/client/AuthPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
+const CatalogPage = lazy(() => import("./pages/CatalogPage"));
+const UnifiedProfilePage = lazy(() => import("./pages/UnifiedProfilePage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const ProProfilePage = lazy(() => import("./pages/client/ProProfilePage"));
 
 const CategoryDetailScreen = lazy(() => import("./components/CategoryDetailScreen"));
+const RequestWizardPage = lazy(() => import("./pages/client/RequestWizardPage"));
+const MatchingSearchPage = lazy(() => import("./pages/client/MatchingSearchPage"));
+const ProposalsListPage = lazy(() => import("./pages/client/ProposalsListPage"));
+const ProposalDetailPage = lazy(() => import("./pages/client/ProposalDetailPage"));
 const RequestCreationPage = lazy(() => import("./pages/client/RequestCreationPage"));
 const ProSelectionPage = lazy(() => import("./pages/client/ProSelectionPage"));
 const RequestDetailPage = lazy(() => import("./pages/client/RequestDetailPage"));
@@ -50,6 +56,14 @@ const ProPlanningPage = lazy(() => import("./pages/profile/ProPlanningPage"));
 const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotificationsPage"));
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
 const ProOnboardingPage = lazy(() => import("./pages/ProOnboardingPage"));
+const MarketplaceHome = lazy(() => import("./components/marketplace/MarketplaceHome"));
+const SellerRegistrationPage = lazy(() => import("./pages/marketplace/SellerRegistrationPage"));
+const ShopPage = lazy(() => import("./pages/marketplace/ShopPage"));
+const BrowseProducts = lazy(() => import("./components/marketplace/BrowseProducts"));
+const CategoryExplore = lazy(() => import("./components/marketplace/CategoryExplore"));
+const ProductDetail = lazy(() => import("./components/marketplace/ProductDetail"));
+const ProfessionalListingScreen = lazy(() => import("./components/ProfessionalListingScreen"));
+const FreelanceListingScreen = lazy(() => import("./components/FreelanceListingScreen"));
 const ProDashboardScreen = lazy(() => import("./components/ProDashboardScreen"));
 const ProServicesPage = lazy(() => import("./pages/pro/ProServicesPage"));
 const ProRevenusPage = lazy(() => import("./pages/pro/ProRevenusPage"));
@@ -102,6 +116,9 @@ const AdminPromotionsPage = lazy(() => import("./pages/admin/AdminPromotionsPage
 const AdminCMSPage = lazy(() => import("./pages/admin/AdminCMSPage"));
 const AdminRolesPage = lazy(() => import("./pages/admin/AdminRolesPage"));
 const AdminFraudPage = lazy(() => import("./pages/admin/AdminFraudPage"));
+const VerifyPhonePage = lazy(() => import("./pages/verify/VerifyPhonePage"));
+const VerifyEmailPage = lazy(() => import("./pages/verify/VerifyEmailPage"));
+const VerifyIdentityPage = lazy(() => import("./pages/verify/VerifyIdentityPage"));
 const InvoicePage = lazy(() => import("./pages/client/InvoicePage"));
 const QuoteCreatePage = lazy(() => import("./pages/client/QuoteCreatePage"));
 const QuoteReviewPage = lazy(() => import("./pages/client/QuoteReviewPage"));
@@ -134,6 +151,10 @@ const AdminFeatureFlagsPage = lazy(() => import("./pages/admin/AdminFeatureFlags
 const AdminSuppliersPage = lazy(() => import("./pages/admin/AdminSuppliersPage"));
 const AdminSupplierDetailPage = lazy(() => import("./pages/admin/AdminSupplierDetailPage"));
 const AdminSupplierApplicationsPage = lazy(() => import("./pages/admin/AdminSupplierApplicationsPage"));
+const AdminDisputesPage = lazy(() => import("./pages/admin/AdminDisputesPage"));
+const AdminDisputeDetailPage = lazy(() => import("./pages/admin/AdminDisputeDetailPage"));
+const AdminDeliveriesPage = lazy(() => import("./pages/admin/AdminDeliveriesPage"));
+const AdminDeliveryDetailPage = lazy(() => import("./pages/admin/AdminDeliveryDetailPage"));
 
 // Supplier portal lazy imports
 const SupplierRegisterPage = lazy(() => import("./pages/supplier/SupplierRegisterPage"));
@@ -153,6 +174,16 @@ const SupplierDisputeDetailPage = lazy(() => import("./pages/supplier/SupplierDi
 const SupplierDeliveriesPage = lazy(() => import("./pages/supplier/SupplierDeliveriesPage"));
 const SupplierDeliveryDetailPage = lazy(() => import("./pages/supplier/SupplierDeliveryDetailPage"));
 const SupplierBalancePage = lazy(() => import("./pages/supplier/SupplierBalancePage"));
+const SupplierSettingsPage = lazy(() => import("./pages/supplier/SupplierSettingsPage"));
+const SupplierStockPage = lazy(() => import("./pages/supplier/SupplierStockPage"));
+const SupplierClientsPage = lazy(() => import("./pages/supplier/SupplierClientsPage"));
+const SupplierClientDetailPage = lazy(() => import("./pages/supplier/SupplierClientDetailPage"));
+const SupplierPromotionsPage = lazy(() => import("./pages/supplier/SupplierPromotionsPage"));
+const SupplierInvoicesPage = lazy(() => import("./pages/supplier/SupplierInvoicesPage"));
+const SupplierInvoiceDetailPage = lazy(() => import("./pages/supplier/SupplierInvoiceDetailPage"));
+const SupplierDocumentsPage = lazy(() => import("./pages/supplier/SupplierDocumentsPage"));
+const SupplierImportPage = lazy(() => import("./pages/supplier/SupplierImportPage"));
+const SupplierPickingPage = lazy(() => import("./pages/supplier/SupplierPickingPage"));
 
 class ErrorFallback extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: ReactNode }) {
@@ -260,7 +291,6 @@ function App() {
   return (
     <Routes>
       <Route path="/onboarding" element={<Suspense fallback={<PageLoader />}><OnboardingPage /></Suspense>} />
-      <Route path="/auth" element={<Suspense fallback={<PageLoader />}><AuthPage /></Suspense>} />
 
       {/* Admin routes — separate auth from regular users */}
       <Route element={<AdminInitGate />}>
@@ -301,6 +331,10 @@ function App() {
             <Route path="/admin/suppliers" element={<Suspense fallback={<PageLoader />}><AdminSuppliersPage /></Suspense>} />
             <Route path="/admin/suppliers/:id" element={<Suspense fallback={<PageLoader />}><AdminSupplierDetailPage /></Suspense>} />
             <Route path="/admin/suppliers/applications" element={<Suspense fallback={<PageLoader />}><AdminSupplierApplicationsPage /></Suspense>} />
+            <Route path="/admin/disputes" element={<Suspense fallback={<PageLoader />}><AdminDisputesPage /></Suspense>} />
+            <Route path="/admin/disputes/:id" element={<Suspense fallback={<PageLoader />}><AdminDisputeDetailPage /></Suspense>} />
+            <Route path="/admin/deliveries" element={<Suspense fallback={<PageLoader />}><AdminDeliveriesPage /></Suspense>} />
+            <Route path="/admin/deliveries/:id" element={<Suspense fallback={<PageLoader />}><AdminDeliveryDetailPage /></Suspense>} />
           </Route>
         </Route>
       </Route>
@@ -327,12 +361,23 @@ function App() {
           <Route path="/supplier/deliveries" element={<Suspense fallback={<PageLoader />}><SupplierDeliveriesPage /></Suspense>} />
           <Route path="/supplier/deliveries/:id" element={<Suspense fallback={<PageLoader />}><SupplierDeliveryDetailPage /></Suspense>} />
           <Route path="/supplier/balance" element={<Suspense fallback={<PageLoader />}><SupplierBalancePage /></Suspense>} />
+          <Route path="/supplier/settings" element={<Suspense fallback={<PageLoader />}><SupplierSettingsPage /></Suspense>} />
+          <Route path="/supplier/stock" element={<Suspense fallback={<PageLoader />}><SupplierStockPage /></Suspense>} />
+          <Route path="/supplier/clients" element={<Suspense fallback={<PageLoader />}><SupplierClientsPage /></Suspense>} />
+          <Route path="/supplier/clients/:id" element={<Suspense fallback={<PageLoader />}><SupplierClientDetailPage /></Suspense>} />
+          <Route path="/supplier/promotions" element={<Suspense fallback={<PageLoader />}><SupplierPromotionsPage /></Suspense>} />
+          <Route path="/supplier/invoices" element={<Suspense fallback={<PageLoader />}><SupplierInvoicesPage /></Suspense>} />
+          <Route path="/supplier/invoices/:id" element={<Suspense fallback={<PageLoader />}><SupplierInvoiceDetailPage /></Suspense>} />
+          <Route path="/supplier/documents" element={<Suspense fallback={<PageLoader />}><SupplierDocumentsPage /></Suspense>} />
+          <Route path="/supplier/picking" element={<Suspense fallback={<PageLoader />}><SupplierPickingPage /></Suspense>} />
+          <Route path="/supplier/import" element={<Suspense fallback={<PageLoader />}><SupplierImportPage /></Suspense>} />
         </Route>
       </Route>
 
       {/* User routes */}
       <Route element={<AuthGate />}>
-        <Route element={<ProLayout />}>
+        <Route element={<RequireMode mode="pro" />}>
+          <Route element={<ProLayout />}>
           <Route path="pro/onboarding" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
           <Route path="pro/onboarding/:step" element={<Suspense fallback={<PageLoader />}><ProOnboardingPage /></Suspense>} />
           <Route path="pro/dashboard" element={<Suspense fallback={<PageLoader />}><ProDashboardScreen /></Suspense>} />
@@ -369,14 +414,19 @@ function App() {
           <Route path="pro/edit" element={<Navigate to="/profile/pro-edit" replace />} />
           <Route path="pro/planning" element={<Navigate to="/profile/pro-planning" replace />} />
           <Route path="pro/notifications" element={<Navigate to="/profile/pro-notifications" replace />} />
-        </Route>
-        <Route element={<AppLayout />}>
+            </Route>
+          </Route>
+          <Route element={<AppLayout />}>
         <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
+        <Route path="catalog" element={<Suspense fallback={<PageLoader />}><CatalogPage /></Suspense>} />
         <Route path="messages" element={<Suspense fallback={<PageLoader />}><MessagingListPage /></Suspense>} />
         <Route path="messages/:conversationId" element={<Suspense fallback={<PageLoader />}><ChatPage /></Suspense>} />
         <Route path="orders" element={<Suspense fallback={<PageLoader />}><OrdersPage /></Suspense>} />
-        <Route path="orders/new" element={<Suspense fallback={<PageLoader />}><RequestCreationPage /></Suspense>} />
+        <Route path="orders/new" element={<Suspense fallback={<PageLoader />}><RequestWizardPage /></Suspense>} />
+        <Route path="orders/matching/:requestId" element={<Suspense fallback={<PageLoader />}><MatchingSearchPage /></Suspense>} />
+        <Route path="orders/proposals/:requestId" element={<Suspense fallback={<PageLoader />}><ProposalsListPage /></Suspense>} />
+        <Route path="orders/proposals/:requestId/:proposalId" element={<Suspense fallback={<PageLoader />}><ProposalDetailPage /></Suspense>} />
         <Route path="orders/:id" element={<Suspense fallback={<PageLoader />}><RequestDetailPage /></Suspense>} />
         <Route path="orders/tracker/:id" element={<Suspense fallback={<PageLoader />}><MissionTrackerPage /></Suspense>} />
         <Route path="orders/review" element={<Suspense fallback={<PageLoader />}><ReviewPage /></Suspense>} />
@@ -388,8 +438,9 @@ function App() {
         <Route path="orders/quote/create/:requestId" element={<Suspense fallback={<PageLoader />}><QuoteCreatePage /></Suspense>} />
         <Route path="orders/quote/:requestId" element={<Suspense fallback={<PageLoader />}><QuoteReviewPage /></Suspense>} />
         <Route path="orders/payment/:requestId" element={<Suspense fallback={<PageLoader />}><EscrowPaymentPage /></Suspense>} />
-        <Route path="profile/pro-missions" element={<Suspense fallback={<PageLoader />}><ProMissionListPage /></Suspense>} />
+        <Route path="profile/pro-missions" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProMissionListPage /></Suspense></RequireMode>} />
         <Route path="profile" element={<Suspense fallback={<PageLoader />}><ProfilePage /></Suspense>} />
+        <Route path="my-profile" element={<Suspense fallback={<PageLoader />}><UnifiedProfilePage /></Suspense>} />
         <Route path="profile/settings" element={<Suspense fallback={<PageLoader />}><AppSettingsPage /></Suspense>} />
         <Route path="profile/payments" element={<Suspense fallback={<PageLoader />}><ClientPaymentsPage /></Suspense>} />
         <Route path="profile/addresses" element={<Suspense fallback={<PageLoader />}><ClientAddressesPage /></Suspense>} />
@@ -399,41 +450,55 @@ function App() {
         <Route path="profile/security" element={<Suspense fallback={<PageLoader />}><SecurityPage /></Suspense>} />
         <Route path="profile/language" element={<Suspense fallback={<PageLoader />}><LanguagePage /></Suspense>} />
         <Route path="profile/terms" element={<Suspense fallback={<PageLoader />}><TermsPage /></Suspense>} />
-        <Route path="profile/pro-edit" element={<Suspense fallback={<PageLoader />}><ProEditPage /></Suspense>} />
-        <Route path="profile/pro-verification" element={<Suspense fallback={<PageLoader />}><ProVerificationPage /></Suspense>} />
-        <Route path="profile/pro-finances" element={<Suspense fallback={<PageLoader />}><ProFinancesPage /></Suspense>} />
-        <Route path="profile/pro-subscription" element={<Suspense fallback={<PageLoader />}><ProSubscriptionPage /></Suspense>} />
-        <Route path="profile/pro-planning" element={<Suspense fallback={<PageLoader />}><ProPlanningPage /></Suspense>} />
-        <Route path="profile/pro-notifications" element={<Suspense fallback={<PageLoader />}><ProNotificationsPage /></Suspense>} />
-        <Route path="profile/pro-help" element={<Suspense fallback={<PageLoader />}><ProHelpPage /></Suspense>} />
-        <Route path="subscription/plans" element={<Suspense fallback={<PageLoader />}><SubscriptionPlansPage /></Suspense>} />
-        <Route path="subscription/compare" element={<Suspense fallback={<PageLoader />}><SubscriptionComparePage /></Suspense>} />
-        <Route path="subscription/success" element={<Suspense fallback={<PageLoader />}><SubscriptionSuccessPage /></Suspense>} />
+        <Route path="verify/phone" element={<Suspense fallback={<PageLoader />}><VerifyPhonePage /></Suspense>} />
+        <Route path="verify/email" element={<Suspense fallback={<PageLoader />}><VerifyEmailPage /></Suspense>} />
+        <Route path="verify/identity" element={<Suspense fallback={<PageLoader />}><VerifyIdentityPage /></Suspense>} />
+        <Route path="profile/pro-edit" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProEditPage /></Suspense></RequireMode>} />
+        <Route path="profile/pro-verification" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProVerificationPage /></Suspense></RequireMode>} />
+        <Route path="profile/pro-finances" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProFinancesPage /></Suspense></RequireMode>} />
+        <Route path="profile/pro-subscription" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProSubscriptionPage /></Suspense></RequireMode>} />
+        <Route path="profile/pro-planning" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProPlanningPage /></Suspense></RequireMode>} />
+        <Route path="profile/pro-notifications" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProNotificationsPage /></Suspense></RequireMode>} />
+        <Route path="profile/pro-help" element={<RequireMode mode="pro"><Suspense fallback={<PageLoader />}><ProHelpPage /></Suspense></RequireMode>} />
+        {/* Redirects: canonical subscription path is /settings/subscription/* */}
+        <Route path="subscription/plans" element={<Navigate to="/settings/subscription/plans" replace />} />
+        <Route path="subscription/compare" element={<Navigate to="/settings/subscription/plans" replace />} />
+        <Route path="subscription/success" element={<Navigate to="/settings/subscription" replace />} />
+        <Route path="client/subscription" element={<Navigate to="/settings/subscription" replace />} />
+        <Route path="client/subscription/plans" element={<Navigate to="/settings/subscription/plans" replace />} />
+        <Route path="client/subscription/payment" element={<Navigate to="/settings/subscription/payment" replace />} />
+        <Route path="client/subscription/history" element={<Navigate to="/settings/subscription/history" replace />} />
+        <Route path="client/subscription/invoices" element={<Navigate to="/settings/subscription/invoices" replace />} />
 
         <Route path="settings/subscription" element={<Suspense fallback={<PageLoader />}><SubscriptionDashboardPage /></Suspense>} />
         <Route path="settings/subscription/plans" element={<Suspense fallback={<PageLoader />}><SubscriptionPlansPage /></Suspense>} />
         <Route path="settings/subscription/payment" element={<Suspense fallback={<PageLoader />}><SubscriptionPaymentPage /></Suspense>} />
         <Route path="settings/subscription/history" element={<Suspense fallback={<PageLoader />}><SubscriptionHistoryPage /></Suspense>} />
         <Route path="settings/subscription/invoices" element={<Suspense fallback={<PageLoader />}><SubscriptionInvoicesPage /></Suspense>} />
+        <Route path="marketplace" element={<Suspense fallback={<PageLoader />}><MarketplaceHome /></Suspense>} />
+        <Route path="marketplace/register" element={<Suspense fallback={<PageLoader />}><SellerRegistrationPage /></Suspense>} />
+        <Route path="marketplace/shop/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
+        <Route path="marketplace/browse/:vertical" element={<Suspense fallback={<PageLoader />}><CategoryExplore /></Suspense>} />
+        <Route path="marketplace/item/:productId" element={<Suspense fallback={<PageLoader />}><ProductDetail /></Suspense>} />
+        <Route path="marketplace/:categoryId" element={<Suspense fallback={<PageLoader />}><BrowseProducts /></Suspense>} />
+        <Route path="professionals" element={<Suspense fallback={<PageLoader />}><ProfessionalListingScreen /></Suspense>} />
+        <Route path="freelance" element={<Suspense fallback={<PageLoader />}><FreelanceListingScreen /></Suspense>} />
 
-        <Route path="client/subscription" element={<Suspense fallback={<PageLoader />}><SubscriptionDashboardPage /></Suspense>} />
-        <Route path="client/subscription/plans" element={<Suspense fallback={<PageLoader />}><SubscriptionPlansPage /></Suspense>} />
-        <Route path="client/subscription/payment" element={<Suspense fallback={<PageLoader />}><SubscriptionPaymentPage /></Suspense>} />
-        <Route path="client/subscription/history" element={<Suspense fallback={<PageLoader />}><SubscriptionHistoryPage /></Suspense>} />
-        <Route path="client/subscription/invoices" element={<Suspense fallback={<PageLoader />}><SubscriptionInvoicesPage /></Suspense>} />
-
+        {/* Legacy explorer redirects */}
         <Route path="explorer" element={<Navigate to="/" replace />} />
         <Route path="requests" element={<Navigate to="/orders" replace />} />
         <Route path="requests/*" element={<Navigate to="/orders" replace />} />
+        <Route path="explorer/request-creation" element={<Navigate to="/orders/new" replace />} />
+        <Route path="explorer/pro-selection" element={<Navigate to="/search" replace />} />
+        <Route path="explorer/categories" element={<Navigate to="/search" replace />} />
+        <Route path="explorer/search" element={<Navigate to="/search" replace />} />
+        <Route path="explorer/category/:categoryId" element={<Navigate to="/search" replace />} />
+        <Route path="explorer/matching" element={<Navigate to="/search" replace />} />
+        <Route path="explorer/matching/success" element={<Navigate to="/search" replace />} />
+
+        {/* Still active explorer routes (will be migrated to /search/*) */}
         <Route path="explorer/pro/:id" element={<Suspense fallback={<PageLoader />}><ProProfilePage /></Suspense>} />
-        <Route path="explorer/request-creation" element={<Suspense fallback={<PageLoader />}><RequestCreationPage /></Suspense>} />
-        <Route path="explorer/pro-selection" element={<Suspense fallback={<PageLoader />}><ProSelectionPage /></Suspense>} />
-        <Route path="explorer/categories" element={<Suspense fallback={<PageLoader />}><CategorySelectScreen /></Suspense>} />
-        <Route path="explorer/search" element={<Suspense fallback={<PageLoader />}><SearchScreen /></Suspense>} />
         <Route path="explorer/design-provider/:id" element={<Suspense fallback={<PageLoader />}><ProviderProfileScreen /></Suspense>} />
-        <Route path="explorer/category/:categoryId" element={<Suspense fallback={<PageLoader />}><CategoryDetailScreen /></Suspense>} />
-        <Route path="explorer/matching" element={<Suspense fallback={<PageLoader />}><MatchingScreen /></Suspense>} />
-        <Route path="explorer/matching/success" element={<Suspense fallback={<PageLoader />}><MatchingScreen /></Suspense>} />
 
         <Route path="profile/pro-preview" element={<Suspense fallback={<PageLoader />}><ProPreviewPage /></Suspense>} />
       </Route>

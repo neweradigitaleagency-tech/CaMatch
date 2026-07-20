@@ -2,6 +2,24 @@ import { supabase, isSupabaseReady } from "../supabase"
 import type { MaterialOrder, MaterialOrderItem, MaterialOrderStatus } from "../../types/supplier"
 import { MOCK_ORDERS, getMockSupplierOrders } from "../../data/supplier-mocks"
 
+export interface CreateOrderInput {
+  jobId: string
+  supplierId: string
+  clientId: string
+  professionalId: string
+  deliveryCity?: string
+  deliveryAddress?: string
+  deliveryCost?: number
+  notes?: string
+  estimatedDeliveryAt?: string
+  items: Array<{
+    productId: string
+    productName: string
+    quantity: number
+    unitPrice: number
+  }>
+}
+
 export const ORDER_STATUS_LABELS: Record<MaterialOrderStatus, string> = {
   PENDING_SUPPLIER: "En attente",
   ACCEPTED: "Acceptée",
@@ -88,6 +106,84 @@ export async function updateOrderStatus(orderId: string, status: MaterialOrderSt
     .update({ status } as never)
     .eq("id" as never, orderId)
   return !error
+}
+
+export async function createMaterialOrder(input: CreateOrderInput): Promise<MaterialOrder | null> {
+  const subtotal = input.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0)
+  const deliveryCost = input.deliveryCost ?? 0
+  const commission = Math.round(subtotal * 0.1)
+  const total = subtotal + deliveryCost + commission
+
+  if (!isSupabaseReady()) {
+    return mockCreateOrder(input, subtotal, deliveryCost, commission, total)
+  }
+
+  const { data, error } = await supabase
+    .from("material_orders" as never)
+    .insert({
+      job_id: input.jobId,
+      supplier_id: input.supplierId,
+      client_id: input.clientId,
+      professional_id: input.professionalId,
+      delivery_city: input.deliveryCity ?? null,
+      delivery_address: input.deliveryAddress ?? null,
+      delivery_cost: deliveryCost,
+      subtotal,
+      commission,
+      total,
+      notes: input.notes ?? null,
+      estimated_delivery_at: input.estimatedDeliveryAt ?? null,
+      status: "PENDING_SUPPLIER",
+      material_order_items: input.items.map((item) => ({
+        product_id: item.productId,
+        product_name: item.productName,
+        quantity: item.quantity,
+        unit_price: item.unitPrice,
+      })),
+    } as never)
+    .select("*, material_order_items(*)")
+    .single()
+
+  if (error) {
+    console.error("createMaterialOrder error:", error)
+    return null
+  }
+
+  return mapOrder(data)
+}
+
+function mockCreateOrder(
+  input: CreateOrderInput, subtotal: number,
+  deliveryCost: number, commission: number, total: number,
+): MaterialOrder {
+  const order: MaterialOrder = {
+    id: `mock-${Date.now()}`,
+    jobId: input.jobId,
+    supplierId: input.supplierId,
+    clientId: input.clientId,
+    professionalId: input.professionalId,
+    status: "PENDING_SUPPLIER",
+    deliveryCity: input.deliveryCity,
+    deliveryAddress: input.deliveryAddress,
+    deliveryCost,
+    subtotal,
+    commission,
+    total,
+    notes: input.notes,
+    estimatedDeliveryAt: input.estimatedDeliveryAt,
+    items: input.items.map((item, i) => ({
+      id: `mock-item-${i}`,
+      orderId: `mock-${Date.now()}`,
+      productId: item.productId,
+      productName: item.productName,
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+      totalPrice: item.unitPrice * item.quantity,
+    })),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  }
+  return order
 }
 
 function mapOrder(data: any): MaterialOrder {

@@ -426,11 +426,6 @@ export default function ProDashboardScreen() {
       <HamburgerDrawer
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        isPro
-        proName={pro.name}
-        proTitle={pro.title}
-        proAvatarUrl={pro.avatarUrl}
-        proPhone={pro.phoneNumber}
       />
 
       <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} />

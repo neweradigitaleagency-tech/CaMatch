@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { motion } from "motion/react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useBackNavigation } from "../hooks/useBackNavigation";
 import { Star, MapPin, Clock, MessageCircle } from "lucide-react";
 import TopBarIconButton from "../components/ui/TopBarIconButton";
 import InfoChip from "../components/ui/InfoChip";
@@ -18,6 +19,7 @@ const beforeAfter = [
 
 export default function ProviderProfileScreen() {
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/");
   const { id } = useParams();
   const pro = useMemo(() => abidjanProviders.find((p) => p.id === id) || abidjanProviders[0], [id]);
 
@@ -25,7 +27,7 @@ export default function ProviderProfileScreen() {
     return (
       <div       className="min-h-dvh flex flex-col items-center justify-center px-4 bg-cm-bg">
         <p className="text-[15px] text-cm-text-muted">Prestataire introuvable</p>
-        <button onClick={() => navigate(-1)} className="mt-4 h-[44px] px-6 rounded-full bg-cm-accent text-cm-text-onAccent font-bold text-[15px] cursor-pointer">
+        <button onClick={goBack} className="mt-4 h-[44px] px-6 rounded-full bg-cm-accent text-cm-text-onAccent font-bold text-[15px] cursor-pointer">
           Retour
         </button>
       </div>
@@ -55,7 +57,7 @@ export default function ProviderProfileScreen() {
         <div className="absolute top-4 left-4 z-10">
           <TopBarIconButton icon={
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cm-text"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-          } onClick={() => navigate(-1)} />
+          } onClick={goBack} />
         </div>
 
         {/* Name on image */}

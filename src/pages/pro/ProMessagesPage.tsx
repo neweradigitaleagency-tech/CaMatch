@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, MessageSquare, Search } from "lucide-react";
 import MessagingScreen, { ChatScreen } from "../../components/MessagingScreen";
@@ -138,6 +139,7 @@ function ChatView({ conversationId, onBack }: { conversationId: string; onBack: 
 export default function ProMessagesPage() {
   const { conversationId } = useParams<{ conversationId: string }>();
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const initialize = useChatStore((s) => s.initialize);
   const userId = useAuthStore((s) => s.userId);
   const initialized = useRef(false);
@@ -153,5 +155,5 @@ export default function ProMessagesPage() {
     return <ChatView conversationId={conversationId} onBack={() => nav("/pro/messages")} />;
   }
 
-  return <MessagesList onBack={() => nav(-1)} />;
+  return <MessagesList onBack={goBack} />;
 }

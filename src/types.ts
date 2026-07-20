@@ -211,13 +211,16 @@ export interface Quote {
 }
 
 // ─── Escrow / Payment (W8) ───
+// ⚠️  Nouveaux types unifiés dans src/types/payment/
 
+/** @deprecated Import { EscrowStatus } from '@/types/payment' */
 export type EscrowStatus =
   | "held"
   | "released"
   | "refunded"
   | "partially_refunded";
 
+/** @deprecated Import { EscrowEntry } from '@/types/payment' */
 export interface EscrowEntry {
   id: string;
   missionId: string;
@@ -526,9 +529,12 @@ export interface ProAvailability {
 }
 
 // ─── QR Payment ───
+// ⚠️  Nouveaux types unifiés dans src/types/payment/
 
+/** @deprecated Import { UnifiedPaymentMethod } from '@/types/payment' */
 export type PaymentMethod = "orange_money" | "mtn_momo" | "wave" | "moov_money";
 
+/** @deprecated Import { PAYMENT_METHOD_LABELS } from '@/types/payment' */
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   orange_money: "Orange Money",
   mtn_momo: "MTN MoMo",
@@ -536,6 +542,7 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   moov_money: "Moov Money",
 };
 
+/** @deprecated Import { PAYMENT_METHOD_COLORS } from '@/types/payment' */
 export const PAYMENT_METHOD_COLORS: Record<PaymentMethod, string> = {
   orange_money: "#FF7900",
   mtn_momo: "#FFCC00",
@@ -550,6 +557,7 @@ export interface QRPaymentInfo {
   amountXOF?: number;
 }
 
+/** @deprecated Import { TransactionLedgerEntry } from '@/types/payment' */
 export interface PaymentTransaction {
   id: string;
   missionId: string;
@@ -563,6 +571,67 @@ export interface PaymentTransaction {
   platformAmountXOF: number;
   status: "pending" | "completed" | "failed";
   createdAt: string;
+}
+
+// ─── CEA Unified Financial Types ───
+// ⚠️  Remplacé par src/types/payment/
+
+/** @deprecated Import { UnifiedPaymentMethod } from '@/types/payment' */
+export type UnifiedPaymentMethod =
+  | "wave" | "orange_money" | "mtn_momo" | "moov_money"
+  | "stripe" | "flutterwave" | "cinetpay"
+  | "cash" | "bank_transfer" | "card" | "credit";
+
+/** @deprecated Import { TransactionType } from '@/types/payment' */
+export type UnifiedTransactionType =
+  | "payment" | "payout" | "refund" | "commission"
+  | "withdrawal" | "fee" | "bonus" | "cashback";
+
+/** @deprecated Import { TransactionStatus } from '@/types/payment' */
+export type UnifiedTransactionStatus =
+  | "pending" | "authorized" | "captured" | "completed"
+  | "failed" | "refunded" | "partially_refunded";
+
+/** @deprecated Import { TransactionLedgerEntry } from '@/types/payment' */
+export interface FinancialTransaction {
+  id: string;
+  projectId?: string;
+  type: UnifiedTransactionType;
+  fromUserId: string;
+  toUserId: string;
+  grossAmount: number;
+  feeAmount: number;
+  netAmount: number;
+  method: UnifiedPaymentMethod;
+  status: UnifiedTransactionStatus;
+  reference?: string;
+  linkedEntityType?: "mission" | "subscription" | "material_order" | "boost";
+  linkedEntityId?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export type ProjectStatus = MissionStatus | ProJobStatus;
+
+// ─── CEA Unified Invoice ───
+// ⚠️  Remplacé par src/types/payment/
+
+/** @deprecated Import { InvoiceDomain } from '@/types/payment' */
+export type InvoiceDomain = "mission" | "subscription" | "supplier";
+
+/** @deprecated Import { BaseInvoice } from '@/types/payment' */
+export interface BaseInvoice {
+  id: string;
+  domain: InvoiceDomain;
+  number: string;
+  amount: number;
+  tax?: number;
+  total: number;
+  status: string;
+  createdAt: string;
+  paidAt?: string;
+  pdfUrl?: string;
 }
 
 // ─── Commission ───
@@ -592,6 +661,7 @@ export interface ProFinanceSummary {
 
 // ─── Existing types kept for backward compatibility ───
 
+/** @deprecated Use MissionStatus instead */
 export enum RequestStatus {
   PENDING = "pending",
   ACCEPTED = "accepted",
@@ -600,6 +670,7 @@ export enum RequestStatus {
   COMPLETED = "completed"
 }
 
+/** @deprecated Use Mission or Project instead */
 export interface ServiceRequest {
   id: string;
   clientId: string;
@@ -616,6 +687,7 @@ export interface ServiceRequest {
   cancellationReason?: string;
 }
 
+/** @deprecated Use FinancialTransaction instead */
 export interface Transaction {
   id: string;
   requestId: string;
@@ -1095,7 +1167,9 @@ export interface TrackingData {
 }
 
 // ─── Invoice ───
+// ⚠️  Remplacé par src/types/payment/
 
+/** @deprecated Import { MissionInvoice } from '@/types/payment' */
 export interface Invoice {
   id: string;
   missionId: string;
@@ -1251,15 +1325,122 @@ export interface ProOnboardingData {
   email: string;
   emailVerified: boolean;
 
-  paymentMethod: PaymentMethod | null;
+  paymentMethod: UnifiedPaymentMethod | null;
   paymentPhone: string;
 
   cguAccepted: boolean;
+
   signature: string | null;
 
   submittedAt: string | null;
   reviewedAt: string | null;
   reviewNotes: string | null;
+}
+
+// ─── Request Wizard (7-step) ───
+
+export interface DiagnosticAnswer {
+  questionId: string;
+  question: string;
+  answer: string;
+}
+
+export type MaterialsPreference = "pro_provides" | "client_buys" | "via_ca_match" | "none";
+
+export type BudgetMode = "receive_proposals" | "precise" | "range";
+
+export type AvailabilityMode = "asap" | "today" | "this_week" | "custom";
+
+export interface RequestDraft {
+  step: number;
+  category: string | null;
+  subCategory: string | null;
+  diagnostic: DiagnosticAnswer[];
+  description: string;
+  photos: string[];
+  videos: string[];
+  address: string;
+  addressComplement: string;
+  accessInstructions: string;
+  lat: number;
+  lng: number;
+  availability: AvailabilityMode | null;
+  scheduledDate: string;
+  timeSlot: string;
+  budgetMode: BudgetMode | null;
+  budgetMin: number;
+  budgetMax: number;
+  materialsPreference: MaterialsPreference | null;
+  savedAt: string;
+}
+
+export const DEFAULT_DRAFT: RequestDraft = {
+  step: 1,
+  category: null,
+  subCategory: null,
+  diagnostic: [],
+  description: "",
+  photos: [],
+  videos: [],
+  address: "",
+  addressComplement: "",
+  accessInstructions: "",
+  lat: 5.35,
+  lng: -4.0,
+  availability: null,
+  scheduledDate: "",
+  timeSlot: "",
+  budgetMode: null,
+  budgetMin: 0,
+  budgetMax: 0,
+  materialsPreference: null,
+  savedAt: new Date().toISOString(),
+};
+
+// ─── Proposal ───
+
+export interface ProposalMaterial {
+  id: string;
+  name: string;
+  quantity: number;
+  unitPriceXOF: number;
+  totalXOF: number;
+  supplierId?: string;
+  supplierName?: string;
+  supplierPrice?: number;
+  supplierAvailable?: boolean;
+  supplierDelivery?: "delivery" | "pickup";
+}
+
+export type ProposalStatus = "pending" | "accepted" | "refused" | "expired";
+
+export interface Proposal {
+  id: string;
+  requestId: string;
+  professionalId: string;
+  professionalName: string;
+  professionalAvatar: string;
+  professionalRating: number;
+  trustScore: number;
+  distanceKm: number;
+  estimatedArrivalMinutes: number;
+  laborPriceXOF: number;
+  materialsCostXOF: number;
+  materialsDeliveryXOF: number;
+  totalXOF: number;
+  materials: ProposalMaterial[];
+  estimatedDurationMins: number;
+  status: ProposalStatus;
+  message: string;
+  experienceYears: number;
+  reviewCount: number;
+  completedInterventions: number;
+  isVerified: boolean;
+  verificationLevel: number;
+  avgResponseTimeMinutes: number;
+  completionRate: number;
+  createdAt: string;
+  expiresAt: string;
 }
 
 export const ONBOARDING_STEP_LABELS: Record<OnboardingStepId, string> = {

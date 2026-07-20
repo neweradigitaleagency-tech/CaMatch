@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Send, Wallet, ChevronDown, CheckCircle } from "lucide-react";
 import { useState } from "react";
@@ -7,6 +8,7 @@ import { PAYMENT_METHODS } from "../../data/plans";
 
 export default function ProWithdrawPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("orange_money");
   const [showMethods, setShowMethods] = useState(false);
@@ -45,7 +47,7 @@ export default function ProWithdrawPage() {
     <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center h-14 px-5 gap-3">
-          <button type="button" onClick={() => nav(-1)} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
+          <button type="button" onClick={goBack} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
             <ArrowLeft className="w-5 h-5 text-cm-text" />
           </button>
           <h1 className="text-[18px] font-bold text-cm-text">Retirer mes revenus</h1>

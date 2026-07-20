@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import InvoiceScreen from "../../components/InvoiceScreen";
 import type { Mission, Invoice } from "../../types";
 
@@ -34,6 +35,7 @@ const MOCK_INVOICE: Invoice = {
 export default function InvoicePage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const mission = (location.state as { mission: Mission })?.mission;
 
   if (!mission) {
@@ -45,7 +47,7 @@ export default function InvoicePage() {
     <InvoiceScreen
       mission={mission}
       invoice={MOCK_INVOICE}
-      onBack={() => navigate(-1)}
+      onBack={goBack}
     />
   );
 }

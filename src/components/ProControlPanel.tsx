@@ -1,13 +1,36 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon, Camera, X, Image } from "lucide-react";
-import type { ProJob, MissionStatus, ProJobStatus } from "../types";
+import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon, Camera, X, Image, Clock, Plus, ClipboardList } from "lucide-react";
+import type { ProJob, ProJobStatus } from "../types";
 import { useAuthStore } from "../stores/authStore";
 import { createConversation, findConversation } from "../services/chatService";
 import MapView from "./ui/MapView";
 import { useRequestStore } from "../stores/requestStore";
 
 type ProStep = "idle" | "accepted" | "en_route" | "arrived" | "photos_taken" | "in_progress" | "photos_after" | "completed";
+
+interface ChecklistItem {
+  id: string;
+  label: string;
+  done: boolean;
+}
+
+const DEFAULT_CHECKLIST: ChecklistItem[] = [
+  { id: "c1", label: "Vérifier l'accès au site", done: false },
+  { id: "c2", label: "Préparer le matériel nécessaire", done: false },
+  { id: "c3", label: "Protéger la zone de travail", done: false },
+  { id: "c4", label: "Effectuer l'intervention", done: false },
+  { id: "c5", label: "Nettoyer la zone", done: false },
+  { id: "c6", label: "Vérifier la satisfaction client", done: false },
+];
+
+function formatElapsed(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
 
 function statusToStep(status: ProJobStatus): ProStep {
   switch (status) {
@@ -45,6 +68,49 @@ export default function ProControlPanel({
   const beforeInputRef = useRef<HTMLInputElement>(null);
   const afterInputRef = useRef<HTMLInputElement>(null);
   const setMissionField = useRequestStore((s) => s.setMissionField);
+
+  const [elapsed, setElapsed] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const [checklist, setChecklist] = useState<ChecklistItem[]>(DEFAULT_CHECKLIST);
+  const [customTask, setCustomTask] = useState("");
+  const [showAddTask, setShowAddTask] = useState(false);
+
+  const toggleChecklist = (id: string) => {
+    setChecklist((prev) => prev.map((item) => item.id === id ? { ...item, done: !item.done } : item));
+  };
+
+  const addCustomTask = () => {
+    const label = customTask.trim();
+    if (!label) return;
+    setChecklist((prev) => [...prev, { id: `c-${Date.now()}`, label, done: false }]);
+    setCustomTask("");
+    setShowAddTask(false);
+  };
+
+  const doneCount = checklist.filter((i) => i.done).length;
+  const totalCount = checklist.length;
+
+  const startTimer = useCallback(() => {
+    setElapsed(0);
+    setTimerRunning(true);
+    timerRef.current = setInterval(() => {
+      setElapsed((prev) => prev + 1);
+    }, 1000);
+  }, []);
+
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setTimerRunning(false);
+  }, []);
+
+  useEffect(() => {
+    return () => { stopTimer(); };
+  }, [stopTimer]);
 
   const notify = useCallback((title: string, body: string) => {
     if (onNotification) {
@@ -146,6 +212,7 @@ export default function ProControlPanel({
   };
 
   const handleStartIntervention = () => {
+    startTimer();
     setStep("in_progress");
     onUpdateStatus(job.id, "in_progress");
     notify("Intervention commencée", "Le client est informé du début de l'intervention.");
@@ -172,12 +239,15 @@ export default function ProControlPanel({
   };
 
   const handleComplete = () => {
+    stopTimer();
     setMissionField(job.id, "beforePhotos", beforePhotos);
     setMissionField(job.id, "afterPhotos", afterPhotos);
+    setMissionField(job.id, "elapsedSeconds", elapsed);
+    setMissionField(job.id, "checklist", checklist.filter((i) => i.done).map((i) => i.label));
     setStep("completed");
     setCompleted(true);
     onUpdateStatus(job.id, "completed");
-    notify("Mission terminée", "Le client valide maintenant le travail.");
+    notify("Mission terminée", `Durée : ${formatElapsed(elapsed)}. Le client valide maintenant le travail.`);
     setTimeout(() => onComplete(job.id), 2000);
   };
 
@@ -188,7 +258,13 @@ export default function ProControlPanel({
         <div className="w-16 h-16 rounded-full bg-cm-accent-soft flex items-center justify-center mb-5">
           <CheckCircle className="w-8 h-8 text-cm-accent" />
         </div>
-        <h2 className="text-xl font-bold text-cm-text mb-2">Mission terminée !        </h2>
+        <h2 className="text-xl font-bold text-cm-text mb-2">Mission terminée !</h2>
+        <p className="text-[14px] text-cm-text-soft mb-2 max-w-xs">
+          Durée : <strong>{formatElapsed(elapsed)}</strong>
+        </p>
+        {doneCount > 0 && (
+          <p className="text-[12px] text-cm-text-soft mb-4">{doneCount}/{totalCount} tâches complétées</p>
+        )}
         <p className="text-[14px] text-cm-text-soft mb-6 max-w-xs">
           Le client valide maintenant le travail effectué.
         </p>
@@ -237,6 +313,76 @@ export default function ProControlPanel({
           <span className="ml-auto text-[10px] text-white/60">
             {coords ? `${coords.lat.toFixed(4)}, ${coords.lng.toFixed(4)}` : "Acquisition..."}
           </span>
+        </div>
+      )}
+
+      {/* Chronometer */}
+      {(step === "in_progress" || step === "photos_after") && timerRunning && (
+        <div className="mx-5 mb-4">
+          <div className="bg-cm-elevated rounded-[14px] border border-cm-border p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-cm-accent-soft flex items-center justify-center shrink-0">
+              <Clock className="w-5 h-5 text-cm-accent" />
+            </div>
+            <div>
+              <p className="text-[11px] font-bold text-cm-text-soft uppercase tracking-wider">Chronomètre</p>
+              <motion.p className="text-[28px] font-mono font-bold text-cm-text tracking-widest"
+                animate={{ opacity: [1, 0.6, 1] }} transition={{ duration: 2, repeat: Infinity }}>
+                {formatElapsed(elapsed)}
+              </motion.p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Checklist (during intervention) */}
+      {(step === "in_progress" || step === "photos_after") && (
+        <div className="mx-5 mb-4">
+          <div className="bg-cm-elevated rounded-[14px] border border-cm-border p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <ClipboardList className="w-4 h-4 text-cm-accent" />
+                <p className="text-[13px] font-bold text-cm-text">Checklist</p>
+              </div>
+              <span className="text-[11px] text-cm-text-soft">{doneCount}/{totalCount}</span>
+            </div>
+            <div className="space-y-1.5">
+              {checklist.map((item) => (
+                <button key={item.id} onClick={() => toggleChecklist(item.id)}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-[10px] text-left text-[12px] cursor-pointer transition-all ${
+                    item.done ? "bg-cm-accent-soft/50 text-cm-text-soft line-through" : "bg-cm-bg text-cm-text hover:bg-cm-accent-soft/20"
+                  }`}>
+                  <div className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
+                    item.done ? "bg-cm-accent border-cm-accent" : "border-cm-border"
+                  }`}>
+                    {item.done && <CheckCircle className="w-3 h-3 text-white" />}
+                  </div>
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            {showAddTask ? (
+              <div className="flex items-center gap-2 mt-3">
+                <input type="text" value={customTask} onChange={(e) => setCustomTask(e.target.value)}
+                  placeholder="Nouvelle tâche..."
+                  className="flex-1 h-9 px-3 text-[12px] bg-cm-bg border border-cm-border rounded-lg outline-none text-cm-text placeholder:text-cm-text-muted focus:border-cm-accent"
+                  onKeyDown={(e) => { if (e.key === "Enter") addCustomTask(); }} />
+                <button onClick={addCustomTask}
+                  className="h-9 px-3 rounded-lg bg-cm-accent text-white text-[11px] font-semibold cursor-pointer active:scale-95 transition-transform">
+                  Ajouter
+                </button>
+                <button onClick={() => { setShowAddTask(false); setCustomTask(""); }}
+                  className="h-9 w-9 rounded-lg bg-cm-bg border border-cm-border flex items-center justify-center cursor-pointer active:scale-95">
+                  <X className="w-3.5 h-3.5 text-cm-text-soft" />
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setShowAddTask(true)}
+                className="w-full flex items-center gap-2 mt-2 px-3 py-2 rounded-[10px] text-[11px] text-cm-text-muted cursor-pointer hover:bg-cm-bg transition-colors">
+                <Plus className="w-3.5 h-3.5" />
+                Ajouter une tâche
+              </button>
+            )}
+          </div>
         </div>
       )}
 

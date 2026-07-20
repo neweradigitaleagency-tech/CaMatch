@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 
 export default function ProAboutPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
 
   return (
     <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center h-14 px-5 gap-3">
-          <button type="button" onClick={() => nav(-1)} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
+          <button type="button" onClick={goBack} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
             <ArrowLeft className="w-5 h-5 text-cm-text" />
           </button>
           <h1 className="text-[18px] font-bold text-cm-text">À propos</h1>
@@ -21,9 +23,7 @@ export default function ProAboutPage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <div className="w-20 h-20 rounded-[20px] bg-cm-accent/15 flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl font-bold text-cm-accent">Ça</span>
-          </div>
+          <img src="/logo.svg" alt="Ça Match" className="h-16 mx-auto mb-4" />
           <h2 className="text-[22px] font-bold text-cm-text">Ça Match</h2>
           <p className="text-[12px] text-cm-text-muted mt-1">Version 1.0.0</p>
           <p className="text-[12px] text-cm-text-muted mt-3 max-w-xs mx-auto leading-relaxed">

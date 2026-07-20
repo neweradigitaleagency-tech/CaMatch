@@ -1,11 +1,15 @@
+import type { TransactionStatus, UnifiedPaymentMethod } from './payment'
+
 export type PlanType = "CLIENT" | "PRO" | "BUSINESS"
 export type BillingCycle = "monthly" | "yearly"
 export type SubscriptionStatus = "TRIAL" | "ACTIVE" | "PAST_DUE" | "CANCELLED" | "EXPIRED" | "FAILED"
-export type PaymentProvider = "stripe" | "flutterwave" | "cinetpay" | "orange_money" | "wave" | "mtn_money"
+/** @deprecated Import { UnifiedPaymentMethod } from '@/types/payment' */
+export type PaymentProvider = UnifiedPaymentMethod
 export type CouponType = "percentage" | "fixed" | "free_month"
 export type BoostType = "search_top" | "category_top" | "featured"
 export type CreditTransactionType = "purchase" | "spend" | "refund" | "bonus" | "expired"
-export type PaymentStatus = "pending" | "authorized" | "captured" | "failed" | "refunded" | "partially_refunded"
+/** @deprecated Import { TransactionStatus } from '@/types/payment' */
+export type PaymentStatus = TransactionStatus
 
 export interface Plan {
   id: string

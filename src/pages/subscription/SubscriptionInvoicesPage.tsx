@@ -39,7 +39,7 @@ export default function SubscriptionInvoicesPage() {
     if (userId) fetchInvoices(userId)
   }, [userId])
 
-  const handleBack = () => fromHamburger ? nav("/", { state: { reopenMenu: true } }) : nav(-1)
+  const handleBack = () => nav("/", { state: { reopenMenu: true } })
 
   if (error) {
     return (

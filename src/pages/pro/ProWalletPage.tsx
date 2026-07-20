@@ -1,17 +1,19 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Wallet, Send, CheckCircle, Clock } from "lucide-react";
 import { MOCK_FINANCE_SUMMARY, MOCK_PAYMENT_TXS } from "../../services/mockData";
 
 export default function ProWalletPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
 
   return (
     <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center justify-between h-14 px-5">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => nav(-1)} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
+            <button type="button" onClick={goBack} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
               <ArrowLeft className="w-5 h-5 text-cm-text" />
             </button>
             <h1 className="text-[18px] font-bold text-cm-text">Portefeuille</h1>

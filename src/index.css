@@ -19,6 +19,10 @@
   --cm-error: #EF4444;
   --cm-amber: #F59E0B;
   --cm-overlay: rgba(0,0,0,0.4);
+  --glass-light-bg: rgba(255,255,255,0.15);
+  --glass-light-border: rgba(255,255,255,0.25);
+  --glass-dark-bg: rgba(43,43,43,0.08);
+  --glass-dark-border: rgba(43,43,43,0.12);
 }
 
 @theme {
@@ -42,6 +46,8 @@
   --color-cm-error: #EF4444;
   --color-cm-amber: #F59E0B;
   --color-cm-overlay: rgba(0,0,0,0.4);
+  --color-cm-charcoal: #2B2B2B;
+  --color-cm-green: #7FD356;
 
   --radius-cm: 14px;
   --radius-cm-sm: 16px;
@@ -204,4 +210,27 @@ body {
   margin-left: auto;
   margin-right: auto;
   position: relative;
+}
+
+/* ─── Glass icon utilities ─── */
+.glass-icon-light {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+.glass-icon-light .icon { color: #fff; }
+
+.glass-icon-dark {
+  background: rgba(43,43,43,0.08);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(43,43,43,0.10);
+}
+.glass-icon-dark .icon { color: #2B2B2B; }
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-icon-light, .glass-icon-dark {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
 }

@@ -1,27 +1,43 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import AppSettingsScreen from "../../components/AppSettingsScreen";
-import { useThemeStore } from "../../stores/themeStore";
 
 export default function AppSettingsPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const loc = useLocation();
   const fromHamburger = !!loc.state?.fromHamburger;
-  const { isDark, toggle } = useThemeStore();
 
-  const geminiApiKey = localStorage.getItem("geminiApiKey") || "";
+  const handleBack = () => {
+    if (fromHamburger) {
+      nav("/", { state: { reopenMenu: true } });
+    } else {
+      goBack();
+    }
+  };
 
-  const handleUpdateApiKey = (key: string) => {
-    localStorage.setItem("geminiApiKey", key);
+  const handleNavigate = (path: string) => {
+    if (loc.pathname === path) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    nav(path, { state: { fromHamburger: true } });
   };
 
   return (
     <AppSettingsScreen
-      isDark={isDark}
-      onToggleDarkMode={toggle}
-      onBack={() => fromHamburger ? nav("/", { state: { reopenMenu: true } }) : nav(-1)}
-      onNavigateToHelp={() => nav("/profile/help")}
-      onNavigateToNotifications={() => nav("/profile/notifications")}
-      onNavigateToLanguage={() => nav("/profile/language")}
+      onBack={handleBack}
+      onNavigate={handleNavigate}
+      onSignOutAllDevices={async () => {
+        // stub
+      }}
+      onClearCache={async () => {
+        localStorage.clear();
+        if ("caches" in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map((k) => caches.delete(k)));
+        }
+      }}
     />
   );
 }

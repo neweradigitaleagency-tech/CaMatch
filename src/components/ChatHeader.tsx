@@ -53,17 +53,17 @@ export default function ChatHeader({ conversation, onBack }: ChatHeaderProps) {
         <div className="flex items-center gap-1">
           <button
             onClick={() => {}}
-            className="w-9 h-9 rounded-[10px] border border-cm-border bg-cm-elevated flex items-center justify-center cursor-pointer hover:bg-cm-accent-soft transition-colors"
+            className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer transition-colors"
             title="Appel audio"
           >
-            <Phone className="w-4 h-4 text-cm-text" />
+            <Phone className="w-4 h-4 text-[#2B2B2B]" />
           </button>
           <button
             onClick={() => {}}
-            className="w-9 h-9 rounded-[10px] border border-cm-border bg-cm-elevated flex items-center justify-center cursor-pointer hover:bg-cm-accent-soft transition-colors"
+            className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer transition-colors"
             title="Appel vidéo"
           >
-            <Video className="w-4 h-4 text-cm-text" />
+            <Video className="w-4 h-4 text-[#2B2B2B]" />
           </button>
         </div>
       </div>

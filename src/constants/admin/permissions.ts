@@ -22,6 +22,14 @@ export const ALL_PERMISSIONS: Permission[] = [
   "cms.read", "cms.create", "cms.update", "cms.delete",
   "fraud.read", "fraud.resolve",
   "feature_flags.read", "feature_flags.manage",
+  "suppliers.read", "suppliers.validate", "suppliers.suspend",
+  "applications.read", "applications.review",
+  "subscription.read", "subscription.manage",
+  "plan.create", "plan.update", "plan.delete",
+  "coupon.manage",
+  "refund.manage",
+  "disputes.read", "disputes.resolve",
+  "deliveries.read", "deliveries.manage",
 ]
 
 export const PERMISSION_GROUPS: Record<string, { label: string; permissions: Permission[] }> = {
@@ -96,5 +104,37 @@ export const PERMISSION_GROUPS: Record<string, { label: string; permissions: Per
   feature_flags: {
     label: "Feature Flags",
     permissions: ["feature_flags.read", "feature_flags.manage"],
+  },
+  suppliers: {
+    label: "Fournisseurs",
+    permissions: ["suppliers.read", "suppliers.validate", "suppliers.suspend"],
+  },
+  applications: {
+    label: "Candidatures",
+    permissions: ["applications.read", "applications.review"],
+  },
+  subscription: {
+    label: "Abonnements",
+    permissions: ["subscription.read", "subscription.manage"],
+  },
+  plans: {
+    label: "Plans",
+    permissions: ["plan.create", "plan.update", "plan.delete"],
+  },
+  coupons: {
+    label: "Coupons",
+    permissions: ["coupon.manage"],
+  },
+  refund: {
+    label: "Remboursements",
+    permissions: ["refund.manage"],
+  },
+  disputes: {
+    label: "Litiges",
+    permissions: ["disputes.read", "disputes.resolve"],
+  },
+  deliveries: {
+    label: "Livraisons",
+    permissions: ["deliveries.read", "deliveries.manage"],
   },
 }

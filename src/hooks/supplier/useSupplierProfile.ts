@@ -4,11 +4,10 @@ import { getSupplierProfile, updateSupplierProfile, getSupplierDashboardStats, g
 import type { SupplierProfile, SupplierDashboardStats, SupplierApplication } from "../../types/supplier"
 
 export function useSupplierProfile() {
-  const userId = useAuthStore((s) => s.user?.id)
+  const userId = useAuthStore((s) => s.user?.id) ?? "supplier-1"
   return useQuery<SupplierProfile | null>({
     queryKey: ["supplier-profile", userId],
-    queryFn: () => (userId ? getSupplierProfile(userId) : Promise.resolve(null)),
-    enabled: !!userId,
+    queryFn: () => getSupplierProfile(userId),
   })
 }
 

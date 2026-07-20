@@ -1,5 +1,6 @@
 import { Check, Shield, Zap, Crown } from "lucide-react";
-import type { PlanConfig, PaymentMethod } from "../types";
+import type { PlanConfig } from "../types";
+import type { UnifiedPaymentMethod } from "../types/payment";
 
 export const PLANS: PlanConfig[] = [
   {
@@ -66,7 +67,7 @@ export const PLANS: PlanConfig[] = [
   },
 ];
 
-export const PAYMENT_METHODS: { value: PaymentMethod; label: string; icon: string }[] = [
+export const PAYMENT_METHODS: { value: UnifiedPaymentMethod; label: string; icon: string }[] = [
   { value: "orange_money", label: "Orange Money", icon: "📱" },
   { value: "mtn_momo", label: "MTN MoMo", icon: "📱" },
   { value: "moov_money", label: "Moov Money", icon: "📱" },

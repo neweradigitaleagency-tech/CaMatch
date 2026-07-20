@@ -78,35 +78,57 @@ export default function SupplierProductListScreen() {
         </div>
       ) : (
         <div className="space-y-2">
-          {filtered.map((product) => (
+          {filtered.map((product) => {
+            const isOnSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.supplierPrice
+            const discountPct = isOnSale ? Math.round((1 - (product.salePrice! / product.supplierPrice)) * 100) : 0
+            return (
             <div key={product.id}
               onClick={() => navigate(`/supplier/products/${product.id}/edit`)}
               className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 cursor-pointer transition-colors">
               <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-[14px] font-semibold text-gray-900">{product.name}</p>
-                    {!product.isActive && (
-                      <span className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] text-gray-500">Inactif</span>
-                    )}
-                    {!product.unlimitedStock && product.availableStock <= product.lowStockThreshold && (
-                      <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
-                    )}
-                  </div>
-                  <p className="text-[11px] text-gray-500 mt-0.5">
-                    {product.brand && `${product.brand} · `}{product.manufacturerReference && `${product.manufacturerReference} · `}
-                    {product.categoryName}
-                  </p>
-                  <div className="flex items-center gap-3 mt-2">
-                    <span className="text-[12px] font-medium text-gray-700">{formatXOF(product.supplierPrice)}</span>
-                    <span className="text-[11px] text-gray-400">→ {formatXOF(product.cmPrice)}</span>
-                    {product.unlimitedStock ? (
-                      <span className="text-[11px] text-green-600">Stock illimité</span>
-                    ) : (
-                      <span className={`text-[11px] ${product.availableStock <= product.lowStockThreshold ? "text-orange-600 font-medium" : "text-gray-500"}`}>
-                        Stock: {product.availableStock}
-                      </span>
-                    )}
+                <div className="flex gap-3 flex-1 min-w-0">
+                  {product.images?.[0] && (
+                    <div className="shrink-0 w-14 h-14 rounded-lg overflow-hidden border border-gray-100">
+                      <img src={product.images[0]} alt={product.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-[14px] font-semibold text-gray-900">{product.name}</p>
+                      {isOnSale && (
+                        <span className="px-1.5 py-0.5 bg-red-100 text-red-600 rounded text-[10px] font-bold">-{discountPct}%</span>
+                      )}
+                      {!product.isActive && (
+                        <span className="px-1.5 py-0.5 bg-gray-100 rounded text-[10px] text-gray-500">Inactif</span>
+                      )}
+                      {!product.unlimitedStock && product.availableStock <= product.lowStockThreshold && (
+                        <AlertTriangle className="w-4 h-4 text-orange-500 shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      {product.brand && `${product.brand} · `}{product.manufacturerReference && `${product.manufacturerReference} · `}
+                      {product.categoryName}
+                    </p>
+                    <div className="flex items-center gap-3 mt-2 flex-wrap">
+                      {isOnSale ? (
+                        <>
+                          <span className="text-[12px] font-bold text-red-600">{formatXOF(product.salePrice!)}</span>
+                          <span className="text-[11px] text-gray-400 line-through">{formatXOF(product.supplierPrice)}</span>
+                        </>
+                      ) : (
+                        <span className="text-[12px] font-medium text-gray-700">{formatXOF(product.supplierPrice)}</span>
+                      )}
+                      <span className="text-[11px] text-gray-400">→ {formatXOF(product.cmPrice)}</span>
+                      {product.unlimitedStock ? (
+                        <span className="text-[11px] text-green-600">Stock illimité</span>
+                      ) : (
+                        <span className={`text-[11px] ${product.availableStock <= product.lowStockThreshold ? "text-orange-600 font-medium" : "text-gray-500"}`}>
+                          Stock: {product.availableStock}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
                 <button onClick={(e) => { e.stopPropagation(); toggleActive.mutate({ productId: product.id, isActive: !product.isActive }) }}
@@ -117,7 +139,7 @@ export default function SupplierProductListScreen() {
                 </button>
               </div>
             </div>
-          ))}
+          )})}
         </div>
       )}
     </div>

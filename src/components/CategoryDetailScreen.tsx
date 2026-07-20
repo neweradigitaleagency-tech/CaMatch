@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../hooks/useBackNavigation";
 import { ArrowLeft, TrendingUp, Clock, Users } from "lucide-react";
 import { motion } from "motion/react";
 import { SERVICE_CATEGORIES } from "../data/serviceCategories";
@@ -19,6 +20,7 @@ const itemAnim = {
 export default function CategoryDetailScreen() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const nav = useNavigate();
+  const goBack = useBackNavigation("/marketplace");
 
   const category = useMemo(
     () => SERVICE_CATEGORIES.find((c) => c.id === categoryId),
@@ -49,7 +51,7 @@ export default function CategoryDetailScreen() {
         <h2 className="text-[18px] font-extrabold text-cm-text text-center">
           Catégorie introuvable
         </h2>
-        <button onClick={() => nav(-1)}
+        <button onClick={goBack}
           className="cm-scale-btn h-10 px-6 bg-cm-text text-white rounded-[14px] text-[12px] font-bold cursor-pointer">
           Retour
         </button>
@@ -61,7 +63,7 @@ export default function CategoryDetailScreen() {
     <div className="min-h-dynamic bg-cm-bg pb-24">
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="flex items-center gap-3 px-4 h-14">
-          <button onClick={() => nav(-1)}
+          <button onClick={goBack}
             className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer">
             <ArrowLeft className="w-4 h-4 text-cm-text" />
           </button>

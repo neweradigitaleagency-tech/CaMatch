@@ -21,6 +21,8 @@ import {
   TicketCheck,
   Percent,
   ToggleRight,
+  Scale,
+  Truck,
   type LucideIcon,
 } from "lucide-react"
 
@@ -60,6 +62,10 @@ export const ADMIN_ROUTES = {
   SUPPLIERS: "/admin/suppliers",
   SUPPLIER_DETAIL: "/admin/suppliers/:id",
   SUPPLIER_APPLICATIONS: "/admin/suppliers/applications",
+  DISPUTES: "/admin/disputes",
+  DISPUTE_DETAIL: "/admin/disputes/:id",
+  DELIVERIES: "/admin/deliveries",
+  DELIVERY_DETAIL: "/admin/deliveries/:id",
 } as const
 
 export interface NavItem {
@@ -97,4 +103,6 @@ export const ADMIN_NAV_ITEMS: NavItem[] = [
   { label: "Paramètres", href: ADMIN_ROUTES.SETTINGS, icon: Settings, permission: "settings.read" },
   { label: "Logs", href: ADMIN_ROUTES.LOGS, icon: ScrollText, permission: "logs.read" },
   { label: "Fournisseurs", href: ADMIN_ROUTES.SUPPLIERS, icon: Building2, permission: "suppliers.read" },
+  { label: "Litiges", href: ADMIN_ROUTES.DISPUTES, icon: Scale, permission: "disputes.read" },
+  { label: "Livraisons", href: ADMIN_ROUTES.DELIVERIES, icon: Truck, permission: "deliveries.read" },
 ]

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import RequestCreationScreen, { ProceedDetails, RequestPayload } from "../../components/RequestCreationScreen";
 import { useRequestStore } from "../../stores/requestStore";
 import { useProStore } from "../../stores/proStore";
@@ -10,6 +11,7 @@ function mapUrgency(u: "immediate" | "today" | "this_week" | "flexible"): ProAle
 
 export default function RequestCreationPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const addRequest = useRequestStore((s) => s.addRequest);
   const proAlerts = useProStore((s) => s.alerts);
   const setProAlerts = useProStore((s) => s.setAlerts);
@@ -41,7 +43,7 @@ export default function RequestCreationPage() {
 
   return (
     <RequestCreationScreen
-      onBack={() => nav(-1)}
+      onBack={goBack}
       onProceedToMatching={(details) => {
         handleCreate({
           title: details.description.slice(0, 50),

@@ -38,10 +38,8 @@ export default function AdminSidebar({ collapsed, onToggle, mobileOpen, onMobile
             </button>
           ) : (
             <>
-              <button onClick={onToggle} className="w-7 h-7 rounded-full bg-[var(--admin-accent)] flex items-center justify-center text-white text-[11px] font-bold shrink-0 cursor-pointer">
-                Ç
-              </button>
-              <span className="text-white text-[14px] font-bold whitespace-nowrap">Ça Match Admin</span>
+              <img src="/logo.svg" alt="Ça Match" className="h-6" />
+              <span className="text-white text-[14px] font-bold whitespace-nowrap">Admin</span>
               <button onClick={onToggle} className="ml-auto w-7 h-7 flex items-center justify-center text-white/50 hover:text-white cursor-pointer lg:flex hidden">
                 <Menu className="w-4 h-4" />
               </button>

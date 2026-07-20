@@ -1,5 +1,6 @@
 import { supabase, isSupabaseReady } from "./supabase"
 import type { Payment, PaymentInput } from "../types/subscription"
+import type { TransactionLedgerEntry, TransactionStatus, UnifiedPaymentMethod } from "../types/payment"
 import { format } from "date-fns"
 
 const MOCK_PAYMENTS: Payment[] = [

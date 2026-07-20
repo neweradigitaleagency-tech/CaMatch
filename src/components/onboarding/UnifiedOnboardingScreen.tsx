@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   ChevronLeft, ArrowRight, Check, Sparkles, Crown,
   Smartphone, Mail, Lock, Eye, EyeOff, MessageCircle, Star,
+  User, Briefcase, Building2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../../stores/authStore";
@@ -11,10 +12,12 @@ type AuthMode = "phone" | "email";
 
 interface Props {
   onComplete: () => void;
-  onSkip?: () => void;
+  onDemoClient?: () => void;
+  onDemoPro?: () => void;
+  onDemoSupplier?: () => void;
 }
 
-export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
+export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDemoPro, onDemoSupplier }: Props) {
   const nav = useNavigate();
   const signInWithPhone = useAuthStore((s) => s.signInWithPhone);
   const verifyOtp = useAuthStore((s) => s.verifyOtp);
@@ -101,7 +104,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
 
   return (
     <div className="min-h-dynamic bg-cm-bg flex flex-col">
-      <div className="flex-1 flex flex-col justify-center px-6 max-w-sm mx-auto w-full">
+      <div className="flex-1 flex flex-col justify-start sm:justify-center overflow-y-auto px-6 max-w-sm mx-auto w-full">
         <div className="text-center mb-8">
           <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg ${
             step === "premium" ? "bg-amber-500 shadow-amber-500/20" : "bg-cm-accent shadow-cm-accent/20"
@@ -112,9 +115,11 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
               <Sparkles className="w-8 h-8 text-white" />
             )}
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
-            {step === "premium" ? "Passez à Premium" : "Ça Match"}
-          </h1>
+          {step === "premium" ? (
+            <h1 className="text-2xl font-extrabold tracking-tight">Passez à Premium</h1>
+          ) : (
+            <img src="/logo.svg" alt="Ça Match" className="h-9" />
+          )}
           <p className="text-xs text-cm-text-soft mt-1">
             {step === "auth" && "Connectez-vous pour commencer"}
             {step === "discover" && "Prêt à explorer"}
@@ -183,7 +188,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
                     <p className="text-xs text-cm-text-soft">
                       Envoyé au <strong>+225 {phone}</strong>
                     </p>
-                    <div className="flex justify-center gap-2 pt-2">
+                    <div className="flex justify-center gap-1.5 sm:gap-2 pt-2">
                       {otp.map((digit, i) => (
                         <input
                           key={i}
@@ -192,7 +197,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
                           value={digit}
                           onChange={(e) => handleOtpChange(i, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(i, e.key)}
-                          className={`w-12 h-14 text-center text-lg font-extrabold rounded-xl border outline-none transition-all ${
+                          className={`w-11 h-12 sm:w-12 sm:h-14 text-center text-base sm:text-lg font-extrabold rounded-xl border outline-none transition-all ${
                             digit ? "bg-white border-brand-forest" : "bg-white border-cm-border/30"
                           }`}
                         />
@@ -350,12 +355,19 @@ export default function UnifiedOnboardingScreen({ onComplete, onSkip }: Props) {
         </AnimatePresence>
       </div>
 
-      <div className="px-6 pb-8">
-        <button
-          onClick={onSkip}
-          className="w-full h-10 text-xs text-cm-text-soft/60 hover:text-cm-text-soft transition-colors cursor-pointer"
-        >
-          Mode démo — Continuer sans compte
+      <div className="px-6 pb-8 space-y-2">
+        <p className="text-[10px] text-cm-text-soft/40 text-center">Accès rapide — Mode démo</p>
+        <button onClick={onDemoClient}
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-border hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <User className="w-4 h-4 text-cm-text-soft/60" /> Mode démo Client
+        </button>
+        <button onClick={onDemoPro}
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-border hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <Briefcase className="w-4 h-4 text-cm-text-soft/60" /> Mode démo Pro
+        </button>
+        <button onClick={onDemoSupplier}
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-accent/30 hover:bg-cm-accent/5 transition-all cursor-pointer flex items-center justify-center gap-2">
+          <Building2 className="w-4 h-4 text-cm-accent" /> Mode démo Fournisseur
         </button>
       </div>
     </div>

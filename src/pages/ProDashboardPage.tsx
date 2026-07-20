@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Users, CalendarDays, TrendingUp, Settings, LogOut } from "lucide-react";
+import { useBackNavigation } from "../hooks/useBackNavigation";
+import { ArrowLeft, Star, Users, CalendarDays, TrendingUp, Settings, LogOut, Store } from "lucide-react";
 
 interface Mission {
   id: string;
@@ -20,6 +21,7 @@ const MOCK_MISSIONS: Mission[] = [
 
 export default function ProDashboardPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/");
   const [filter, setFilter] = useState<"all" | "upcoming" | "completed">("all");
 
   const stats = [
@@ -39,7 +41,7 @@ export default function ProDashboardPage() {
       <header className="sticky top-0 z-10 bg-white border-b border-cm-border">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
-            <button onClick={() => nav(-1)}
+            <button onClick={goBack}
               className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
               <ArrowLeft className="w-4 h-4 text-gray-700" />
             </button>
@@ -82,6 +84,23 @@ export default function ProDashboardPage() {
           </p>
         </div>
       )}
+
+      {/* Devenir fournisseur */}
+      <div className="mx-4 mb-4 p-4 bg-gradient-to-r from-amber-50 to-amber-100 border border-amber-200 rounded-[14px]">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-200 flex items-center justify-center shrink-0">
+            <Store className="w-5 h-5 text-amber-700" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-[13px] font-bold text-amber-900">Devenir fournisseur partenaire</p>
+            <p className="text-[11px] text-amber-700 mt-0.5">Vendez vos matériaux et équipements sur notre marketplace.</p>
+            <button onClick={() => nav("/supplier/register")}
+              className="mt-2 h-8 px-4 rounded-lg bg-amber-600 text-white text-[10px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-amber-700">
+              Je m'inscris
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Missions */}
       <div className="px-4 mb-4">

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Plus, Trash2, Loader2, ImageIcon } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
@@ -16,6 +17,7 @@ const CATEGORIES: { key: string; label: string }[] = [
 
 export default function ProGalleryPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const user = useAuthStore((s) => s.user);
   const [filter, setFilter] = useState("Tout");
   const [images, setImages] = useState<GalleryItem[]>([]);
@@ -74,7 +76,7 @@ export default function ProGalleryPage() {
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-200">
         <div className="flex items-center justify-between h-14 px-4 max-w-[448px] mx-auto">
           <div className="flex items-center gap-3">
-            <button onClick={() => nav(-1)}
+            <button onClick={goBack}
               className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer active:scale-95">
               <ArrowLeft className="w-5 h-5 text-gray-900" />
             </button>

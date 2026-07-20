@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAdminAuthStore } from "../../stores/adminAuthStore"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
 
 export default function AdminLoginPage() {
   const navigate = useNavigate()
-  const { login, isAuthenticated, isLoading, initialized, error } = useAdminAuthStore()
+  const { login, demoLogin, isAuthenticated, isLoading, initialized, error } = useAdminAuthStore()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -46,10 +46,8 @@ export default function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-[#00A86B] flex items-center justify-center mx-auto mb-4">
-            <span className="text-white text-xl font-bold">Ç</span>
-          </div>
-          <h1 className="text-[22px] font-bold text-gray-900">Ça Match Admin</h1>
+          <img src="/logo.svg" alt="Ça Match" className="h-12 mx-auto mb-4" />
+          <h1 className="text-[22px] font-bold text-gray-900">Admin</h1>
           <p className="text-[13px] text-gray-500 mt-1">Connectez-vous pour accéder au back-office</p>
         </div>
 
@@ -119,6 +117,14 @@ export default function AdminLoginPage() {
         <p className="text-center mt-6 text-[11px] text-gray-400">
           Accès réservé au personnel autorisé
         </p>
+
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <p className="text-[10px] text-gray-400 text-center mb-2">Accès rapide — Mode démo</p>
+          <button onClick={demoLogin}
+            className="w-full h-10 text-xs font-semibold text-gray-700 bg-white rounded-xl border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-gray-400" /> Mode démo Admin
+          </button>
+        </div>
       </div>
     </div>
   )

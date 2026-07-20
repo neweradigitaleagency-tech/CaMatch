@@ -2,11 +2,14 @@ import type { MissionStatus } from "../../types";
 import { MISSION_STATUS_LABELS } from "../../types";
 
 interface StatusBadgeProps {
-  status: MissionStatus;
+  status: string;
+  label?: string;
+  size?: "sm" | "md" | "lg";
+  showDot?: boolean;
   className?: string;
 }
 
-const STATUS_STYLES: Record<MissionStatus, string> = {
+const MISSION_STYLES: Record<string, string> = {
   draft: "bg-gray-100 text-gray-500",
   published: "bg-blue-50 text-blue-600 border border-blue-200",
   pending: "bg-amber-50 text-amber-600 border border-amber-200",
@@ -30,12 +33,52 @@ const STATUS_STYLES: Record<MissionStatus, string> = {
   reviewed: "bg-gray-900 text-white",
 };
 
-export default function StatusBadge({ status, className = "" }: StatusBadgeProps) {
+const GENERIC_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
+  active: { bg: "bg-green-50", text: "text-green-600", dot: "bg-green-500" },
+  approved: { bg: "bg-green-50", text: "text-green-600", dot: "bg-green-500" },
+  completed: { bg: "bg-green-50", text: "text-green-600", dot: "bg-green-500" },
+  success: { bg: "bg-green-50", text: "text-green-600", dot: "bg-green-500" },
+  verified: { bg: "bg-green-50", text: "text-green-600", dot: "bg-green-500" },
+  pending: { bg: "bg-amber-50", text: "text-amber-600", dot: "bg-amber-500" },
+  submitted: { bg: "bg-amber-50", text: "text-amber-600", dot: "bg-amber-500" },
+  under_review: { bg: "bg-blue-50", text: "text-blue-600", dot: "bg-blue-500" },
+  in_progress: { bg: "bg-blue-50", text: "text-blue-600", dot: "bg-blue-500" },
+  en_attente: { bg: "bg-amber-50", text: "text-amber-600", dot: "bg-amber-500" },
+  actif: { bg: "bg-green-50", text: "text-green-600", dot: "bg-green-500" },
+  blocked: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
+  rejeté: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
+  rejected: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
+  suspended: { bg: "bg-red-50", text: "text-red-600", dot: "bg-red-500" },
+  disabled: { bg: "bg-gray-100", text: "text-gray-500", dot: "bg-gray-400" },
+  inactive: { bg: "bg-gray-100", text: "text-gray-500", dot: "bg-gray-400" },
+};
+
+export default function StatusBadge({
+  status,
+  label,
+  size = "sm",
+  showDot = false,
+  className = "",
+}: StatusBadgeProps) {
+  const missionStyle = MISSION_STYLES[status];
+  if (missionStyle) {
+    const h = size === "sm" ? "h-6" : size === "md" ? "h-7" : "h-8";
+    const textSize = size === "sm" ? "text-[11px]" : "text-[12px]";
+    return (
+      <span className={`inline-flex items-center ${h} px-2.5 rounded-[9999px] ${textSize} font-semibold ${missionStyle} ${className}`}>
+        {label ?? MISSION_STATUS_LABELS[status as MissionStatus] ?? status}
+      </span>
+    );
+  }
+
+  const generic = GENERIC_STYLES[status.toLowerCase()] ?? { bg: "bg-gray-100", text: "text-gray-600", dot: "bg-gray-400" };
+  const h = size === "sm" ? "h-5" : size === "md" ? "h-6" : "h-7";
+  const textSize = size === "sm" ? "text-[11px]" : "text-[12px]";
+
   return (
-    <span
-      className={`inline-flex items-center h-6 px-2.5 rounded-[9999px] text-[11px] font-semibold ${STATUS_STYLES[status]} ${className}`}
-    >
-      {MISSION_STATUS_LABELS[status]}
+    <span className={`inline-flex items-center gap-1.5 px-2.5 ${h} rounded-full ${generic.bg} ${generic.text} ${textSize} font-medium ${className}`}>
+      {showDot && <span className={`w-1.5 h-1.5 rounded-full ${generic.dot}`} />}
+      {label ?? status}
     </span>
   );
 }

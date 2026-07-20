@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Plus, Power } from "lucide-react";
 import { useState } from "react";
@@ -6,6 +7,7 @@ import { MOCK_PROS, MOCK_SERVICES } from "../../services/mockData";
 
 export default function ProServicesPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const myServices = MOCK_SERVICES.filter((s) => s.proId === "pro6");
   const [activeIds, setActiveIds] = useState<string[]>(myServices.map((s) => s.id));
 
@@ -20,7 +22,7 @@ export default function ProServicesPage() {
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center justify-between h-14 px-5">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={() => nav(-1)} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
+            <button type="button" onClick={goBack} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
               <ArrowLeft className="w-5 h-5 text-cm-text" />
             </button>
             <h1 className="text-[18px] font-bold text-cm-text">Services</h1>

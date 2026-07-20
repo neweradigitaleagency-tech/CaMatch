@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, Flag, Shield, Send } from "lucide-react";
 import { useNotificationStore } from "../../stores/notificationStore";
 
@@ -15,6 +16,7 @@ const REPORT_REASONS = [
 
 export default function ReportPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -39,7 +41,7 @@ export default function ReportPage() {
         </div>
         <h1 className="text-[18px] font-display font-bold text-cm-text mb-2">Signalement envoyé</h1>
         <p className="text-[13px] text-cm-text-soft text-center mb-6">Notre équipe de modération va examiner votre signalement.</p>
-        <button onClick={() => nav(-1)} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour</button>
+        <button onClick={goBack} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour</button>
       </div>
     );
   }
@@ -47,8 +49,8 @@ export default function ReportPage() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
-        <button onClick={() => nav(-1)} className="w-11 h-11 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95">
-          <ArrowLeft className="w-5 h-5" />
+        <button onClick={goBack} className="w-11 h-11 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95">
+          <ArrowLeft className="w-5 h-5 text-[#2B2B2B]" />
         </button>
         <h1 className="text-[15px] font-bold text-cm-text">Signaler</h1>
         <div className="w-11 h-11" />

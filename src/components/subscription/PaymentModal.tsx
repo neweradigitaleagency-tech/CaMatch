@@ -15,7 +15,7 @@ interface PaymentModalProps {
 const PROVIDERS: { value: PaymentProvider; label: string; icon: string }[] = [
   { value: "wave", label: "Wave", icon: "W" },
   { value: "orange_money", label: "Orange Money", icon: "O" },
-  { value: "mtn_money", label: "MTN MoMo", icon: "M" },
+  { value: "mtn_momo", label: "MTN MoMo", icon: "M" },
 ]
 
 export default function PaymentModal({

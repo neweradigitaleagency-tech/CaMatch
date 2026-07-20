@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, Shield, CheckCircle, Clock, XCircle } from "lucide-react";
 import { MOCK_VERIFICATION } from "../../services/mockData";
 
@@ -11,13 +12,14 @@ const STATUS_CONFIG: Record<string, { icon: typeof CheckCircle; color: string; l
 
 export default function ProVerificationPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/profile");
   const v = MOCK_VERIFICATION;
 
   return (
     <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center h-14 px-5 gap-3">
-          <button type="button" onClick={() => nav(-1)} className="p-1 -ml-1">
+          <button type="button" onClick={goBack} className="p-1 -ml-1">
             <ArrowLeft className="w-5 h-5 text-cm-text" />
           </button>
           <h1 className="text-[18px] font-bold text-cm-text">Vérification</h1>

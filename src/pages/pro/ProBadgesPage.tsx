@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Trophy, Star, Lock, Award, Check } from "lucide-react";
 import { PRO_LEVELS, getProLevel } from "../../types";
@@ -8,6 +9,7 @@ const CURRENT_XP = 4200;
 
 export default function ProBadgesPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const currentLevel = getProLevel(CURRENT_XP);
   const nextLevel = PRO_LEVELS.find((l) => l.level !== currentLevel.level && l.minXP > currentLevel.minXP);
   const nextMinXP = nextLevel?.minXP ?? currentLevel.maxXP;
@@ -17,7 +19,7 @@ export default function ProBadgesPage() {
     <div className="min-h-dynamic bg-[#F5F5F0]">
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-200">
         <div className="flex items-center h-14 px-4 gap-3 max-w-[448px] mx-auto">
-          <button onClick={() => nav(-1)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer active:scale-95">
+          <button onClick={goBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer active:scale-95">
             <ArrowLeft className="w-5 h-5 text-gray-900" />
           </button>
           <h1 className="text-[16px] font-bold text-gray-900">Badges & Progression</h1>

@@ -1,5 +1,6 @@
 import { supabase, isSupabaseReady } from "../supabase"
 import type { DashboardStats, AdminUser } from "../../types/admin"
+import { MOCK_DISPUTES, MOCK_DELIVERIES } from "../../data/supplier-mocks"
 
 export async function getDashboardStats(): Promise<DashboardStats> {
   if (!isSupabaseReady()) {
@@ -303,75 +304,81 @@ export async function getAdminProfile(): Promise<AdminUser | null> {
 }
 
 function getMockDashboardStats(): DashboardStats {
+  const supplierCount = 5
+  const productCount = 56
+  const orderCount = 15
+  const disputes = MOCK_DISPUTES.length
+  const openDisputes = MOCK_DISPUTES.filter((d) => d.status === "opened" || d.status === "under_review").length
+  const deliveriesInTransit = MOCK_DELIVERIES.filter((d) => d.status === "in_transit" || d.status === "pending" || d.status === "preparing").length
   return {
     today: {
-      total_clients: 1158,
-      total_pros: 342,
-      verified_pros: 198,
-      missions_today: 34,
-      missions_in_progress: 89,
-      missions_completed: 22,
-      revenue_today: 458000,
-      platform_revenue: 68700,
-      success_rate: 94,
-      avg_response_time: 6,
+      total_clients: 1250,
+      total_pros: 28,
+      verified_pros: 22,
+      missions_today: 4,
+      missions_in_progress: 2,
+      missions_completed: 6,
+      revenue_today: 325000,
+      platform_revenue: 48750,
+      success_rate: 92,
+      avg_response_time: 8,
     },
     trends: {
-      users: { value: 1248, change: 12 },
-      pros: { value: 342, change: 8 },
-      revenue: { value: 458000, change: 15 },
-      missions: { value: 89, change: -3 },
+      users: { value: supplierCount, change: 25 },
+      pros: { value: 28, change: 12 },
+      revenue: { value: 325000, change: 18 },
+      missions: { value: 4, change: 33 },
     },
     charts: {
       registrations: [
-        { date: "8 Juin", clients: 12, pros: 3 },
-        { date: "15 Juin", clients: 18, pros: 5 },
-        { date: "22 Juin", clients: 15, pros: 4 },
-        { date: "29 Juin", clients: 22, pros: 6 },
-        { date: "6 Juil", clients: 19, pros: 3 },
+        { date: "10 Juin", clients: 8, pros: 1 },
+        { date: "15 Juin", clients: 14, pros: 2 },
+        { date: "20 Juin", clients: 11, pros: 3 },
+        { date: "25 Juin", clients: 18, pros: 4 },
+        { date: "30 Juin", clients: 20, pros: 5 },
+        { date: "5 Juil", clients: 15, pros: 6 },
+        { date: "10 Juil", clients: 22, pros: 7 },
       ],
       revenue: [
-        { date: "Lun", amount: 120000 },
-        { date: "Mar", amount: 95000 },
-        { date: "Mer", amount: 140000 },
-        { date: "Jeu", amount: 110000 },
-        { date: "Ven", amount: 135000 },
-        { date: "Sam", amount: 90000 },
+        { date: "Lun", amount: 45000 },
+        { date: "Mar", amount: 82000 },
+        { date: "Mer", amount: 125000 },
+        { date: "Jeu", amount: 95000 },
+        { date: "Ven", amount: 75000 },
+        { date: "Sam", amount: 110000 },
         { date: "Dim", amount: 85000 },
       ],
       missions_by_category: [
-        { category: "plombier", count: 45 },
-        { category: "électricien", count: 38 },
-        { category: "climatisation", count: 28 },
-        { category: "nettoyage", count: 22 },
-        { category: "peintre", count: 15 },
-        { category: "jardinage", count: 10 },
+        { category: "Matériaux BTP", count: 45 },
+        { category: "Plomberie", count: 18 },
+        { category: "Électricité", count: 15 },
+        { category: "Quincaillerie", count: 12 },
+        { category: "Peinture", count: 8 },
+        { category: "Menuiserie", count: 6 },
       ],
       cities: [
-        { city: "Cocody", count: 89 },
-        { city: "Plateau", count: 67 },
-        { city: "Yopougon", count: 54 },
-        { city: "Abobo", count: 42 },
-        { city: "Treichville", count: 31 },
-        { city: "Marcory", count: 28 },
-        { city: "Koumassi", count: 22 },
-        { city: "Port-Bouët", count: 18 },
+        { city: "Cocody", count: supplierCount },
+        { city: "Yopougon", count: supplierCount },
+        { city: "Marcory", count: supplierCount - 2 },
+        { city: "Treichville", count: supplierCount - 3 },
+        { city: "Abobo", count: 4 },
+        { city: "Plateau", count: 3 },
       ],
     },
     activity: [
-      { id: "a1", time: "09:12", type: "new_pro", description: "a rejoint la plateforme", user_name: "Koffi Kouamé" },
-      { id: "a2", time: "09:16", type: "new_client", description: "a créé un compte client", user_name: "Aminata Diallo" },
-      { id: "a3", time: "09:18", type: "new_mission", description: "Nouvelle mission de Plombier — 25 000 F" },
-      { id: "a4", time: "09:20", type: "new_payment", description: "Paiement reçu — 35 000 F" },
-      { id: "a5", time: "09:25", type: "new_report", description: "Signalement #102 — Compte suspect" },
-      { id: "a6", time: "08:45", type: "new_pro", description: "a été vérifié niveau 3", user_name: "Mamadou K." },
-      { id: "a7", time: "08:30", type: "new_mission", description: "Nouvelle mission de nettoyage — 20 000 F" },
+      { id: "a1", time: "10:12", type: "new_pro", description: "a rejoint la plateforme", user_name: "Soro Ibrahim" },
+      { id: "a2", time: "10:16", type: "new_client", description: "a créé un compte client", user_name: "Cissé Fatima" },
+      { id: "a3", time: "10:18", type: "new_mission", description: "Commande de matériaux BTP — 95 000 F" },
+      { id: "a4", time: "10:20", type: "new_payment", description: "Paiement Orange Money reçu — 45 000 F" },
+      { id: "a5", time: "09:25", type: "new_report", description: `Nouveau litige #${MOCK_DISPUTES[0]?.id ?? ""} — ${MOCK_DISPUTES[0]?.reason ?? "Qualité"}` },
+      { id: "a6", time: "08:45", type: "new_pro", description: "Fournisseur vérifié — ACTIF", user_name: "Mamadou Diallo" },
+      { id: "a7", time: "08:30", type: "new_mission", description: `Livraison en transit vers Yopougon — ${MOCK_DELIVERIES.filter(d => d.status === "in_transit").length} en cours` },
     ],
     alerts: [
-      { type: "verification", count: 8, label: "Documents à vérifier", severity: "high", link: "/admin/verifications" },
-      { type: "ticket", count: 5, label: "Tickets support ouverts", severity: "medium", link: "/admin/support" },
-      { type: "report", count: 3, label: "Signalements en attente", severity: "high", link: "/admin/reports" },
-      { type: "payment", count: 2, label: "Paiements en attente", severity: "low", link: "/admin/payments" },
+      { type: "verification", count: 1, label: "Fournisseur en attente de vérification", severity: "high", link: "/admin/suppliers" },
+      { type: "ticket", count: openDisputes, label: `${openDisputes} litige(s) ouvert(s)`, severity: "medium", link: "/admin/disputes" },
+      { type: "report", count: deliveriesInTransit, label: `${deliveriesInTransit} livraison(s) en cours`, severity: "low", link: "/admin/deliveries" },
+      { type: "payment", count: 3, label: "Paiements en attente de confirmation", severity: "medium", link: "/admin/payments" },
     ],
   }
 }

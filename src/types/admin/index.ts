@@ -366,3 +366,5 @@ export type Permission =
   | "refund.manage"
   | "feature_flags.read" | "feature_flags.manage"
   | "suppliers.read" | "suppliers.validate" | "suppliers.suspend"
+  | "disputes.read" | "disputes.resolve"
+  | "deliveries.read" | "deliveries.manage"

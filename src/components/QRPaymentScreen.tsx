@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, Shield, Coins, Smartphone, Building, CreditCard } from "lucide-react";
-import { Mission, PaymentMethod, PAYMENT_METHOD_LABELS } from "../types";
+import type { Mission } from "../types";
+import type { UnifiedPaymentMethod } from "../types/payment";
+import { PAYMENT_METHOD_LABELS } from "../types/payment";
 
 interface QRPaymentScreenProps {
   mission: Mission;
   onBack: () => void;
-  onPay: (missionId: string, method: PaymentMethod) => void;
+  onPay: (missionId: string, method: UnifiedPaymentMethod) => void;
 }
 
-const METHOD_ICONS: Record<PaymentMethod, typeof Smartphone> = {
+const METHOD_ICONS: Record<string, typeof Smartphone> = {
   orange_money: Smartphone,
   mtn_momo: Smartphone,
   wave: CreditCard,
@@ -17,14 +19,18 @@ const METHOD_ICONS: Record<PaymentMethod, typeof Smartphone> = {
 };
 
 export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScreenProps) {
-  const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<UnifiedPaymentMethod | null>(null);
   const [confirming, setConfirming] = useState(false);
 
   const commissionRate = 15;
   const commissionXOF = Math.round(mission.budgetXOF * commissionRate / 100);
   const proAmount = mission.budgetXOF - commissionXOF;
 
-  const methods: PaymentMethod[] = ["orange_money", "mtn_momo", "wave"];
+  const methods: UnifiedPaymentMethod[] = ["orange_money", "mtn_momo", "wave"];
+
+  const getIcon = (m: UnifiedPaymentMethod) => {
+    return METHOD_ICONS[m] ?? Smartphone;
+  };
 
   const handleConfirm = () => {
     if (!selectedMethod) return;
@@ -82,7 +88,7 @@ export default function QRPaymentScreen({ mission, onBack, onPay }: QRPaymentScr
           <div className="space-y-2">
             <p className="text-[11px] font-medium text-cm-text-soft uppercase tracking-wider">Choisissez votre moyen de paiement</p>
             {methods.map((m) => {
-              const Icon = METHOD_ICONS[m];
+              const Icon = getIcon(m);
               const selected = selectedMethod === m;
               return (
                 <button key={m} onClick={() => setSelectedMethod(m)}

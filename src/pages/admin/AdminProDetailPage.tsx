@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { getProById, verifyPro } from "../../services/admin/pros.service"
+import { getTrustScores } from "../../services/admin/trust.service"
+import type { UnifiedTrustScore } from "../../services/admin/trust.service"
 import { usePermissions } from "../../hooks/usePermissions"
 import StatusBadge from "../../components/admin/ui/StatusBadge"
 import ErrorState from "../../components/admin/ui/ErrorState"
+import TrustScoreCard from "../../components/admin/TrustScoreCard"
 import { formatXOF } from "../../utils/admin/formatCurrency"
 import {
   ArrowLeft, Mail, Phone, Calendar, Shield, Briefcase, Star, Clock,
   MapPin, Award, CheckCircle, XCircle, FileText, MessageSquare,
-  Circle, Wallet, Coins, User, ShieldAlert, Scan, CreditCard,
+  Circle, Wallet, Coins, User,
 } from "lucide-react"
 import { getCategoryLabel } from "../../constants/admin/categoryLabels"
 import type { ProProfile } from "../../services/admin/pros.service"
@@ -20,12 +23,24 @@ function getInitials(first: string, last: string): string {
   return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase()
 }
 
+const fallbackScores: UnifiedTrustScore = {
+  overall: 0,
+  kyc: 0,
+  activity: 0,
+  payment_reliability: 0,
+  fraud_score: 0,
+  fraud_flags: 0,
+  last_assessed: new Date().toISOString(),
+};
+
 export default function AdminProDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { hasPermission } = usePermissions()
   const [pro, setPro] = useState<ProProfile | null>(null)
+  const [trustScores, setTrustScores] = useState<UnifiedTrustScore | null>(null)
   const [loading, setLoading] = useState(true)
+  const [trustLoading, setTrustLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
@@ -34,13 +49,18 @@ export default function AdminProDetailPage() {
     setLoading(true)
     setError(null)
     try {
-      const data = await getProById(id)
+      const [data, scores] = await Promise.all([
+        getProById(id),
+        getTrustScores(id),
+      ])
       if (data) setPro(data)
       else setError("Professionnel introuvable")
+      if (scores) setTrustScores(scores)
     } catch {
       setError("Impossible de charger le profil")
     } finally {
       setLoading(false)
+      setTrustLoading(false)
     }
   }, [id])
 
@@ -148,90 +168,7 @@ export default function AdminProDetailPage() {
         <StatCard icon={<Wallet className="w-4 h-4" />} label="Portefeuille" value={formatXOF(pro.wallet_balance ?? 0)} />
       </div>
 
-      {pro.trust_score && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="w-4 h-4 text-gray-400" />
-            <h3 className="text-[13px] font-semibold text-gray-900">Score de Confiance</h3>
-            <span className="text-[10px] text-gray-400 ml-auto">
-              Évalué le {format(new Date(pro.trust_score.last_assessed), "dd/MM/yyyy")}
-            </span>
-          </div>
-          <div className="flex flex-wrap items-start gap-6">
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="relative w-16 h-16">
-                <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-                  <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" strokeWidth="2.5" />
-                  <circle cx="18" cy="18" r="15.5" fill="none"
-                    stroke={pro.trust_score.overall >= 80 ? "#10b981" : pro.trust_score.overall >= 50 ? "#f59e0b" : "#ef4444"}
-                    strokeWidth="2.5" strokeDasharray={`${pro.trust_score.overall * 0.97} 97`}
-                    strokeLinecap="round" />
-                </svg>
-                <span className={`absolute inset-0 flex items-center justify-center text-[16px] font-bold ${
-                  pro.trust_score.overall >= 80 ? "text-emerald-600" : pro.trust_score.overall >= 50 ? "text-amber-600" : "text-red-600"
-                }`}>
-                  {pro.trust_score.overall}
-                </span>
-              </div>
-              <div>
-                <p className="text-[12px] font-semibold text-gray-900">Score global</p>
-                <p className={`text-[11px] font-medium ${
-                  pro.trust_score.overall >= 80 ? "text-emerald-600" : pro.trust_score.overall >= 50 ? "text-amber-600" : "text-red-600"
-                }`}>
-                  {pro.trust_score.overall >= 80 ? "🟢 Fiable" : pro.trust_score.overall >= 50 ? "🟡 À surveiller" : "🔴 Risqué"}
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              <div className="min-w-[140px]">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="flex items-center gap-1 text-[11px] text-gray-500"><Scan className="w-3 h-3" /> KYC</span>
-                  <span className="text-[11px] font-medium text-gray-700">{pro.trust_score.kyc}/100</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${pro.trust_score.kyc >= 80 ? "bg-emerald-500" : pro.trust_score.kyc >= 50 ? "bg-amber-500" : "bg-red-500"}`}
-                    style={{ width: `${pro.trust_score.kyc}%` }} />
-                </div>
-              </div>
-              <div className="min-w-[140px]">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="flex items-center gap-1 text-[11px] text-gray-500"><Briefcase className="w-3 h-3" /> Activité</span>
-                  <span className="text-[11px] font-medium text-gray-700">{pro.trust_score.activity}/100</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${pro.trust_score.activity >= 80 ? "bg-emerald-500" : pro.trust_score.activity >= 50 ? "bg-amber-500" : "bg-red-500"}`}
-                    style={{ width: `${pro.trust_score.activity}%` }} />
-                </div>
-              </div>
-              <div className="min-w-[140px]">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="flex items-center gap-1 text-[11px] text-gray-500"><CreditCard className="w-3 h-3" /> Paiements</span>
-                  <span className="text-[11px] font-medium text-gray-700">{pro.trust_score.payment_reliability}/100</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${pro.trust_score.payment_reliability >= 80 ? "bg-emerald-500" : pro.trust_score.payment_reliability >= 50 ? "bg-amber-500" : "bg-red-500"}`}
-                    style={{ width: `${pro.trust_score.payment_reliability}%` }} />
-                </div>
-              </div>
-              <div className="min-w-[140px]">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="flex items-center gap-1 text-[11px] text-gray-500"><ShieldAlert className="w-3 h-3" /> Fraude</span>
-                  <span className="text-[11px] font-medium text-gray-700">{pro.trust_score.fraud_score}/100</span>
-                </div>
-                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                  <div className={`h-full rounded-full transition-all ${pro.trust_score.fraud_score >= 50 ? "bg-red-500" : pro.trust_score.fraud_score >= 20 ? "bg-amber-500" : "bg-emerald-500"}`}
-                    style={{ width: `${pro.trust_score.fraud_score}%` }} />
-                </div>
-                {pro.trust_score.fraud_flags > 0 && (
-                  <p className="text-[10px] text-red-500 mt-0.5 font-medium">
-                    {pro.trust_score.fraud_flags} signalement{pro.trust_score.fraud_flags > 1 ? "s" : ""}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <TrustScoreCard scores={trustScores ?? fallbackScores} loading={trustLoading} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Section title="Informations personnelles">

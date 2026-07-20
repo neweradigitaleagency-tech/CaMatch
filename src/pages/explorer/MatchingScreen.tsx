@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import MatchingDatePage from "../../components/matching/MatchingDatePage";
 import MatchingConfirmPage from "../../components/matching/MatchingConfirmPage";
 import type { BookingContextData, BookingMode } from "../../components/profil/types";
@@ -13,6 +14,7 @@ interface MatchingLocationState {
 
 export default function MatchingScreen() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/");
   const location = useLocation();
   const state = location.state as MatchingLocationState | null;
 
@@ -30,7 +32,7 @@ export default function MatchingScreen() {
     if (step === "confirm") {
       setStep("date");
     } else {
-      nav(-1);
+      goBack();
     }
   }, [step, nav]);
 
@@ -40,7 +42,7 @@ export default function MatchingScreen() {
 
   const handleConfirm = useCallback(() => {
     if (booking.mode === "simulation") {
-      nav(-1);
+      goBack();
     } else {
       // TODO: actual booking creation
       console.log("Booking confirmed:", booking);

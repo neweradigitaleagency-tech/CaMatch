@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { ArrowLeft, Building2, Upload, CheckCircle } from "lucide-react"
+import { useBackNavigation } from "../../hooks/useBackNavigation"
 import { useAuthStore } from "../../stores/authStore"
 import { useCreateSupplierApplication } from "../../hooks/supplier/useSupplierProfile"
 import type { SupplierApplication } from "../../types/supplier"
@@ -9,6 +10,7 @@ const ABIDJAN_COMMUNES = ["Cocody", "Plateau", "Marcory", "Yopougon", "Adjamé",
 
 export default function SupplierRegisterScreen() {
   const navigate = useNavigate()
+  const goBack = useBackNavigation("/marketplace")
   const user = useAuthStore((s) => s.user)
   const createApplication = useCreateSupplierApplication()
 
@@ -72,7 +74,7 @@ export default function SupplierRegisterScreen() {
   return (
     <div className="min-h-dynamic bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl border border-gray-200 p-6 max-w-lg w-full">
-        <button onClick={() => step > 1 ? setStep(step - 1) : navigate(-1)}
+        <button onClick={() => step > 1 ? setStep(step - 1) : goBack()}
           className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer mb-4">
           <ArrowLeft className="w-4 h-4 text-gray-700" />
         </button>

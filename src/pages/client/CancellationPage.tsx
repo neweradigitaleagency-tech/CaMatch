@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, XCircle, Shield, AlertTriangle } from "lucide-react";
 import { useRequestStore } from "../../stores/requestStore";
 import { useEscrowStore } from "../../stores/escrowStore";
@@ -17,6 +18,7 @@ const CANCEL_REASONS = [
 export default function CancellationPage() {
   const { id: missionId } = useParams();
   const nav = useNavigate();
+  const goBack = useBackNavigation("/orders");
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === missionId));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
   const refundPayment = useEscrowStore((s) => s.refundPayment);
@@ -68,8 +70,8 @@ export default function CancellationPage() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
-        <button onClick={() => nav(-1)} className="w-11 h-11 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95">
-          <ArrowLeft className="w-5 h-5" />
+        <button onClick={goBack} className="w-11 h-11 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95">
+          <ArrowLeft className="w-5 h-5 text-[#2B2B2B]" />
         </button>
         <h1 className="text-[15px] font-bold text-cm-text">Annuler la mission</h1>
         <div className="w-11 h-11" />

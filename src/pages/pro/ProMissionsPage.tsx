@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, CalendarDays, MapPin, Coins, UserIcon, Clock, XCircle, Navigation, MessageCircle, Phone } from "lucide-react";
 import { MOCK_PRO_JOBS, MOCK_PRO_ALERTS } from "../../services/mockData";
@@ -41,6 +42,7 @@ function formatDate(iso: string): string {
 
 export default function ProMissionsPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const [tab, setTab] = useState<TabFilter>("active");
   const [showDetail, setShowDetail] = useState<string | null>(null);
 
@@ -54,7 +56,7 @@ export default function ProMissionsPage() {
     <div className="min-h-dynamic bg-[#F5F5F0]">
       <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-200">
         <div className="flex items-center h-14 px-4 gap-3 max-w-[448px] mx-auto">
-          <button onClick={() => nav(-1)} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer active:scale-95">
+          <button onClick={goBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer active:scale-95">
             <ArrowLeft className="w-5 h-5 text-gray-900" />
           </button>
           <h1 className="text-[16px] font-bold text-gray-900">Mes missions</h1>

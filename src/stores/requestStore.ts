@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import type { ClientRequest, Mission } from "../types";
-import { useNotificationStore } from "./notificationStore";
+import { useProjectStore, fromMission } from "./projectStore";
 
 interface RequestState {
   requests: ClientRequest[];
@@ -27,33 +27,30 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     set((state) => ({
       requests: state.requests.filter((r) => r.id !== id),
     })),
-  setMissions: (missions) => set({ missions }),
-  addMission: (mission) =>
-    set((state) => ({ missions: [mission, ...state.missions] })),
-  selectMission: (mission) => set({ selectedMission: mission }),
-  updateMissionStatus: (id: string, status: string) => {
-    const mission = get().missions.find((m) => m.id === id);
-    const statusLabels: Record<string, string> = {
-      accepted: "a accepté votre demande",
-      refused: "a refusé la demande",
-      paid: "paiement reçu, fonds sécurisés",
-      in_progress: "a commencé l'intervention",
-      completed: "a terminé l'intervention",
-      client_validation: "en attente de votre validation",
-      closed: "mission clôturée",
-      cancelled: "mission annulée",
-      disputed: "litige ouvert",
-      refunded: "remboursement effectué",
-    };
-    const label = statusLabels[status];
-    if (label && mission) {
-      useNotificationStore.getState().addNotification({
-        type: "mission",
-        title: mission.proName || "Mise à jour",
-        body: `${mission.proName || "Le professionnel"} ${label}`,
-        actionUrl: `/orders/tracker/${id}`,
-      });
+  setMissions: (missions) => {
+    const projectStore = useProjectStore.getState();
+    const projects = missions.map(fromMission);
+    projectStore.setProjects(projects);
+    if (projectStore.perspective !== "client") {
+      projectStore.setPerspective("client");
     }
+    set({ missions });
+  },
+  addMission: (mission) => {
+    const projectStore = useProjectStore.getState();
+    projectStore.addProject(fromMission(mission));
+    set((state) => ({ missions: [mission, ...state.missions] }));
+  },
+  selectMission: (mission) => {
+    if (mission) {
+      useProjectStore.getState().selectProject(fromMission(mission));
+    } else {
+      useProjectStore.getState().selectProject(null);
+    }
+    set({ selectedMission: mission });
+  },
+  updateMissionStatus: (id: string, status: string) => {
+    useProjectStore.getState().updateProjectStatus(id, status);
     set((state) => ({
       missions: state.missions.map((m) =>
         m.id === id ? { ...m, status: status as never } : m

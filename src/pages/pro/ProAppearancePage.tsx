@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Moon, Sun, Eye } from "lucide-react";
 import { useState } from "react";
@@ -14,13 +15,14 @@ function Toggle({ enabled, onChange }: { enabled: boolean; onChange: () => void 
 
 export default function ProAppearancePage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/pro/dashboard");
   const [themeDark, setThemeDark] = useState(false);
 
   return (
     <div className="min-h-dynamic bg-cm-bg">
       <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
         <div className="flex items-center h-14 px-5 gap-3">
-          <button type="button" onClick={() => nav(-1)} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
+          <button type="button" onClick={goBack} className="p-1 -ml-1 cursor-pointer active:scale-[0.97]">
             <ArrowLeft className="w-5 h-5 text-cm-text" />
           </button>
           <h1 className="text-[18px] font-bold text-cm-text">Affichage</h1>

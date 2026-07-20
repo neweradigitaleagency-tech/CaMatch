@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Save, Package } from "lucide-react"
+import { ArrowLeft, Save, Package, ImagePlus, X, Link } from "lucide-react"
 import { useSupplierProduct, useCreateProduct, useUpdateProduct } from "../../hooks/supplier/useSupplierProducts"
 import { useSupplierProfile } from "../../hooks/supplier/useSupplierProfile"
 import { getAllProductCategories } from "../../services/supplier/categories.service"
@@ -41,6 +41,11 @@ export default function SupplierProductFormScreen() {
   const [unlimitedStock, setUnlimitedStock] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const [error, setError] = useState("")
+  const [images, setImages] = useState<string[]>([])
+  const [imageUrl, setImageUrl] = useState("")
+  const [saleEnabled, setSaleEnabled] = useState(false)
+  const [salePrice, setSalePrice] = useState<number>(0)
+  const [saleEndsAt, setSaleEndsAt] = useState("")
 
   const commissionRate = profile?.commissionRate ?? 10
   const cmPrice = calculateCmPrice(supplierPrice, commissionRate)
@@ -63,6 +68,12 @@ export default function SupplierProductFormScreen() {
       setLowStockThreshold(existingProduct.lowStockThreshold)
       setUnlimitedStock(existingProduct.unlimitedStock)
       setIsVisible(existingProduct.isVisible)
+      setImages(existingProduct.images ?? [])
+      if (existingProduct.salePrice && existingProduct.salePrice > 0) {
+        setSaleEnabled(true)
+        setSalePrice(existingProduct.salePrice)
+        setSaleEndsAt(existingProduct.saleEndsAt ?? "")
+      }
     }
   }, [isEdit, existingProduct])
 
@@ -76,12 +87,14 @@ export default function SupplierProductFormScreen() {
     const form: SupplierProductFormData = {
       name, categoryId,
       description: description || undefined,
-      images: [],
+      images,
       brand: brand || undefined,
       manufacturerReference: manufacturerReference || undefined,
       technicalSpecs: {},
       unitType, supplierPrice,
       recommendedPrice: recommendedPrice > 0 ? recommendedPrice : undefined,
+      salePrice: saleEnabled && salePrice > 0 ? salePrice : undefined,
+      saleEndsAt: saleEnabled && saleEndsAt ? saleEndsAt : undefined,
       stock, lowStockThreshold, unlimitedStock, isVisible,
     }
 
@@ -155,6 +168,38 @@ export default function SupplierProductFormScreen() {
         </div>
       </div>
 
+      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-2">
+          <ImagePlus className="w-4 h-4" /> Photos
+        </h2>
+        <div className="flex gap-2">
+          <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="Coller une URL d'image..."
+            className="flex-1 h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+          <button onClick={() => { if (imageUrl.trim()) { setImages([...images, imageUrl.trim()]); setImageUrl("") } }}
+            disabled={!imageUrl.trim()}
+            className="h-9 px-4 bg-cm-green text-white text-[12px] font-bold rounded-lg disabled:opacity-50 cursor-pointer flex items-center gap-1.5">
+            <Link className="w-3.5 h-3.5" /> Ajouter
+          </button>
+        </div>
+        {images.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {images.map((url, i) => (
+              <div key={i} className="relative group">
+                <img src={url} alt={`Photo ${i + 1}`}
+                  className="w-20 h-20 rounded-lg object-cover border border-gray-200"
+                  onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ddd'><rect width='24' height='24' rx='4'/></svg>" }} />
+                <button onClick={() => setImages(images.filter((_, j) => j !== i))}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-[10px] text-gray-400">{images.length} photo{images.length > 1 ? "s" : ""} ajoutée{images.length > 1 ? "s" : ""}</p>
+      </div>
+
       <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
         <h2 className="text-[13px] font-semibold text-gray-900">💰 Prix</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -183,6 +228,36 @@ export default function SupplierProductFormScreen() {
             Calculé : {formatXOF(supplierPrice)} / (1 - {commissionRate}%) = {formatXOF(cmPrice)}
           </p>
         </div>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
+        <h2 className="text-[13px] font-semibold text-gray-900">🏷️ Promo / Solde</h2>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input checked={saleEnabled} onChange={(e) => setSaleEnabled(e.target.checked)} type="checkbox"
+            className="w-4 h-4 rounded border-gray-300 text-cm-green focus:ring-cm-green/20" />
+          <span className="text-[12px] text-gray-700">Mettre en solde</span>
+        </label>
+        {saleEnabled && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
+            <div>
+              <label className="text-[11px] font-medium text-gray-600 block mb-1">Prix soldé (FCFA)</label>
+              <input value={salePrice || ""} onChange={(e) => setSalePrice(Number(e.target.value) || 0)} type="number" min={0}
+                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+            </div>
+            <div>
+              <label className="text-[11px] font-medium text-gray-600 block mb-1">Date de fin</label>
+              <input value={saleEndsAt} onChange={(e) => setSaleEndsAt(e.target.value)} type="date"
+                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+            </div>
+            {salePrice > 0 && supplierPrice > 0 && (
+              <div className="sm:col-span-2">
+                <p className="text-[11px] text-red-500 font-medium">
+                  Remise : {Math.round((1 - salePrice / supplierPrice) * 100)}%
+                </p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">

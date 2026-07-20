@@ -1,12 +1,12 @@
 import { create } from "zustand";
-import type { EscrowEntry, EscrowStatus, PaymentMethod } from "../types";
+import type { EscrowEntry, EscrowStatus, UnifiedPaymentMethod } from "../types/payment";
 import { useNotificationStore } from "./notificationStore";
 
 const COMMISSION_PERCENT = 15;
 
 interface EscrowState {
   entries: EscrowEntry[];
-  holdPayment: (missionId: string, clientId: string, proId: string, amountXOF: number, paymentMethod: PaymentMethod) => EscrowEntry;
+  holdPayment: (missionId: string, clientId: string, proId: string, amountXOF: number, paymentMethod: UnifiedPaymentMethod) => EscrowEntry;
   releasePayment: (missionId: string) => void;
   refundPayment: (missionId: string) => void;
   getEntry: (missionId: string) => EscrowEntry | undefined;
@@ -17,7 +17,7 @@ let escrowCounter = 0;
 export const useEscrowStore = create<EscrowState>((set, get) => ({
   entries: [],
 
-  holdPayment: (missionId, clientId, proId, amountXOF) => {
+  holdPayment: (missionId, clientId, proId, amountXOF, method) => {
     escrowCounter += 1;
     const commissionXOF = Math.round(amountXOF * COMMISSION_PERCENT / 100);
     const entry: EscrowEntry = {
@@ -30,6 +30,7 @@ export const useEscrowStore = create<EscrowState>((set, get) => ({
       commissionXOF,
       proAmountXOF: amountXOF - commissionXOF,
       platformAmountXOF: commissionXOF,
+      method,
       status: "held",
       paidAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),

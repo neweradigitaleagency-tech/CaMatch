@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../hooks/useBackNavigation";
 import { Star } from "lucide-react";
 import TopBarIconButton from "../components/ui/TopBarIconButton";
 import PillToggle from "../components/ui/PillToggle";
@@ -11,6 +12,7 @@ import { screenEnter, listItem } from "../animations/variants";
 
 export default function SearchScreen() {
   const navigate = useNavigate();
+  const goBack = useBackNavigation("/marketplace");
   const [mode, setMode] = useState<"urgent" | "planifié">("urgent");
   const [selected, setSelected] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -33,7 +35,7 @@ export default function SearchScreen() {
       <div className="flex items-center justify-between">
         <TopBarIconButton icon={
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cm-text"><path d="M19 12H5"/><polyline points="12 19 5 12 12 5"/></svg>
-        } onClick={() => navigate(-1)} />
+        } onClick={goBack} />
 
         <div className="h-[40px] flex-1 mx-3 rounded-full bg-cm-elevated flex items-center px-[14px]">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 shrink-0 text-cm-text-muted"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>

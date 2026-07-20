@@ -14,7 +14,7 @@ import ErrorState from "../../components/ui/ErrorState"
 const PROVIDERS: { id: PaymentProvider; name: string; icon: typeof Smartphone }[] = [
   { id: "wave", name: "Wave", icon: Smartphone },
   { id: "orange_money", name: "Orange Money", icon: Smartphone },
-  { id: "mtn_money", name: "MTN Mobile Money", icon: Smartphone },
+  { id: "mtn_momo", name: "MTN Mobile Money", icon: Smartphone },
   { id: "flutterwave", name: "Flutterwave", icon: Globe },
   { id: "cinetpay", name: "CinetPay", icon: Globe },
   { id: "stripe", name: "Stripe", icon: Building2 },
@@ -79,7 +79,7 @@ export default function SubscriptionPaymentPage() {
     }
   }
 
-  const handleBack = () => fromHamburger ? nav("/", { state: { reopenMenu: true } }) : nav(-1)
+  const handleBack = () => nav("/", { state: { reopenMenu: true } })
 
   if (paymentResult) {
     return (

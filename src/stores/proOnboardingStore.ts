@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { ProOnboardingData, ProApplicationStatus, PaymentMethod } from "../types";
+import type { ProOnboardingData, ProApplicationStatus } from "../types";
 
 const STORAGE_KEY = "cm_pro_onboarding";
 

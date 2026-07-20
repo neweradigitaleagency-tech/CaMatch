@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useBackNavigation } from "../../hooks/useBackNavigation";
 import ProfilProScreen from "../../components/ProfilProScreen";
 import { MOCK_PROS, MOCK_SERVICES } from "../../services/mockData";
 import { useAuthStore } from "../../stores/authStore";
@@ -8,6 +9,7 @@ import { MOCK_PORTFOLIO } from "../../services/mockData";
 
 export default function ProPreviewPage() {
   const nav = useNavigate();
+  const goBack = useBackNavigation("/profile");
   const { user } = useAuthStore();
 
   const pro: ProfessionalDetails = (MOCK_PROS.find((p) => p.id === user?.id) || MOCK_PROS[0])!;
@@ -25,7 +27,7 @@ export default function ProPreviewPage() {
       portfolio={portfolio}
       reviews={reviews}
       badges={badges}
-      onBack={() => nav(-1)}
+      onBack={goBack}
     />
   );
 }
