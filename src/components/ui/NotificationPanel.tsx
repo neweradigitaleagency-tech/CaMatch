@@ -53,7 +53,7 @@ export default function NotificationPanel({
   const storeMarkRead = useNotificationStore((s) => s.markRead);
   const storeClear = useNotificationStore((s) => s.clearNotification);
 
-  const notifications = externalNotifications ?? storeNotifications;
+  const notifications = (externalNotifications ?? storeNotifications) ?? [];
   const handleMarkRead = externalMarkRead ?? storeMarkRead;
   const handleMarkAllRead = externalMarkAllRead ?? storeMarkAllRead;
   const handleClear = externalClear ?? storeClear;

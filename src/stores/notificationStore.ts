@@ -23,9 +23,11 @@ interface NotificationState {
 function loadPersisted(): AppNotification[] {
   try {
     const raw = localStorage.getItem("cm_notifications");
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
   } catch {
-    return [];
+    return []
   }
 }
 

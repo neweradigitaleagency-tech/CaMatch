@@ -1,14 +1,13 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { CheckCircle, X } from "lucide-react"
-import { useBackNavigation } from "../../hooks/useBackNavigation"
+import PageHeader from "../../components/ui/PageHeader"
 import { useAuthStore } from "../../stores/authStore"
 import { useSellerRegistrationStore } from "../../stores/sellerRegistrationStore"
 import SellerRegistrationWizard from "../../components/marketplace/SellerRegistrationWizard"
 
 export default function SellerRegistrationPage() {
   const nav = useNavigate()
-  const goBack = useBackNavigation("/marketplace")
   const user = useAuthStore((s) => s.user)
   const { draft, reset } = useSellerRegistrationStore()
   const [loading, setLoading] = useState(false)
@@ -60,17 +59,17 @@ export default function SellerRegistrationPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-dynamic bg-[#EDE8DC] flex items-center justify-center p-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 max-w-md w-full text-center">
+      <div className="min-h-dynamic bg-cm-bg flex items-center justify-center p-6">
+        <div className="bg-cm-elevated rounded-2xl border border-cm-border p-8 max-w-md w-full text-center">
           <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-7 h-7 text-green-600" />
           </div>
-          <h2 className="text-[18px] font-bold text-gray-900 mb-2">Demande envoyée !</h2>
-          <p className="text-[13px] text-gray-500 mb-6">
+          <h2 className="text-[18px] font-bold text-cm-text mb-2">Demande envoyée !</h2>
+          <p className="text-[13px] text-cm-text-soft mb-6">
             Votre demande d'inscription a été soumise. Notre équipe la vérifiera sous 24-48h.
           </p>
           <button onClick={() => nav("/marketplace", { replace: true })}
-            className="h-10 px-6 bg-gray-900 text-white text-[12px] font-bold rounded-xl cursor-pointer transition-all hover:opacity-90">
+            className="h-10 px-6 bg-cm-text text-cm-elevated text-[12px] font-bold rounded-xl cursor-pointer transition-all hover:opacity-90">
             Retour au marketplace
           </button>
         </div>

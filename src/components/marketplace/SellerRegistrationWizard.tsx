@@ -35,17 +35,17 @@ export default function SellerRegistrationWizard({ onBack, onSubmit, loading }: 
   }
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic pb-safe bg-[#EDE8DC]">
-      <header className="sticky top-0 z-30 bg-[#EDE8DC]">
+    <div className="flex flex-col w-full min-h-dynamic pb-safe bg-cm-bg">
+      <header className="sticky top-0 z-30 bg-cm-bg">
         <div className="flex items-center gap-3 px-5 h-12">
           <button
             onClick={draft.step !== "seller_type" ? goPrev : onBack}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 cursor-pointer active:scale-95 shrink-0"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95 shrink-0"
           >
-            <ArrowLeft className="w-4 h-4 text-[#1A1A1A]" />
+            <ArrowLeft className="w-4 h-4 text-cm-text" />
           </button>
           <div className="flex-1 text-center">
-            <span className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest">
+            <span className="text-[10px] font-bold text-cm-text-soft uppercase tracking-widest">
               Étape {stepNum}/3
             </span>
           </div>

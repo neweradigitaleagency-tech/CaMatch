@@ -1,14 +1,15 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
-import { ArrowLeft, Search, Package, MapPin, SlidersHorizontal, X, ChevronRight, ChevronDown } from "lucide-react"
-import { useBackNavigation } from "../../hooks/useBackNavigation"
+import { Search, Package, MapPin, SlidersHorizontal, X, ChevronRight, ChevronDown, ShoppingCart } from "lucide-react"
+import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
+import PageHeader from "../../components/ui/PageHeader"
 import BottomSheet from "../BottomSheet"
 import { MARKETPLACE_PRODUCTS } from "../../data/marketplaceProducts"
 import { MARKETPLACE_CATEGORIES } from "../../data/marketplaceCategories"
 import { VERTICAL_LABELS } from "../../types/marketplace"
+import CatalogProductCard from "./CatalogProductCard"
 import type { MarketplaceVertical, Product } from "../../types/marketplace"
-import Breadcrumbs from "../ui/Breadcrumbs"
 
 const ITEMS_PER_PAGE = 8
 
@@ -61,7 +62,8 @@ function parseSearchParams(sp: URLSearchParams) {
 export default function CategoryExplore() {
   const { vertical } = useParams<{ vertical: string }>()
   const nav = useNavigate()
-  const goBack = useBackNavigation("/marketplace")
+  const location = useLocation()
+  const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
   const [searchParams, setSearchParams] = useSearchParams()
 
   const params = useMemo(() => parseSearchParams(searchParams), [searchParams])
@@ -173,36 +175,29 @@ export default function CategoryExplore() {
     updateParam("sub", id === "all" ? "" : id)
   }
 
-  return (
-    <div className="flex flex-col w-full min-h-dynamic bg-[#EDE8DC] pb-8">
-      <header className="sticky top-0 z-20 bg-white border-b border-gray-100">
-        <div className="px-5 pt-3 pb-3">
-          <div className="flex items-center gap-2 mb-2">
-            <button onClick={goBack}
-              className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0">
-              <ArrowLeft className="w-4 h-4 text-[#1A1A1A]" />
-            </button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-[17px] font-extrabold text-[#1A1A1A]">{pageTitle}</h1>
-              <Breadcrumbs />
-            </div>
-            <button onClick={() => setFilterOpen(true)}
-              className={`relative h-9 px-3 rounded-xl border cursor-pointer active:scale-95 transition-all flex items-center gap-1.5 ${
-                hasActiveFilters ? "bg-[#1A1A1A] text-white border-[#1A1A1A]" : "bg-white text-[#6B7280] border-gray-200"
-              }`}>
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span className="text-[10px] font-bold">Filtres</span>
-              {activeFilterCount > 0 && (
-                <span className="w-4 h-4 rounded-full bg-[#AECB2A] text-[#243318] text-[8px] font-bold flex items-center justify-center">{activeFilterCount}</span>
-              )}
-            </button>
-          </div>
+  const cartButton = (
+    <button onClick={() => nav("/marketplace/cart", { state: { from: location.pathname + location.search } })}
+      className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-cm-surface cursor-pointer active:scale-90 transition-transform shrink-0">
+      <ShoppingCart className="w-4.5 h-4.5 text-cm-text" />
+      {cartCount > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-cm-error text-white text-[9px] font-bold rounded-full px-1">
+          {cartCount > 9 ? "9+" : cartCount}
+        </span>
+      )}
+    </button>
+  )
 
+  return (
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-8">
+      <div className="sticky top-0 z-20 bg-cm-elevated border-b border-cm-border">
+        <PageHeader title="Catégories" fallbackRoute="/marketplace" rightAction={cartButton} />
+
+        <div className="px-5 pb-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B7280] pointer-events-none" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-soft pointer-events-none" />
             <input type="text" value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="Rechercher dans cette catégorie..."
-              className="w-full h-10 pl-9 pr-4 text-[13px] bg-gray-50 border border-gray-200 rounded-xl outline-none text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:border-[#243318] focus:bg-white transition-all" />
+              className="w-full h-10 pl-9 pr-4 text-[13px] bg-cm-surface border border-cm-border rounded-xl outline-none text-cm-text placeholder:text-cm-text-muted focus:border-[#243318] focus:bg-cm-elevated transition-all" />
           </div>
         </div>
 
@@ -211,7 +206,7 @@ export default function CategoryExplore() {
             {subcategories.map((sub) => (
               <button key={sub.id} onClick={() => handleSubChange(sub.id)}
                 className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                  params.sub === sub.id ? "bg-[#1A1A1A] text-white" : "bg-gray-50 text-[#6B7280] border border-gray-200 hover:border-gray-300"
+                  params.sub === sub.id ? "bg-cm-text text-white" : "bg-cm-surface text-cm-text-soft border border-cm-border hover:border-gray-300"
                 }`}>
                 {sub.name}
               </button>
@@ -222,25 +217,25 @@ export default function CategoryExplore() {
         {hasActiveFilters && (
           <div className="flex gap-1.5 overflow-x-auto no-scrollbar px-5 pb-3 -mt-1">
             {params.sub !== "all" && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-[#AECB2A]/20 text-[#243318] rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-accent/20 text-cm-forest rounded-full text-[9px] font-semibold">
                 {subcategories.find((s) => s.id === params.sub)?.name}
                 <button onClick={() => handleSubChange("all")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
             )}
             {(params.min || params.max) && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#1A1A1A] rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-cm-text rounded-full text-[9px] font-semibold">
                 {params.min ? `${Number(params.min).toLocaleString("fr-FR")} F` : "0"} — {params.max ? `${Number(params.max).toLocaleString("fr-FR")} F` : "∞"}
                 <button onClick={() => { updateParam("min", ""); updateParam("max", "") }} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
             )}
             {params.cond && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#1A1A1A] rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-cm-text rounded-full text-[9px] font-semibold">
                 {CONDITION_LABELS[params.cond]}
                 <button onClick={() => updateParam("cond", "")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
             )}
             {params.loc && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-[#1A1A1A] rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-cm-text rounded-full text-[9px] font-semibold">
                 <MapPin className="w-2.5 h-2.5" /> {params.loc}
                 <button onClick={() => updateParam("loc", "")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
@@ -249,21 +244,21 @@ export default function CategoryExplore() {
         )}
 
         <div className="flex items-center justify-between px-5 pb-3">
-          <span className="text-[11px] text-[#6B7280]">{filtered.length} résultat{filtered.length !== 1 ? "s" : ""}</span>
+          <span className="text-[11px] text-cm-text-soft">{filtered.length} résultat{filtered.length !== 1 ? "s" : ""}</span>
           <div className="relative">
             <button onClick={() => setShowSort(!showSort)}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-gray-50 border border-gray-200 rounded-lg text-[11px] font-medium text-[#6B7280] cursor-pointer hover:bg-gray-100 transition-colors">
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-cm-surface border border-cm-border rounded-lg text-[11px] font-medium text-cm-text-soft cursor-pointer hover:bg-gray-100 transition-colors">
               <SlidersHorizontal className="w-3 h-3" />
               {SORT_OPTIONS.find((o) => o.value === params.sort)?.label}
             </button>
             {showSort && (
               <>
                 <div className="fixed inset-0 z-10" onClick={() => setShowSort(false)} />
-                <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden min-w-[140px]">
+                <div className="absolute right-0 top-full mt-1 z-20 bg-cm-elevated border border-cm-border rounded-xl shadow-lg overflow-hidden min-w-[140px]">
                   {SORT_OPTIONS.map((opt) => (
                     <button key={opt.value} onClick={() => { updateParam("sort", opt.value); setShowSort(false) }}
-                      className={`w-full text-left px-4 py-2.5 text-[12px] cursor-pointer hover:bg-gray-50 transition-colors ${
-                        params.sort === opt.value ? "text-[#243318] font-semibold bg-gray-50" : "text-[#1A1A1A]"
+                      className={`w-full text-left px-4 py-2.5 text-[12px] cursor-pointer hover:bg-cm-surface transition-colors ${
+                        params.sort === opt.value ? "text-cm-forest font-semibold bg-cm-surface" : "text-cm-text"
                       }`}>
                       {opt.label}
                     </button>
@@ -273,7 +268,7 @@ export default function CategoryExplore() {
             )}
           </div>
         </div>
-      </header>
+      </div>
 
       {category && params.sub === "all" && !params.q && !params.min && !params.max && !params.cond && !params.loc && (
         <div className="px-5 pt-4">
@@ -282,12 +277,12 @@ export default function CategoryExplore() {
               const count = allProducts.filter((p) => p.subcategory === sub.slug || p.category === sub.slug).length
               return (
                 <motion.button key={sub.id} whileTap={{ scale: 0.96 }} onClick={() => handleSubChange(sub.id)}
-                  className="text-left bg-white rounded-xl border border-gray-100 p-3 cursor-pointer hover:border-[#243318]/30 transition-all active:scale-[0.98]">
+                  className="text-left bg-cm-elevated rounded-xl border border-cm-border p-3 cursor-pointer hover:border-[#243318]/30 transition-all active:scale-[0.98]">
                   <span className="text-xl leading-none">{SUBCAT_ICONS[sub.slug] || "📦"}</span>
-                  <p className="text-[12px] font-bold text-[#1A1A1A] mt-1.5 leading-tight">{sub.name}</p>
+                  <p className="text-[12px] font-bold text-cm-text mt-1.5 leading-tight">{sub.name}</p>
                   <div className="flex items-center gap-1 mt-1">
-                    <span className="text-[9px] text-[#6B7280]">{count} article{count !== 1 ? "s" : ""}</span>
-                    <ChevronRight className="w-2.5 h-2.5 text-[#9CA3AF]" />
+                    <span className="text-[9px] text-cm-text-soft">{count} article{count !== 1 ? "s" : ""}</span>
+                    <ChevronRight className="w-2.5 h-2.5 text-cm-text-muted" />
                   </div>
                 </motion.button>
               )
@@ -300,32 +295,19 @@ export default function CategoryExplore() {
         {filtered.length === 0 ? (
           <div className="text-center py-16">
             <Package className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-            <p className="text-[14px] font-bold text-[#1A1A1A] mb-1">Aucune annonce trouvée</p>
-            <p className="text-[12px] text-[#6B7280]">Essayez de modifier votre recherche ou vos filtres</p>
+            <p className="text-[14px] font-bold text-cm-text mb-1">Aucune annonce trouvée</p>
+            <p className="text-[12px] text-cm-text-soft">Essayez de modifier votre recherche ou vos filtres</p>
             {hasActiveFilters && (
-              <button onClick={clearFilters} className="mt-3 h-9 px-4 rounded-xl bg-[#1A1A1A] text-white text-[11px] font-bold cursor-pointer">
+              <button onClick={clearFilters} className="mt-3 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer">
                 Réinitialiser les filtres
               </button>
             )}
             {suggestions.length > 0 && (
               <div className="mt-8 text-left">
-                <p className="text-[13px] font-bold text-[#1A1A1A] mb-3">Vous aimerez aussi</p>
+                <p className="text-[13px] font-bold text-cm-text mb-3">Vous aimerez aussi</p>
                 <div className="grid grid-cols-2 gap-3">
-                  {suggestions.map((product) => (
-                    <button key={product.id} onClick={() => nav(`/marketplace/item/${product.id}`)}
-                      className="text-left bg-white rounded-xl overflow-hidden border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform hover:border-gray-200">
-                      <div className="aspect-square bg-gray-50">
-                        {product.images[0] ? (
-                          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center"><Package className="w-6 h-6 text-gray-300" /></div>
-                        )}
-                      </div>
-                      <div className="p-2.5">
-                        <h3 className="text-[11px] font-semibold text-[#1A1A1A] line-clamp-2 leading-tight">{product.name}</h3>
-                        <p className="text-[13px] font-bold text-[#1A1A1A] mt-0.5">{product.price.toLocaleString("fr-FR")} F</p>
-                      </div>
-                    </button>
+                  {suggestions.map((product, i) => (
+                    <CatalogProductCard key={product.id} product={product} index={i} />
                   ))}
                 </div>
               </div>
@@ -335,13 +317,13 @@ export default function CategoryExplore() {
           <>
             <div className="grid grid-cols-2 gap-3">
               {visibleProducts.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} onClick={() => nav(`/marketplace/item/${product.id}${location.search}`)} />
+                <CatalogProductCard key={product.id} product={product} index={i} />
               ))}
             </div>
             {hasMore && (
               <div className="flex justify-center mt-5">
                 <button onClick={() => setVisibleCount((c) => c + ITEMS_PER_PAGE)}
-                  className="h-10 px-6 rounded-xl bg-white border border-gray-200 text-[12px] font-semibold text-[#1A1A1A] cursor-pointer hover:border-gray-300 active:scale-[0.98] transition-all flex items-center gap-1.5">
+                  className="h-10 px-6 rounded-xl bg-cm-elevated border border-cm-border text-[12px] font-semibold text-cm-text cursor-pointer hover:border-gray-300 active:scale-[0.98] transition-all flex items-center gap-1.5">
                   <ChevronDown className="w-4 h-4" />
                   Afficher plus ({filtered.length - visibleCount} restant{(filtered.length - visibleCount) > 1 ? "s" : ""})
                 </button>
@@ -353,23 +335,23 @@ export default function CategoryExplore() {
 
       <BottomSheet open={filterOpen} onClose={() => setFilterOpen(false)} title="Filtres">
         <div className="mb-4">
-          <p className="text-[11px] font-semibold text-[#1A1A1A] mb-2">Prix</p>
+          <p className="text-[11px] font-semibold text-cm-text mb-2">Prix</p>
           <div className="flex items-center gap-2">
             <input type="number" value={localMin} onChange={(e) => { setLocalMin(e.target.value); updatePriceParam("min", e.target.value) }}
-              placeholder="Min" className="w-full h-10 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:border-[#243318]" />
-            <span className="text-[11px] text-[#6B7280]">→</span>
+              placeholder="Min" className="w-full h-10 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text placeholder:text-cm-text-muted focus:border-[#243318]" />
+            <span className="text-[11px] text-cm-text-soft">→</span>
             <input type="number" value={localMax} onChange={(e) => { setLocalMax(e.target.value); updatePriceParam("max", e.target.value) }}
-              placeholder="Max" className="w-full h-10 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-[#1A1A1A] placeholder:text-[#9CA3AF] focus:border-[#243318]" />
+              placeholder="Max" className="w-full h-10 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text placeholder:text-cm-text-muted focus:border-[#243318]" />
           </div>
         </div>
         {isSecondHand && (
           <div className="mb-4">
-            <p className="text-[11px] font-semibold text-[#1A1A1A] mb-2">État</p>
+            <p className="text-[11px] font-semibold text-cm-text mb-2">État</p>
             <div className="flex gap-2 overflow-x-auto no-scrollbar">
               {Object.entries(CONDITION_LABELS).map(([key, label]) => (
                 <button key={key} onClick={() => updateParam("cond", params.cond === key ? "" : key)}
                   className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-semibold border cursor-pointer transition-all ${
-                    params.cond === key ? CONDITION_COLORS[key] : "bg-gray-50 text-[#6B7280] border-gray-200"
+                    params.cond === key ? CONDITION_COLORS[key] : "bg-cm-surface text-cm-text-soft border-cm-border"
                   }`}>
                   {label}
                 </button>
@@ -378,12 +360,12 @@ export default function CategoryExplore() {
           </div>
         )}
         <div className="mb-4">
-          <p className="text-[11px] font-semibold text-[#1A1A1A] mb-2">Localisation</p>
+          <p className="text-[11px] font-semibold text-cm-text mb-2">Localisation</p>
           <div className="flex gap-1.5 flex-wrap">
             {LOCATIONS.slice(0, 8).map((loc) => (
               <button key={loc} onClick={() => updateParam("loc", params.loc === loc ? "" : loc)}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-[10px] font-semibold border cursor-pointer transition-all ${
-                  params.loc === loc ? "bg-[#243318] text-white border-[#243318]" : "bg-gray-50 text-[#6B7280] border-gray-200"
+                  params.loc === loc ? "bg-cm-forest text-white border-[#243318]" : "bg-cm-surface text-cm-text-soft border-cm-border"
                 }`}>
                 {loc}
               </button>
@@ -391,7 +373,7 @@ export default function CategoryExplore() {
           </div>
         </div>
         <button onClick={clearFilters}
-          className="w-full h-10 rounded-xl bg-gray-100 text-[12px] font-medium text-[#6B7280] cursor-pointer hover:bg-gray-200 transition-colors">
+          className="w-full h-10 rounded-xl bg-gray-100 text-[12px] font-medium text-cm-text-soft cursor-pointer hover:bg-gray-200 transition-colors">
           Réinitialiser les filtres
         </button>
       </BottomSheet>
@@ -399,57 +381,4 @@ export default function CategoryExplore() {
   )
 }
 
-function ProductCard({ product, index, onClick }: { product: Product; index: number; onClick: () => void }) {
-  const formatPrice = (price: number) => price.toLocaleString("fr-FR") + " F"
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr)
-    const diff = Math.floor((Date.now() - d.getTime()) / 86400000)
-    if (diff === 0) return "Aujourd'hui"
-    if (diff === 1) return "Hier"
-    if (diff < 7) return `Il y a ${diff} jours`
-    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
-  }
-  const condition = "condition" in product ? (product as { condition: string }).condition : null
-  const brand = "brand" in product ? (product as { brand: string }).brand : null
 
-  return (
-    <motion.button initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.03, duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
-      onClick={onClick}
-      className="text-left bg-white rounded-xl overflow-hidden border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform hover:border-gray-200">
-      <div className="relative aspect-square bg-gray-50">
-        {product.images[0] ? (
-          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center"><Package className="w-8 h-8 text-gray-300" /></div>
-        )}
-        {product.originalPrice && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-            -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-          </div>
-        )}
-      </div>
-      <div className="p-2.5">
-        <h3 className="text-[12px] font-semibold text-[#1A1A1A] line-clamp-2 leading-tight">{product.name}</h3>
-        {brand && <p className="text-[9px] text-[#6B7280] mt-0.5">{brand}</p>}
-        <div className="flex items-center gap-1 mt-1">
-          <span className="text-[14px] font-bold text-[#1A1A1A]">{formatPrice(product.price)}</span>
-          {product.originalPrice && <span className="text-[10px] text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</span>}
-        </div>
-        <div className="flex items-center gap-1.5 mt-1 text-[10px] text-[#6B7280]">
-          {condition && (
-            <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold leading-tight ${
-              condition === "like_new" ? "bg-green-100 text-green-700" :
-              condition === "good" ? "bg-blue-100 text-blue-700" :
-              condition === "fair" ? "bg-amber-100 text-amber-700" : "bg-gray-100 text-gray-600"
-            }`}>
-              {condition === "like_new" ? "Comme neuf" : condition === "good" ? "Bon état" : "État correct"}
-            </span>
-          )}
-          <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{product.location.split(",")[0]}</span>
-          <span className="ml-auto">{formatDate(product.createdAt)}</span>
-        </div>
-      </div>
-    </motion.button>
-  )
-}

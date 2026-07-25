@@ -63,6 +63,7 @@ export interface SupplierProduct {
   name: string
   description?: string
   images: string[]
+  videos: string[]
   brand?: string
   manufacturerReference?: string
   barcode?: string
@@ -90,6 +91,7 @@ export interface SupplierProductFormData {
   categoryId: string
   description?: string
   images: string[]
+  videos: string[]
   brand?: string
   manufacturerReference?: string
   barcode?: string

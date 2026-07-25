@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Check, Shield, Coins, Smartphone, CreditCard } from "lucide-react";
 import { useRequestStore } from "../../stores/requestStore";
@@ -20,7 +19,7 @@ const METHODS: UnifiedPaymentMethod[] = ["orange_money", "mtn_momo", "wave"];
 export default function EscrowPaymentPage() {
   const { requestId } = useParams();
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const missions = useRequestStore((s) => s.missions);
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
   const holdPayment = useEscrowStore((s) => s.holdPayment);

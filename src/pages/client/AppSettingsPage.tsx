@@ -1,10 +1,9 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import AppSettingsScreen from "../../components/AppSettingsScreen";
 
 export default function AppSettingsPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const loc = useLocation();
   const fromHamburger = !!loc.state?.fromHamburger;
 

@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { ChevronDown, AlertTriangle } from "lucide-react"
 import type { Product } from "../../types/marketplace"
@@ -20,6 +20,7 @@ const SORT_LABELS: Record<SortKey, string> = {
 
 export default function ShopProducts({ products }: ShopProductsProps) {
   const nav = useNavigate()
+  const location = useLocation()
   const { activeCategory, sort, setActiveCategory, setSort } = useMarketplaceViewStore()
   const [showSort, setShowSort] = useState(false)
 
@@ -110,7 +111,7 @@ export default function ShopProducts({ products }: ShopProductsProps) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.03, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-            onClick={() => nav(`/marketplace/item/${product.id}`)}
+            onClick={() => nav(`/marketplace/item/${product.id}`, { state: { from: location.pathname + location.search } })}
             className="text-left bg-white rounded-xl overflow-hidden border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform hover:border-gray-200"
           >
             <div className="relative aspect-square bg-gray-50">

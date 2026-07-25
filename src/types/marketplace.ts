@@ -224,3 +224,37 @@ export interface MarketplaceSubcategory {
   description: string
   parentId: string
 }
+
+// ── Marketplace cart & order ──
+
+export type MarketplaceOrderStatus =
+  | "pending" | "confirmed" | "preparing" | "shipped"
+  | "delivered" | "cancelled" | "disputed"
+
+export interface CartItem {
+  productId: string
+  productName: string
+  productImage: string
+  price: number
+  quantity: number
+  sellerId: string
+  sellerName: string
+  vertical: MarketplaceVertical
+}
+
+export interface MarketplaceOrder {
+  id: string
+  items: CartItem[]
+  subtotal: number
+  deliveryCost: number
+  commission: number
+  commissionRate: number
+  sellerNet: number
+  total: number
+  status: MarketplaceOrderStatus
+  deliveryCity: string
+  deliveryAddress: string
+  paymentMethod: string
+  createdAt: string
+  updatedAt: string
+}

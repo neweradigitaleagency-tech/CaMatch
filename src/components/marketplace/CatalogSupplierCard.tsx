@@ -1,51 +1,103 @@
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
-import { Store, Star, MapPin, Package, BadgeCheck } from "lucide-react"
+import { Store, Star, MapPin, BadgeCheck, ChevronRight } from "lucide-react"
 import type { ProfessionalSeller } from "../../types/marketplace"
 
 interface CatalogSupplierCardProps {
   seller: ProfessionalSeller
   productCount: number
   index: number
+  featured?: boolean
 }
 
-export default function CatalogSupplierCard({ seller, productCount, index }: CatalogSupplierCardProps) {
+const CATEGORY_LABELS: Record<string, string> = {
+  "ps-ciment": "Ciment", "ps-aciers": "Aciers", "ps-carrelage": "Carrelage",
+  "ps-peinture": "Peinture", "ps-plomberie": "Plomberie", "ps-electricite": "Électricité",
+  "ps-menuiserie": "Menuiserie", "ps-quincaillerie": "Quincaillerie", "ps-outillage": "Outillage",
+  "ps-equipement": "Équipement", "ps-gros-oeuvre": "Gros œuvre", "ps-clim": "Clim",
+}
+
+export default function CatalogSupplierCard({ seller, productCount, index, featured }: CatalogSupplierCardProps) {
   const nav = useNavigate()
+  const location = useLocation()
+
+  const displayCategories = seller.categories.slice(0, 3)
 
   return (
     <motion.button
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      onClick={() => nav(`/marketplace/shop/${seller.id}`)}
-      className="w-full flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-xl cursor-pointer hover:border-gray-200 active:scale-[0.99] transition-all text-left"
+      transition={{ delay: index * 0.05, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+      onClick={() => nav(`/marketplace/shop/${seller.id}`, { state: { from: location.pathname + location.search } })}
+      className="w-full text-left bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden cursor-pointer hover:border-cm-accent/40 active:scale-[0.99] transition-all"
     >
-      <div className="w-12 h-12 rounded-xl bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
-        {seller.logo ? (
-          <img src={seller.logo} alt={seller.companyName} className="w-full h-full object-cover" />
+      {/* Banner */}
+      <div className="relative h-20 overflow-hidden">
+        {seller.banner ? (
+          <img src={seller.banner} alt="" className="w-full h-full object-cover" loading="lazy" />
         ) : (
-          <Store className="w-6 h-6 text-gray-400" />
+          <div className="w-full h-full bg-gradient-to-br from-cm-accent/20 via-cm-forest/10 to-cm-accent/5" />
         )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[13px] font-semibold text-[#1A1A1A] truncate">{seller.companyName}</span>
-          {(seller.verificationStatus === "active" || seller.verificationStatus === "verified") && (
-            <BadgeCheck className="w-3.5 h-3.5 text-[#AECB2A] shrink-0" />
-          )}
+
+      {/* Content */}
+      <div className="px-4 -mt-6 pb-4 relative">
+        {/* Logo + Name row */}
+        <div className="flex items-end gap-3 mb-3">
+          <div className="w-14 h-14 rounded-xl border-[3px] border-white overflow-hidden shrink-0 bg-cm-surface shadow-md flex items-center justify-center">
+            {seller.logo ? (
+              <img src={seller.logo} alt={seller.companyName} className="w-full h-full object-cover" />
+            ) : (
+              <Store className="w-6 h-6 text-cm-text-muted" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0 pb-0.5">
+            <div className="flex items-center gap-2">
+              <h3 className="text-[15px] font-bold text-cm-text truncate line-clamp-1 leading-tight">{seller.companyName}</h3>
+              {(seller.verificationStatus === "active" || seller.verificationStatus === "verified") && (
+                <BadgeCheck className="w-4 h-4 text-cm-green shrink-0" />
+              )}
+            </div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="flex items-center gap-1 text-[11px] text-cm-text-soft">
+                <Star className="w-3 h-3 fill-cm-amber text-cm-amber" />
+                <span className="font-semibold">{seller.rating.toFixed(1)}</span>
+              </span>
+              <span className="text-cm-text-muted text-[10px]">·</span>
+              <span className="flex items-center gap-1 text-[11px] text-cm-text-soft">
+                <MapPin className="w-3 h-3" />
+                {seller.city}
+              </span>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-[11px] text-[#6B7280] mt-0.5">
-          <span className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 fill-[#F59E0B] text-[#F59E0B]" />
-            {seller.rating.toFixed(1)}
-          </span>
-          <span className="flex items-center gap-0.5">
-            <MapPin className="w-3 h-3" />
-            {seller.city}
-          </span>
-          <span className="flex items-center gap-0.5">
-            <Package className="w-3 h-3" />
-            {productCount} produits
+
+        {/* Categories */}
+        {displayCategories.length > 0 && (
+          <div className="flex gap-1.5 mb-3 flex-wrap">
+            {displayCategories.map((cat) => (
+              <span key={cat} className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold h-6 bg-cm-accent/12 text-cm-forest">
+                {CATEGORY_LABELS[cat] || cat}
+              </span>
+            ))}
+            {seller.categories.length > 3 && (
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold h-6 bg-cm-accent/12 text-cm-forest">
+                +{seller.categories.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Bottom bar */}
+        <div className="flex items-center justify-between pt-3 border-t border-cm-border/50">
+          <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+            <span className="text-[11px] text-cm-text-soft whitespace-nowrap overflow-hidden text-ellipsis">
+              {productCount} produit{productCount !== 1 ? "s" : ""} · {seller.reviewCount} avis
+            </span>
+          </div>
+          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold text-cm-forest bg-cm-accent/10 shrink-0">
+            Voir <ChevronRight className="w-3 h-3" />
           </span>
         </div>
       </div>

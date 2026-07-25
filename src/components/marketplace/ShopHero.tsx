@@ -1,6 +1,5 @@
 import { MapPin, Package, Star, Store, Share2, MessageCircle, ArrowLeft } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { useBackNavigation } from "../../hooks/useBackNavigation"
+import { useNavigate, useLocation } from "react-router-dom"
 import type { Seller } from "../../types/marketplace"
 
 interface ShopHeroProps {
@@ -10,7 +9,7 @@ interface ShopHeroProps {
 
 export default function ShopHero({ seller, productCount }: ShopHeroProps) {
   const nav = useNavigate()
-  const goBack = useBackNavigation("/marketplace")
+  const location = useLocation()
   const isPro = seller.type === "professional" || seller.type === "ca_match_pro"
   const name = isPro && "companyName" in seller ? seller.companyName
     : "displayName" in seller ? seller.displayName
@@ -44,7 +43,7 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
         <button
-          onClick={goBack}
+          onClick={() => nav(location.state?.from || "/marketplace", { replace: true })}
           className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
         >
           <ArrowLeft className="w-4 h-4 text-white" />
@@ -87,17 +86,17 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
         </div>
       </div>
 
-      <div className="px-5 py-3 bg-white border-b border-gray-100">
+      <div className="px-5 py-3 bg-cm-elevated border-b border-cm-border">
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-cm-text-soft">
             <MapPin className="w-3.5 h-3.5" />
             {city}
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-cm-text-soft">
             <Package className="w-3.5 h-3.5" />
             {productCount} produit{productCount !== 1 ? "s" : ""}
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-cm-text-soft">
             <Store className="w-3.5 h-3.5" />
             {seller.totalSales} vente{seller.totalSales !== 1 ? "s" : ""}
           </div>
@@ -106,15 +105,22 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
         <div className="flex items-center gap-2 mt-2.5">
           <button
             onClick={() => {
-              if (phone) {
-                window.open(`https://wa.me/${phone.replace(/[^0-9]/g, "")}`, "_blank")
-              }
+              nav(`/messages/new?seller=${seller.id}`, { state: { from: location.pathname } })
             }}
-            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-[#25D366] text-white text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-[#1da851]"
+            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-cm-text text-white text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform"
           >
             <MessageCircle className="w-4 h-4" />
             Contacter
           </button>
+          {phone && (
+            <button
+              onClick={() => window.open(`https://wa.me/${phone.replace(/[^0-9]/g, "")}`, "_blank")}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-cm-accent/20 text-cm-accent cursor-pointer active:scale-[0.98] transition-transform shrink-0"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </div>

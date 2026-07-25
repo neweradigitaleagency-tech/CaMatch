@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Save, Package, ImagePlus, X, Link } from "lucide-react"
+import { ArrowLeft, Save, Package, ImagePlus, X, Upload, Video, Film, AlertCircle } from "lucide-react"
 import { useSupplierProduct, useCreateProduct, useUpdateProduct } from "../../hooks/supplier/useSupplierProducts"
 import { useSupplierProfile } from "../../hooks/supplier/useSupplierProfile"
 import { getAllProductCategories } from "../../services/supplier/categories.service"
@@ -42,13 +42,44 @@ export default function SupplierProductFormScreen() {
   const [isVisible, setIsVisible] = useState(true)
   const [error, setError] = useState("")
   const [images, setImages] = useState<string[]>([])
-  const [imageUrl, setImageUrl] = useState("")
+  const [videos, setVideos] = useState<string[]>([])
+  const [uploading, setUploading] = useState(false)
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const videoInputRef = useRef<HTMLInputElement>(null)
   const [saleEnabled, setSaleEnabled] = useState(false)
   const [salePrice, setSalePrice] = useState<number>(0)
   const [saleEndsAt, setSaleEndsAt] = useState("")
 
   const commissionRate = profile?.commissionRate ?? 10
   const cmPrice = calculateCmPrice(supplierPrice, commissionRate)
+
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+
+  const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    setUploading(true)
+    const b64 = await Promise.all(Array.from(files).map(fileToBase64))
+    setImages((prev) => [...prev, ...b64])
+    setUploading(false)
+    if (imageInputRef.current) imageInputRef.current.value = ""
+  }
+
+  const handleVideoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+    setUploading(true)
+    const b64 = await Promise.all(Array.from(files).map(fileToBase64))
+    setVideos((prev) => [...prev, ...b64])
+    setUploading(false)
+    if (videoInputRef.current) videoInputRef.current.value = ""
+  }
 
   useEffect(() => {
     getAllProductCategories().then(setCategories)
@@ -69,6 +100,7 @@ export default function SupplierProductFormScreen() {
       setUnlimitedStock(existingProduct.unlimitedStock)
       setIsVisible(existingProduct.isVisible)
       setImages(existingProduct.images ?? [])
+      setVideos(existingProduct.videos ?? [])
       if (existingProduct.salePrice && existingProduct.salePrice > 0) {
         setSaleEnabled(true)
         setSalePrice(existingProduct.salePrice)
@@ -88,6 +120,7 @@ export default function SupplierProductFormScreen() {
       name, categoryId,
       description: description || undefined,
       images,
+      videos,
       brand: brand || undefined,
       manufacturerReference: manufacturerReference || undefined,
       technicalSpecs: {},
@@ -168,27 +201,30 @@ export default function SupplierProductFormScreen() {
         </div>
       </div>
 
+      {/* Photos */}
       <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
         <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-2">
           <ImagePlus className="w-4 h-4" /> Photos
         </h2>
-        <div className="flex gap-2">
-          <input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="Coller une URL d'image..."
-            className="flex-1 h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
-          <button onClick={() => { if (imageUrl.trim()) { setImages([...images, imageUrl.trim()]); setImageUrl("") } }}
-            disabled={!imageUrl.trim()}
-            className="h-9 px-4 bg-cm-green text-white text-[12px] font-bold rounded-lg disabled:opacity-50 cursor-pointer flex items-center gap-1.5">
-            <Link className="w-3.5 h-3.5" /> Ajouter
-          </button>
-        </div>
+        <input ref={imageInputRef} type="file" accept="image/*" multiple
+          onChange={handleImageSelect} className="hidden" />
+        <button onClick={() => imageInputRef.current?.click()} disabled={uploading}
+          className="w-full h-20 rounded-xl border-2 border-dashed border-gray-300 hover:border-cm-green bg-gray-50 hover:bg-cm-green/5 flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all">
+          {uploading ? (
+            <div className="w-5 h-5 border-2 border-cm-green border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              <Upload className="w-5 h-5 text-gray-400" />
+              <span className="text-[11px] font-medium text-gray-500">Ajouter des photos</span>
+            </>
+          )}
+        </button>
         {images.length > 0 && (
           <div className="flex gap-2 flex-wrap">
             {images.map((url, i) => (
               <div key={i} className="relative group">
                 <img src={url} alt={`Photo ${i + 1}`}
-                  className="w-20 h-20 rounded-lg object-cover border border-gray-200"
-                  onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ddd'><rect width='24' height='24' rx='4'/></svg>" }} />
+                  className="w-20 h-20 rounded-lg object-cover border border-gray-200" />
                 <button onClick={() => setImages(images.filter((_, j) => j !== i))}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                   <X className="w-3 h-3" />
@@ -198,6 +234,40 @@ export default function SupplierProductFormScreen() {
           </div>
         )}
         <p className="text-[10px] text-gray-400">{images.length} photo{images.length > 1 ? "s" : ""} ajoutée{images.length > 1 ? "s" : ""}</p>
+      </div>
+
+      {/* Videos */}
+      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-2">
+          <Film className="w-4 h-4" /> Vidéos
+        </h2>
+        <input ref={videoInputRef} type="file" accept="video/*" multiple
+          onChange={handleVideoSelect} className="hidden" />
+        <button onClick={() => videoInputRef.current?.click()} disabled={uploading}
+          className="w-full h-20 rounded-xl border-2 border-dashed border-gray-300 hover:border-cm-green bg-gray-50 hover:bg-cm-green/5 flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all">
+          {uploading ? (
+            <div className="w-5 h-5 border-2 border-cm-green border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              <Video className="w-5 h-5 text-gray-400" />
+              <span className="text-[11px] font-medium text-gray-500">Ajouter des vidéos</span>
+            </>
+          )}
+        </button>
+        {videos.length > 0 && (
+          <div className="flex gap-2 flex-wrap">
+            {videos.map((url, i) => (
+              <div key={i} className="relative group">
+                <video src={url} className="w-24 h-20 rounded-lg object-cover border border-gray-200 bg-black" controls />
+                <button onClick={() => setVideos(videos.filter((_, j) => j !== i))}
+                  className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-[10px] text-gray-400">{videos.length} vidéo{videos.length > 1 ? "s" : ""} ajoutée{videos.length > 1 ? "s" : ""}</p>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">

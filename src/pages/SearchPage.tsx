@@ -1,7 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useBackNavigation } from "../hooks/useBackNavigation";
-import { Search, ArrowLeft, X, Star, MapPin, ChevronRight, BriefcaseBusiness, Wrench, Package, ClipboardList } from "lucide-react";
+import PageHeader from "../components/ui/PageHeader";
+import { Search, X, Star, MapPin, ChevronRight, BriefcaseBusiness, Wrench, Package, ClipboardList } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { SERVICE_CATEGORIES, smartSearchSuggestions } from "../data/serviceCategories";
 import { useLocationStore } from "../stores/locationStore";
@@ -30,7 +30,7 @@ const DISCOVERY_PRODUCTS = [
 function ProResultCard({ result, onClick }: { result: SearchResult; onClick?: () => void }) {
   return (
     <motion.button onClick={onClick} variants={fadeUp}
-      className="flex items-center gap-3 p-3 bg-white rounded-[14px] text-left cursor-pointer active:scale-[0.98] transition-transform border border-gray-100 hover:border-gray-200 shrink-0 w-[280px]"
+      className="flex items-center gap-3 p-3 bg-cm-elevated rounded-[var(--radius-cm)] text-left cursor-pointer active:scale-[0.98] transition-transform border border-cm-border shrink-0 w-[280px]"
     >
       <div className="w-11 h-11 rounded-full bg-gray-100 shrink-0 overflow-hidden border-2 border-gray-100">
         {result.image_url ? (
@@ -40,16 +40,16 @@ function ProResultCard({ result, onClick }: { result: SearchResult; onClick?: ()
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="text-[13px] font-semibold text-[#2B2B2B] truncate">{result.title}</h3>
-        <p className="text-[11px] text-gray-500 truncate">{result.description ?? result.category ?? ""}</p>
+        <h3 className="text-[13px] font-semibold text-cm-text truncate">{result.title}</h3>
+        <p className="text-[11px] text-cm-text-soft truncate">{result.description ?? result.category ?? ""}</p>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="flex items-center gap-0.5 text-[10px] font-medium text-amber-600">
             <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
             {result.rating.toFixed(1)}
           </span>
           {result.location_city && (
-            <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-              <MapPin className="w-2.5 h-2.5" />{result.location_city}
+            <span className="text-[10px] text-cm-text-muted flex items-center gap-0.5">
+              <MapPin className="w-2.5 h-2.5" /> {result.location_city}
             </span>
           )}
         </div>
@@ -64,20 +64,20 @@ function ProResultCard({ result, onClick }: { result: SearchResult; onClick?: ()
 function ProCardSimple({ name, title, rating, reviewCount, avatarUrl, onClick }: { name: string; title: string; rating: number; reviewCount: number; avatarUrl: string; onClick?: () => void }) {
   return (
     <motion.button onClick={onClick} variants={fadeUp}
-      className="flex items-center gap-3 p-3 bg-white rounded-[14px] text-left cursor-pointer active:scale-[0.98] transition-transform border border-gray-100 hover:border-gray-200"
+      className="flex items-center gap-3 p-3 bg-cm-elevated rounded-[var(--radius-cm)] text-left cursor-pointer active:scale-[0.98] transition-transform border border-cm-border"
     >
       <div className="w-11 h-11 rounded-full bg-gray-100 shrink-0 overflow-hidden border-2 border-gray-100">
         <img src={avatarUrl} alt={name} className="w-full h-full object-cover" loading="lazy" />
       </div>
       <div className="min-w-0 flex-1">
-        <h3 className="text-[13px] font-semibold text-[#2B2B2B] truncate">{name}</h3>
-        <p className="text-[11px] text-gray-500 truncate">{title}</p>
+        <h3 className="text-[13px] font-semibold text-cm-text truncate">{name}</h3>
+        <p className="text-[11px] text-cm-text-soft truncate">{title}</p>
         <div className="flex items-center gap-2 mt-0.5">
           <span className="flex items-center gap-0.5 text-[10px] font-medium text-amber-600">
             <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
             {rating.toFixed(1)}
           </span>
-          <span className="text-[10px] text-gray-400">{reviewCount}+</span>
+          <span className="text-[10px] text-cm-text-muted">{reviewCount}+</span>
         </div>
       </div>
     </motion.button>
@@ -87,7 +87,7 @@ function ProCardSimple({ name, title, rating, reviewCount, avatarUrl, onClick }:
 function ProductResultCard({ result, onClick }: { result: SearchResult; onClick?: () => void }) {
   return (
     <motion.button onClick={onClick} variants={fadeUp}
-      className="flex gap-3 p-3 bg-white rounded-[14px] text-left cursor-pointer active:scale-[0.98] transition-transform border border-gray-100 hover:border-gray-200 min-w-0"
+      className="flex gap-3 p-3 bg-cm-elevated rounded-[var(--radius-cm)] text-left cursor-pointer active:scale-[0.98] transition-transform border border-cm-border min-w-0"
     >
       <div className="w-16 h-16 rounded-[10px] bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden">
         {result.image_url ? (
@@ -97,9 +97,9 @@ function ProductResultCard({ result, onClick }: { result: SearchResult; onClick?
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold text-[#2B2B2B] line-clamp-2">{result.title}</p>
+        <p className="text-[12px] font-semibold text-cm-text line-clamp-2">{result.title}</p>
         {result.category && (
-          <p className="text-[10px] text-gray-500 mt-0.5">{result.category}</p>
+          <p className="text-[10px] text-cm-text-soft mt-0.5">{result.category}</p>
         )}
         {result.price > 0 && (
           <p className="text-[13px] font-bold text-[#7FD356] mt-1">{result.price.toLocaleString()} FCFA</p>
@@ -112,15 +112,15 @@ function ProductResultCard({ result, onClick }: { result: SearchResult; onClick?
 function ProductCardSimple({ title, price, category, onClick }: { title: string; price: number; category: string; onClick?: () => void }) {
   return (
     <motion.button onClick={onClick} variants={fadeUp}
-      className="flex gap-3 p-3 bg-white rounded-[14px] text-left cursor-pointer active:scale-[0.98] transition-transform border border-gray-100 hover:border-gray-200"
+      className="flex gap-3 p-3 bg-cm-elevated rounded-[var(--radius-cm)] text-left cursor-pointer active:scale-[0.98] transition-transform border border-cm-border"
     >
-      <div className="w-16 h-16 rounded-[10px] bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
+      <div className="w-16 h-16 rounded-[10px] bg-gray-100 border border-cm-border flex items-center justify-center shrink-0">
         <Package className="w-6 h-6 text-gray-400" />
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-semibold text-[#2B2B2B] line-clamp-2">{title}</p>
-        <p className="text-[10px] text-gray-500 mt-0.5">{category}</p>
-        <p className="text-[13px] font-bold text-[#7FD356] mt-1">{price.toLocaleString()} FCFA</p>
+        <p className="text-[12px] font-semibold text-cm-text line-clamp-2">{title}</p>
+        <p className="text-[10px] text-cm-text-soft mt-0.5">{category}</p>
+        <p className="text-[13px] font-bold text-cm-accent mt-1">{price.toLocaleString()} FCFA</p>
       </div>
     </motion.button>
   );
@@ -179,7 +179,6 @@ function SectionHeader({ label, count, onViewAll }: { label: string; count: numb
 
 export default function SearchPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/marketplace");
   const [searchParams] = useSearchParams();
   const qParam = searchParams.get("q");
   const storeLat = useLocationStore((s) => s.latitude);
@@ -236,33 +235,24 @@ export default function SearchPage() {
   }, [missions]);
 
   return (
-    <div className="min-h-dynamic bg-[#F5F5F5] pb-24">
-      {/* Sticky Search Header */}
-      <div className="sticky top-0 z-10 bg-[#F5F5F5]/80 backdrop-blur-xl border-b border-gray-200/50">
-        <div className="px-4 pt-3 pb-3">
-          <div className="flex items-center gap-2 mb-2">
-            <button onClick={goBack}
-              className="w-8 h-8 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0">
-              <ArrowLeft className="w-4 h-4 text-[#2B2B2B]" />
-            </button>
-            <span className="text-[15px] font-bold text-[#2B2B2B]">Recherche</span>
-          </div>
-          <div className="relative w-full">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#2B2B2B]/40 pointer-events-none" />
-            <input
-              type="text"
-              autoFocus={!qParam}
-              className="w-full h-11 pl-10 pr-4 text-[13px] bg-white rounded-[14px] outline-none text-[#2B2B2B] placeholder:text-[#2B2B2B]/40 font-medium shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/60 focus:border-[#7FD356]/30 focus:ring-2 focus:ring-[#7FD356]/20"
-              placeholder="Peinture, plombier, climatiseur..."
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            {loading && (
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
-                <div className="w-4 h-4 border-2 border-[#7FD356] border-t-transparent rounded-full animate-spin" />
-              </div>
-            )}
-          </div>
+    <div className="min-h-dynamic bg-cm-bg pb-24">
+      <PageHeader title="Recherche" fallbackRoute="/" />
+      <div className="px-4 pt-2 pb-1">
+        <div className="relative w-full">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted pointer-events-none" />
+          <input
+            type="text"
+            autoFocus={!qParam}
+            className="w-full h-11 pl-10 pr-4 text-[13px] bg-cm-elevated rounded-[var(--radius-cm-lg)] outline-none text-cm-text placeholder:text-cm-text-muted font-medium border border-cm-border focus:border-cm-accent/50 focus:ring-2 focus:ring-cm-accent/20 transition-all"
+            placeholder="Peinture, plombier, climatiseur..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {loading && (
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2">
+              <div className="w-4 h-4 border-2 border-cm-accent border-t-transparent rounded-full animate-spin" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -272,7 +262,7 @@ export default function SearchPage() {
             <motion.div key="results" variants={container} initial="hidden" animate="show" exit={{ opacity: 0 }} className="pb-4">
               <div className="flex items-center justify-end mt-2 mb-1">
                 <button onClick={() => setQuery("")}
-                  className="text-[11px] font-medium text-gray-400 flex items-center gap-1 cursor-pointer active:scale-95 transition-transform">
+                  className="text-[11px] font-medium text-cm-text-muted flex items-center gap-1 cursor-pointer active:scale-95 transition-transform">
                   <X className="w-3 h-3" /> Effacer
                 </button>
               </div>
@@ -280,7 +270,7 @@ export default function SearchPage() {
               {professionals.length > 0 && (
                 <div>
                   <SectionHeader label="Professionnels" count={countByType.professional}
-                    onViewAll={() => nav(`/professionals?q=${encodeURIComponent(query)}`)} />
+                    onViewAll={() => nav(`/search?q=${encodeURIComponent(query)}`)} />
                   <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-2">
                     {professionals.map((pro) => (
                       <ProResultCard key={pro.id} result={pro} onClick={() => handleResultClick(pro)} />
@@ -296,7 +286,7 @@ export default function SearchPage() {
                     {matchedServices.map((svc, i) => (
                       <ServiceRow key={`${svc.categoryId}-${i}`}
                         service={svc}
-                        onClick={() => nav(`/professionals?category=${svc.categoryId}`)} />
+                        onClick={() => nav(`/search?q=${encodeURIComponent(svc.label)}`)} />
                     ))}
                   </div>
                 </div>

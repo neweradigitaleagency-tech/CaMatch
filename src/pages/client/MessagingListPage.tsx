@@ -1,13 +1,12 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import MessagingScreen from "../../components/MessagingScreen";
 import { useChatStore } from "../../stores/chatStore";
 import { useAuthStore } from "../../stores/authStore";
 
 export default function MessagingListPage() {
   const navigate = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => navigate(-1);
   const conversations = useChatStore((s) => s.conversations);
   const initialize = useChatStore((s) => s.initialize);
   const markRead = useChatStore((s) => s.markRead);

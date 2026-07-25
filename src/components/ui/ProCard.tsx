@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Star, Heart, Loader2, Check, MapPin } from "lucide-react";
+import { Star, Heart, Loader2, Check } from "lucide-react";
 import { motion } from "motion/react";
 import type { ProfessionalDetails, ProCategory } from "../../types";
 import TouchFeedback from "../TouchFeedback";
@@ -78,7 +78,7 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
         layout
         whileHover={{ y: -3, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="bg-cm-elevated border border-cm-border rounded-[var(--radius-cm-card)] overflow-hidden cursor-pointer flex flex-col hover:border-cm-accent/30 shadow-cm-card group"
+        className="bg-cm-elevated border border-cm-border rounded-xl overflow-hidden cursor-pointer flex flex-col hover:border-cm-accent/30 shadow-cm-card group"
         aria-label={`Profil de ${pro.name}`}
         role="button"
         tabIndex={0}
@@ -100,22 +100,24 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
         <div className="pt-6 px-3 pb-3 flex flex-col flex-1">
           <div className="flex items-start justify-between gap-1 mb-2">
             <div className="min-w-0">
-              <h4 className="text-[12px] font-black text-cm-text line-clamp-1 leading-tight">{pro.name}</h4>
-              <p className="text-[9px] font-bold mt-0.5 text-cm-text-soft line-clamp-1">{pro.title || pro.subCategory}</p>
+              <h4 className="text-xs font-black text-cm-text line-clamp-1 leading-tight">{pro.name}</h4>
+              <p className="text-[10px] font-bold mt-0.5 text-cm-text-soft line-clamp-1">{pro.title || pro.subCategory}</p>
             </div>
             {pro.isVerified && <VerifiedBadgeSVG className="w-3.5 h-3.5 text-blue-500 shrink-0 mt-0.5" />}
           </div>
           <div className="flex items-center gap-2 py-1.5 px-2 rounded-[var(--radius-cm-lg)] bg-cm-surface mb-2">
-            <span className="flex items-center gap-1 text-[9px] font-black text-cm-text"><Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />{rating.toFixed(1)}</span>
-            <span className="text-[9px] font-black text-cm-text-soft">·</span>
-            <span className="text-[9px] font-black text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F/h</span>
-            <span className="text-[9px] font-black text-cm-text-soft">·</span>
-            <span className="text-[9px] font-black text-cm-text">{pro.reviewCount}+</span>
+            <span className="flex items-center gap-1 text-[10px] font-black text-cm-text">
+              <Star className="w-3 h-3 text-amber-500 fill-amber-500" />{rating.toFixed(1)}
+            </span>
+            <span className="text-[10px] font-black text-cm-text-soft">·</span>
+            <span className="text-[10px] font-black text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F/h</span>
+            <span className="text-[10px] font-black text-cm-text-soft">·</span>
+            <span className="text-[10px] font-black text-cm-text">{pro.reviewCount}+</span>
           </div>
           <button
             onClick={handleButtonClick}
             disabled={btnState !== "idle"}
-            className="w-full py-1.5 rounded-[var(--radius-cm-lg)] text-[9px] font-black tracking-wide bg-cm-accent text-cm-text-onAccent active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all mt-auto"
+            className="w-full py-1.5 rounded-[var(--radius-cm-lg)] text-[10px] font-black tracking-wide bg-cm-accent text-cm-text-onAccent active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed transition-all mt-auto"
             aria-label={`Contacter ${pro.name}`}
           >
             {btnState === "loading" ? <Loader2 className="w-3 h-3 animate-spin mx-auto" /> : btnState === "done" ? <Check className="w-3 h-3 mx-auto" /> : "Voir"}
@@ -155,7 +157,7 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
       </div>
 
       <div className="pt-6 px-3.5 pb-3.5 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-1 mb-2.5">
+        <div className="flex items-start justify-between gap-1 mb-3">
           <div className="min-w-0 flex-1">
             <h4 className={`text-[13px] font-black tracking-tight leading-none line-clamp-1 ${isDark ? "text-white" : "text-cm-text"}`}>
               {pro.name}
@@ -180,26 +182,26 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
           </div>
         </div>
 
-        <div className={`grid grid-cols-3 gap-0.5 py-2 px-1 rounded-[var(--radius-cm-lg)] mb-3 h-12 items-center justify-items-center text-center ${
+        <div className={`grid grid-cols-3 gap-0.5 py-2.5 px-1.5 rounded-[var(--radius-cm-lg)] mb-3 items-center justify-items-center text-center ${
           isDark ? "bg-zinc-900/60" : "bg-cm-surface"
         }`}>
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-0.5">
               <StarRating rating={rating} size="xs" />
             </div>
-            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Note</span>
+            <span className={`text-[9px] font-black uppercase tracking-wider mt-1 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Note</span>
           </div>
           <div className={`flex flex-col items-center border-x w-full ${isDark ? "border-zinc-800" : "border-cm-border/50"}`}>
-            <span className={`text-[10px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
+            <span className={`text-[11px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
               {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
             </span>
-            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Tarif/h</span>
+            <span className={`text-[9px] font-black uppercase tracking-wider mt-1 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Tarif/h</span>
           </div>
           <div className="flex flex-col items-center">
-            <span className={`text-[10px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
+            <span className={`text-[11px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
               {pro.reviewCount}+
             </span>
-            <span className={`text-[8px] font-black uppercase tracking-wider mt-0.5 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Avis</span>
+            <span className={`text-[9px] font-black uppercase tracking-wider mt-1 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Avis</span>
           </div>
         </div>
 

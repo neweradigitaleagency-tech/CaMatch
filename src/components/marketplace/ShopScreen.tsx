@@ -18,7 +18,7 @@ export default function ShopScreen({ seller }: ShopScreenProps) {
   const hasProducts = products.length > 0
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic bg-[#EDE8DC]">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
       <ShopHero seller={seller} productCount={products.length} />
       <ShopAbout seller={seller} />
       {hasProducts && <ShopFeaturedProducts products={products.slice(0, 8)} />}
@@ -32,13 +32,13 @@ export default function ShopScreen({ seller }: ShopScreenProps) {
 export function ShopNotFound() {
   const nav = useNavigate()
   return (
-    <div className="flex flex-col items-center justify-center min-h-dynamic bg-[#EDE8DC] px-5">
-      <XCircle className="w-12 h-12 text-gray-300 mb-3" />
-      <h2 className="text-lg font-bold text-[#1A1A1A]">Boutique introuvable</h2>
-      <p className="text-sm text-[#6B7280] mt-1 text-center">Cette boutique n'existe pas ou a été supprimée.</p>
+    <div className="flex flex-col items-center justify-center min-h-dynamic bg-cm-bg px-5">
+      <XCircle className="w-12 h-12 text-cm-text-muted mb-3" />
+      <h2 className="text-lg font-bold text-cm-text">Boutique introuvable</h2>
+      <p className="text-sm text-cm-text-soft mt-1 text-center">Cette boutique n'existe pas ou a été supprimée.</p>
       <button
         onClick={() => nav("/marketplace")}
-        className="mt-4 h-12 px-6 rounded-xl bg-[#1A1A1A] text-white text-sm font-bold cursor-pointer active:scale-[0.98] transition-transform"
+        className="mt-4 h-12 px-6 rounded-xl bg-cm-text text-white text-sm font-bold cursor-pointer active:scale-[0.98] transition-transform"
       >
         Retour au marketplace
       </button>

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, XCircle, Shield, AlertTriangle } from "lucide-react";
 import { useRequestStore } from "../../stores/requestStore";
 import { useEscrowStore } from "../../stores/escrowStore";
@@ -18,7 +17,7 @@ const CANCEL_REASONS = [
 export default function CancellationPage() {
   const { id: missionId } = useParams();
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === missionId));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
   const refundPayment = useEscrowStore((s) => s.refundPayment);

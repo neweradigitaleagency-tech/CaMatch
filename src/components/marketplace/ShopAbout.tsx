@@ -29,23 +29,23 @@ export default function ShopAbout({ seller }: ShopAboutProps) {
 
   return (
     <div className="px-5 pt-5">
-      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border overflow-hidden">
         {description && (
-          <div className="p-4 border-b border-gray-50">
+          <div className="p-4 border-b border-cm-border/50">
             <div className="flex items-start gap-2.5">
-              <Store className="w-4 h-4 text-[#6B7280] mt-0.5 shrink-0" />
-              <p className="text-xs text-[#4B5563] leading-relaxed">{description}</p>
+              <Store className="w-4 h-4 text-cm-text-soft mt-0.5 shrink-0" />
+              <p className="text-xs text-cm-text-soft leading-relaxed">{description}</p>
             </div>
           </div>
         )}
 
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-cm-border/50">
           {visibleItems.map((item) => (
             <div key={item.label} className="flex items-start gap-3 px-4 py-3">
-              <item.icon className="w-4 h-4 text-[#6B7280] mt-0.5 shrink-0" />
+              <item.icon className="w-4 h-4 text-cm-text-soft mt-0.5 shrink-0" />
               <div>
-                <p className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">{item.label}</p>
-                <p className="text-xs text-[#1A1A1A] mt-0.5">{item.value}</p>
+                <p className="text-[10px] font-semibold text-cm-text-soft uppercase tracking-wider">{item.label}</p>
+                <p className="text-xs text-cm-text mt-0.5">{item.value}</p>
               </div>
             </div>
           ))}
@@ -54,7 +54,7 @@ export default function ShopAbout({ seller }: ShopAboutProps) {
         {infoItems.length > 2 && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="w-full flex items-center justify-center gap-1 py-2.5 text-xs font-semibold text-[#6B7280] cursor-pointer hover:text-[#1A1A1A] transition-colors border-t border-gray-50"
+            className="w-full flex items-center justify-center gap-1 py-2.5 text-xs font-semibold text-cm-text-soft cursor-pointer hover:text-cm-text transition-colors border-t border-cm-border/50"
           >
             {expanded ? "Voir moins" : `Voir tout (${infoItems.length})`}
             {expanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -62,16 +62,16 @@ export default function ShopAbout({ seller }: ShopAboutProps) {
         )}
 
         {deliveryZones.length > 0 && (
-          <div className="border-t border-gray-50 px-4 py-3">
+          <div className="border-t border-cm-border/50 px-4 py-3">
             <div className="flex items-start gap-3">
-              <Truck className="w-4 h-4 text-[#6B7280] mt-0.5 shrink-0" />
+              <Truck className="w-4 h-4 text-cm-text-soft mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-semibold text-[#6B7280] uppercase tracking-wider">Zones de livraison</p>
+                <p className="text-[10px] font-semibold text-cm-text-soft uppercase tracking-wider">Zones de livraison</p>
                 <div className="mt-1.5 space-y-1">
                   {deliveryZones.filter((z) => z.isActive).map((z) => (
                     <div key={z.id} className="flex items-center justify-between text-xs">
-                      <span className="text-[#1A1A1A]">{z.city}</span>
-                      <span className="text-[#6B7280]">
+                      <span className="text-cm-text">{z.city}</span>
+                      <span className="text-cm-text-soft">
                         {z.price.toLocaleString("fr-FR")} F
                         {z.estimatedDelayHours && <span className="ml-1">· ~{z.estimatedDelayHours}h</span>}
                       </span>

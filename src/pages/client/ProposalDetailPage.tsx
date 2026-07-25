@@ -1,5 +1,4 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import ProposalDetailScreen from "../../components/proposals/ProposalDetailScreen";
 import { useMatchingStore } from "../../stores/matchingStore";
 import { useRequestStore } from "../../stores/requestStore";
@@ -11,7 +10,7 @@ import type { Mission } from "../../types";
 
 export default function ProposalDetailPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const { requestId, proposalId } = useParams<{ requestId: string; proposalId: string }>();
   const proposal = useMatchingStore((s) => s.getProposalById(requestId || "", proposalId || ""));
   const { acceptProposal } = useMatchingStore();

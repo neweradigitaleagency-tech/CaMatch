@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { useBackNavigation } from "../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { Search, MapPin, Star, ChevronRight, X } from "lucide-react";
 import { LOCATIONS } from "../stores/locationStore";
+import PageHeader from "./ui/PageHeader";
 
 interface FreelancerProfile {
   id: string;
@@ -71,7 +71,6 @@ const FREELANCERS: Record<string, FreelancerProfile[]> = {
 
 export default function FreelanceListingScreen() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/");
   const [query, setQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [showLocationPicker, setShowLocationPicker] = useState(false);
@@ -97,28 +96,19 @@ export default function FreelanceListingScreen() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-[#F5F5F5]">
       {/* Header */}
-      <header className="px-4 pt-3 pb-2 bg-[#F5F5F5]">
-        <div className="flex items-center gap-3 mb-2">
-          <button onClick={goBack}
-            className="w-10 h-10 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0">
-            <X className="w-4 h-4 text-[#2B2B2B]" />
-          </button>
-          <h1 className="text-[18px] font-extrabold text-[#2B2B2B]">Freelance</h1>
-          <span className="text-[11px] font-medium text-gray-400">Services digitaux</span>
-        </div>
+      <PageHeader title="Freelance" fallbackRoute="/" subtitle="Services digitaux" />
 
-        {/* Search */}
+      {/* Search + Categories */}
+      <div className="px-4 pt-3 pb-2">
         <div className="relative w-full mb-2">
           <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-            <div className="w-7 h-7 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center">
-              <Search className="w-3.5 h-3.5 text-[#2B2B2B]" />
-            </div>
+            <Search className="w-4 h-4 text-cm-text-muted" />
           </div>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full h-11 pl-[42px] pr-4 text-[13px] bg-white rounded-[12px] outline-none text-[#2B2B2B] placeholder:text-[#2B2B2B]/40 font-medium shadow-[0_1px_3px_rgba(0,0,0,0.04)] border border-gray-200/60 focus:border-[#7FD356]/30 focus:ring-2 focus:ring-[#7FD356]/20"
+            className="w-full h-11 pl-9 pr-4 text-[13px] bg-cm-elevated border border-cm-border rounded-xl outline-none text-cm-text placeholder:text-cm-text-muted focus:border-cm-forest"
             placeholder="Graphiste, développeur, community manager..."
           />
         </div>
@@ -129,8 +119,8 @@ export default function FreelanceListingScreen() {
             <button key={cat.id} onClick={() => setSelectedCategory(selectedCategory === cat.id ? null : cat.id)}
               className={`shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-medium transition-all cursor-pointer ${
                 selectedCategory === cat.id
-                  ? "bg-[#2B2B2B] text-white"
-                  : "bg-white border border-gray-200 text-[#2B2B2B] hover:border-gray-300"
+                  ? "bg-cm-text text-white"
+                  : "bg-cm-elevated border border-cm-border text-cm-text hover:border-cm-text-muted"
               }`}>
               <span>{cat.icon}</span>
               <span>{cat.name}</span>
@@ -140,96 +130,140 @@ export default function FreelanceListingScreen() {
 
         {/* Location filter */}
         <button onClick={() => setShowLocationPicker(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-gray-200 text-[11px] font-medium text-[#2B2B2B]/70 cursor-pointer active:scale-95 transition-transform mt-2">
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cm-elevated border border-cm-border text-[11px] font-medium text-cm-text-soft cursor-pointer active:scale-95 transition-transform mt-2">
           <MapPin className="w-3.5 h-3.5" />
           {locationFilter || "Toutes les zones"}
         </button>
-      </header>
+      </div>
+
+      {/* Top Rated Horizontal Carousel */}
+      {!query && !selectedCategory && (
+        <div className="pt-3 pb-1">
+          <div className="flex items-center justify-between px-4 mb-3">
+            <h2 className="text-[13px] font-bold text-cm-text">Freelances en vedette</h2>
+          </div>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-1">
+            {FREELANCE_CATEGORIES.flatMap((cat) => FREELANCERS[cat.id] || [])
+              .sort((a, b) => b.rating - a.rating)
+              .slice(0, 6)
+              .map((pro, i) => (
+                <motion.button
+                  key={pro.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05, duration: 0.25 }}
+                  onClick={() => nav(`/explorer/pro/${pro.id}`)}
+                  className="shrink-0 w-40 bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
+                >
+                  <div className="relative h-24 overflow-hidden">
+                    <img src={pro.avatarUrl} alt={pro.name} className="w-full h-full object-cover object-top" loading="lazy" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <div className="absolute bottom-2 left-2 right-2">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-3 h-3 fill-cm-amber text-cm-amber drop-shadow-sm" />
+                        <span className="text-[11px] font-bold text-white drop-shadow-sm">{pro.rating}</span>
+                      </div>
+                    </div>
+                    {pro.badge && (
+                      <span className="absolute top-2 right-2 px-1.5 py-0.5 rounded-full bg-cm-amber text-[8px] font-bold text-cm-text shadow-sm">
+                        {pro.badge}
+                      </span>
+                    )}
+                    {pro.verified && !pro.badge && (
+                      <div className="absolute top-2 right-2 w-5 h-5 bg-cm-green rounded-full flex items-center justify-center shadow-sm">
+                        <svg viewBox="0 0 12 12" className="w-3 h-3 text-white" fill="none"><path d="M3 6L5 8L9 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <h3 className="text-[12px] font-bold text-cm-text truncate">{pro.name}</h3>
+                    <p className="text-[10px] text-cm-text-soft truncate mt-0.5">{pro.title}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-[10px] text-cm-text-soft flex items-center gap-0.5">
+                        <MapPin className="w-2.5 h-2.5" />{pro.location}
+                      </span>
+                      <span className="text-[10px] font-bold text-cm-forest">{pro.hourlyRate.toLocaleString()} F</span>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+          </div>
+        </div>
+      )}
 
       {/* Results */}
-      <section className="flex-1 px-4 pb-6 overflow-y-auto pt-3">
+      <section className="flex-1 px-4 pb-6 pt-3">
         {filteredCategories.length === 0 && query ? (
           <div className="flex flex-col items-center justify-center pt-12">
-            <span className="text-[32px] mb-2">🔍</span>
-            <p className="text-[13px] font-semibold text-[#2B2B2B]">Aucun freelance trouvé</p>
+            <div className="w-14 h-14 rounded-xl bg-cm-elevated border border-cm-border flex items-center justify-center mb-3">
+              <Search className="w-6 h-6 text-cm-text-muted" />
+            </div>
+            <p className="text-[13px] font-bold text-cm-text mb-1">Aucun freelance trouvé</p>
             <button onClick={() => { setQuery(""); setSelectedCategory(null); }}
-              className="mt-3 px-4 py-2 bg-[#2B2B2B] text-white text-[11px] font-semibold rounded-full cursor-pointer active:scale-95 transition-transform">
+              className="mt-3 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-95 transition-transform">
               Réinitialiser
             </button>
           </div>
         ) : (
-          <div className="space-y-5">
-            {filteredCategories.map((cat) => {
-              const isExpanded = expandedCategory === cat.id;
-              const visiblePros = isExpanded ? cat.pros : cat.pros.slice(0, 3);
-
-              return (
-                <div key={cat.id}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[14px]">{cat.icon}</span>
-                      <h2 className="text-[15px] font-bold text-[#2B2B2B]">{cat.name}</h2>
-                      <span className="text-[11px] text-gray-400 font-medium">({cat.pros.length})</span>
-                    </div>
-                    {!isExpanded && cat.pros.length > 3 && (
-                      <button onClick={() => setExpandedCategory(cat.id)}
-                        className="text-[11px] font-semibold text-[#7FD356] flex items-center gap-0.5 cursor-pointer">
-                        Voir tout <ChevronRight className="w-3 h-3" />
-                      </button>
-                    )}
+          <div className="space-y-6">
+            {filteredCategories.map((cat) => (
+              <div key={cat.id}>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[16px]">{cat.icon}</span>
+                    <h2 className="text-[14px] font-bold text-cm-text">{cat.name}</h2>
+                    <span className="text-[10px] text-cm-text-muted font-medium bg-cm-elevated px-1.5 py-0.5 rounded-full">{cat.pros.length}</span>
                   </div>
+                </div>
 
-                  <div className="space-y-2">
-                    {visiblePros.map((pro, i) => (
-                      <motion.button
-                        key={pro.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05, duration: 0.2 }}
-                        onClick={() => nav(`/explorer/pro/${pro.id}`)}
-                        className="w-full flex items-center gap-3 p-3 bg-white rounded-[12px] text-left cursor-pointer active:scale-[0.98] transition-transform border border-gray-100 hover:border-gray-200"
-                      >
-                        <div className="relative w-11 h-11 rounded-full overflow-hidden shrink-0 border-2 border-gray-100">
+                {/* Horizontal scroll of freelancer cards */}
+                <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4">
+                  {cat.pros.map((pro, i) => (
+                    <motion.button
+                      key={pro.id}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05, duration: 0.25 }}
+                      onClick={() => nav(`/explorer/pro/${pro.id}`)}
+                      className="shrink-0 w-56 bg-cm-elevated border border-cm-border rounded-2xl p-3 text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-cm-border">
                           <img src={pro.avatarUrl} alt={pro.name} className="w-full h-full object-cover" loading="lazy" />
                           {pro.verified && (
-                            <div className="absolute bottom-0 right-0 w-4 h-4 bg-[#7FD356] rounded-full flex items-center justify-center">
+                            <div className="absolute bottom-0 right-0 w-4 h-4 bg-cm-green rounded-full flex items-center justify-center">
                               <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-white" fill="none"><path d="M3 6L5 8L9 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
                             </div>
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <h3 className="text-[13px] font-semibold text-[#2B2B2B] truncate">{pro.name}</h3>
+                          <div className="flex items-center gap-1">
+                            <h3 className="text-[12px] font-bold text-cm-text truncate">{pro.name}</h3>
                             {pro.badge && (
-                              <span className="text-[8px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-full shrink-0">{pro.badge}</span>
+                              <span className="text-[8px] font-bold text-cm-amber bg-cm-amber/15 px-1.5 py-0.5 rounded-full shrink-0">{pro.badge}</span>
                             )}
                           </div>
-                          <p className="text-[11px] text-gray-500 truncate">{pro.title}</p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="flex items-center gap-0.5 text-[10px] font-medium text-amber-600">
-                              <Star className="w-2.5 h-2.5 fill-amber-500 text-amber-500" />
-                              {pro.rating}
-                            </span>
-                            <span className="text-[10px] text-gray-400">({pro.reviewCount})</span>
-                            <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
-                              <MapPin className="w-2.5 h-2.5" />{pro.location}
-                            </span>
-                          </div>
+                          <p className="text-[10px] text-cm-text-soft truncate">{pro.title}</p>
                         </div>
-                        <span className="text-[11px] font-bold text-[#7FD356] shrink-0">{pro.hourlyRate.toLocaleString()} F/h</span>
-                      </motion.button>
-                    ))}
-                  </div>
-
-                  {isExpanded && (
-                    <button onClick={() => setExpandedCategory(null)}
-                      className="w-full mt-1 py-2 text-[11px] font-medium text-gray-400 cursor-pointer hover:text-gray-600 transition-colors text-center">
-                      Réduire
-                    </button>
-                  )}
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-cm-border/50">
+                        <div className="flex items-center gap-2">
+                          <span className="flex items-center gap-0.5 text-[10px] font-semibold text-cm-amber">
+                            <Star className="w-2.5 h-2.5 fill-cm-amber text-cm-amber" />{pro.rating}
+                          </span>
+                          <span className="text-[9px] text-cm-text-muted">({pro.reviewCount})</span>
+                        </div>
+                        <span className="text-[11px] font-bold text-cm-forest">{pro.hourlyRate.toLocaleString()} F/h</span>
+                      </div>
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <MapPin className="w-2.5 h-2.5 text-cm-text-muted" />
+                        <span className="text-[9px] text-cm-text-muted">{pro.location}</span>
+                      </div>
+                    </motion.button>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         )}
       </section>

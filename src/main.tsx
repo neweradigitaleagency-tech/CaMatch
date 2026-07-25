@@ -1,4 +1,4 @@
-import { StrictMode, lazy, Suspense, Component, useState, useEffect, type ReactNode, type ErrorInfo } from "react";
+import { StrictMode, lazy, Suspense, Component, useState, useEffect, useRef, type ReactNode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -40,6 +40,7 @@ const QRPaymentPage = lazy(() => import("./pages/client/QRPaymentPage"));
 const EscrowPaymentPage = lazy(() => import("./pages/client/EscrowPaymentPage"));
 const MessagingListPage = lazy(() => import("./pages/client/MessagingListPage"));
 const ChatPage = lazy(() => import("./pages/client/ChatPage"));
+const NewConversationPage = lazy(() => import("./pages/client/NewConversationPage"));
 const AppSettingsPage = lazy(() => import("./pages/client/AppSettingsPage"));
 const ClientPaymentsPage = lazy(() => import("./pages/client/ClientPaymentsPage"));
 const ClientAddressesPage = lazy(() => import("./pages/client/ClientAddressesPage"));
@@ -59,6 +60,10 @@ const ProOnboardingPage = lazy(() => import("./pages/ProOnboardingPage"));
 const MarketplaceHome = lazy(() => import("./components/marketplace/MarketplaceHome"));
 const SellerRegistrationPage = lazy(() => import("./pages/marketplace/SellerRegistrationPage"));
 const ShopPage = lazy(() => import("./pages/marketplace/ShopPage"));
+const CartPage = lazy(() => import("./pages/marketplace/CartPage"));
+const CheckoutPage = lazy(() => import("./pages/marketplace/CheckoutPage"));
+const OrderConfirmationPage = lazy(() => import("./pages/marketplace/OrderConfirmationPage"));
+const MyOrdersPage = lazy(() => import("./pages/marketplace/MyOrdersPage"));
 const BrowseProducts = lazy(() => import("./components/marketplace/BrowseProducts"));
 const CategoryExplore = lazy(() => import("./components/marketplace/CategoryExplore"));
 const ProductDetail = lazy(() => import("./components/marketplace/ProductDetail"));
@@ -238,8 +243,14 @@ function AuthGate({ children }: { children?: React.ReactNode }) {
   const initialized = useAuthStore((s) => s.initialized);
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const isLoading = useAuthStore((s) => s.isLoading);
+  const [timedOut, setTimedOut] = useState(false);
 
-  if (!initialized || isLoading) return <PageLoader />;
+  useEffect(() => {
+    const t = setTimeout(() => setTimedOut(true), 10000);
+    return () => clearTimeout(t);
+  }, []);
+
+  if (!timedOut && (!initialized || isLoading)) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/onboarding" replace />;
   return children ? <>{children}</> : <Outlet />;
 }
@@ -275,8 +286,11 @@ function App() {
   const initialize = useAuthStore((s) => s.initialize);
   const initialized = useAuthStore((s) => s.initialized);
   const [booted, setBooted] = useState(false);
+  const initRef = useRef(false);
 
   useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
     initialize().finally(() => setBooted(true));
   }, []);
 
@@ -419,6 +433,7 @@ function App() {
         <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
         <Route path="catalog" element={<Suspense fallback={<PageLoader />}><CatalogPage /></Suspense>} />
         <Route path="messages" element={<Suspense fallback={<PageLoader />}><MessagingListPage /></Suspense>} />
+        <Route path="messages/new" element={<Suspense fallback={<PageLoader />}><NewConversationPage /></Suspense>} />
         <Route path="messages/:conversationId" element={<Suspense fallback={<PageLoader />}><ChatPage /></Suspense>} />
         <Route path="orders" element={<Suspense fallback={<PageLoader />}><OrdersPage /></Suspense>} />
         <Route path="orders/new" element={<Suspense fallback={<PageLoader />}><RequestWizardPage /></Suspense>} />
@@ -476,8 +491,13 @@ function App() {
         <Route path="marketplace" element={<Suspense fallback={<PageLoader />}><MarketplaceHome /></Suspense>} />
         <Route path="marketplace/register" element={<Suspense fallback={<PageLoader />}><SellerRegistrationPage /></Suspense>} />
         <Route path="marketplace/shop/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
+        <Route path="marketplace/supplier/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
         <Route path="marketplace/browse/:vertical" element={<Suspense fallback={<PageLoader />}><CategoryExplore /></Suspense>} />
         <Route path="marketplace/item/:productId" element={<Suspense fallback={<PageLoader />}><ProductDetail /></Suspense>} />
+        <Route path="marketplace/cart" element={<Suspense fallback={<PageLoader />}><CartPage /></Suspense>} />
+        <Route path="marketplace/checkout" element={<Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense>} />
+        <Route path="marketplace/order/confirm/:orderId" element={<Suspense fallback={<PageLoader />}><OrderConfirmationPage /></Suspense>} />
+        <Route path="marketplace/orders" element={<Suspense fallback={<PageLoader />}><MyOrdersPage /></Suspense>} />
         <Route path="marketplace/:categoryId" element={<Suspense fallback={<PageLoader />}><BrowseProducts /></Suspense>} />
         <Route path="professionals" element={<Suspense fallback={<PageLoader />}><ProfessionalListingScreen /></Suspense>} />
         <Route path="freelance" element={<Suspense fallback={<PageLoader />}><FreelanceListingScreen /></Suspense>} />

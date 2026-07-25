@@ -66,6 +66,8 @@
   --shadow-cm-btn: 0 4px 16px rgba(174,203,42,0.30);
 
   --ease-snappy: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --breakpoint-xs: 375px;
 }
 
 html {
@@ -190,6 +192,38 @@ body {
   left: 0;
   right: 0;
   padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0.75rem));
+}
+
+/* ─── Typography scale ─── */
+@utility h1-cm {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+@utility h2-cm {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+}
+@utility h3-cm {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 22px;
+}
+@utility body-cm {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+@utility label-cm {
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+}
+@utility caption-cm {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
 }
 
 /* Touch target minimum — opt-in class for icon buttons */

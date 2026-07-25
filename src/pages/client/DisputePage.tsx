@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, AlertTriangle, Shield, Send } from "lucide-react";
 import { useRequestStore } from "../../stores/requestStore";
 import { useNotificationStore } from "../../stores/notificationStore";
@@ -18,7 +17,7 @@ const DISPUTE_REASONS = [
 export default function DisputePage() {
   const { id: missionId } = useParams();
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);

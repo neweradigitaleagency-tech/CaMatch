@@ -1,11 +1,13 @@
 import { useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useSearchParams } from "react-router-dom"
 import { getSellerById, PROFESSIONAL_SELLERS, INDIVIDUAL_SELLERS, CA_MATCH_PRO_SELLERS } from "../../data/marketplaceSuppliers"
 import ShopScreen, { ShopNotFound } from "../../components/marketplace/ShopScreen"
+import ShopScreenV2 from "../../components/marketplace/ShopScreenV2"
 
 export default function ShopPage() {
   const { sellerId } = useParams<{ sellerId: string }>()
-  const nav = useNavigate()
+  const [searchParams] = useSearchParams()
+  const variant = searchParams.get("v")
 
   let seller = sellerId ? getSellerById(sellerId) : undefined
 
@@ -20,5 +22,6 @@ export default function ShopPage() {
   }, [sellerId, seller])
 
   if (!seller) return <ShopNotFound />
+  if (variant === "2") return <ShopScreenV2 seller={seller} />
   return <ShopScreen seller={seller} />
 }

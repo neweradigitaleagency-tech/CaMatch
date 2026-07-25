@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { motion } from "motion/react"
-import { ChevronDown, AlertTriangle } from "lucide-react"
+import { ChevronDown } from "lucide-react"
 import type { Product } from "../../types/marketplace"
+import CatalogProductCard from "./CatalogProductCard"
 
 interface ShopCatalogProps {
   products: Product[]
@@ -25,11 +24,9 @@ const VERTICAL_LABEL: Record<string, string> = {
 }
 
 export default function ShopCatalog({ products }: ShopCatalogProps) {
-  const nav = useNavigate()
   const [activeCategory, setActiveCategory] = useState("all")
   const [sort, setSort] = useState<SortKey>("popular")
   const [showSort, setShowSort] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
   const categories = useMemo(() => {
@@ -61,14 +58,12 @@ export default function ShopCatalog({ products }: ShopCatalogProps) {
     return [...available, ...unavailable]
   }, [products, activeCategory, sort, searchQuery])
 
-  const formatPrice = (price: number) => price.toLocaleString("fr-FR") + " F"
-
   const verticalLabel = products[0] ? VERTICAL_LABEL[products[0].vertical] || products[0].vertical : ""
 
   if (products.length === 0) {
     return (
       <div className="px-5 py-8 text-center">
-        <p className="text-sm text-[#6B7280]">Aucun produit disponible</p>
+        <p className="text-sm text-cm-text-soft">Aucun produit disponible</p>
       </div>
     )
   }
@@ -76,10 +71,10 @@ export default function ShopCatalog({ products }: ShopCatalogProps) {
   return (
     <div className="px-5 pt-5 pb-6">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-[#1A1A1A]">
-          Catalogue {verticalLabel && <span className="font-normal text-[#6B7280]">· {verticalLabel}</span>}
+        <h3 className="text-sm font-bold text-cm-text">
+          Catalogue {verticalLabel && <span className="font-normal text-cm-text-soft">· {verticalLabel}</span>}
         </h3>
-        <span className="text-[11px] text-[#6B7280]">{filtered.length} produit{filtered.length !== 1 ? "s" : ""}</span>
+        <span className="text-[11px] text-cm-text-soft">{filtered.length} produit{filtered.length !== 1 ? "s" : ""}</span>
       </div>
 
       <div className="flex items-center gap-2 mb-3">
@@ -90,8 +85,8 @@ export default function ShopCatalog({ products }: ShopCatalogProps) {
               onClick={() => setActiveCategory(cat)}
               className={`shrink-0 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
                 activeCategory === cat
-                  ? "bg-[#1A1A1A] text-white"
-                  : "bg-gray-100 text-[#6B7280] hover:bg-gray-200"
+                  ? "bg-cm-text text-white"
+                  : "bg-cm-elevated text-cm-text-soft"
               }`}
             >
               {cat === "all" ? "Tous" : cat}
@@ -101,7 +96,7 @@ export default function ShopCatalog({ products }: ShopCatalogProps) {
         <div className="relative flex items-center gap-1">
           <button
             onClick={() => setShowSort(!showSort)}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-gray-100 text-[11px] font-semibold text-[#6B7280] cursor-pointer hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-cm-elevated text-[11px] font-semibold text-cm-text-soft cursor-pointer"
           >
             {SORT_LABELS[sort]}
             <ChevronDown className="w-3 h-3" />
@@ -109,13 +104,13 @@ export default function ShopCatalog({ products }: ShopCatalogProps) {
           {showSort && (
             <>
               <div className="fixed inset-0 z-10" onClick={() => setShowSort(false)} />
-              <div className="absolute right-0 top-full mt-1 z-20 bg-white rounded-xl shadow-lg border border-gray-100 py-1 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 z-20 bg-cm-elevated rounded-xl shadow-lg border border-cm-border py-1 min-w-[140px]">
                 {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
                   <button
                     key={k}
                     onClick={() => { setSort(k); setShowSort(false) }}
-                    className={`w-full text-left px-4 py-2 text-xs font-medium cursor-pointer hover:bg-gray-50 transition-colors ${
-                      sort === k ? "text-[#1A1A1A] bg-gray-50" : "text-[#6B7280]"
+                    className={`w-full text-left px-4 py-2 text-xs font-medium cursor-pointer ${
+                      sort === k ? "text-cm-text bg-cm-border/20" : "text-cm-text-soft"
                     }`}
                   >
                     {SORT_LABELS[k]}
@@ -129,50 +124,7 @@ export default function ShopCatalog({ products }: ShopCatalogProps) {
 
       <div className="grid grid-cols-2 gap-3">
         {filtered.map((product, i) => (
-          <motion.button
-            key={product.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.03, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-            onClick={() => nav(`/marketplace/item/${product.id}`)}
-            className="text-left bg-white rounded-xl overflow-hidden border border-gray-100 cursor-pointer active:scale-[0.98] transition-transform hover:border-gray-200"
-          >
-            <div className="relative aspect-square bg-gray-50">
-              {product.images[0] ? (
-                <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-3xl text-gray-300">📦</span>
-                </div>
-              )}
-              {!product.isAvailable && (
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <span className="text-[10px] font-bold text-white bg-black/60 px-2 py-1 rounded-full">Rupture</span>
-                </div>
-              )}
-              {product.originalPrice && (
-                <div className="absolute top-2 left-2 bg-red-500 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full">
-                  -{Math.round((1 - product.price / product.originalPrice) * 100)}%
-                </div>
-              )}
-            </div>
-            <div className="p-2.5">
-              <h3 className="text-[12px] font-semibold text-[#1A1A1A] line-clamp-2 leading-tight">{product.name}</h3>
-              <p className="text-[10px] text-[#6B7280] mt-0.5">{"brand" in product ? (product as { brand: string }).brand : ""}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-[13px] font-bold text-[#1A1A1A]">{formatPrice(product.price)}</span>
-                {product.originalPrice && (
-                  <span className="text-[10px] text-[#9CA3AF] line-through">{formatPrice(product.originalPrice)}</span>
-                )}
-              </div>
-              {"stock" in product && product.stock <= 5 && product.stock > 0 && (
-                <div className="flex items-center gap-1 mt-1">
-                  <AlertTriangle className="w-3 h-3 text-amber-500" />
-                  <span className="text-[9px] text-amber-600 font-medium">Plus que {product.stock}</span>
-                </div>
-              )}
-            </div>
-          </motion.button>
+          <CatalogProductCard key={product.id} product={product} index={i} />
         ))}
       </div>
     </div>

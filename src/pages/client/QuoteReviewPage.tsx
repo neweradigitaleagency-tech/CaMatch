@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, Check, X, MessageSquare, Clock, FileText } from "lucide-react";
 import { useQuoteStore } from "../../stores/quoteStore";
 import { useRequestStore } from "../../stores/requestStore";
@@ -9,7 +8,7 @@ import type { QuoteVersion, Mission } from "../../types";
 
 export default function QuoteReviewPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const { requestId } = useParams<{ requestId: string }>();
   const quote = useQuoteStore((s) => requestId ? s.quotes[requestId] : undefined);
   const acceptQuote = useQuoteStore((s) => s.acceptQuote);

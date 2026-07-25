@@ -5,6 +5,9 @@ import { Search, MapPin, Menu, ClipboardPlus, Store, Briefcase, UserPlus, X } fr
 import SponsoredCard from "./SponsoredCard";
 import type { SponsoredItem } from "./SponsoredCard";
 import HamburgerDrawer from "./HamburgerDrawer";
+import NotificationBell from "./ui/NotificationBell";
+import NotificationPanel from "./ui/NotificationPanel";
+import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, LOCATIONS } from "../stores/locationStore";
 import { cardAppear } from "../animations/variants";
 
@@ -22,7 +25,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Quincaillerie",
     image: "https://images.unsplash.com/photo-1567721913486-6585f069b332?w=600&h=300&fit=crop",
     tagline: "Tout pour vos travaux et rénovations",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-1",
     size: "large",
   },
   {
@@ -31,7 +34,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Épicerie",
     image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=300&fit=crop",
     tagline: "Produits frais et articles quotidiens",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-2",
     size: "medium",
   },
   {
@@ -40,7 +43,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Plomberie",
     image: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=300&fit=crop",
     tagline: "Dépannage 7j/7 - Intervention rapide",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-6",
     size: "small",
   },
   {
@@ -49,7 +52,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Santé",
     image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=400&h=300&fit=crop",
     tagline: "Soins dentaires de qualité",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-7",
     size: "medium",
   },
   {
@@ -58,7 +61,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Supermarché",
     image: "https://images.unsplash.com/photo-1484712401471-05c7215830eb?w=600&h=300&fit=crop",
     tagline: "Le meilleur rapport qualité-prix",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-1",
     size: "large",
   },
   {
@@ -67,7 +70,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Nettoyage",
     image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop",
     tagline: "Nettoyage professionnel rapide",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-3",
     size: "small",
   },
   {
@@ -76,7 +79,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Électricité",
     image: "https://images.unsplash.com/photo-1588286840104-8957b019727f?w=400&h=300&fit=crop",
     tagline: "Installation, dépannage et rénovation",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-7",
     size: "medium",
   },
   {
@@ -85,7 +88,7 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     category: "Beauté",
     image: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=300&fit=crop",
     tagline: "Coupes, tresses et soins capillaires",
-    link: "#",
+    link: "/marketplace/shop/seller-pro-8",
     size: "large",
   },
 ];
@@ -94,7 +97,9 @@ export default function ModernHomeScreen() {
   const nav = useNavigate();
   const [showDrawer, setShowDrawer] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
 
+  const unreadCount = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
   const neighborhood = useLocationStore((s) => s.neighborhood);
   const locStatus = useLocationStore((s) => s.status);
   const gpsAccuracy = useLocationStore((s) => s.gpsAccuracy);
@@ -111,13 +116,16 @@ export default function ModernHomeScreen() {
             <span className="text-[20px] leading-none">🌿</span>
             <span className="text-[#2B2B2B] text-[18px] font-extrabold tracking-tight">CaMatch</span>
           </div>
-          <button
-            onClick={() => setShowDrawer(true)}
-            className="w-8 h-8 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
-            aria-label="Menu"
-          >
-            <Menu className="w-4 h-4 text-[#2B2B2B]" />
-          </button>
+          <div className="flex items-center gap-1">
+            <NotificationBell unreadCount={unreadCount} onClick={() => setShowNotifications(true)} variant="client" />
+            <button
+              onClick={() => setShowDrawer(true)}
+              className="w-8 h-8 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+              aria-label="Menu"
+            >
+              <Menu className="w-4 h-4 text-[#2B2B2B]" />
+            </button>
+          </div>
         </div>
         <button
           onClick={() => setShowLocationPicker(true)}
@@ -193,6 +201,9 @@ export default function ModernHomeScreen() {
           </AnimatePresence>
         </div>
       </section>
+
+      {/* ── Notifications ── */}
+      <NotificationPanel open={showNotifications} onClose={() => setShowNotifications(false)} variant="sheet" />
 
       {/* ── Hamburger Drawer ── */}
       <HamburgerDrawer open={showDrawer} onClose={() => setShowDrawer(false)} />

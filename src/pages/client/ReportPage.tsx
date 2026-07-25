@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { ArrowLeft, Flag, Shield, Send } from "lucide-react";
 import { useNotificationStore } from "../../stores/notificationStore";
 
@@ -16,7 +15,7 @@ const REPORT_REASONS = [
 
 export default function ReportPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);

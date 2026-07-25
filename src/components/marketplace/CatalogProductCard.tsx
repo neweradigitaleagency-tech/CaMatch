@@ -1,89 +1,130 @@
 import { useNavigate } from "react-router-dom"
 import { motion } from "motion/react"
-import { Package, AlertTriangle, Star } from "lucide-react"
+import { Package, AlertTriangle } from "lucide-react"
 import type { Product } from "../../types/marketplace"
 
 interface CatalogProductCardProps {
   product: Product
   index: number
+  horizontal?: boolean
 }
 
 function formatPrice(price: number): string {
   return price.toLocaleString("fr-FR") + " FCFA"
 }
 
-function getVerticalIcon(vertical: string): string {
-  switch (vertical) {
-    case "pro_supply": return "🏗️"
-    case "shopping": return "🛒"
-    case "second_hand": return "♻️"
-    case "real_estate": return "🏠"
-    default: return "📦"
+function getConditionLabel(condition: string): string {
+  switch (condition) {
+    case "like_new": return "Comme neuf"
+    case "good": return "Bon état"
+    case "fair": return "État correct"
+    default: return condition
   }
 }
 
-export default function CatalogProductCard({ product, index }: CatalogProductCardProps) {
+export default function CatalogProductCard({ product, index, horizontal }: CatalogProductCardProps) {
   const nav = useNavigate()
 
   const isOnSale = product.originalPrice && product.originalPrice > product.price
   const discountPct = isOnSale ? Math.round((1 - product.price / product.originalPrice!) * 100) : 0
   const brand = "brand" in product ? (product as { brand?: string }).brand : undefined
+  const condition = "condition" in product ? (product as { condition: string }).condition : null
+  const isLowStock = product.stock !== undefined && product.stock <= 5 && product.stock > 0
+
+  const cardContent = horizontal ? (
+    <div className="flex gap-3 p-3">
+      <div className="w-16 h-16 rounded-xl bg-cm-surface relative shrink-0 overflow-hidden">
+        {product.images[0] ? (
+          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-5 h-5 text-cm-text-muted" />
+          </div>
+        )}
+        {isOnSale && (
+          <span className="absolute top-0.5 left-0.5 px-1 py-0.5 rounded-full bg-cm-error text-white text-[7px] font-bold leading-tight">
+            -{discountPct}%
+          </span>
+        )}
+        {!product.isAvailable && (
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <span className="text-[7px] font-bold text-white bg-black/60 px-1 py-0.5 rounded-full">Rupture</span>
+          </div>
+        )}
+      </div>
+      <div className="flex-1 min-w-0 pt-0.5">
+        <h3 className="text-[12px] font-semibold text-cm-text line-clamp-2 leading-tight">{product.name}</h3>
+        {brand && <p className="text-[10px] text-cm-text-soft mt-0.5 truncate">{brand}</p>}
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-[12px] font-bold text-cm-text">{formatPrice(product.price)}</span>
+          {isOnSale && (
+            <span className="text-[9px] text-cm-text-muted line-through">{formatPrice(product.originalPrice!)}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-cm-accent/12 text-cm-forest">{product.category}</span>
+          {isLowStock && (
+            <span className="flex items-center gap-0.5 text-[9px] text-amber-600">
+              <AlertTriangle className="w-2.5 h-2.5" />+{product.stock}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <>
+      <div className="aspect-square bg-cm-surface relative">
+        {product.images[0] ? (
+          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-8 h-8 text-cm-text-muted" />
+          </div>
+        )}
+        {isOnSale && (
+          <span className="absolute top-2 left-2 px-1.5 py-0.5 rounded-full bg-cm-error text-white text-[9px] font-bold leading-tight">
+            -{discountPct}%
+          </span>
+        )}
+        {!product.isAvailable && (
+          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+            <span className="text-[9px] font-bold text-white bg-black/60 px-2 py-0.5 rounded-full">Rupture</span>
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <h3 className="text-sm font-semibold text-cm-text line-clamp-2 leading-tight">{product.name}</h3>
+        {brand && <p className="caption-cm text-cm-text-soft mt-1 truncate">{brand}</p>}
+        <div className="flex items-center gap-1.5 mt-1">
+          <span className="text-sm font-bold text-cm-text">{formatPrice(product.price)}</span>
+          {isOnSale && (
+            <span className="caption-cm text-cm-text-muted line-through">{formatPrice(product.originalPrice!)}</span>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+          <span className="label-cm px-[10px] py-[6px] rounded-full bg-cm-accent/12 text-cm-forest">{product.category}</span>
+          {condition && (
+            <span className="caption-cm text-cm-text-soft">{getConditionLabel(condition)}</span>
+          )}
+          {isLowStock && (
+            <span className="flex items-center gap-1 caption-cm text-amber-600 font-medium">
+              <AlertTriangle className="w-3 h-3" /> Plus que {product.stock}
+            </span>
+          )}
+        </div>
+      </div>
+    </>
+  )
 
   return (
     <motion.button
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      onClick={() => nav(`/marketplace/item/${product.id}`)}
-      className="w-full text-left bg-white border border-gray-100 rounded-xl overflow-hidden cursor-pointer hover:border-gray-200 active:scale-[0.99] transition-all"
+      onClick={() => nav(`/marketplace/item/${product.id}`, { state: { from: window.location.pathname + window.location.search } })}
+      className={`w-full text-left bg-cm-elevated border border-cm-border rounded-xl overflow-hidden cursor-pointer hover:border-cm-accent/40 active:scale-[0.97] transition-all ${horizontal ? "" : ""}`}
     >
-      <div className="flex gap-3 p-3">
-        <div className="w-20 h-20 rounded-xl bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
-          {product.images[0] ? (
-            <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
-          ) : (
-            <Package className="w-8 h-8 text-gray-300" />
-          )}
-          {!product.isAvailable && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center rounded-xl">
-              <span className="text-[9px] font-bold text-white bg-black/60 px-1.5 py-0.5 rounded-full">Rupture</span>
-            </div>
-          )}
-        </div>
-        <div className="flex-1 min-w-0 flex flex-col justify-between">
-          <div>
-            <div className="flex items-start gap-1.5">
-              <span className="text-[9px]">{getVerticalIcon(product.vertical)}</span>
-              <p className="text-[13px] font-semibold text-[#1A1A1A] leading-tight line-clamp-2">{product.name}</p>
-            </div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              {brand && <span className="text-[10px] text-[#6B7280]">{brand}</span>}
-              <span className="text-[9px] text-[#6B7280] bg-gray-100 px-1.5 py-0.5 rounded-full">{product.category}</span>
-            </div>
-          </div>
-          <div className="flex items-center justify-between mt-1.5">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[14px] font-bold text-[#1A1A1A]">{formatPrice(product.price)}</span>
-              {isOnSale && (
-                <span className="text-[10px] text-[#6B7280] line-through">{formatPrice(product.originalPrice!)}</span>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              {discountPct > 0 && (
-                <span className="text-[9px] font-bold text-red-500 bg-red-50 px-1.5 py-0.5 rounded-full">-{discountPct}%</span>
-              )}
-              {product.stock <= 5 && product.stock > 0 && (
-                <AlertTriangle className="w-3 h-3 text-amber-500" />
-              )}
-            </div>
-          </div>
-          {"condition" in product && product.vertical === "second_hand" && (
-            <span className="text-[9px] text-[#6B7280] mt-0.5">
-              {product.condition === "like_new" ? "Comme neuf" : product.condition === "good" ? "Bon état" : "État correct"}
-            </span>
-          )}
-        </div>
-      </div>
+      {cardContent}
     </motion.button>
   )
 }

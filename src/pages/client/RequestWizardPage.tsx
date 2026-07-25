@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import RequestWizardScreen from "../../components/wizard/RequestWizardScreen";
 import { useRequestWizardStore } from "../../stores/requestWizardStore";
 import { useRequestStore } from "../../stores/requestStore";
@@ -21,7 +20,7 @@ function mapUrgency(u: string): ProAlert["urgency"] {
 
 export default function RequestWizardPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const { draft, reset } = useRequestWizardStore();
   const addRequest = useRequestStore((s) => s.addRequest);
   const proAlerts = useProStore((s) => s.alerts);

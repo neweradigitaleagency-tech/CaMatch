@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import MissionTrackerScreen from "../../components/MissionTrackerScreen";
 import ProControlPanel from "../../components/ProControlPanel";
 import InvoiceScreen from "../../components/InvoiceScreen";
@@ -45,7 +44,7 @@ const MOCK_INVOICE: Invoice = {
 export default function MissionTrackerPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => navigate(-1);
   const isPro = useAuthStore((s) => s.isPro);
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === id));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);

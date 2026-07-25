@@ -51,18 +51,18 @@ export default function Breadcrumbs() {
   if (items.length <= 1) return null
 
   return (
-    <nav className="flex items-center gap-1 text-[11px] text-[#6B7280] mb-3 overflow-x-auto no-scrollbar" aria-label="Fil d'Ariane">
+    <nav className="flex items-center gap-1 text-[11px] text-cm-text-soft overflow-x-auto no-scrollbar" aria-label="Fil d'Ariane">
       {items.map((item, i) => {
         const isLast = i === items.length - 1
         return (
           <span key={i} className="flex items-center gap-1 shrink-0">
-            {i > 0 && <ChevronRight className="w-2.5 h-2.5 text-[#9CA3AF]" />}
+            {i > 0 && <ChevronRight className="w-2.5 h-2.5 text-cm-text-muted" />}
             {isLast ? (
-              <span className="text-[#1A1A1A] font-semibold truncate max-w-[140px]">{item.label}</span>
+              <span className="text-cm-text font-semibold truncate max-w-[140px]">{item.label}</span>
             ) : (
               <button
                 onClick={() => item.path && nav(item.path)}
-                className="hover:text-[#243318] transition-colors cursor-pointer truncate max-w-[120px]"
+                className="hover:text-cm-forest transition-colors cursor-pointer truncate max-w-[120px]"
               >
                 {item.label}
               </button>

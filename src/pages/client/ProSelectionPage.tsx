@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
 import ProSelectionScreen from "../../components/ProSelectionScreen";
 import { useRequestStore } from "../../stores/requestStore";
 import type { ProceedDetails } from "../../components/RequestCreationScreen";
@@ -12,7 +11,7 @@ const RADII = [5, 10, 15, 30, 60, Infinity];
 
 export default function ProSelectionPage() {
   const nav = useNavigate();
-  const goBack = useBackNavigation("/orders");
+  const goBack = () => nav(-1);
   const location = useLocation();
   const details = (location.state as { details: ProceedDetails })?.details;
   const category = details?.category || "maison-reparations";
