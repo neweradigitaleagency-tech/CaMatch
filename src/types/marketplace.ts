@@ -1,10 +1,11 @@
-export type MarketplaceVertical = "pro_supply" | "shopping" | "second_hand" | "real_estate"
+export type MarketplaceVertical = "pro_supply" | "shopping" | "second_hand" | "real_estate" | "automobile"
 
 export const VERTICAL_LABELS: Record<MarketplaceVertical, string> = {
-  pro_supply: "Pro Supply",
+  pro_supply: "Construction",
   shopping: "Shopping",
   second_hand: "Seconde main",
   real_estate: "Immobilier",
+  automobile: "Automobile",
 }
 
 export const VERTICAL_ICONS: Record<MarketplaceVertical, string> = {
@@ -12,6 +13,7 @@ export const VERTICAL_ICONS: Record<MarketplaceVertical, string> = {
   shopping: "shopping-bag",
   second_hand: "refresh-cw",
   real_estate: "home",
+  automobile: "car",
 }
 
 // ─── Seller types ───

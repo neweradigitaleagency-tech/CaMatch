@@ -1,15 +1,18 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom"
-import { Search, Filter, Store, Package, SlidersHorizontal, X, ChevronDown, MapPin, ShoppingCart, Sparkles, Award } from "lucide-react"
+import { Search, Filter, Store, Package, SlidersHorizontal, X, ChevronDown, MapPin, ShoppingCart, Sparkles, Award, Plus, ArrowRight, TrendingUp, LayoutGrid } from "lucide-react"
+import { motion } from "motion/react"
 import PageHeader from "../components/ui/PageHeader"
 import { useMarketplaceCartStore } from "../stores/marketplaceCartStore"
 import type { MarketplaceVertical, Product } from "../types/marketplace"
 import { PROFESSIONAL_SELLERS } from "../data/marketplaceSuppliers"
 import { MARKETPLACE_PRODUCTS, searchProducts } from "../data/marketplaceProducts"
+import { MARKETPLACE_CATEGORIES } from "../data/marketplaceCategories"
 import CatalogSupplierCard from "../components/marketplace/CatalogSupplierCard"
 import CatalogProductCard from "../components/marketplace/CatalogProductCard"
-import Breadcrumbs from "../components/ui/Breadcrumbs"
 import BottomSheet from "../components/BottomSheet"
+import { logSearch } from "../services/searchAnalytics"
+import { useTrendingSearches } from "../hooks/useTrendingSearches"
 
 const ITEMS_PER_PAGE = 10
 
@@ -23,11 +26,28 @@ type VerticalFilter = MarketplaceVertical | "all"
 
 const VERTICAL_TABS: { value: VerticalFilter; label: string }[] = [
   { value: "all", label: "Tous" },
-  { value: "pro_supply", label: "Pro Supply" },
+  { value: "pro_supply", label: "Construction" },
   { value: "shopping", label: "Shopping" },
   { value: "second_hand", label: "Seconde main" },
   { value: "real_estate", label: "Immobilier" },
+  { value: "automobile", label: "Automobile" },
 ]
+
+const VERTICAL_GRADIENTS: Record<string, string> = {
+  pro_supply: "from-stone-500/20 to-amber-500/10",
+  shopping: "from-pink-500/20 to-rose-500/10",
+  second_hand: "from-amber-500/20 to-yellow-500/10",
+  real_estate: "from-blue-500/20 to-indigo-500/10",
+  automobile: "from-blue-500/20 to-sky-500/10",
+}
+
+const VERTICAL_EMOJI: Record<string, string> = {
+  pro_supply: "🏗️",
+  shopping: "🛍️",
+  second_hand: "🔄",
+  real_estate: "🏠",
+  automobile: "🚗",
+}
 
 const SORT_OPTIONS = [
   { value: "relevance", label: "Pertinence" },
@@ -109,6 +129,10 @@ export default function CatalogPage() {
   const [filterOpen, setFilterOpen] = useState(false)
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
   const [loading, setLoading] = useState(true)
+  const [showAllBoutiques, setShowAllBoutiques] = useState(false)
+  const [showAllPopulaires, setShowAllPopulaires] = useState(false)
+
+  const trendingSearches = useTrendingSearches()
 
   const [localMin, setLocalMin] = useState(params.min)
   const [localMax, setLocalMax] = useState(params.max)
@@ -133,6 +157,10 @@ export default function CatalogPage() {
       return next
     })
     setVisibleCount(ITEMS_PER_PAGE)
+    if (key === "vert") {
+      setShowAllBoutiques(false)
+      setShowAllPopulaires(false)
+    }
   }, [setSearchParams])
 
   const updatePriceParam = useCallback((key: string, value: string) => {
@@ -148,6 +176,9 @@ export default function CatalogPage() {
     searchTimer.current = setTimeout(() => {
       setDebouncedQuery(val)
       updateParam("q", val)
+      if (val.trim().length >= 2) {
+        logSearch(val, params.vert === "all" ? undefined : params.vert)
+      }
     }, 300)
   }
 
@@ -161,21 +192,22 @@ export default function CatalogPage() {
     setDebouncedQuery("")
   }
 
-  const isProSupply = params.vert === "all" || params.vert === "pro_supply"
+  const isBrowsing = !debouncedQuery
 
+  // ─── Suppliers ───
   const filteredSuppliers = useMemo(() => {
     const active = PROFESSIONAL_SELLERS.filter((s) => s.verificationStatus === "active")
     if (params.vert === "all") return active
     return active.filter((s) => s.verticals.includes(params.vert as never))
   }, [params.vert])
 
-  const featuredSuppliers = useMemo(() => {
+  const recommendedSuppliers = useMemo(() => {
     return filteredSuppliers
-      .filter((s) => s.rating >= 4.5)
       .sort((a, b) => b.rating - a.rating)
-      .slice(0, 5)
+      .slice(0, 6)
   }, [filteredSuppliers])
 
+  // ─── Products ───
   const filteredProducts = useMemo(() => {
     if (debouncedQuery) {
       const searched = searchProducts(debouncedQuery)
@@ -204,6 +236,11 @@ export default function CatalogPage() {
     return filteredProducts.filter((p) => p.originalPrice && p.originalPrice > p.price).slice(0, 6)
   }, [filteredProducts])
 
+  const popularProducts = useMemo(() => {
+    return [...MARKETPLACE_PRODUCTS]
+      .sort((a, b) => (b.originalPrice ? b.originalPrice - b.price : 0) - (a.originalPrice ? a.originalPrice - a.price : 0))
+  }, [])
+
   const visibleProducts = useMemo(() => {
     if (debouncedQuery) return filteredProducts.slice(0, visibleCount)
     const promotedIds = new Set(promotedProducts.map((p) => p.id))
@@ -223,8 +260,17 @@ export default function CatalogPage() {
     return counts
   }, [])
 
+  // ─── Categories ───
+  const categoriesWithCount = useMemo(() => {
+    return MARKETPLACE_CATEGORIES.map((cat) => ({
+      ...cat,
+      count: MARKETPLACE_PRODUCTS.filter((p) => p.vertical === cat.vertical).length,
+    })).sort((a, b) => b.count - a.count)
+  }, [])
+
   const showCondition = params.vert === "all" || params.vert === "second_hand"
 
+  // ─── Buttons ───
   const cartButton = (
     <div className="relative shrink-0">
       <button onClick={() => nav("/marketplace/cart", { state: { from: location.pathname + location.search } })}
@@ -239,11 +285,20 @@ export default function CatalogPage() {
     </div>
   )
 
+  const vendreButton = (
+    <button onClick={() => nav("/marketplace/register")}
+      className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-[#2A2A2A] shrink-0">
+      <Plus className="w-3.5 h-3.5" />
+      Vendre
+    </button>
+  )
+
   return (
     <div className="min-h-dynamic bg-cm-bg pb-8">
-      <PageHeader title="Pro Supply" fallbackRoute="/marketplace" rightAction={cartButton} />
+      <PageHeader title="Marketplace" fallbackRoute="/" rightAction={<div className="flex items-center gap-1.5">{cartButton}{vendreButton}</div>} />
 
-      <div className="px-4 pt-3 pb-2">
+      {/* ── Search ── */}
+      <div className="px-5 pt-3 pb-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted pointer-events-none" />
           <input type="text"
@@ -252,11 +307,8 @@ export default function CatalogPage() {
             value={query} onChange={(e) => handleSearch(e.target.value)} />
         </div>
 
-        <div className="mt-2">
-          <Breadcrumbs />
-        </div>
-
-        <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar -mx-4 px-4">
+        {/* ── Vertical chips ── */}
+        <div className="flex items-center gap-2 mt-3 overflow-x-auto no-scrollbar -mx-5 px-5">
           {VERTICAL_TABS.map((tab) => (
             <button key={tab.value} onClick={() => updateParam("vert", tab.value)}
               className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer touch-min ${
@@ -267,6 +319,20 @@ export default function CatalogPage() {
           ))}
         </div>
 
+        {/* ── Trending searches ── */}
+        {isBrowsing && !hasActiveFilters && trendingSearches.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar mt-2 -mx-5 px-5">
+            <span className="text-[10px] text-cm-text-muted shrink-0 self-center">🔥</span>
+            {trendingSearches.slice(0, 6).map((term) => (
+              <button key={term} onClick={() => handleSearch(term)}
+                className="shrink-0 px-3 py-1 rounded-full bg-cm-accent/10 text-cm-forest text-[11px] font-medium cursor-pointer hover:bg-cm-accent/20 transition-colors">
+                {term}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* ── Sort & Filters ── */}
         <div className="flex flex-wrap items-center gap-2 mt-3">
           <div className="flex items-center gap-2">
             <button onClick={() => setShowSort(!showSort)}
@@ -328,60 +394,115 @@ export default function CatalogPage() {
         )}
       </div>
 
-      <div className="px-4">
-        {!debouncedQuery && isProSupply && featuredSuppliers.length > 0 && (
-          <div className="mb-4">
-            <h2 className="h2-cm text-cm-text mb-4 flex items-center gap-2">
-              <Award className="w-4 h-4 text-cm-amber" /> Boutiques à la une
-            </h2>
-            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 pr-8">
-              {featuredSuppliers.map((s, i) => (
-                <div key={s.id} className="shrink-0 w-[80vw] max-w-72">
-                  <CatalogSupplierCard seller={s} productCount={supplierProductCounts[s.id] || 0} index={i} featured />
-                </div>
-              ))}
+      <div className="px-5">
+        {/* ── Boutiques recommandées ── */}
+        {isBrowsing && recommendedSuppliers.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-cm-amber" />
+                <h2 className="text-sm font-bold text-cm-text">Boutiques recommandées</h2>
+              </div>
+              <button onClick={() => setShowAllBoutiques(!showAllBoutiques)}
+                className="flex items-center gap-0.5 text-[11px] font-semibold text-cm-text-soft cursor-pointer hover:text-cm-text transition-colors">
+                {showAllBoutiques ? "Voir moins" : "Voir toutes"} <ArrowRight className="w-3 h-3" />
+              </button>
             </div>
-          </div>
-        )}
-
-        {filteredSuppliers.length > 0 && !debouncedQuery && (
-          <div className="mb-4">
-            <h2 className="h2-cm text-cm-text mb-4 flex items-center gap-2">
-              <Store className="w-4 h-4" />Fournisseurs
-            </h2>
             {loading ? (
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5">
-                {[1, 2, 3, 4].map((i) => <SupplierCardSkeleton key={i} />)}
+              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+                {[1, 2, 3, 4].map((i) => <div key={i} className="shrink-0 w-[80vw] sm:w-72 md:w-80"><SupplierCardSkeleton /></div>)}
+              </div>
+            ) : showAllBoutiques ? (
+              <div className="grid grid-cols-2 gap-3">
+                {recommendedSuppliers.map((s, i) => (
+                  <CatalogSupplierCard key={s.id} seller={s} productCount={supplierProductCounts[s.id] || 0} index={i} />
+                ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5">
-                {filteredSuppliers.map((s, i) => (
-                  <CatalogSupplierCard key={s.id} seller={s} productCount={supplierProductCounts[s.id] || 0} index={i} />
+              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1 pr-8">
+                {recommendedSuppliers.map((s, i) => (
+                  <div key={s.id} className="shrink-0 w-[80vw] sm:w-72 md:w-80">
+                    <CatalogSupplierCard seller={s} productCount={supplierProductCounts[s.id] || 0} index={i} />
+                  </div>
                 ))}
               </div>
             )}
           </div>
         )}
 
-        {!debouncedQuery && isProSupply && promotedProducts.length > 0 && (
-          <div className="mb-4">
-            <h2 className="h2-cm text-cm-text mb-4 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-cm-accent" /> En promotion
-            </h2>
+        {/* ── En promotion ── */}
+        {isBrowsing && promotedProducts.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Sparkles className="w-4 h-4 text-cm-accent" />
+              <h2 className="text-sm font-bold text-cm-text">En promotion</h2>
+            </div>
             <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
               {promotedProducts.map((product, i) => (
                 <div key={product.id} className="shrink-0 w-36">
-                  <CatalogProductCard product={product} index={i} horizontal />
+                  <CatalogProductCard product={product} index={i} />
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <h2 className="h2-cm text-cm-text mb-4 flex items-center gap-2">
+        {/* ── Explorer par catégorie ── */}
+        {isBrowsing && (
+          <div className="mb-6">
+            <div className="flex items-center gap-1.5 mb-3">
+              <LayoutGrid className="w-4 h-4 text-cm-text" />
+              <h2 className="text-sm font-bold text-cm-text">Explorer par catégorie</h2>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {categoriesWithCount.map((cat) => (
+                <motion.button key={cat.id} whileTap={{ scale: 0.95 }}
+                  onClick={() => nav(`/marketplace/browse/${cat.vertical}`)}
+                  className="rounded-2xl overflow-hidden relative cursor-pointer text-left bg-cm-elevated border border-cm-border"
+                >
+                  <div className={`aspect-square p-3 flex flex-col justify-between bg-gradient-to-br ${VERTICAL_GRADIENTS[cat.vertical] || "from-gray-100"}`}>
+                    <div className="w-9 h-9 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center text-lg">
+                      <span className="text-xl">{VERTICAL_EMOJI[cat.vertical] || "📦"}</span>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-bold text-cm-text leading-tight">{cat.name}</p>
+                      <p className="text-[9px] text-cm-text-soft mt-0.5">{cat.count} article{cat.count !== 1 ? "s" : ""}</p>
+                    </div>
+                  </div>
+                </motion.button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Populaires ── */}
+        {isBrowsing && popularProducts.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1.5">
+                <TrendingUp className="w-4 h-4 text-cm-text" />
+                <h2 className="text-sm font-bold text-cm-text">Populaires</h2>
+              </div>
+              <button onClick={() => setShowAllPopulaires(!showAllPopulaires)}
+                className="flex items-center gap-0.5 text-[11px] font-semibold text-cm-text-soft cursor-pointer hover:text-cm-text transition-colors">
+                {showAllPopulaires ? "Voir moins" : "Voir tout"} <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {(showAllPopulaires ? popularProducts : popularProducts.slice(0, 4)).map((product, i) => (
+                <CatalogProductCard key={product.id} product={product} index={i} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Produits ── */}
+        <div className="flex items-center gap-1.5 mb-3">
           <Package className="w-4 h-4" />
-          {debouncedQuery ? `Résultats pour "${debouncedQuery}"` : "Produits"}
-        </h2>
+          <h2 className="text-sm font-bold text-cm-text">
+            {debouncedQuery ? `Résultats pour "${debouncedQuery}"` : "Tous les produits"}
+          </h2>
+        </div>
 
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
@@ -398,7 +519,7 @@ export default function CatalogPage() {
             {suggestions.length > 0 && (
               <div className="mt-8 text-left">
                 <p className="text-[13px] font-bold text-cm-text mb-3">Vous aimerez aussi</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3">
                   {suggestions.map((product, i) => (
                     <CatalogProductCard key={product.id} product={product} index={i} />
                   ))}
@@ -409,11 +530,11 @@ export default function CatalogPage() {
         ) : (
           <>
             {loading ? (
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-3">
                 {[1, 2, 3, 4].map((i) => <ProductCardSkeleton key={i} />)}
               </div>
             ) : (
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-2 gap-3">
                 {visibleProducts.map((product, i) => (
                   <CatalogProductCard key={product.id} product={product} index={i} />
                 ))}
@@ -429,6 +550,28 @@ export default function CatalogPage() {
               </div>
             )}
           </>
+        )}
+
+        {/* ── CTA Banners ── */}
+        {isBrowsing && (
+          <div className="mt-6 space-y-3">
+            <div className="rounded-2xl bg-gradient-to-br from-cm-forest to-[#3a5a2a] p-5">
+              <h3 className="text-base font-bold text-white">Vous avez des articles à vendre ?</h3>
+              <p className="text-xs text-white/70 mt-1">Créez votre boutique et vendez facilement sur Ça Match.</p>
+              <button onClick={() => nav("/marketplace/register")}
+                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-cm-forest text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-50">
+                Commencer à vendre
+              </button>
+            </div>
+            <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 p-5">
+              <h3 className="text-base font-bold text-white">Vous êtes un fournisseur professionnel ?</h3>
+              <p className="text-xs text-white/70 mt-1">Proposez vos matériaux et équipements aux professionnels de Ça Match.</p>
+              <button onClick={() => nav("/supplier/register")}
+                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-amber-700 text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-50">
+                Devenir fournisseur
+              </button>
+            </div>
+          </div>
         )}
       </div>
 

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "motion/react"
 import { Package, AlertTriangle } from "lucide-react"
@@ -24,6 +25,9 @@ function getConditionLabel(condition: string): string {
 
 export default function CatalogProductCard({ product, index, horizontal }: CatalogProductCardProps) {
   const nav = useNavigate()
+  const [imgError, setImgError] = useState(false)
+
+  const hasImage = product.images.length > 0 && product.images[0]?.trim() && !imgError
 
   const isOnSale = product.originalPrice && product.originalPrice > product.price
   const discountPct = isOnSale ? Math.round((1 - product.price / product.originalPrice!) * 100) : 0
@@ -34,8 +38,8 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
   const cardContent = horizontal ? (
     <div className="flex gap-3 p-3">
       <div className="w-16 h-16 rounded-xl bg-cm-surface relative shrink-0 overflow-hidden">
-        {product.images[0] ? (
-          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+        {hasImage ? (
+          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={() => setImgError(true)} />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Package className="w-5 h-5 text-cm-text-muted" />
@@ -53,16 +57,16 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
         )}
       </div>
       <div className="flex-1 min-w-0 pt-0.5">
-        <h3 className="text-[12px] font-semibold text-cm-text line-clamp-2 leading-tight">{product.name}</h3>
+        <h3 className="caption-cm font-semibold text-cm-text line-clamp-2 leading-tight">{product.name}</h3>
         {brand && <p className="text-[10px] text-cm-text-soft mt-0.5 truncate">{brand}</p>}
         <div className="flex items-center gap-1.5 mt-1">
-          <span className="text-[12px] font-bold text-cm-text">{formatPrice(product.price)}</span>
+          <span className="label-cm font-semibold text-cm-text">{formatPrice(product.price)}</span>
           {isOnSale && (
             <span className="text-[9px] text-cm-text-muted line-through">{formatPrice(product.originalPrice!)}</span>
           )}
         </div>
         <div className="flex items-center gap-1.5 mt-1">
-          <span className="px-1.5 py-0.5 rounded-full text-[9px] font-medium bg-cm-accent/12 text-cm-forest">{product.category}</span>
+          <span className="px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-cm-accent/20 text-cm-forest">{product.category}</span>
           {isLowStock && (
             <span className="flex items-center gap-0.5 text-[9px] text-amber-600">
               <AlertTriangle className="w-2.5 h-2.5" />+{product.stock}
@@ -74,8 +78,8 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
   ) : (
     <>
       <div className="aspect-square bg-cm-surface relative">
-        {product.images[0] ? (
-          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" />
+        {hasImage ? (
+          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" loading="lazy" onError={() => setImgError(true)} />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Package className="w-8 h-8 text-cm-text-muted" />
@@ -92,17 +96,17 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
           </div>
         )}
       </div>
-      <div className="p-4">
+      <div className="p-3">
         <h3 className="text-sm font-semibold text-cm-text line-clamp-2 leading-tight">{product.name}</h3>
         {brand && <p className="caption-cm text-cm-text-soft mt-1 truncate">{brand}</p>}
-        <div className="flex items-center gap-1.5 mt-1">
-          <span className="text-sm font-bold text-cm-text">{formatPrice(product.price)}</span>
+        <div className="flex items-center gap-1.5 mt-1.5">
+          <span className="label-cm font-semibold text-cm-text">{formatPrice(product.price)}</span>
           {isOnSale && (
             <span className="caption-cm text-cm-text-muted line-through">{formatPrice(product.originalPrice!)}</span>
           )}
         </div>
         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-          <span className="label-cm px-[10px] py-[6px] rounded-full bg-cm-accent/12 text-cm-forest">{product.category}</span>
+          <span className="label-cm px-2 py-0.5 rounded-full bg-cm-accent/20 text-cm-forest">{product.category}</span>
           {condition && (
             <span className="caption-cm text-cm-text-soft">{getConditionLabel(condition)}</span>
           )}
@@ -122,7 +126,7 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
       onClick={() => nav(`/marketplace/item/${product.id}`, { state: { from: window.location.pathname + window.location.search } })}
-      className={`w-full text-left bg-cm-elevated border border-cm-border rounded-xl overflow-hidden cursor-pointer hover:border-cm-accent/40 active:scale-[0.97] transition-all ${horizontal ? "" : ""}`}
+      className={`w-full text-left bg-cm-elevated border border-cm-border rounded-xl overflow-hidden cursor-pointer hover:border-cm-accent/40 active:scale-[0.97] transition-all shadow-cm-card hover:shadow-cm-card-hov transition-shadow ${horizontal ? "" : ""}`}
     >
       {cardContent}
     </motion.button>

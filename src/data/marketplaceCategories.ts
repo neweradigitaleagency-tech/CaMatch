@@ -62,6 +62,19 @@ export const MARKETPLACE_CATEGORIES: MarketplaceCategory[] = [
       { id: "re-commerces", name: "Commerces", slug: "commerces", description: "Locaux commerciaux et bureaux", parentId: "real_estate" },
     ],
   },
+  // ── Automobile ──
+  {
+    id: "automobile", vertical: "automobile", name: "Automobile",
+    slug: "automobile", description: "Voitures, motos, pièces détachées",
+    icon: "car", color: "#3B82F6",
+    children: [
+      { id: "auto-voitures", name: "Voitures", slug: "voitures", description: "Véhicules neufs et occasion", parentId: "automobile" },
+      { id: "auto-motos", name: "Motos", slug: "motos", description: "Motos et scooters", parentId: "automobile" },
+      { id: "auto-pieces", name: "Pièces détachées", slug: "pieces-detachees", description: "Mécanique, carrosserie, pièces", parentId: "automobile" },
+      { id: "auto-pneus", name: "Pneus et jantes", slug: "pneus-jantes", description: "Pneumatiques, jantes, accessoires", parentId: "automobile" },
+      { id: "auto-accessoires", name: "Accessoires", slug: "accessoires-auto", description: "Audio, GPS, organes intérieurs", parentId: "automobile" },
+    ],
+  },
 ]
 
 export function getCategoryById(id: string): MarketplaceCategory | undefined {
