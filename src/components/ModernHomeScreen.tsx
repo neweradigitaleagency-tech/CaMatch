@@ -12,10 +12,36 @@ import { useLocationStore, LOCATIONS } from "../stores/locationStore";
 import { cardAppear } from "../animations/variants";
 
 const MENU_ITEMS = [
-  { id: "creer", label: "Créer une demande", icon: ClipboardPlus, route: "/orders/new", image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400&h=300&fit=crop" },
-  { id: "marketplace", label: "Marketplace", icon: Store, route: "/marketplace", image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop" },
-  { id: "professionnel", label: "Professionnel", icon: Briefcase, route: "/professionals", image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&h=300&fit=crop" },
-  { id: "freelance", label: "Freelance", icon: UserPlus, route: "/freelance", image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop" },
+  {
+    id: "professionnel",
+    label: "Services professionnels",
+    icon: Briefcase,
+    route: "/professionals",
+    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&h=300&fit=crop",
+    description: "Trouver un professionnel pour vos besoins du quotidien.",
+    categories: ["Plomberie", "Électricité", "BTP", "Beauté", "Services locaux"],
+    ctaLabel: "Explorer les professionnels",
+  },
+  {
+    id: "freelance",
+    label: "Freelance",
+    icon: UserPlus,
+    route: "/freelance",
+    image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop",
+    description: "Trouver des experts digitaux pour vos projets.",
+    categories: ["Développement", "Design", "Marketing", "Rédaction", "Conseil"],
+    ctaLabel: "Trouver un freelance",
+  },
+  {
+    id: "marketplace",
+    label: "Marketplace",
+    icon: Store,
+    route: "/marketplace",
+    image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop",
+    description: "Acheter, vendre et découvrir des produits.",
+    categories: ["Électronique", "Immobilier", "Seconde main", "Maison"],
+    ctaLabel: "Explorer",
+  },
 ] as const;
 
 const SPONSORED_ITEMS: SponsoredItem[] = [
@@ -136,37 +162,82 @@ export default function ModernHomeScreen() {
         </button>
       </header>
 
-      {/* ── 2×2 Menu Grid ── */}
-      <section className="px-3 pt-2 pb-1">
-        <div className="grid grid-cols-2 gap-3">
+      {/* ── Explorer ── */}
+      <section className="px-3 pt-3 pb-1">
+        <h2 className="text-[16px] font-bold text-[#2B2B2B] mb-3">Que recherchez-vous ?</h2>
+        <div className="space-y-3">
           {MENU_ITEMS.map((item, i) => (
-            <motion.button
+            <motion.div
               key={item.id}
               variants={cardAppear}
               initial="hidden"
               animate="visible"
               custom={i}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => nav(item.route)}
-              className="relative rounded-[16px] overflow-hidden min-h-[120px] cursor-pointer text-left group"
+              className="rounded-[16px] overflow-hidden bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200/60"
             >
-              <img
-                src={item.image}
-                alt=""
-                loading="lazy"
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-[#1a1a1a]/40 to-[#1a1a1a]/20" />
-              <div className="relative z-10 flex flex-col items-start justify-between h-full p-3.5">
-                <div className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center">
-                  <item.icon className="w-4 h-4 text-white" />
+              <button
+                onClick={() => nav(item.route)}
+                className="relative w-full h-[120px] overflow-hidden cursor-pointer text-left group"
+              >
+                <img
+                  src={item.image}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-[#1a1a1a]/40 to-[#1a1a1a]/20" />
+                <div className="relative z-10 flex flex-col items-start justify-between h-full p-3.5">
+                  <div className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                    <item.icon className="w-4 h-4 text-white" />
+                  </div>
+                  <span className="text-[13px] font-extrabold text-white leading-tight">{item.label}</span>
                 </div>
-                <span className="text-[13px] font-extrabold text-white leading-tight">{item.label}</span>
+              </button>
+              <div className="px-3.5 py-3">
+                <p className="text-[12px] text-[#2B2B2B]/60 leading-relaxed mb-2.5">{item.description}</p>
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {item.categories.map((cat) => (
+                    <span key={cat} className="text-[10px] font-semibold text-[#2B2B2B]/50 bg-[#2B2B2B]/5 rounded-full px-2 py-0.5">
+                      {cat}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => nav(item.route)}
+                  className="w-full py-2 rounded-[10px] bg-[#7FD356]/15 text-[#2B2B2B] text-[12px] font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.97] transition-all"
+                >
+                  {item.ctaLabel}
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
               </div>
-            </motion.button>
+            </motion.div>
           ))}
         </div>
+      </section>
+
+      {/* ── Créer une demande ── */}
+      <section className="px-3 pt-3 pb-1">
+        <motion.div
+          variants={cardAppear}
+          initial="hidden"
+          animate="visible"
+          custom={3}
+          className="rounded-[16px] bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200/60"
+        >
+          <h3 className="text-[14px] font-bold text-[#2B2B2B]">Besoin d'une solution précise ?</h3>
+          <p className="text-[12px] text-[#2B2B2B]/60 mt-1 leading-relaxed">
+            Décrivez votre besoin et recevez des propositions de professionnels adaptées.
+          </p>
+          <button
+            onClick={() => nav("/orders/new")}
+            className="w-full mt-3 py-2.5 rounded-[12px] bg-[#7FD356] text-[#2B2B2B] text-[13px] font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all"
+          >
+            <ClipboardPlus className="w-4 h-4" />
+            Créer une demande
+          </button>
+        </motion.div>
       </section>
 
       {/* ── Search Bar ── */}
