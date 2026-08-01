@@ -42,17 +42,17 @@ export default function ProDashboardPage() {
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
             <button onClick={goBack}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
-              <ArrowLeft className="w-4 h-4 text-gray-700" />
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-cm-surface cursor-pointer">
+              <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
             </button>
             <h1 className="text-[16px] font-bold text-cm-text">Tableau de bord</h1>
           </div>
           <div className="flex items-center gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
-              <Settings className="w-4 h-4 text-gray-600" />
+            <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-cm-surface cursor-pointer">
+              <Settings className="w-4 h-4 text-cm-text-soft" />
             </button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer">
-              <LogOut className="w-4 h-4 text-gray-600" />
+            <button className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-cm-surface cursor-pointer">
+              <LogOut className="w-4 h-4 text-cm-text-soft" />
             </button>
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function ProDashboardPage() {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-2.5 py-1 rounded-full text-[10px] font-medium cursor-pointer transition-colors ${
-                  filter === f ? "bg-cm-accent text-cm-text-onAccent" : "bg-gray-100 text-gray-600"
+                  filter === f ? "bg-cm-accent text-cm-text-onAccent" : "bg-cm-surface text-cm-text-soft"
                 }`}
               >
                 {f === "all" ? "Toutes" : f === "upcoming" ? "À venir" : "Terminées"}

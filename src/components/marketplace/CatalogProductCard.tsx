@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { motion } from "motion/react"
-import { Package, AlertTriangle } from "lucide-react"
+import { Package, AlertTriangle, KeyRound } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import type { Product } from "../../types/marketplace"
 
 interface CatalogProductCardProps {
@@ -24,7 +24,7 @@ function getConditionLabel(condition: string): string {
 }
 
 export default function CatalogProductCard({ product, index, horizontal }: CatalogProductCardProps) {
-  const nav = useNavigate()
+  const { navigate: nav } = useAppNavigation()
   const [imgError, setImgError] = useState(false)
 
   const hasImage = product.images.length > 0 && product.images[0]?.trim() && !imgError
@@ -48,6 +48,11 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
         {isOnSale && (
           <span className="absolute top-0.5 left-0.5 px-1 py-0.5 rounded-full bg-cm-error text-white text-[7px] font-bold leading-tight">
             -{discountPct}%
+          </span>
+        )}
+        {product.rental && (
+          <span className="absolute top-0.5 right-0.5 flex items-center gap-0.5 px-1 py-0.5 rounded-full bg-cm-forest text-white text-[7px] font-bold leading-tight">
+            <KeyRound className="w-2 h-2" />Location
           </span>
         )}
         {!product.isAvailable && (
@@ -90,6 +95,11 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
             -{discountPct}%
           </span>
         )}
+        {product.rental && (
+          <span className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cm-forest text-white text-[9px] font-bold leading-tight">
+            <KeyRound className="w-2.5 h-2.5" />Location
+          </span>
+        )}
         {!product.isAvailable && (
           <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
             <span className="text-[9px] font-bold text-white bg-black/60 px-2 py-0.5 rounded-full">Rupture</span>
@@ -125,7 +135,7 @@ export default function CatalogProductCard({ product, index, horizontal }: Catal
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.03, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      onClick={() => nav(`/marketplace/item/${product.id}`, { state: { from: window.location.pathname + window.location.search } })}
+      onClick={() => nav(`/marketplace/item/${product.id}`)}
       className={`w-full text-left bg-cm-elevated border border-cm-border rounded-xl overflow-hidden cursor-pointer hover:border-cm-accent/40 active:scale-[0.97] transition-all shadow-cm-card hover:shadow-cm-card-hov transition-shadow ${horizontal ? "" : ""}`}
     >
       {cardContent}

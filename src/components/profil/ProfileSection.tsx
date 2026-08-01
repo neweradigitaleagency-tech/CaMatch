@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+﻿import { motion } from "motion/react";
 import type { ProfileSectionProps } from "./types";
 
 export default function ProfileSection({ title, subtitle, children, className = "", editable }: ProfileSectionProps) {
@@ -11,12 +11,12 @@ export default function ProfileSection({ title, subtitle, children, className = 
       {(title || subtitle) && (
         <div className="flex items-center justify-between mb-3 px-0.5">
           {title && (
-            <h3 className={`text-[13px] font-black text-gray-900 tracking-tight ${editable ? "text-cm-accent" : ""}`}>
+            <h3 className={`text-[13px] font-black text-cm-text tracking-tight ${editable ? "text-cm-accent" : ""}`}>
               {title}
             </h3>
           )}
           {subtitle && (
-            <span className="text-[10px] font-bold text-gray-400">{subtitle}</span>
+            <span className="text-[10px] font-bold text-cm-text-muted">{subtitle}</span>
           )}
         </div>
       )}

@@ -35,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
   in_progress: "bg-amber-500/15 text-amber-600",
   completed: "bg-green-500/15 text-green-600",
   client_validation: "bg-teal-500/15 text-teal-600",
-  closed: "bg-gray-900/15 text-gray-900",
+  closed: "bg-cm-text/15 text-cm-text",
   cancelled: "bg-red-500/15 text-red-600",
 };
 
@@ -161,7 +161,7 @@ export default function ProMissionDetailPage() {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[16px] font-bold text-cm-text">{job.serviceName}</h2>
-            <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_COLORS[effectiveStatus] || "bg-gray-500/15 text-gray-600"}`}>
+            <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${STATUS_COLORS[effectiveStatus] || "bg-cm-surface text-cm-text-soft"}`}>
               {STEP_LABELS[effectiveStatus] || effectiveStatus}
             </span>
           </div>
@@ -277,9 +277,9 @@ export default function ProMissionDetailPage() {
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-lg bg-white rounded-t-[20px] sm:rounded-[20px] pb-6 flex flex-col max-h-[85vh]"
+               className="w-full max-w-lg bg-white rounded-t-[20px] sm:rounded-[20px] pb-6 flex flex-col max-h-[85vh]"
             >
-              <div className="flex items-center justify-between p-5 pb-3 border-b border-gray-100">
+              <div className="flex items-center justify-between p-5 pb-3 border-b border-cm-border/40">
                 <div>
                   <h3 className="text-[16px] font-bold">Ajouter des matériaux</h3>
                   <p className="text-[11px] text-cm-text-muted mt-0.5">Livraison à {clientCity || "votre zone"}</p>
@@ -292,49 +292,49 @@ export default function ProMissionDetailPage() {
               <div className="flex-1 overflow-y-auto p-5 pt-3 space-y-4">
                 {availableSuppliers.length === 0 ? (
                   <div className="text-center py-8">
-                    <Package className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                    <p className="text-[13px] text-gray-500">Aucun fournisseur trouvé dans votre zone</p>
-                    <p className="text-[11px] text-gray-400 mt-1">Essayez avec une autre adresse</p>
+                    <Package className="w-10 h-10 text-cm-border-soft mx-auto mb-2" />
+                    <p className="text-[13px] text-cm-text-muted">Aucun fournisseur trouvé dans votre zone</p>
+                    <p className="text-[11px] text-cm-text-muted mt-1">Essayez avec une autre adresse</p>
                   </div>
                 ) : (
                   availableSuppliers.map((supplier) => (
                     <div key={supplier.supplierId}>
-                      <h4 className="text-[12px] font-semibold text-gray-700 mb-2">
+                      <h4 className="text-[12px] font-semibold text-cm-text-soft mb-2">
                         Fournisseur #{supplier.supplierId.replace("supplier-", "")}
-                        <span className="text-gray-400 font-normal"> · {formatXOF(supplier.deliveryCost)} livraison</span>
+                        <span className="text-cm-text-muted font-normal"> · {formatXOF(supplier.deliveryCost)} livraison</span>
                       </h4>
                       <div className="space-y-1.5">
                         {supplier.products.map((product) => {
                           const qty = selectedItems[product.id] ?? 0;
                           const isOnSale = product.salePrice && product.salePrice > 0 && product.salePrice < product.supplierPrice;
                           return (
-                            <div key={product.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50">
+                            <div key={product.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-cm-surface">
                               {product.images?.[0] && (
                                 <img src={product.images[0]} alt={product.name}
                                   className="w-10 h-10 rounded-lg object-cover shrink-0"
                                   onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }} />
                               )}
                               <div className="flex-1 min-w-0">
-                                <p className="text-[12px] font-medium text-gray-900 truncate">{product.name}</p>
-                                <p className="text-[11px] text-gray-500">{product.brand}</p>
+                                <p className="text-[12px] font-medium text-cm-text truncate">{product.name}</p>
+                                <p className="text-[11px] text-cm-text-muted">{product.brand}</p>
                                 <div className="flex items-center gap-2 mt-0.5">
                                   {isOnSale ? (
                                     <>
                                       <span className="text-[12px] font-bold text-red-600">{formatXOF(product.salePrice!)}</span>
-                                      <span className="text-[10px] text-gray-400 line-through">{formatXOF(product.supplierPrice)}</span>
+                                      <span className="text-[10px] text-cm-text-muted line-through">{formatXOF(product.supplierPrice)}</span>
                                     </>
                                   ) : (
-                                    <span className="text-[12px] font-semibold text-gray-700">{formatXOF(product.cmPrice)}</span>
-                                  )}
-                                  {!product.unlimitedStock && (
-                                    <span className="text-[10px] text-gray-400">Stock: {product.availableStock}</span>
+                                    <span className="text-[12px] font-semibold text-cm-text-soft">{formatXOF(product.cmPrice)}</span>
+                                   )}
+                                   {!product.unlimitedStock && (
+                                     <span className="text-[10px] text-cm-text-muted">Stock: {product.availableStock}</span>
                                   )}
                                 </div>
                               </div>
                               <div className="flex items-center gap-1.5 shrink-0">
                                 <button onClick={() => removeItem(product.id)}
                                   className={`w-7 h-7 rounded-full flex items-center justify-center cursor-pointer transition-colors ${
-                                    qty > 0 ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-gray-100 text-gray-300 cursor-not-allowed"
+                                    qty > 0 ? "bg-red-100 text-red-600 hover:bg-red-200" : "bg-cm-surface text-cm-border-soft cursor-not-allowed"
                                   }`}>
                                   <Minus className="w-3.5 h-3.5" />
                                 </button>
@@ -355,9 +355,9 @@ export default function ProMissionDetailPage() {
               </div>
 
               {materialSubtotal > 0 && (
-                <div className="px-5 pt-3 border-t border-gray-100 space-y-2">
+                <div className="px-5 pt-3 border-t border-cm-border/40 space-y-2">
                   <div className="flex justify-between text-[12px]">
-                    <span className="text-gray-500">Sous-total</span>
+                    <span className="text-cm-text-muted">Sous-total</span>
                     <span className="font-medium">{formatXOF(materialSubtotal)}</span>
                   </div>
                   <div className="flex justify-between text-[12px]">

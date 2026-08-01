@@ -13,9 +13,9 @@ const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string
   en_route:       { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
   arrived:        { border: "border-l-sky-500",     dot: "bg-sky-500",    badge: "bg-sky-50 text-sky-700" },
   in_progress:    { border: "border-l-orange-500",  dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700" },
-  completed:      { border: "border-l-gray-400",    dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600" },
+  completed:      { border: "border-l-cm-text-muted",    dot: "bg-cm-text-muted",   badge: "bg-cm-surface text-cm-text-soft" },
   client_validation: { border: "border-l-teal-500", dot: "bg-teal-500",  badge: "bg-teal-50 text-teal-700" },
-  closed:         { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+  closed:         { border: "border-l-cm-text",    dot: "bg-cm-text",   badge: "bg-cm-surface text-cm-text" },
   cancelled:      { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
 };
 
@@ -54,12 +54,12 @@ export default function ProMissionsPage() {
 
   return (
     <div className="min-h-dynamic bg-[#F5F5F0]">
-      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-gray-200">
+      <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-lg border-b border-cm-border/40">
         <div className="flex items-center h-14 px-4 gap-3 max-w-[448px] mx-auto">
-          <button onClick={goBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer active:scale-95">
-            <ArrowLeft className="w-5 h-5 text-gray-900" />
+          <button onClick={goBack} className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-cm-surface cursor-pointer active:scale-95">
+            <ArrowLeft className="w-5 h-5 text-cm-text" />
           </button>
-          <h1 className="text-[16px] font-bold text-gray-900">Mes missions</h1>
+          <h1 className="text-[16px] font-bold text-cm-text">Mes missions</h1>
         </div>
       </header>
 
@@ -70,8 +70,8 @@ export default function ProMissionsPage() {
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-1.5 rounded-full text-[12px] font-bold transition-all cursor-pointer active:scale-95 ${
                 tab === t
-                  ? "bg-gray-900 text-white shadow-sm"
-                  : "bg-white text-gray-500 border border-gray-200 hover:border-gray-300"
+                  ? "bg-cm-text text-white shadow-sm"
+                  : "bg-white text-cm-text-muted border border-cm-border/40 hover:border-cm-border-soft"
               }`}>
               {t === "active" ? "En cours" : t === "upcoming" ? "À venir" : "Terminées"}
             </button>
@@ -81,16 +81,16 @@ export default function ProMissionsPage() {
         {/* Nouvelles alertes (pending) */}
         {tab === "upcoming" && MOCK_PRO_ALERTS.length > 0 && (
           <div className="mb-4">
-            <h3 className="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Nouvelles demandes</h3>
+            <h3 className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider mb-2">Nouvelles demandes</h3>
             {MOCK_PRO_ALERTS.map((alert) => (
               <motion.div key={alert.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-white border border-gray-200 rounded-[16px] p-3.5 mb-2 shadow-sm">
+                className="bg-white border border-cm-border/40 rounded-[16px] p-3.5 mb-2 shadow-sm">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-[14px]">👤</div>
                     <div>
-                      <p className="text-[13px] font-bold text-gray-900">{alert.clientName}</p>
-                      <div className="flex items-center gap-1 text-[10px] text-gray-500">
+                      <p className="text-[13px] font-bold text-cm-text">{alert.clientName}</p>
+                      <div className="flex items-center gap-1 text-[10px] text-cm-text-muted">
                         <Clock className="w-2.5 h-2.5" />
                         <span>Il y a 10 s</span>
                       </div>
@@ -100,8 +100,8 @@ export default function ProMissionsPage() {
                     alert.urgency === "high" ? "bg-red-50 text-red-500" : "bg-amber-50 text-amber-500"
                   }`}>{alert.urgency === "high" ? "Urgent" : "Nouveau"}</span>
                 </div>
-                <p className="text-[11px] text-gray-600 mb-2 line-clamp-1">{alert.description}</p>
-                <div className="flex items-center gap-2 text-[10px] text-gray-500 mb-3">
+                <p className="text-[11px] text-cm-text-soft mb-2 line-clamp-1">{alert.description}</p>
+                <div className="flex items-center gap-2 text-[10px] text-cm-text-muted mb-3">
                   <MapPin className="w-3 h-3" />
                   <span>{alert.location}</span>
                   <span className="font-bold text-cm-accent ml-auto">{alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} - {alert.estimatedPriceMaxXOF.toLocaleString("fr-FR")} F</span>
@@ -122,13 +122,13 @@ export default function ProMissionsPage() {
         {/* Mission list */}
         {filtered.length === 0 && tab !== "upcoming" && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <CalendarDays className="w-7 h-7 text-gray-400" />
+            <div className="w-16 h-16 rounded-full bg-cm-surface flex items-center justify-center mb-4">
+              <CalendarDays className="w-7 h-7 text-cm-text-muted" />
             </div>
-            <p className="text-[14px] font-bold text-gray-900 mb-1">
+            <p className="text-[14px] font-bold text-cm-text mb-1">
               {tab === "active" ? "Aucune mission en cours" : "Aucune mission terminée"}
             </p>
-            <p className="text-[12px] text-gray-500">Les missions apparaîtront ici.</p>
+            <p className="text-[12px] text-cm-text-muted">Les missions apparaîtront ici.</p>
           </div>
         )}
 
@@ -153,7 +153,7 @@ export default function ProMissionsPage() {
                       initial={{ scaleY: 0 }}
                       animate={{ scaleY: 1 }}
                       transition={{ duration: 0.3, delay: idx * 0.06 + 0.08 }}
-                      className="w-0.5 flex-1 min-h-[16px] bg-gray-200 origin-top"
+                      className="w-0.5 flex-1 min-h-[16px] bg-cm-border-soft origin-top"
                     />
                   )}
                 </div>
@@ -172,8 +172,8 @@ export default function ProMissionsPage() {
                         <UserIcon className="w-4 h-4 text-cm-accent" />
                       </div>
                       <div>
-                        <p className="text-[13px] font-bold text-gray-900">{job.clientName}</p>
-                        <p className="text-[10px] text-gray-500 flex items-center gap-1">
+                        <p className="text-[13px] font-bold text-cm-text">{job.clientName}</p>
+                        <p className="text-[10px] text-cm-text-muted flex items-center gap-1">
                           <CalendarDays className="w-3 h-3" />
                           {job.scheduledDate ? formatDate(job.scheduledDate) : "Date flexible"}
                         </p>
@@ -189,10 +189,10 @@ export default function ProMissionsPage() {
                     </motion.span>
                   </div>
 
-                  <p className="text-[12px] text-gray-700 font-medium ml-10.5 mb-2">{job.serviceName}</p>
+                  <p className="text-[12px] text-cm-text-soft font-medium ml-10.5 mb-2">{job.serviceName}</p>
 
                   <div className="flex items-center justify-between ml-10.5">
-                    <div className="flex items-center gap-2 text-[10px] text-gray-500">
+                    <div className="flex items-center gap-2 text-[10px] text-cm-text-muted">
                       <MapPin className="w-3 h-3" />
                       <span>{job.clientLocation.split(",")[0]}</span>
                     </div>
@@ -201,21 +201,21 @@ export default function ProMissionsPage() {
 
                   {/* Expanded detail */}
                   {isDetailOpen && (tab === "active") && (
-                    <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="mt-3 pt-3 border-t border-cm-border/40">
                       <div className="flex gap-2 mb-2">
-                        <button className="flex-1 h-9 rounded-[10px] bg-gray-900 text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
-                          <Navigation className="w-3 h-3" /> Naviguer
-                        </button>
-                        <button className="flex-1 h-9 rounded-[10px] border border-gray-200 text-gray-700 text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
-                          <MessageCircle className="w-3 h-3" /> Chat
-                        </button>
-                        <button className="w-9 h-9 rounded-[10px] border border-gray-200 text-gray-700 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
+                        <button className="flex-1 h-9 rounded-[10px] bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
+                           <Navigation className="w-3 h-3" /> Naviguer
+                         </button>
+                         <button className="flex-1 h-9 rounded-[10px] border border-cm-border/40 text-cm-text-soft text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
+                           <MessageCircle className="w-3 h-3" /> Chat
+                         </button>
+                         <button className="w-9 h-9 rounded-[10px] border border-cm-border/40 text-cm-text-soft flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
                           <Phone className="w-4 h-4" />
                         </button>
                       </div>
-                      <div className="flex items-center gap-2 bg-gray-50 rounded-[10px] p-2.5">
+                      <div className="flex items-center gap-2 bg-cm-surface rounded-[10px] p-2.5">
                         <div className={`w-2 h-2 rounded-full ${job.status === "accepted" ? "bg-blue-500 animate-pulse" : job.status === "en_route" ? "bg-amber-500 animate-pulse" : "bg-cm-accent"}`} />
-                        <span className="text-[11px] font-medium text-gray-700">
+                        <span className="text-[11px] font-medium text-cm-text-soft">
                           {job.status === "accepted" ? "En attente de départ" :
                            job.status === "en_route" ? "En route vers le client" :
                            "Travail en cours"}

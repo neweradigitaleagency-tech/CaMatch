@@ -32,8 +32,8 @@ export default function Step3Verification() {
           <ShieldCheck className="w-5 h-5 text-[#243318]" />
         </div>
         <div>
-          <h2 className="text-xl font-bold text-[#1A1A1A]">Vérification</h2>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h2 className="text-xl font-bold text-cm-text">Vérification</h2>
+          <p className="text-sm text-cm-text-muted mt-1">
             Nous vérifions votre identité pour garantir la confiance sur la plateforme
           </p>
         </div>
@@ -53,7 +53,7 @@ export default function Step3Verification() {
           </div>
 
           <div>
-            <label className="text-xs font-semibold text-[#6B7280] uppercase tracking-wider mb-2 block">
+            <label className="text-xs font-semibold text-cm-text-muted uppercase tracking-wider mb-2 block">
               Documents légaux
             </label>
             <input
@@ -66,18 +66,18 @@ export default function Step3Verification() {
             />
 
             {draft.legalDocs.map((doc, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-gray-100 mb-2">
-                <FileText className="w-5 h-5 text-gray-400 shrink-0" />
-                <span className="text-xs text-[#1A1A1A] flex-1 truncate">{doc.name}</span>
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-cm-surface border border-cm-border mb-2">
+                <FileText className="w-5 h-5 text-cm-text-muted shrink-0" />
+                <span className="text-xs text-cm-text flex-1 truncate">{doc.name}</span>
                 <button onClick={() => removeLegalDoc(i)} className="cursor-pointer">
-                  <X className="w-4 h-4 text-gray-400 hover:text-red-500" />
+                  <X className="w-4 h-4 text-cm-text-muted hover:text-red-500" />
                 </button>
               </div>
             ))}
 
             <button
               onClick={handleFileSelect}
-              className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-500 font-medium cursor-pointer hover:border-gray-300 hover:text-gray-600 transition-colors"
+              className="w-full flex items-center justify-center gap-2 p-4 rounded-xl border-2 border-dashed border-cm-border-soft text-sm text-cm-text-muted font-medium cursor-pointer hover:border-cm-border-soft hover:text-cm-text-soft transition-colors"
             >
               <Upload className="w-4 h-4" />
               Ajouter un document
@@ -99,16 +99,16 @@ export default function Step3Verification() {
       <div className="bg-[#243318]/5 rounded-xl p-4">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-2 h-2 rounded-full bg-amber-400" />
-          <span className="text-xs font-semibold text-[#1A1A1A]">Statut de la demande</span>
+          <span className="text-xs font-semibold text-cm-text">Statut de la demande</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 bg-amber-100 px-2 py-0.5 rounded-full">
             Pending
           </span>
-          <span className="text-xs text-[#6B7280]">→</span>
-          <span className="text-[10px] text-gray-400">Verification → Active</span>
+          <span className="text-xs text-cm-text-muted">→</span>
+          <span className="text-[10px] text-cm-text-muted">Verification → Active</span>
         </div>
-        <p className="text-[11px] text-[#6B7280] mt-2">
+        <p className="text-[11px] text-cm-text-muted mt-2">
           Notre équipe examinera vos documents sous 24-48h ouvrées. Vous recevrez une notification dès que votre boutique sera active.
         </p>
       </div>

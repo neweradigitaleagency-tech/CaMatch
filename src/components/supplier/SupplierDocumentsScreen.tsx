@@ -24,7 +24,7 @@ const STATUS_ICONS = {
 const STATUS_COLORS = {
   pending: "text-amber-600 bg-amber-50",
   processing: "text-blue-600 bg-blue-50",
-  reviewed: "text-gray-600 bg-gray-100",
+  reviewed: "text-cm-text-soft bg-cm-surface",
   approved: "text-green-700 bg-green-50",
   rejected: "text-red-600 bg-red-50",
 }
@@ -80,8 +80,8 @@ export default function SupplierDocumentsScreen() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Documents</h1>
-          <p className="text-[12px] text-gray-500 mt-1">Documents légaux, catalogues, factures et bons</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Documents</h1>
+          <p className="text-[12px] text-cm-text-muted mt-1">Documents légaux, catalogues, factures et bons</p>
         </div>
         <label className="flex items-center gap-1.5 px-3 py-2 bg-cm-green text-white rounded-lg text-[12px] font-semibold cursor-pointer hover:bg-cm-green/90 transition-colors">
           <Upload className="w-3.5 h-3.5" />
@@ -92,15 +92,15 @@ export default function SupplierDocumentsScreen() {
 
       <div className="flex items-center gap-2">
         <div className="relative flex-1 max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cm-text-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher..."
-            className="w-full pl-8 pr-3 py-2 text-[12px] border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green bg-white" />
+            className="w-full pl-8 pr-3 py-2 text-[12px] border border-cm-border rounded-lg focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green bg-cm-elevated" />
         </div>
         <div className="flex gap-1">
           {categories.map((c) => (
             <button key={c.key} onClick={() => setCategoryFilter(c.key)}
               className={`px-2.5 py-1.5 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
-                categoryFilter === c.key ? "bg-cm-green text-white" : "bg-white text-gray-500 border border-gray-200 hover:bg-gray-50"
+                categoryFilter === c.key ? "bg-cm-green text-white" : "bg-cm-elevated text-cm-text-muted border border-cm-border hover:bg-cm-surface"
               }`}>
               {c.label}
             </button>
@@ -109,14 +109,14 @@ export default function SupplierDocumentsScreen() {
       </div>
 
       {isLoading ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-12 text-center">
           <div className="w-6 h-6 border-2 border-cm-green border-t-transparent rounded-full animate-spin mx-auto" />
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <FileText className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-          <p className="text-[13px] text-gray-500">Aucun document trouvé</p>
-          <p className="text-[11px] text-gray-400 mt-1">Importez un document pour commencer</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-12 text-center">
+          <FileText className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+          <p className="text-[13px] text-cm-text-muted">Aucun document trouvé</p>
+          <p className="text-[11px] text-cm-text-muted mt-1">Importez un document pour commencer</p>
         </div>
       ) : (
         <div className="grid gap-3">
@@ -126,29 +126,29 @@ export default function SupplierDocumentsScreen() {
             const FileIcon = FILE_ICONS[doc.fileType as keyof typeof FILE_ICONS] || FILE_ICONS.default
             return (
               <div key={doc.id}
-                className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3 hover:border-gray-300 transition-colors cursor-pointer"
+                className="bg-cm-elevated rounded-xl border border-cm-border px-4 py-3 flex items-center gap-3 hover:border-cm-border transition-colors cursor-pointer"
                 onClick={() => setSelectedDoc(doc)}>
-                <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
-                  <DocIcon className="w-4.5 h-4.5 text-gray-400" />
+                <div className="w-9 h-9 rounded-lg bg-cm-surface flex items-center justify-center shrink-0">
+                  <DocIcon className="w-4.5 h-4.5 text-cm-text-muted" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-[13px] text-gray-800 font-medium truncate">{doc.name}</p>
+                    <p className="text-[13px] text-cm-text font-medium truncate">{doc.name}</p>
                     <span className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0 ${STATUS_COLORS[doc.status]}`}>
                       <StatusIcon className="w-3 h-3" />
                       {DOCUMENT_STATUS_LABELS[doc.status]}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[11px] text-gray-400">{DOCUMENT_CATEGORY_LABELS[doc.category]}</span>
-                    <span className="flex items-center gap-1 text-[11px] text-gray-400">
+                    <span className="text-[11px] text-cm-text-muted">{DOCUMENT_CATEGORY_LABELS[doc.category]}</span>
+                    <span className="flex items-center gap-1 text-[11px] text-cm-text-muted">
                       <FileIcon className="w-3 h-3" />
                       {doc.fileType.toUpperCase()} · {formatSize(doc.fileSize)}
                     </span>
-                    <span className="text-[11px] text-gray-400">{formatDate(doc.uploadedAt)}</span>
+                    <span className="text-[11px] text-cm-text-muted">{formatDate(doc.uploadedAt)}</span>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-gray-300" />
+                <ChevronRight className="w-4 h-4 text-cm-border-soft" />
               </div>
             )
           })}
@@ -157,9 +157,9 @@ export default function SupplierDocumentsScreen() {
 
       {uploadDoc.isPending && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-6 text-center space-y-3">
+          <div className="bg-cm-elevated rounded-2xl p-6 text-center space-y-3">
             <div className="w-10 h-10 border-2 border-cm-green border-t-transparent rounded-full animate-spin mx-auto" />
-            <p className="text-[13px] text-gray-700 font-medium">Import en cours...</p>
+            <p className="text-[13px] text-cm-text-soft font-medium">Import en cours...</p>
           </div>
         </div>
       )}
@@ -167,10 +167,10 @@ export default function SupplierDocumentsScreen() {
       {selectedDoc && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={() => setSelectedDoc(null)}>
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
-          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-4 py-3 flex items-center justify-between">
-              <h2 className="text-[14px] font-bold text-gray-900 truncate">{selectedDoc.name}</h2>
-              <button onClick={() => setSelectedDoc(null)} className="text-gray-400 hover:text-gray-600 text-[18px] cursor-pointer">✕</button>
+          <div className="relative bg-cm-elevated rounded-t-2xl sm:rounded-2xl w-full sm:max-w-lg max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 bg-cm-elevated border-b border-cm-border/40 px-4 py-3 flex items-center justify-between">
+              <h2 className="text-[14px] font-bold text-cm-text truncate">{selectedDoc.name}</h2>
+              <button onClick={() => setSelectedDoc(null)} className="text-cm-text-muted hover:text-cm-text-soft text-[18px] cursor-pointer">✕</button>
             </div>
             <div className="p-4 space-y-4">
               <div className="flex items-center gap-3">
@@ -183,30 +183,30 @@ export default function SupplierDocumentsScreen() {
                     </span>
                   )
                 })()}
-                <span className="text-[11px] text-gray-400">{DOCUMENT_CATEGORY_LABELS[selectedDoc.category]}</span>
+                <span className="text-[11px] text-cm-text-muted">{DOCUMENT_CATEGORY_LABELS[selectedDoc.category]}</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-[12px]">
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-400">Fichier</p>
-                  <p className="text-gray-800 font-medium">{selectedDoc.fileName}</p>
+                <div className="bg-cm-surface rounded-lg p-3">
+                  <p className="text-cm-text-muted">Fichier</p>
+                  <p className="text-cm-text font-medium">{selectedDoc.fileName}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-400">Taille</p>
-                  <p className="text-gray-800 font-medium">{formatSize(selectedDoc.fileSize)}</p>
+                <div className="bg-cm-surface rounded-lg p-3">
+                  <p className="text-cm-text-muted">Taille</p>
+                  <p className="text-cm-text font-medium">{formatSize(selectedDoc.fileSize)}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-400">Type</p>
-                  <p className="text-gray-800 font-medium">{selectedDoc.fileType.toUpperCase()}</p>
+                <div className="bg-cm-surface rounded-lg p-3">
+                  <p className="text-cm-text-muted">Type</p>
+                  <p className="text-cm-text font-medium">{selectedDoc.fileType.toUpperCase()}</p>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-gray-400">Importé le</p>
-                  <p className="text-gray-800 font-medium">{formatDate(selectedDoc.uploadedAt)}</p>
+                <div className="bg-cm-surface rounded-lg p-3">
+                  <p className="text-cm-text-muted">Importé le</p>
+                  <p className="text-cm-text font-medium">{formatDate(selectedDoc.uploadedAt)}</p>
                 </div>
               </div>
 
               <div className="flex gap-2">
-                <button className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer">
+                <button className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-cm-text-soft bg-cm-surface rounded-lg hover:bg-cm-border-soft transition-colors cursor-pointer">
                   <Download className="w-3.5 h-3.5" /> Télécharger
                 </button>
                 {selectedDoc.status === "processing" && (
@@ -220,14 +220,14 @@ export default function SupplierDocumentsScreen() {
               {selectedDoc.ocrText && (
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-[12px] font-semibold text-gray-700">Texte extrait (OCR)</h3>
+                    <h3 className="text-[12px] font-semibold text-cm-text-soft">Texte extrait (OCR)</h3>
                     {selectedDoc.ocrConfidence && (
-                      <span className="text-[11px] text-gray-400">
+                      <span className="text-[11px] text-cm-text-muted">
                         Confiance: {Math.round(selectedDoc.ocrConfidence * 100)}%
                       </span>
                     )}
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-[12px] text-gray-600 font-mono whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                  <div className="bg-cm-surface rounded-lg p-3 text-[12px] text-cm-text-soft font-mono whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
                     {selectedDoc.ocrText}
                   </div>
                 </div>
@@ -235,12 +235,12 @@ export default function SupplierDocumentsScreen() {
 
               {selectedDoc.extractedFields && Object.keys(selectedDoc.extractedFields).length > 0 && (
                 <div>
-                  <h3 className="text-[12px] font-semibold text-gray-700 mb-2">Champs extraits</h3>
+                  <h3 className="text-[12px] font-semibold text-cm-text-soft mb-2">Champs extraits</h3>
                   <div className="bg-green-50 rounded-lg divide-y divide-green-100">
                     {Object.entries(selectedDoc.extractedFields).map(([key, value]) => (
                       <div key={key} className="flex justify-between px-3 py-2 text-[12px]">
-                        <span className="text-gray-500">{key}</span>
-                        <span className="text-gray-800 font-medium">{value}</span>
+                        <span className="text-cm-text-muted">{key}</span>
+                        <span className="text-cm-text font-medium">{value}</span>
                       </div>
                     ))}
                   </div>

@@ -1,18 +1,16 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import QRPaymentScreen from "../../components/QRPaymentScreen";
 import { useRequestStore } from "../../stores/requestStore";
 import type { Mission } from "../../types";
 import type { UnifiedPaymentMethod } from "../../types/payment";
 
 export default function QRPaymentPage() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const goBack = () => navigate(-1);
-  const mission = (location.state as { mission: Mission })?.mission;
+  const { goBack, complete, getFlow } = useAppNavigation();
+  const mission = getFlow<Mission>("mission");
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
 
   if (!mission) {
-    navigate("/orders", { replace: true });
+    complete({ flow: "mission" });
     return null;
   }
 
@@ -22,7 +20,7 @@ export default function QRPaymentPage() {
       onBack={goBack}
       onPay={(missionId: string, method: UnifiedPaymentMethod) => {
         updateMissionStatus(missionId, "paid");
-        navigate("/orders");
+        complete({ flow: "mission" });
       }}
     />
   );

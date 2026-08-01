@@ -1,9 +1,9 @@
 import { useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { ArrowLeft, Receipt, Download, FileText, Check, AlertTriangle } from "lucide-react"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useSubscriptionStore } from "../../stores/subscriptionStore"
 import { useAuthStore } from "../../stores/authStore"
 import { downloadInvoice } from "../../services/invoiceService"
@@ -29,9 +29,8 @@ const INVOICE_STATUS_COLORS: Record<string, string> = {
 }
 
 export default function SubscriptionInvoicesPage() {
-  const nav = useNavigate()
-  const loc = useLocation()
-  const fromHamburger = !!loc.state?.fromHamburger
+  const { navigate, goBack, getFlag, setFlag } = useAppNavigation()
+  const fromHamburger = getFlag("from-hamburger")
   const userId = useAuthStore((s) => s.userId)
   const { invoices, loading, error, fetchInvoices, clearError } = useSubscriptionStore()
 
@@ -39,7 +38,14 @@ export default function SubscriptionInvoicesPage() {
     if (userId) fetchInvoices(userId)
   }, [userId])
 
-  const handleBack = () => nav("/", { state: { reopenMenu: true } })
+  const handleBack = () => {
+    if (fromHamburger) {
+      setFlag("reopen-menu", true)
+      navigate("/")
+    } else {
+      goBack()
+    }
+  }
 
   if (error) {
     return (

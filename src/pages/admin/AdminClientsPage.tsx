@@ -118,15 +118,15 @@ export default function AdminClientsPage() {
       width: "200px",
       render: (u) => (
         <div className="flex items-center gap-2.5">
-          <div className="relative w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-semibold text-gray-600 shrink-0">
+          <div className="relative w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center text-[12px] font-semibold text-cm-text-soft shrink-0">
             {getUserName(u).charAt(0)}
             {u.role === "professional" && (
-              <span className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 border-2 border-white rounded-full ${u.professional_profile?.is_online ? "bg-green-500" : "bg-gray-300"}`} />
+              <span className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 border-2 border-white rounded-full ${u.professional_profile?.is_online ? "bg-green-500" : "bg-cm-border-soft"}`} />
             )}
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900 truncate">{getUserName(u)}</p>
-            <p className="text-[11px] text-gray-400 truncate">{u.email}</p>
+            <p className="text-[13px] font-medium text-cm-text truncate">{getUserName(u)}</p>
+            <p className="text-[11px] text-cm-text-muted truncate">{u.email}</p>
           </div>
         </div>
       ),
@@ -137,7 +137,7 @@ export default function AdminClientsPage() {
       sortable: true,
       width: "90px",
       render: (u) => (
-        <span className={`text-[12px] capitalize font-medium ${u.role === "professional" ? "text-blue-600" : "text-gray-600"}`}>
+        <span className={`text-[12px] capitalize font-medium ${u.role === "professional" ? "text-blue-600" : "text-cm-text-soft"}`}>
           {u.role === "professional" ? "Pro" : "Client"}
         </span>
       ),
@@ -147,7 +147,7 @@ export default function AdminClientsPage() {
       label: "Téléphone",
       sortable: true,
       width: "130px",
-      render: (u) => <span className="text-[12px] text-gray-600">{u.phone_number || "—"}</span>,
+      render: (u) => <span className="text-[12px] text-cm-text-soft">{u.phone_number || "—"}</span>,
     },
     {
       key: "city",
@@ -157,10 +157,10 @@ export default function AdminClientsPage() {
       render: (u) => {
         const city = getUserCity(u)
         return city ? (
-          <span className="flex items-center gap-1 text-[12px] text-gray-600">
-            <MapPin className="w-3 h-3 text-gray-400" /> {city}
+          <span className="flex items-center gap-1 text-[12px] text-cm-text-soft">
+            <MapPin className="w-3 h-3 text-cm-text-muted" /> {city}
           </span>
-        ) : <span className="text-[12px] text-gray-400">—</span>
+        ) : <span className="text-[12px] text-cm-text-muted">—</span>
       },
     },
     {
@@ -171,8 +171,8 @@ export default function AdminClientsPage() {
       render: (u) => {
         const commune = getUserCommune(u)
         return commune ? (
-          <span className="text-[12px] text-gray-600">{commune}</span>
-        ) : <span className="text-[12px] text-gray-400">—</span>
+          <span className="text-[12px] text-cm-text-soft">{commune}</span>
+        ) : <span className="text-[12px] text-cm-text-muted">—</span>
       },
     },
     {
@@ -181,7 +181,7 @@ export default function AdminClientsPage() {
       sortable: true,
       width: "110px",
       render: (u) => (
-        <span className="text-[12px] text-gray-500">
+        <span className="text-[12px] text-cm-text-muted">
           {format(new Date(u.created_at), "d MMM yyyy", { locale: fr })}
         </span>
       ),
@@ -191,14 +191,14 @@ export default function AdminClientsPage() {
       label: "Missions",
       sortable: true,
       width: "80px",
-      render: (u) => <span className="text-[12px] font-medium text-gray-700">{getUserJobs(u)}</span>,
+      render: (u) => <span className="text-[12px] font-medium text-cm-text-soft">{getUserJobs(u)}</span>,
     },
     {
       key: "depenses",
       label: "CA / Dépenses",
       sortable: true,
       width: "110px",
-      render: (u) => <span className="text-[12px] font-medium text-gray-700">{formatXOF(getUserRevenue(u))}</span>,
+      render: (u) => <span className="text-[12px] font-medium text-cm-text-soft">{formatXOF(getUserRevenue(u))}</span>,
     },
     {
       key: "status",
@@ -231,8 +231,8 @@ export default function AdminClientsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Utilisateurs</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">
+          <h1 className="text-[20px] font-bold text-cm-text">Utilisateurs</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">
             {total} utilisateur{total !== 1 ? "s" : ""} sur la plateforme
           </p>
         </div>
@@ -254,8 +254,8 @@ export default function AdminClientsPage() {
             onClick={() => setFilter(f.key)}
             className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${
               filter === f.key
-                ? "bg-gray-900 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                ? "bg-cm-text text-white"
+                : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"
             }`}
           >
             {f.label}
@@ -291,11 +291,11 @@ export default function AdminClientsPage() {
 
 function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 flex items-center gap-2.5">
-      <span className="text-gray-400 shrink-0">{icon}</span>
+    <div className="bg-cm-elevated border border-cm-border rounded-xl px-3 py-2.5 flex items-center gap-2.5">
+      <span className="text-cm-text-muted shrink-0">{icon}</span>
       <div>
-        <p className="text-[15px] font-bold text-gray-900 leading-tight">{value}</p>
-        <p className="text-[10px] text-gray-500 leading-tight">{label}</p>
+        <p className="text-[15px] font-bold text-cm-text leading-tight">{value}</p>
+        <p className="text-[10px] text-cm-text-muted leading-tight">{label}</p>
       </div>
     </div>
   )

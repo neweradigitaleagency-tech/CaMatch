@@ -14,18 +14,18 @@ const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string
   en_route:       { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
   arrived:        { border: "border-l-sky-500",     dot: "bg-sky-500",    badge: "bg-sky-50 text-sky-700" },
   in_progress:    { border: "border-l-orange-500",  dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700" },
-  completed:      { border: "border-l-gray-400",    dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600" },
+  completed:      { border: "border-l-cm-text-muted",    dot: "bg-cm-text-muted",   badge: "bg-cm-surface text-cm-text-soft" },
   client_validation: { border: "border-l-teal-500", dot: "bg-teal-500",  badge: "bg-teal-50 text-teal-700" },
   client_validated:{ border: "border-l-emerald-500",dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700" },
-  closed:         { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+  closed:         { border: "border-l-cm-text",    dot: "bg-cm-text",   badge: "bg-cm-surface text-cm-text" },
   cancelled:      { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
   disputed:       { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
   refunded:       { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
   refused:        { border: "border-l-red-300",     dot: "bg-red-300",    badge: "bg-red-50 text-red-500" },
-  draft:          { border: "border-l-gray-300",    dot: "bg-gray-300",   badge: "bg-gray-100 text-gray-500" },
+  draft:          { border: "border-l-cm-border-soft",    dot: "bg-cm-border-soft",   badge: "bg-cm-surface text-cm-text-muted" },
   published:      { border: "border-l-blue-400",    dot: "bg-blue-400",   badge: "bg-blue-50 text-blue-600" },
-  created:        { border: "border-l-gray-300",    dot: "bg-gray-300",   badge: "bg-gray-100 text-gray-500" },
-  reviewed:       { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+  created:        { border: "border-l-cm-border-soft",    dot: "bg-cm-border-soft",   badge: "bg-cm-surface text-cm-text-muted" },
+  reviewed:       { border: "border-l-cm-text",    dot: "bg-cm-text",   badge: "bg-cm-surface text-cm-text" },
 };
 
 interface ProMissionListScreenProps {
@@ -118,7 +118,7 @@ export default function ProMissionListScreen({ missions, onBack, onSelectMission
                       initial={{ scaleY: 0 }}
                       animate={{ scaleY: 1 }}
                       transition={{ duration: 0.3, delay: idx * 0.06 + 0.08 }}
-                      className="w-0.5 flex-1 min-h-[16px] bg-gray-200 origin-top"
+                      className="w-0.5 flex-1 min-h-[16px] bg-cm-border-soft origin-top"
                     />
                   )}
                 </div>

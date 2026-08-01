@@ -1,15 +1,15 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AppSettingsScreen from "../../components/AppSettingsScreen";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 
 export default function AppSettingsPage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
   const loc = useLocation();
-  const fromHamburger = !!loc.state?.fromHamburger;
+  const { goBack, navigate, getFlag, setFlag } = useAppNavigation();
+  const fromHamburger = getFlag("from-hamburger");
 
   const handleBack = () => {
     if (fromHamburger) {
-      nav("/", { state: { reopenMenu: true } });
+      navigate("/");
     } else {
       goBack();
     }
@@ -20,7 +20,8 @@ export default function AppSettingsPage() {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    nav(path, { state: { fromHamburger: true } });
+    setFlag("from-hamburger", true);
+    navigate(path);
   };
 
   return (

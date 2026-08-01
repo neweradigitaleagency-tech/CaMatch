@@ -27,12 +27,12 @@ export async function getTotalXP(proId: string): Promise<number> {
     return txns.reduce((sum, t) => sum + t.xp, 0);
   }
 
-  const { data, error } = await supabase.rpc("get_total_xp", { p_user_id: proId });
+  const { data, error } = await (supabase as any).rpc("get_total_xp", { p_user_id: proId });
   if (error) {
     const txns = getLocalTransactions().filter((t) => t.proId === proId);
     return txns.reduce((sum, t) => sum + t.xp, 0);
   }
-  return data ?? 0;
+  return data as number ?? 0;
 }
 
 export async function getXPHistory(proId: string): Promise<XPTransaction[]> {
@@ -42,7 +42,7 @@ export async function getXPHistory(proId: string): Promise<XPTransaction[]> {
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("xp_transactions")
     .select("*")
     .eq("user_id", proId)
@@ -89,7 +89,7 @@ export async function addXP(
 
   // Persister en DB si disponible
   if (isSupabaseReady()) {
-    await supabase.rpc("add_xp", {
+    await (supabase as any).rpc("add_xp", {
       p_user_id: proId,
       p_event_type: eventType,
       p_mission_id: missionId ?? null,

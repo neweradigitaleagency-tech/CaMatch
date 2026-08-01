@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import ClientPaymentsScreen from "../../components/ClientPaymentsScreen";
 
 export default function ClientPaymentsPage() {
-  const nav = useNavigate();
-  return <ClientPaymentsScreen onBack={() => nav("/", { state: { reopenMenu: true } })} />;
+  const { navigate, setFlag } = useAppNavigation();
+  return <ClientPaymentsScreen onBack={() => { setFlag("reopen-menu", true); navigate("/") }} />;
 }

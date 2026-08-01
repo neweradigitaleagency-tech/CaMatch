@@ -199,7 +199,7 @@ export default function ProfilProScreen({
   }, []);
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic bg-gray-50">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-surface">
       <ProfileHeader
         mode={mode}
         proName={effectivePro.name}
@@ -217,18 +217,18 @@ export default function ProfilProScreen({
 
       {mode === "owner" && editing && (
         <div className="px-4">
-          <div className="bg-white border border-gray-100 rounded-[20px] p-4 shadow-sm">
-            <h3 className="text-[11px] font-black text-gray-700 uppercase tracking-wider mb-3">Informations générales</h3>
+          <div className="bg-white border border-cm-border/40 rounded-[20px] p-4 shadow-sm">
+            <h3 className="text-[11px] font-black text-cm-text-soft uppercase tracking-wider mb-3">Informations générales</h3>
             <div className="space-y-3">
               <div>
-                <label className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1.5 block">Titre professionnel</label>
+                <label className="text-[9px] font-black text-cm-text-muted uppercase tracking-wider mb-1.5 block">Titre professionnel</label>
                 <input value={(editForm.title as string) || ""} onChange={(e) => handleUpdate("title", e.target.value)}
-                  className="w-full h-11 rounded-[12px] border border-gray-200 bg-white px-3 text-[13px] outline-none focus:ring-1 focus:ring-gray-300" />
+                  className="w-full h-11 rounded-[12px] border border-cm-border-soft bg-white px-3 text-[13px] outline-none focus:ring-1 focus:ring-cm-border-soft" />
               </div>
               <div>
-                <label className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1.5 block">Localisation</label>
+                <label className="text-[9px] font-black text-cm-text-muted uppercase tracking-wider mb-1.5 block">Localisation</label>
                 <input value={(editForm.locationNeighborhood as string) || ""} onChange={(e) => handleUpdate("locationNeighborhood", e.target.value)}
-                  className="w-full h-11 rounded-[12px] border border-gray-200 bg-white px-3 text-[13px] outline-none focus:ring-1 focus:ring-gray-300" />
+                  className="w-full h-11 rounded-[12px] border border-cm-border-soft bg-white px-3 text-[13px] outline-none focus:ring-1 focus:ring-cm-border-soft" />
               </div>
             </div>
           </div>

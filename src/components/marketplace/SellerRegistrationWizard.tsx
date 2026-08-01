@@ -60,20 +60,20 @@ export default function SellerRegistrationWizard({ onBack, onSubmit, loading }: 
               const isDone = i < currentIdx
               return (
                 <div key={s} className="flex items-center gap-1.5 flex-1">
-                  <div className="flex-1 h-1 rounded-full overflow-hidden bg-gray-200">
+                  <div className="flex-1 h-1 rounded-full overflow-hidden bg-cm-border-soft">
                     <motion.div
-                      className="h-full bg-[#1A1A1A] rounded-full"
+                      className="h-full bg-cm-text rounded-full"
                       initial={{ width: "0%" }}
                       animate={{ width: isDone ? "100%" : isActive ? "50%" : "0%" }}
                       transition={{ duration: 0.4, ease: "easeOut" }}
                     />
                   </div>
                   <span className={`text-[8px] font-semibold uppercase tracking-wider whitespace-nowrap ${
-                    isActive || isDone ? "text-[#1A1A1A]" : "text-gray-300"
+                    isActive || isDone ? "text-cm-text" : "text-cm-border-soft"
                   }`}>
                     {STEP_LABELS[s]}
                   </span>
-                  {i < 2 && <span className="text-gray-200 text-[10px]">/</span>}
+                  {i < 2 && <span className="text-cm-border-soft text-[10px]">/</span>}
                 </div>
               )
             })}
@@ -97,14 +97,14 @@ export default function SellerRegistrationWizard({ onBack, onSubmit, loading }: 
         </AnimatePresence>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-100 px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom,12px))]">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-cm-elevated border-t border-cm-border px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom,12px))]">
         <div className="max-w-lg mx-auto">
           <div className="flex items-center gap-3">
             {!isLastStep ? (
               <button
                 onClick={goNext}
                 disabled={!valid}
-                className="flex-1 h-12 rounded-xl bg-[#1A1A1A] text-white text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
+                className="flex-1 h-12 rounded-xl bg-cm-text text-white text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-[0.98] transition-all"
               >
                 Continuer
                 <ArrowLeft className="w-4 h-4 rotate-180" />

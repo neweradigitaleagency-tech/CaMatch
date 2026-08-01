@@ -1,5 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ProposalDetailScreen from "../../components/proposals/ProposalDetailScreen";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useMatchingStore } from "../../stores/matchingStore";
 import { useRequestStore } from "../../stores/requestStore";
 import { useChatStore } from "../../stores/chatStore";
@@ -9,8 +10,7 @@ import { MOCK_WORKFLOW_ESCROW } from "../../data/mockWorkflowData";
 import type { Mission } from "../../types";
 
 export default function ProposalDetailPage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, replace } = useAppNavigation();
   const { requestId, proposalId } = useParams<{ requestId: string; proposalId: string }>();
   const proposal = useMatchingStore((s) => s.getProposalById(requestId || "", proposalId || ""));
   const { acceptProposal } = useMatchingStore();
@@ -129,7 +129,7 @@ export default function ProposalDetailPage() {
       }];
     }
 
-    nav(`/orders/tracker/${missionId}`, { replace: true });
+    replace(`/orders/tracker/${missionId}`);
   };
 
   if (!proposal) {

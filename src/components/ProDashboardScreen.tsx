@@ -27,7 +27,7 @@ import HamburgerDrawer from "./HamburgerDrawer";
 import RouteMapModal from "./RouteMapModal";
 
 function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <div className={`bg-gray-200/50 animate-pulse rounded-[14px] ${className}`} />;
+  return <div className={`bg-cm-border-soft/50 animate-pulse rounded-[14px] ${className}`} />;
 }
 
 function formatXOF(amount: number): string {
@@ -71,9 +71,9 @@ const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string
   en_route:       { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
   arrived:        { border: "border-l-sky-500",     dot: "bg-sky-500",    badge: "bg-sky-50 text-sky-700" },
   in_progress:    { border: "border-l-orange-500",  dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700" },
-  completed:      { border: "border-l-gray-400",    dot: "bg-gray-400",   badge: "bg-gray-100 text-gray-600" },
+  completed:      { border: "border-l-cm-text-muted",    dot: "bg-cm-text-muted",   badge: "bg-cm-surface text-cm-text-soft" },
   client_validation: { border: "border-l-teal-500", dot: "bg-teal-500",  badge: "bg-teal-50 text-teal-700" },
-  closed:         { border: "border-l-gray-900",    dot: "bg-gray-900",   badge: "bg-gray-100 text-gray-800" },
+  closed:         { border: "border-l-cm-text",    dot: "bg-cm-text",   badge: "bg-cm-surface text-cm-text" },
   cancelled:      { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
 };
 
@@ -407,7 +407,7 @@ export default function ProDashboardScreen() {
 
   if (loading) {
     return (
-      <div className="min-h-dynamic bg-[#F5F5F0] p-4 w-full max-w-[448px] mx-auto space-y-4 pt-14">
+      <div className="min-h-dynamic bg-cm-bg p-4 w-full max-w-[448px] mx-auto space-y-4 pt-14">
         <SkeletonBlock className="h-14 w-full" />
         <SkeletonBlock className="h-32 w-full" />
         <SkeletonBlock className="h-48 w-full" />
@@ -422,7 +422,7 @@ export default function ProDashboardScreen() {
   )[0];
 
   return (
-    <div className="min-h-dynamic bg-[#F5F5F0]">
+    <div className="min-h-dynamic bg-cm-bg">
       <HamburgerDrawer
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
@@ -445,23 +445,23 @@ export default function ProDashboardScreen() {
 
       <div ref={containerRef} className="w-full max-w-[448px] mx-auto px-4 pb-28">
         {/* ─── Sticky Header ─── */}
-        <header className="sticky top-0 z-20 bg-[#F5F5F0]/90 backdrop-blur-xl pt-3 pb-2">
+        <header className="sticky top-0 z-20 bg-cm-bg/90 backdrop-blur-xl pt-3 pb-2">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full overflow-hidden bg-gray-100 border-2 border-white shadow-sm">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-cm-surface border-2 border-cm-bg shadow-sm">
                 {pro.avatarUrl ? (
                   <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <UserIcon className="w-4 h-4 text-gray-400" />
+                    <UserIcon className="w-4 h-4 text-cm-text-muted" />
                   </div>
                 )}
               </div>
               <div>
-                <p className="text-[13px] font-bold text-gray-900 leading-tight">{firstName}</p>
+                <p className="text-[13px] font-bold text-cm-text leading-tight">{firstName}</p>
                 <div className="flex items-center gap-1">
-                  <div className={`w-1.5 h-1.5 rounded-full ${isAvailable ? "bg-green-500" : "bg-gray-400"}`} />
-                  <span className={`text-[9px] font-medium ${isAvailable ? "text-green-600" : "text-gray-400"}`}>
+                  <div className={`w-1.5 h-1.5 rounded-full ${isAvailable ? "bg-green-500" : "bg-cm-text-muted"}`} />
+                  <span className={`text-[9px] font-medium ${isAvailable ? "text-green-600" : "text-cm-text-muted"}`}>
                     {isAvailable ? "En ligne" : "Hors ligne"}
                   </span>
                 </div>
@@ -469,13 +469,13 @@ export default function ProDashboardScreen() {
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full">
+              <div className="flex items-center gap-1 px-2 py-1 bg-cm-surface rounded-full">
                 <span className="text-[11px]">{level.emoji}</span>
                 <span className={`text-[10px] font-bold ${level.color}`}>{level.label}</span>
               </div>
               <button onClick={() => setShowNotifications(true)}
-                className="relative w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center cursor-pointer active:scale-90 transition-transform shadow-sm">
-                <Bell className="w-4 h-4 text-gray-700" />
+                className="relative w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform shadow-sm">
+                <Bell className="w-4 h-4 text-cm-text-soft" />
                 {unreadNotifs > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
                     {unreadNotifs > 9 ? "9+" : unreadNotifs}
@@ -483,11 +483,11 @@ export default function ProDashboardScreen() {
                 )}
               </button>
               <button onClick={() => setMenuOpen(true)}
-                className="w-9 h-9 rounded-full bg-white border border-gray-200 flex items-center justify-center cursor-pointer active:scale-90 transition-transform shadow-sm">
+                className="w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform shadow-sm">
                 <div className="w-4 h-3 flex flex-col justify-between">
-                  <span className="block h-0.5 w-full bg-gray-700 rounded-full" />
-                  <span className="block h-0.5 w-3/4 bg-gray-700 rounded-full" />
-                  <span className="block h-0.5 w-full bg-gray-700 rounded-full" />
+                  <span className="block h-0.5 w-full bg-cm-text-soft rounded-full" />
+                  <span className="block h-0.5 w-3/4 bg-cm-text-soft rounded-full" />
+                  <span className="block h-0.5 w-full bg-cm-text-soft rounded-full" />
                 </div>
               </button>
             </div>
@@ -497,7 +497,7 @@ export default function ProDashboardScreen() {
         {/* ─── Active Mission Control ─── */}
         {activeJob && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
-            <div className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm">
+            <div className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm">
               <div className="flex items-center gap-1 mb-3">
                 <CheckCircle className="w-4 h-4 text-green-600" />
                 <span className="text-[11px] font-bold text-green-600 uppercase tracking-wider">
@@ -513,31 +513,31 @@ export default function ProDashboardScreen() {
               </div>
 
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[16px]">👤</div>
+                <div className="w-10 h-10 rounded-full bg-cm-surface flex items-center justify-center text-[16px]">👤</div>
                 <div>
-                  <p className="text-[14px] font-bold text-gray-900">{activeJob.clientName}</p>
-                  <p className="text-[11px] text-gray-500">{activeJob.clientLocation}</p>
+                  <p className="text-[14px] font-bold text-cm-text">{activeJob.clientName}</p>
+                  <p className="text-[11px] text-cm-text-muted">{activeJob.clientLocation}</p>
                 </div>
                 <div className="ml-auto"></div>
               </div>
 
               <div className="flex gap-2 mb-3">
                 <button onClick={() => openMapForJob(activeJob)}
-                  className="flex-1 h-10 rounded-[12px] bg-gray-900 text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
+                  className="flex-1 h-10 rounded-[12px] bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
                   <Navigation className="w-3.5 h-3.5" /> Naviguer
                 </button>
                 <button onClick={() => openChatForJob(activeJob)}
-                  className="flex-1 h-10 rounded-[12px] border border-gray-200 text-gray-700 text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
+                  className="flex-1 h-10 rounded-[12px] border border-cm-border text-cm-text-soft text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
                   <MessageCircle className="w-3.5 h-3.5" /> Chat
                 </button>
                 <a href={`tel:${activeJob.clientPhone}`}
-                  className="w-10 h-10 rounded-[12px] border border-gray-200 text-gray-700 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
+                  className="w-10 h-10 rounded-[12px] border border-cm-border text-cm-text-soft flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
                   <Phone className="w-4 h-4" />
                 </a>
               </div>
 
               {/* Status progression */}
-              <div className="flex items-center justify-between bg-gray-50 rounded-[12px] p-2">
+              <div className="flex items-center justify-between bg-cm-surface rounded-[12px] p-2">
                 {STATUS_FLOW.map((s, i) => {
                   const flowIdx = STATUS_FLOW.indexOf(activeJob.status as typeof STATUS_FLOW[number]);
                   const done = i < flowIdx;
@@ -554,12 +554,12 @@ export default function ProDashboardScreen() {
                   return (
                     <div key={s} className="flex flex-col items-center flex-1">
                       <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                        done ? "bg-gray-900 text-white" : active ? "bg-gray-900 text-white shadow-md" : "bg-gray-200 text-gray-400"
+                        done ? "bg-cm-text text-white" : active ? "bg-cm-text text-white shadow-md" : "bg-cm-border-soft text-cm-text-muted"
                       }`}>
                         {done ? <Check className="w-3 h-3" /> : active ? <div className="w-2 h-2 rounded-full bg-white" /> : <span className="text-[9px] font-bold">{i + 1}</span>}
                       </div>
                       <span className={`text-[7px] mt-1 font-bold text-center leading-tight uppercase tracking-wider ${
-                        active ? "text-gray-900" : done ? "text-gray-500" : "text-gray-300"
+                        active ? "text-cm-text" : done ? "text-cm-text-muted" : "text-cm-border-soft"
                       }`}>{labels[s]}</span>
                     </div>
                   );
@@ -573,12 +573,12 @@ export default function ProDashboardScreen() {
                   📄 Créer un devis
                 </button>
               ) : activeJob.status === "client_validation" ? (
-                <div className="w-full mt-3 h-11 rounded-[12px] bg-gray-100 text-gray-400 text-[12px] font-bold flex items-center justify-center gap-2">
+                <div className="w-full mt-3 h-11 rounded-[12px] bg-cm-surface text-cm-text-muted text-[12px] font-bold flex items-center justify-center gap-2">
                   <Clock className="w-3.5 h-3.5" /> En attente de validation du client
                 </div>
               ) : nextStatus(activeJob.status) && (
                 <button onClick={() => handleAdvanceClick(activeJob.id, activeJob.status)}
-                  className="w-full mt-3 h-11 rounded-[12px] bg-gray-900 text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-gray-800 shadow-sm">
+                  className="w-full mt-3 h-11 rounded-[12px] bg-cm-text text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-text/90 shadow-sm">
                   {FLOW_BUTTON_LABELS[activeJob.status] || "Continuer"}
                 </button>
               )}
@@ -591,39 +591,39 @@ export default function ProDashboardScreen() {
           <div className="space-y-3 mb-4">
             <div className="flex items-center gap-1.5">
               <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              <h2 className="text-[13px] font-bold text-gray-700 uppercase tracking-wider">Nouvelles missions</h2>
+              <h2 className="text-[13px] font-bold text-cm-text-soft uppercase tracking-wider">Nouvelles missions</h2>
             </div>
             {activeMissions.map((alert) => (
               <motion.div key={alert.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
+                className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
                 onClick={() => { setSelectedAlert(alert); setShowMissionDetail(true); }}>
                 <div className="flex items-center gap-1.5 mb-2">
                   <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
                     <span className="text-[10px] text-white font-bold">N</span>
                   </div>
                   <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Nouvelle mission</span>
-                  <span className="text-[9px] text-gray-400 ml-auto">Il y a 10 s</span>
+                  <span className="text-[9px] text-cm-text-muted ml-auto">Il y a 10 s</span>
                 </div>
 
                 <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[16px]">👤</div>
+                  <div className="w-10 h-10 rounded-full bg-cm-surface flex items-center justify-center text-[16px]">👤</div>
                   <div className="flex-1">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-[14px] font-bold text-gray-900">{alert.clientName}</p>
+                      <p className="text-[14px] font-bold text-cm-text">{alert.clientName}</p>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-[12px] font-semibold text-gray-800 mb-2 line-clamp-1">{alert.description}</p>
+                <p className="text-[12px] font-semibold text-cm-text mb-2 line-clamp-1">{alert.description}</p>
 
-                <div className="flex items-center gap-3 text-[11px] text-gray-600 mb-3">
+                <div className="flex items-center gap-3 text-[11px] text-cm-text-soft mb-3">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-gray-400" /> {alert.location}
+                    <MapPin className="w-3 h-3 text-cm-text-muted" /> {alert.location}
                   </span>
                   <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-gray-400" /> 7 min
+                    <Clock className="w-3 h-3 text-cm-text-muted" /> 7 min
                   </span>
-                  <span className="flex items-center gap-1 font-bold text-gray-900 ml-auto">
+                  <span className="flex items-center gap-1 font-bold text-cm-text ml-auto">
                     <Coins className="w-3 h-3" /> {alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} F
                   </span>
                 </div>
@@ -634,7 +634,7 @@ export default function ProDashboardScreen() {
                     <XCircle className="w-4 h-4" /> Refuser
                   </button>
                   <button onClick={(e) => { e.stopPropagation(); handleAcceptAlert(alert.id); }}
-                    className="flex-1 h-11 rounded-[12px] bg-gray-900 text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-gray-800 flex items-center justify-center gap-1.5 shadow-sm">
+                    className="flex-1 h-11 rounded-[12px] bg-cm-text text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-text/90 flex items-center justify-center gap-1.5 shadow-sm">
                     <Check className="w-4 h-4" /> Accepter
                   </button>
                 </div>
@@ -645,19 +645,19 @@ export default function ProDashboardScreen() {
 
         {/* ─── Stats Card ─── */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm mb-4">
+          className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm mb-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                <span className="text-[18px] font-extrabold text-gray-900">{rating}</span>
+                <span className="text-[18px] font-extrabold text-cm-text">{rating}</span>
               </div>
-              <span className="text-[12px] text-gray-500">({pro.reviewCount} avis)</span>
+              <span className="text-[12px] text-cm-text-muted">({pro.reviewCount} avis)</span>
             </div>
             {pro.isVerified && (
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-gray-100 rounded-full">
-                <CheckCircle className="w-3 h-3 text-gray-700" />
-                <span className="text-[10px] font-medium text-gray-700">Vérifié</span>
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-cm-surface rounded-full">
+                <CheckCircle className="w-3 h-3 text-cm-text-soft" />
+                <span className="text-[10px] font-medium text-cm-text-soft">Vérifié</span>
               </div>
             )}
           </div>
@@ -673,34 +673,34 @@ export default function ProDashboardScreen() {
               return (
                 <div key={s.label} className={`${s.bg} rounded-[12px] p-2.5 text-center`}>
                   <Icon className={`w-4 h-4 ${s.color} mx-auto mb-0.5`} />
-                  <p className="text-[13px] font-extrabold text-gray-900">{s.value}</p>
-                  <p className="text-[8px] text-gray-500 uppercase tracking-wide">{s.label}</p>
+                  <p className="text-[13px] font-extrabold text-cm-text">{s.value}</p>
+                  <p className="text-[8px] text-cm-text-muted uppercase tracking-wide">{s.label}</p>
                 </div>
               );
             })}
           </div>
 
-          <div className="bg-gray-50 rounded-[12px] p-3">
+          <div className="bg-cm-surface rounded-[12px] p-3">
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-1.5">
                 <span className="text-[13px]">{level.emoji}</span>
-                <span className="text-[11px] font-medium text-gray-600">Niveau {level.label}</span>
+                <span className="text-[11px] font-medium text-cm-text-soft">Niveau {level.label}</span>
               </div>
-              <span className="text-[10px] font-bold text-gray-900">
+              <span className="text-[10px] font-bold text-cm-text">
                 {nextLevel ? `${nextLevelXp} XP → ${nextLevel.label}` : "Niveau max"}
               </span>
             </div>
-            <div className="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-full h-2.5 bg-cm-border-soft rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${xpPercent}%` }}
                 transition={{ duration: 0.8, ease: "easeOut" }}
-                className={`h-full rounded-full ${nextLevel ? "bg-gray-900" : "bg-amber-500"}`}
+                className={`h-full rounded-full ${nextLevel ? "bg-cm-text" : "bg-amber-500"}`}
               />
             </div>
             <div className="flex items-center justify-between mt-1">
-              <span className="text-[9px] text-gray-400">{xpProgress.toLocaleString("fr-FR")} XP</span>
-              <span className="text-[9px] text-gray-400">{nextLevel ? `${nextLevel.minXP.toLocaleString("fr-FR")} XP` : "MAX"}</span>
+              <span className="text-[9px] text-cm-text-muted">{xpProgress.toLocaleString("fr-FR")} XP</span>
+              <span className="text-[9px] text-cm-text-muted">{nextLevel ? `${nextLevel.minXP.toLocaleString("fr-FR")} XP` : "MAX"}</span>
             </div>
           </div>
         </motion.div>
@@ -714,11 +714,11 @@ export default function ProDashboardScreen() {
                 <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-[14px] font-bold text-gray-900">Augmentez votre visibilité</p>
-                <p className="text-[11px] text-gray-500">Votre profil a été vu {proProfileViews} fois.</p>
+                <p className="text-[14px] font-bold text-cm-text">Augmentez votre visibilité</p>
+                <p className="text-[11px] text-cm-text-muted">Votre profil a été vu {proProfileViews} fois.</p>
               </div>
             </div>
-            <p className="text-[12px] text-gray-600 mb-3">
+            <p className="text-[12px] text-cm-text-soft mb-3">
               Passez à une formule Premium pour apparaître plus haut dans les recherches et recevoir plus de demandes.
             </p>
             <button onClick={() => nav("/pro/subscription/plans")}
@@ -730,23 +730,23 @@ export default function ProDashboardScreen() {
 
         {/* ─── Revenue Section ─── */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm mb-4">
+          className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm mb-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Wallet className="w-4 h-4 text-gray-900" />
-              <span className="text-[14px] font-bold text-gray-900">Revenus</span>
+              <Wallet className="w-4 h-4 text-cm-text" />
+              <span className="text-[14px] font-bold text-cm-text">Revenus</span>
             </div>
             <button onClick={() => nav("/pro/revenues")}
-              className="text-[11px] font-medium text-gray-700 cursor-pointer hover:underline">
+              className="text-[11px] font-medium text-cm-text-soft cursor-pointer hover:underline">
               Voir tout
             </button>
           </div>
 
           <div className="flex items-end gap-1 mb-4">
-            <span className="text-[28px] font-extrabold text-gray-900 font-mono">
+            <span className="text-[28px] font-extrabold text-cm-text font-mono">
               {displayFinance.available.toLocaleString("fr-FR")}
             </span>
-            <span className="text-[12px] font-medium text-gray-500 mb-1">F</span>
+            <span className="text-[12px] font-medium text-cm-text-muted mb-1">F</span>
           </div>
 
           <div className="grid grid-cols-3 gap-2 mb-4">
@@ -755,9 +755,9 @@ export default function ProDashboardScreen() {
               { label: "Cette semaine", value: displayFinance.week },
               { label: "Ce mois", value: displayFinance.month },
             ].map((r) => (
-              <div key={r.label} className="bg-gray-50 rounded-[10px] p-2.5 text-center">
-                <p className="text-[10px] text-gray-500">{r.label}</p>
-                <p className="text-[13px] font-extrabold text-gray-900 font-mono">{r.value.toLocaleString("fr-FR")}</p>
+              <div key={r.label} className="bg-cm-surface rounded-[10px] p-2.5 text-center">
+                <p className="text-[10px] text-cm-text-muted">{r.label}</p>
+                <p className="text-[13px] font-extrabold text-cm-text font-mono">{r.value.toLocaleString("fr-FR")}</p>
               </div>
             ))}
           </div>
@@ -769,7 +769,7 @@ export default function ProDashboardScreen() {
                   initial={{ height: 0 }}
                   animate={{ height: `${(v / chartMax) * 100}%` }}
                   transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="w-full bg-gray-900 rounded-t-sm opacity-80 hover:opacity-100 transition-opacity"
+                  className="w-full bg-cm-text rounded-t-sm opacity-80 hover:opacity-100 transition-opacity"
                 />
               </div>
             ))}
@@ -779,9 +779,9 @@ export default function ProDashboardScreen() {
         {/* ─── Missions Section ─── */}
         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[14px] font-bold text-gray-900">Missions</h2>
+            <h2 className="text-[14px] font-bold text-cm-text">Missions</h2>
             <button onClick={() => nav("/pro/missions")}
-              className="text-[11px] font-medium text-gray-700 cursor-pointer hover:underline">
+              className="text-[11px] font-medium text-cm-text-soft cursor-pointer hover:underline">
               Voir tout
             </button>
           </div>
@@ -807,7 +807,7 @@ export default function ProDashboardScreen() {
                           initial={{ scaleY: 0 }}
                           animate={{ scaleY: 1 }}
                           transition={{ duration: 0.3, delay: i * 0.08 + 0.1 }}
-                          className="w-0.5 flex-1 min-h-[16px] bg-gray-200 origin-top"
+                          className="w-0.5 flex-1 min-h-[16px] bg-cm-border-soft origin-top"
                         />
                       )}
                     </div>
@@ -818,22 +818,22 @@ export default function ProDashboardScreen() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.08, type: "spring", damping: 20, stiffness: 200 }}
                       onClick={() => nav(`/pro/missions`)}
-                      className={`flex-1 bg-white rounded-[16px] p-3.5 cursor-pointer shadow-sm ${cfg.border} hover:shadow-md active:scale-[0.99] transition-all`}
+                      className={`flex-1 bg-cm-elevated rounded-[16px] p-3.5 cursor-pointer shadow-sm ${cfg.border} hover:shadow-md active:scale-[0.99] transition-all`}
                     >
                       <div className="flex items-start justify-between mb-1.5">
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                            <UserIcon className="w-4 h-4 text-gray-700" />
+                          <div className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center">
+                            <UserIcon className="w-4 h-4 text-cm-text-soft" />
                           </div>
                           <div>
-                            <p className="text-[13px] font-bold text-gray-900">{job.clientName}</p>
-                            <p className="text-[10px] text-gray-500">{job.clientLocation.split(",")[0]}</p>
+                            <p className="text-[13px] font-bold text-cm-text">{job.clientName}</p>
+                            <p className="text-[10px] text-cm-text-muted">{job.clientLocation.split(",")[0]}</p>
                           </div>
                         </div>
-                        <span className="text-[13px] font-extrabold text-gray-900 font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
+                        <span className="text-[13px] font-extrabold text-cm-text font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
                       </div>
-                      <p className="text-[11px] text-gray-600 line-clamp-1 ml-10.5">{job.serviceName}</p>
-                      <div className="flex items-center gap-2 text-[10px] text-gray-500 mt-2 ml-10.5">
+                      <p className="text-[11px] text-cm-text-soft line-clamp-1 ml-10.5">{job.serviceName}</p>
+                      <div className="flex items-center gap-2 text-[10px] text-cm-text-muted mt-2 ml-10.5">
                         {job.scheduledDate && (
                           <span>{new Date(job.scheduledDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
                         )}
@@ -858,15 +858,15 @@ export default function ProDashboardScreen() {
         {/* ─── Performance (Premium feature) ─── */}
         {isFree ? (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="bg-white border border-amber-200 rounded-[20px] p-4 shadow-sm mb-4">
+            className="bg-cm-elevated border border-amber-200 rounded-[20px] p-4 shadow-sm mb-4">
             <div className="flex items-center gap-2 mb-3">
               <BarChart3 className="w-4 h-4 text-amber-500" />
-              <span className="text-[14px] font-bold text-gray-900">Analytics</span>
+              <span className="text-[14px] font-bold text-cm-text">Analytics</span>
             </div>
             <div className="bg-amber-50 rounded-[14px] p-4 text-center mb-3">
               <Lock className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-              <p className="text-[13px] font-semibold text-gray-900 mb-1">Statistiques Premium</p>
-              <p className="text-[11px] text-gray-600 mb-3">
+              <p className="text-[13px] font-semibold text-cm-text mb-1">Statistiques Premium</p>
+              <p className="text-[11px] text-cm-text-soft mb-3">
                 Passez à une formule supérieure pour accéder à vos analytics, suivi de revenus et indicateurs de performance.
               </p>
               <button onClick={() => nav("/pro/subscription/plans")}
@@ -877,15 +877,15 @@ export default function ProDashboardScreen() {
           </motion.div>
         ) : (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="bg-white border border-gray-200 rounded-[20px] p-4 shadow-sm mb-4">
+            className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-gray-900" />
-              <span className="text-[14px] font-bold text-gray-900">Performance</span>
+              <BarChart3 className="w-4 h-4 text-cm-text" />
+              <span className="text-[14px] font-bold text-cm-text">Performance</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 mb-3">
               {[
-                { label: "Cette semaine", value: "+620 XP", icon: TrendingUp, color: "text-gray-900", bg: "bg-gray-100" },
+                { label: "Cette semaine", value: "+620 XP", icon: TrendingUp, color: "text-cm-text", bg: "bg-cm-surface" },
                 { label: "Missions", value: `${MOCK_DASH_DATA.missionsTrend}%`, icon: CalendarDays, color: "text-blue-600", bg: "bg-blue-50" },
                 { label: "Avis", value: `${MOCK_DASH_DATA.ratingTrend}%`, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
               ].map((m) => {
@@ -893,32 +893,32 @@ export default function ProDashboardScreen() {
                 return (
                   <div key={m.label} className={`${m.bg} rounded-[12px] p-3 text-center`}>
                     <Icon className={`w-4 h-4 ${m.color} mx-auto mb-1`} />
-                    <p className="text-[14px] font-extrabold text-gray-900">{m.value}</p>
-                    <p className="text-[8px] text-gray-500 uppercase tracking-wider">{m.label}</p>
+                    <p className="text-[14px] font-extrabold text-cm-text">{m.value}</p>
+                    <p className="text-[8px] text-cm-text-muted uppercase tracking-wider">{m.label}</p>
                   </div>
                 );
               })}
             </div>
 
             <div className="space-y-2">
-              <div className="bg-gray-50 rounded-[12px] p-3 flex items-center gap-3">
+              <div className="bg-cm-surface rounded-[12px] p-3 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
                   <Target className="w-4 h-4 text-amber-500" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-[11px] font-medium text-gray-700">Encore <span className="font-bold text-gray-900">{nextLevel ? nextLevelXp : 0} XP</span> pour {nextLevel?.label ?? "le max"}</p>
-                  <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1.5 overflow-hidden">
+                  <p className="text-[11px] font-medium text-cm-text-soft">Encore <span className="font-bold text-cm-text">{nextLevel ? nextLevelXp : 0} XP</span> pour {nextLevel?.label ?? "le max"}</p>
+                  <div className="w-full h-1.5 bg-cm-border-soft rounded-full mt-1.5 overflow-hidden">
                     <div className="h-full bg-amber-500 rounded-full" style={{ width: `${xpPercent}%` }} />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-[12px] p-3 flex items-center gap-3">
+              <div className="bg-cm-surface rounded-[12px] p-3 flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
                   <Star className="w-4 h-4 text-green-500" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-[11px] font-medium text-gray-700">Encore <span className="font-bold text-gray-900">{3 - (pro.reviewCount % 3)} avis 5★</span> pour le badge Premium</p>
-                  <div className="w-full h-1.5 bg-gray-200 rounded-full mt-1.5 overflow-hidden">
+                  <p className="text-[11px] font-medium text-cm-text-soft">Encore <span className="font-bold text-cm-text">{3 - (pro.reviewCount % 3)} avis 5★</span> pour le badge Premium</p>
+                  <div className="w-full h-1.5 bg-cm-border-soft rounded-full mt-1.5 overflow-hidden">
                     <div className="h-full bg-green-500 rounded-full" style={{ width: `${(pro.reviewCount % 3) / 3 * 100}%` }} />
                   </div>
                 </div>
@@ -930,21 +930,21 @@ export default function ProDashboardScreen() {
         {/* ─── Quick Actions ─── */}
         <div className="grid grid-cols-2 gap-2 mb-4">
           <button onClick={() => nav("/pro/services")}
-            className="bg-white border border-gray-200 rounded-[16px] p-3.5 text-left cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-50 shadow-sm">
-            <Settings className="w-4 h-4 text-gray-900 mb-1.5" />
-            <p className="text-[12px] font-bold text-gray-900">Gérer mes services</p>
-            <p className="text-[9px] text-gray-500">Tarifs, catégories</p>
+            className="bg-cm-elevated border border-cm-border rounded-[16px] p-3.5 text-left cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface shadow-sm">
+            <Settings className="w-4 h-4 text-cm-text mb-1.5" />
+            <p className="text-[12px] font-bold text-cm-text">Gérer mes services</p>
+            <p className="text-[9px] text-cm-text-muted">Tarifs, catégories</p>
           </button>
           <button onClick={() => nav("/profile/pro-preview")}
-            className="bg-white border border-gray-200 rounded-[16px] p-3.5 text-left cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-50 shadow-sm">
-            <Award className="w-4 h-4 text-gray-900 mb-1.5" />
-            <p className="text-[12px] font-bold text-gray-900">Voir mon profil</p>
-            <p className="text-[9px] text-gray-500">Aperçu client</p>
+            className="bg-cm-elevated border border-cm-border rounded-[16px] p-3.5 text-left cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface shadow-sm">
+            <Award className="w-4 h-4 text-cm-text mb-1.5" />
+            <p className="text-[12px] font-bold text-cm-text">Voir mon profil</p>
+            <p className="text-[9px] text-cm-text-muted">Aperçu client</p>
           </button>
         </div>
 
         <div className="text-center py-4">
-          <p className="text-[10px] text-gray-400">ÇaMatch Prestataire v2.0</p>
+          <p className="text-[10px] text-cm-text-muted">ÇaMatch Prestataire v2.0</p>
         </div>
       </div>
 
@@ -963,28 +963,28 @@ export default function ProDashboardScreen() {
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="bg-white rounded-t-[24px] w-full max-w-md"
+              className="bg-cm-elevated rounded-t-[24px] w-full max-w-md"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-3 mb-2" />
+              <div className="w-10 h-1 bg-cm-border-soft rounded-full mx-auto mt-3 mb-2" />
               <div className="px-5 pb-8">
-                <h3 className="text-[16px] font-bold text-gray-900 text-center mb-1">Type de prestation</h3>
-                <p className="text-[11px] text-gray-500 text-center mb-5">Choisissez le modèle de tarification</p>
+                <h3 className="text-[16px] font-bold text-cm-text text-center mb-1">Type de prestation</h3>
+                <p className="text-[11px] text-cm-text-muted text-center mb-5">Choisissez le modèle de tarification</p>
 
                 <button onClick={() => handlePricingChoice("fixed")}
-                  className="w-full mb-3 p-4 rounded-[14px] border-2 border-gray-200 text-left cursor-pointer active:scale-[0.98] transition-transform hover:border-gray-900">
-                  <p className="text-[14px] font-bold text-gray-900 mb-1">💰 Prix fixe</p>
-                  <p className="text-[11px] text-gray-500">Le prix est connu à l'avance. Paiement immédiat.</p>
+                  className="w-full mb-3 p-4 rounded-[14px] border-2 border-cm-border text-left cursor-pointer active:scale-[0.98] transition-transform hover:border-cm-text">
+                  <p className="text-[14px] font-bold text-cm-text mb-1">💰 Prix fixe</p>
+                  <p className="text-[11px] text-cm-text-muted">Le prix est connu à l'avance. Paiement immédiat.</p>
                 </button>
 
                 <button onClick={() => handlePricingChoice("quote")}
-                  className="w-full p-4 rounded-[14px] border-2 border-gray-200 text-left cursor-pointer active:scale-[0.98] transition-transform hover:border-gray-900">
-                  <p className="text-[14px] font-bold text-gray-900 mb-1">📋 Sur devis</p>
-                  <p className="text-[11px] text-gray-500">Vous établissez un devis détaillé. Paiement après acceptation.</p>
+                  className="w-full p-4 rounded-[14px] border-2 border-cm-border text-left cursor-pointer active:scale-[0.98] transition-transform hover:border-cm-text">
+                  <p className="text-[14px] font-bold text-cm-text mb-1">📋 Sur devis</p>
+                  <p className="text-[11px] text-cm-text-muted">Vous établissez un devis détaillé. Paiement après acceptation.</p>
                 </button>
 
                 <button onClick={() => { setShowPricingChoice(false); setPricingAlert(null); }}
-                  className="w-full mt-4 h-11 text-[13px] text-gray-500 font-medium cursor-pointer hover:text-gray-700 transition-colors">
+                  className="w-full mt-4 h-11 text-[13px] text-cm-text-muted font-medium cursor-pointer hover:text-cm-text-soft transition-colors">
                   Annuler
                 </button>
               </div>

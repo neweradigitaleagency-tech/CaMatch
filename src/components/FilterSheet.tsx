@@ -26,7 +26,7 @@ export default function FilterSheet({ open, filters, onSetFilter, onClose }: Fil
       >
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-[16px] font-semibold text-cm-text">Filtrer les résultats</h3>
-          <button onClick={onClose} className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer">
+          <button onClick={onClose} className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer">
             <X className="w-4 h-4 text-cm-text" />
           </button>
         </div>

@@ -160,17 +160,17 @@ export default function AdminCategoriesPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Catégories</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{parents.length} catégories · {children.length} sous-catégories</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Catégories</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{parents.length} catégories · {children.length} sous-catégories</p>
         </div>
         <div className="flex items-center gap-2">
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cm-text-muted" />
             <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Rechercher..."
-              className="w-48 h-9 pl-8 pr-3 text-[12px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-48 h-9 pl-8 pr-3 text-[12px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             {searchQuery && (
-              <button onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer">
+              <button onClick={() => setSearchQuery("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-cm-text-muted hover:text-cm-text-soft cursor-pointer">
                 <X className="w-3.5 h-3.5" />
               </button>
             )}
@@ -181,9 +181,9 @@ export default function AdminCategoriesPage() {
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden animate-pulse">
-              <div className="h-12 bg-gray-100" />
-              {[1, 2].map((j) => <div key={j} className="h-10 bg-gray-50 border-t border-gray-100" />)}
+            <div key={i} className="bg-cm-elevated border border-cm-border rounded-xl overflow-hidden animate-pulse">
+              <div className="h-12 bg-cm-surface" />
+              {[1, 2].map((j) => <div key={j} className="h-10 bg-cm-surface border-t border-cm-border/40" />)}
             </div>
           ))}
         </div>
@@ -195,46 +195,46 @@ export default function AdminCategoriesPage() {
             const hasSearchMatch = searchQuery && parentChildren.some((c) => c.name.toLowerCase().includes(searchQuery.toLowerCase()))
 
             return (
-              <div key={parent.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-2 px-4 h-11 bg-gray-50 border-b border-gray-100 cursor-pointer hover:bg-gray-100/80 transition-colors select-none"
+              <div key={parent.id} className="bg-cm-elevated border border-cm-border rounded-xl overflow-hidden">
+                <div className="flex items-center gap-2 px-4 h-11 bg-cm-surface border-b border-cm-border/40 cursor-pointer hover:bg-cm-surface/80 transition-colors select-none"
                   onClick={() => toggleExpand(parent.id)}>
-                  <button className="text-gray-400 hover:text-gray-600 cursor-pointer shrink-0">
+                  <button className="text-cm-text-muted hover:text-cm-text-soft cursor-pointer shrink-0">
                     {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                   </button>
                   <span className="text-[15px]">{getParentEmoji(parent.slug)}</span>
-                  <span className="text-[13px] font-semibold text-gray-900">{parent.name}</span>
-                  <span className="text-[11px] text-gray-400">({parentChildren.length} sous-catégorie{parentChildren.length !== 1 ? "s" : ""})</span>
+                  <span className="text-[13px] font-semibold text-cm-text">{parent.name}</span>
+                  <span className="text-[11px] text-cm-text-muted">({parentChildren.length} sous-catégorie{parentChildren.length !== 1 ? "s" : ""})</span>
                   {canCreate && (
                     <button onClick={(e) => { e.stopPropagation(); openCreateModal(parent.id) }}
-                      className="ml-auto flex items-center gap-1 h-7 px-2.5 rounded-lg text-[11px] font-medium text-gray-500 hover:text-gray-700 hover:bg-gray-200/50 cursor-pointer transition-colors">
+                      className="ml-auto flex items-center gap-1 h-7 px-2.5 rounded-lg text-[11px] font-medium text-cm-text-muted hover:text-cm-text-soft hover:bg-cm-border-soft/50 cursor-pointer transition-colors">
                       <Plus className="w-3 h-3" /> Ajouter
                     </button>
                   )}
                 </div>
                 {isExpanded && (
-                  <div className="divide-y divide-gray-50">
+                  <div className="divide-y divide-cm-border/40">
                     {parentChildren.length === 0 && (
-                      <div className="px-4 py-6 text-center text-[12px] text-gray-400">
+                      <div className="px-4 py-6 text-center text-[12px] text-cm-text-muted">
                         Aucune sous-catégorie
                       </div>
                     )}
                     {parentChildren.map((child) => (
-                      <div key={child.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50/50 transition-colors min-h-[40px]">
-                        <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-[10px] text-gray-400 shrink-0">
+                      <div key={child.id} className="flex items-center gap-3 px-4 py-2.5 hover:bg-cm-surface/50 transition-colors min-h-[40px]">
+                        <div className="w-5 h-5 rounded-full bg-cm-surface flex items-center justify-center text-[10px] text-cm-text-muted shrink-0">
                           {child.name.charAt(0)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-[13px] font-medium text-gray-900">{child.name}</span>
-                            <span className="text-[10px] text-gray-400 font-mono">{child.slug}</span>
+                            <span className="text-[13px] font-medium text-cm-text">{child.name}</span>
+                            <span className="text-[10px] text-cm-text-muted font-mono">{child.slug}</span>
                           </div>
                         </div>
                         <StatusBadge status={child.is_active ? "active" : "inactive"} label={child.is_active ? "Actif" : "Inactif"} />
-                        <span className="text-[11px] text-gray-500 w-12 text-right">{child.pro_count} pro{child.pro_count !== 1 ? "s" : ""}</span>
+                        <span className="text-[11px] text-cm-text-muted w-12 text-right">{child.pro_count} pro{child.pro_count !== 1 ? "s" : ""}</span>
                         {canUpdate && (
                           <div className="flex items-center gap-1">
                             <button onClick={() => openEditModal(child)}
-                              className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer">
+                              className="w-7 h-7 flex items-center justify-center rounded-lg text-cm-text-muted hover:text-cm-text-soft hover:bg-cm-surface cursor-pointer">
                               <Pencil className="w-3 h-3" />
                             </button>
                             <button onClick={() => handleToggle(child)} disabled={actionLoading === child.id}
@@ -245,7 +245,7 @@ export default function AdminCategoriesPage() {
                             </button>
                             {canDelete && (
                               <button onClick={() => setDeleteTarget(child)}
-                                className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 cursor-pointer">
+                                className="w-7 h-7 flex items-center justify-center rounded-lg text-cm-text-muted hover:text-red-500 hover:bg-red-50 cursor-pointer">
                                 <Trash2 className="w-3 h-3" />
                               </button>
                             )}
@@ -259,7 +259,7 @@ export default function AdminCategoriesPage() {
             )
           })}
           {filteredParents.length === 0 && (
-            <div className="bg-white border border-gray-200 rounded-xl py-12 text-center text-[13px] text-gray-400">
+            <div className="bg-cm-elevated border border-cm-border rounded-xl py-12 text-center text-[13px] text-cm-text-muted">
               Aucune catégorie trouvée
             </div>
           )}
@@ -269,33 +269,33 @@ export default function AdminCategoriesPage() {
       <Modal isOpen={modalOpen} onClose={() => { if (!saving) { setModalOpen(false); } }} title={editingId ? "Modifier la sous-catégorie" : "Nouvelle sous-catégorie"} size="sm">
         <div className="space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Catégorie parente</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Catégorie parente</label>
             <select value={form.parent_id} onChange={(e) => setForm({ ...form, parent_id: e.target.value })}
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 cursor-pointer">
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border cursor-pointer">
               {parents.map((p) => (
                 <option key={p.id} value={p.id}>{getParentEmoji(p.slug)} {p.name}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Nom</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Nom</label>
             <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Ex: Plombier, Électricien…"
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
           </div>
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Slug</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Slug</label>
             <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
               placeholder="Ex: plombier, electricien…"
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 font-mono" />
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border font-mono" />
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
             <button onClick={() => { setModalOpen(false) }} disabled={saving}
-              className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer disabled:opacity-50">
               Annuler
             </button>
             <button onClick={handleSave} disabled={saving || !form.name || !form.slug}
-              className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
               <Save className="w-3.5 h-3.5" /> {saving ? "Enregistrement…" : editingId ? "Enregistrer" : "Créer"}
             </button>
           </div>

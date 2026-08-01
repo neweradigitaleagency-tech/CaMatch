@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import ProfileSecurityScreen from "../../components/ProfileSecurityScreen";
 
 export default function SecurityPage() {
-  const nav = useNavigate();
-  return <ProfileSecurityScreen onBack={() => nav("/", { state: { reopenMenu: true } })} />;
+  const { navigate, setFlag } = useAppNavigation();
+  return <ProfileSecurityScreen onBack={() => { setFlag("reopen-menu", true); navigate("/") }} />;
 }

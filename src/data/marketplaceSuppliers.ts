@@ -1,5 +1,6 @@
 import type {
   ProfessionalSeller, IndividualSeller, CaMatchProSeller, Seller, DeliveryZone,
+  MarketplaceVertical, ShopType,
 } from "../types/marketplace"
 
 // ─── Professional Sellers (Pro Supply) ───
@@ -8,6 +9,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-1", userId: "user-pro-1", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: true,
     companyName: "Quincaillerie ABC", slug: "quincaillerie-abc",
     logo: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1200&h=400&fit=crop",
@@ -35,6 +37,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-2", userId: "user-pro-2", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: true,
     companyName: "Matériaux Yopougon", slug: "materiaux-yopougon",
     logo: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&h=400&fit=crop",
@@ -57,6 +60,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-3", userId: "user-pro-3", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "hybrid", buyOnline: true,
     companyName: "BTP Express", slug: "btp-express",
     logo: "https://images.unsplash.com/photo-1570488676426-87b3f25574fb?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&h=400&fit=crop",
@@ -79,6 +83,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-4", userId: "user-pro-4", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: false,
     companyName: "Fournitures Générales", slug: "fournitures-generales",
     logo: "", banner: "",
     description: "Fournitures générales pour le bâtiment et la construction.",
@@ -98,6 +103,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-5", userId: "user-pro-5", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: false,
     companyName: "Nouvelle Quincaillerie", slug: "nouvelle-quincaillerie",
     logo: "", banner: "",
     description: "Nouvelle quincaillerie à Cocody. Ouverture prochaine.",
@@ -115,6 +121,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-6", userId: "user-pro-6", type: "professional",
     verticals: ["pro_supply", "shopping"],
+    shopType: "hybrid", buyOnline: true,
     companyName: "Plomberie Fofana", slug: "plomberie-fofana",
     logo: "https://images.unsplash.com/photo-1590959651373-a3db0f38a961?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=400&fit=crop",
@@ -138,6 +145,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-7", userId: "user-pro-7", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: true,
     companyName: "Élec Shop Abidjan", slug: "elec-shop-abidjan",
     logo: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=1200&h=400&fit=crop",
@@ -160,6 +168,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-8", userId: "user-pro-8", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: true,
     companyName: "Matériaux Koumassi", slug: "materiaux-koumassi",
     logo: "https://images.unsplash.com/photo-1567529684892-09290a1b2d05?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1513828583688-c52646db42da?w=1200&h=400&fit=crop",
@@ -182,6 +191,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-9", userId: "user-pro-9", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: false,
     companyName: "Peinture Plus", slug: "peinture-plus",
     logo: "https://images.unsplash.com/photo-1562259929-b4e1fd3aef09?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=1200&h=400&fit=crop",
@@ -204,6 +214,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-10", userId: "user-pro-10", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: false,
     companyName: "Menuiserie du Sud", slug: "menuiserie-du-sud",
     logo: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1504148455328-c376907d081c?w=1200&h=400&fit=crop",
@@ -225,6 +236,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-11", userId: "user-pro-11", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "physical", buyOnline: false,
     companyName: "Carrelage Premium", slug: "carrelage-premium",
     logo: "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1615971677499-5467cbab01c0?w=1200&h=400&fit=crop",
@@ -248,6 +260,7 @@ export const PROFESSIONAL_SELLERS: ProfessionalSeller[] = [
   {
     id: "seller-pro-12", userId: "user-pro-12", type: "professional",
     verticals: ["pro_supply"],
+    shopType: "hybrid", buyOnline: true,
     companyName: "Énergie Pro", slug: "energie-pro",
     logo: "https://images.unsplash.com/photo-1509391366360-2e959784a276?w=200&h=200&fit=crop",
     banner: "https://images.unsplash.com/photo-1508514177221-188b1cf16e9d?w=1200&h=400&fit=crop",
@@ -284,6 +297,7 @@ export const INDIVIDUAL_SELLERS: IndividualSeller[] = [
   {
     id: "seller-ind-2", userId: "user-ind-2", type: "individual",
     verticals: ["second_hand"],
+    shopType: "online", buyOnline: true,
     displayName: "Mamadou Traoré", photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop",
     city: "Plateau", phone: "+225 07 34 56 78 90",
     phoneVerified: true, saleHistory: 15, memberSince: "2025-10-20",
@@ -293,6 +307,7 @@ export const INDIVIDUAL_SELLERS: IndividualSeller[] = [
   {
     id: "seller-ind-3", userId: "user-ind-3", type: "individual",
     verticals: ["second_hand", "shopping"],
+    shopType: "online", buyOnline: true,
     displayName: "Fatou Diallo", photo: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop",
     city: "Marcory", phone: "+225 07 45 67 89 01",
     phoneVerified: true, saleHistory: 8, memberSince: "2026-01-05",
@@ -316,6 +331,16 @@ export const INDIVIDUAL_SELLERS: IndividualSeller[] = [
     phoneVerified: true, saleHistory: 12, memberSince: "2025-06-01",
     verificationStatus: "active", rating: 4.9, reviewCount: 11, totalSales: 12,
     createdAt: "2025-06-01T10:00:00Z", updatedAt: "2026-07-15T16:00:00Z",
+  },
+  {
+    id: "seller-ind-6", userId: "user-ind-6", type: "individual",
+    verticals: ["automobile"],
+    shopType: "physical", buyOnline: true,
+    displayName: "Idrissa Camara", photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&h=200&fit=crop",
+    city: "Marcory", phone: "+225 07 89 01 23 45",
+    phoneVerified: true, saleHistory: 34, memberSince: "2025-04-12",
+    verificationStatus: "active", rating: 4.6, reviewCount: 22, totalSales: 34,
+    createdAt: "2025-04-12T10:00:00Z", updatedAt: "2026-07-18T09:00:00Z",
   },
 ]
 
@@ -364,4 +389,60 @@ export function getSellersByCategory(categoryId: string): Seller[] {
 
 export function formatSellerRating(rating: number): string {
   return rating > 0 ? rating.toFixed(1) : "Nouveau"
+}
+
+// ─── Boutiques d'Abidjan ───
+
+export interface BoutiqueView {
+  id: string
+  name: string
+  slug?: string
+  logo: string
+  banner: string
+  description: string
+  city: string
+  verticals: MarketplaceVertical[]
+  shopType: ShopType
+  buyOnline: boolean
+  rating: number
+  reviewCount: number
+  totalSales: number
+  verified: boolean
+}
+
+export function getSellerDisplayName(seller: Seller): string {
+  switch (seller.type) {
+    case "professional":
+      return seller.companyName
+    case "individual":
+      return seller.displayName
+    case "ca_match_pro":
+      return seller.businessName
+  }
+}
+
+export function getBoutiques(): BoutiqueView[] {
+  return ALL_SELLERS
+    .filter((s) => s.verificationStatus === "active" || s.verificationStatus === "verified")
+    .map((s) => ({
+      id: s.id,
+      name: getSellerDisplayName(s),
+      slug: s.type === "professional" ? s.slug : undefined,
+      logo: s.type === "professional" ? s.logo : s.type === "individual" ? s.photo : s.photo,
+      banner: s.type === "professional" ? s.banner : "",
+      description: s.type === "professional" ? s.description : "",
+      city: s.type === "professional" ? s.city : s.type === "individual" ? s.city : s.city,
+      verticals: s.verticals,
+      shopType: s.shopType ?? (s.type === "individual" ? "online" : "physical"),
+      buyOnline: s.buyOnline ?? false,
+      rating: s.rating,
+      reviewCount: s.reviewCount,
+      totalSales: s.totalSales,
+      verified: s.verificationStatus === "verified" || (s.rating >= 4.5 && s.reviewCount >= 40),
+    }))
+    .sort((a, b) => b.rating - a.rating)
+}
+
+export function getBoutiqueById(id: string): BoutiqueView | undefined {
+  return getBoutiques().find((b) => b.id === id)
 }

@@ -30,7 +30,7 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 const SEVERITY_STYLES: Record<string, string> = {
-  low: "text-gray-500 bg-gray-50 border-gray-200",
+  low: "text-cm-text-muted bg-cm-surface border-cm-border",
   medium: "text-amber-700 bg-amber-50 border-amber-200",
   high: "text-orange-700 bg-orange-50 border-orange-200",
   critical: "text-red-700 bg-red-50 border-red-200 font-semibold",
@@ -111,23 +111,23 @@ export default function AdminReportsPage() {
       render: (r) => (
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-mono text-gray-400">{r.id.slice(0, 8)}</span>
+            <span className="text-[11px] font-mono text-cm-text-muted">{r.id.slice(0, 8)}</span>
             {r.severity === "critical" && <span className="w-1.5 h-1.5 rounded-full bg-red-500" />}
           </div>
-          <p className="text-[13px] font-medium text-gray-900 truncate mt-0.5">{REPORT_REASON_LABELS[r.reason] ?? r.reason}</p>
-          <p className="text-[11px] text-gray-400 truncate">{r.description?.slice(0, 60)}</p>
+          <p className="text-[13px] font-medium text-cm-text truncate mt-0.5">{REPORT_REASON_LABELS[r.reason] ?? r.reason}</p>
+          <p className="text-[11px] text-cm-text-muted truncate">{r.description?.slice(0, 60)}</p>
         </div>
       ),
     },
     {
       key: "reporter_name", label: "Signalé par", sortable: true, width: "130px",
-      render: (r) => <span className="text-[12px] text-gray-700">{r.reporter_name || "—"}</span>,
+      render: (r) => <span className="text-[12px] text-cm-text-soft">{r.reporter_name || "—"}</span>,
     },
     {
       key: "reported_user_name", label: "Visé", sortable: true, width: "140px",
       render: (r) => (
         <div className="flex items-center gap-1.5">
-          <span className="text-[12px] text-gray-700">{r.reported_user_name || "—"}</span>
+          <span className="text-[12px] text-cm-text-soft">{r.reported_user_name || "—"}</span>
           <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${r.reported_user_type === "professional" ? "bg-blue-50 text-blue-600" : "bg-purple-50 text-purple-600"}`}>
             {r.reported_user_type === "professional" ? "Pro" : "Client"}
           </span>
@@ -137,7 +137,7 @@ export default function AdminReportsPage() {
     {
       key: "severity", label: "Sévérité", sortable: true, width: "90px",
       render: (r) => (
-        <span className={`inline-flex items-center px-2 py-0.5 text-[11px] rounded-md border ${SEVERITY_STYLES[r.severity] ?? "text-gray-500"}`}>
+        <span className={`inline-flex items-center px-2 py-0.5 text-[11px] rounded-md border ${SEVERITY_STYLES[r.severity] ?? "text-cm-text-muted"}`}>
           {REPORT_SEVERITY_LABELS[r.severity] ?? r.severity}
         </span>
       ),
@@ -153,8 +153,8 @@ export default function AdminReportsPage() {
       key: "created_at", label: "Date", sortable: true, width: "110px",
       render: (r) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-500">{format(new Date(r.created_at), "d MMM HH:mm", { locale: fr })}</span>
-          {r.admin_name && <span className="text-[11px] text-gray-400 mt-0.5">{r.admin_name}</span>}
+          <span className="text-[12px] text-cm-text-muted">{format(new Date(r.created_at), "d MMM HH:mm", { locale: fr })}</span>
+          {r.admin_name && <span className="text-[11px] text-cm-text-muted mt-0.5">{r.admin_name}</span>}
         </div>
       ),
     },
@@ -175,7 +175,7 @@ export default function AdminReportsPage() {
             <button
               onClick={(e) => { e.stopPropagation(); openActionModal(r, "dismiss") }}
               disabled={actionLoading === r.id}
-              className="h-7 px-2 rounded-lg text-[11px] font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 cursor-pointer disabled:opacity-50 flex items-center gap-1"
+              className="h-7 px-2 rounded-lg text-[11px] font-medium text-cm-text-soft bg-cm-surface hover:bg-cm-surface cursor-pointer disabled:opacity-50 flex items-center gap-1"
             >
               <XCircle className="w-3 h-3" /> Ignorer
             </button>
@@ -183,7 +183,7 @@ export default function AdminReportsPage() {
           {(r.status !== "pending" || (!canResolve && !canDismiss)) && (
             <button
               onClick={(e) => { e.stopPropagation(); openViewModal(r) }}
-              className="h-7 px-2 rounded-lg text-[11px] font-medium text-gray-500 hover:bg-gray-100 cursor-pointer flex items-center gap-1"
+              className="h-7 px-2 rounded-lg text-[11px] font-medium text-cm-text-muted hover:bg-cm-surface cursor-pointer flex items-center gap-1"
               title="Détails"
             >
               <Eye className="w-3 h-3" /> Détails
@@ -200,8 +200,8 @@ export default function AdminReportsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Signalements</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">
+          <h1 className="text-[20px] font-bold text-cm-text">Signalements</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">
             {total} signalement{total !== 1 ? "s" : ""}
             {pendingCount > 0 && <span className="ml-2 text-amber-600 font-medium">· {pendingCount} en attente</span>}
             {activeCount > 0 && <span className="ml-2 text-blue-600 font-medium">· {activeCount} en cours</span>}
@@ -212,7 +212,7 @@ export default function AdminReportsPage() {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {FILTERS.map((f) => (
           <button key={f.key} onClick={() => setFilter(f.key)}
-            className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${filter === f.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+            className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${filter === f.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
             {f.label}
             {f.key !== "all" && (
               <span className="ml-1.5 text-[11px] opacity-60">
@@ -246,18 +246,18 @@ export default function AdminReportsPage() {
               <DetailRow label="Date" value={format(new Date(modalReport.created_at), "d MMMM HH:mm", { locale: fr })} />
             </dl>
             <div className="mt-4">
-              <p className="text-[12px] text-gray-500 font-medium mb-1">Description</p>
-              <p className="text-[13px] text-gray-700 bg-gray-50 rounded-lg p-3">{modalReport.description || "Aucune description"}</p>
+              <p className="text-[12px] text-cm-text-muted font-medium mb-1">Description</p>
+              <p className="text-[13px] text-cm-text-soft bg-cm-surface rounded-lg p-3">{modalReport.description || "Aucune description"}</p>
             </div>
             {modalReport.resolution_note && (
               <div className="mt-4">
-                <p className="text-[12px] text-gray-500 font-medium mb-1">Résolution</p>
-                <p className="text-[13px] text-gray-700 bg-amber-50 rounded-lg p-3">{modalReport.resolution_note}</p>
+                <p className="text-[12px] text-cm-text-muted font-medium mb-1">Résolution</p>
+                <p className="text-[13px] text-cm-text-soft bg-amber-50 rounded-lg p-3">{modalReport.resolution_note}</p>
               </div>
             )}
             {modalReport.evidence_urls && modalReport.evidence_urls.length > 0 && (
               <div className="mt-4">
-                <p className="text-[12px] text-gray-500 font-medium mb-1">Preuves</p>
+                <p className="text-[12px] text-cm-text-muted font-medium mb-1">Preuves</p>
                 <div className="space-y-1">
                   {modalReport.evidence_urls.map((url, i) => (
                     <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block text-[12px] text-blue-600 underline">{url}</a>
@@ -269,7 +269,7 @@ export default function AdminReportsPage() {
         )}
         {modalReport && modalAction && modalAction !== "view" && (
           <div>
-            <p className="text-[12px] text-gray-500 mb-4">
+            <p className="text-[12px] text-cm-text-muted mb-4">
               {modalAction === "resolve"
                 ? "Confirmez la résolution de ce signalement. Vous pouvez ajouter une note."
                 : "Confirmez que vous ignorez ce signalement. Vous pouvez ajouter une note."}
@@ -279,17 +279,17 @@ export default function AdminReportsPage() {
               onChange={(e) => setResolutionText(e.target.value)}
               placeholder="Note de résolution (optionnelle)"
               rows={3}
-              className="w-full p-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 placeholder-gray-400 focus:border-gray-300 resize-none mb-4"
+              className="w-full p-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text placeholder:text-cm-text-muted focus:border-cm-border resize-none mb-4"
             />
             <div className="flex justify-end gap-2">
               <button onClick={() => { setModalReport(null); setModalAction(null) }}
-                className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer">
                 Annuler
               </button>
               <button onClick={handleConfirmAction}
                 disabled={actionLoading === modalReport.id}
                 className={`h-9 px-4 text-[12px] font-medium rounded-lg text-white cursor-pointer disabled:opacity-50 flex items-center gap-1.5 ${
-                  modalAction === "resolve" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-gray-600 hover:bg-gray-700"
+                  modalAction === "resolve" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-cm-text hover:bg-cm-text/80"
                 }`}>
                 {actionLoading === modalReport.id ? (
                   <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -307,8 +307,8 @@ export default function AdminReportsPage() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-[12px] text-gray-500">{label}</dt>
-      <dd className="text-[12px] font-medium text-gray-900 text-right truncate ml-4">{value}</dd>
+      <dt className="text-[12px] text-cm-text-muted">{label}</dt>
+      <dd className="text-[12px] font-medium text-cm-text text-right truncate ml-4">{value}</dd>
     </div>
   )
 }

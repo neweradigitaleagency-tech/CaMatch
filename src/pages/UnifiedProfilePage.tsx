@@ -56,15 +56,15 @@ function ProfessionalProfile({ data }: { data: Record<string, unknown> | undefin
       <BentoCard className="p-4">
         <p className="text-[12px] font-semibold text-cm-text mb-3">Profil professionnel</p>
         <div className="space-y-2 text-[12px]">
-          {data?.business_name && (
+          {data?.business_name ? (
             <div className="flex justify-between">
               <span className="text-cm-text-muted">Enseigne</span>
-              <span className="font-medium">{data.business_name as string}</span>
+              <span className="font-medium">{String(data.business_name)}</span>
             </div>
-          )}
-          {data?.bio && (
-            <p className="text-cm-text-muted italic mt-1">{(data.bio as string).slice(0, 100)}</p>
-          )}
+          ) : null}
+          {data?.bio ? (
+            <p className="text-cm-text-muted italic mt-1">{String(data.bio).slice(0, 100)}</p>
+          ) : null}
           <div className="flex justify-between">
             <span className="text-cm-text-muted">Tarif horaire</span>
             <span className="font-medium">{data?.hourly_rate ? formatXOF(data.hourly_rate as number) : "—"}</span>
@@ -85,12 +85,12 @@ function SupplierProfile({ data }: { data: Record<string, unknown> | undefined }
       <BentoCard className="p-4">
         <p className="text-[12px] font-semibold text-cm-text mb-3">Profil boutique</p>
         <div className="space-y-2 text-[12px]">
-          {data?.company_name && (
+          {data?.company_name ? (
             <div className="flex justify-between">
               <span className="text-cm-text-muted">Enseigne</span>
-              <span className="font-medium">{data.company_name as string}</span>
+              <span className="font-medium">{String(data.company_name)}</span>
             </div>
-          )}
+          ) : null}
           <div className="flex justify-between">
             <span className="text-cm-text-muted">Produits</span>
             <span className="font-medium">{(data?.total_products as number) ?? 0}</span>

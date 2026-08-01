@@ -16,7 +16,7 @@ export interface UnifiedTrustScore {
 export async function getTrustScores(userId: string): Promise<UnifiedTrustScore | null> {
   if (!isSupabaseReady()) return getMockTrustScores();
 
-  const { data, error } = await supabase.rpc("get_trust_scores", {
+  const { data, error } = await (supabase as any).rpc("get_trust_scores", {
     p_user_id: userId,
   });
 
@@ -31,7 +31,7 @@ export async function getTrustScores(userId: string): Promise<UnifiedTrustScore 
 export async function recalculateTrustScore(userId: string): Promise<UnifiedTrustScore | null> {
   if (!isSupabaseReady()) return getMockTrustScores();
 
-  const { data, error } = await supabase.rpc("calculate_unified_trust_scores", {
+  const { data, error } = await (supabase as any).rpc("calculate_unified_trust_scores", {
     p_user_id: userId,
   });
 

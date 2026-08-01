@@ -111,7 +111,7 @@ export default function AdminPromotionsPage() {
       key: "code", label: "Code", sortable: true, width: "150px",
       render: (p) => (
         <div className="flex items-center gap-2">
-          <span className="text-[11px] font-mono font-bold text-gray-900 bg-gray-50 border border-gray-200 px-2 py-0.5 rounded">{p.code}</span>
+          <span className="text-[11px] font-mono font-bold text-cm-text bg-cm-surface border border-cm-border px-2 py-0.5 rounded">{p.code}</span>
         </div>
       ),
     },
@@ -126,7 +126,7 @@ export default function AdminPromotionsPage() {
     {
       key: "value", label: "Valeur", sortable: true, width: "100px",
       render: (p) => (
-        <span className="text-[12px] font-medium text-gray-900">
+        <span className="text-[12px] font-medium text-cm-text">
           {p.type === "percentage" ? `${p.value}%` : p.type === "fixed" ? `${p.value.toLocaleString()} F` : "—"}
         </span>
       ),
@@ -135,10 +135,10 @@ export default function AdminPromotionsPage() {
       key: "uses", label: "Utilisations", width: "120px",
       render: (p) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-700">{p.current_uses}{p.max_uses ? ` / ${p.max_uses}` : ""}</span>
+          <span className="text-[12px] text-cm-text-soft">{p.current_uses}{p.max_uses ? ` / ${p.max_uses}` : ""}</span>
           {p.max_uses && (
-            <div className="w-24 h-1.5 bg-gray-100 rounded-full mt-1 overflow-hidden">
-              <div className="h-full bg-gray-900 rounded-full" style={{ width: `${Math.min(100, (p.current_uses / p.max_uses) * 100)}%` }} />
+            <div className="w-24 h-1.5 bg-cm-surface rounded-full mt-1 overflow-hidden">
+              <div className="h-full bg-cm-text rounded-full" style={{ width: `${Math.min(100, (p.current_uses / p.max_uses) * 100)}%` }} />
             </div>
           )}
         </div>
@@ -146,7 +146,7 @@ export default function AdminPromotionsPage() {
     },
     {
       key: "target", label: "Cible", sortable: true, width: "100px",
-      render: (p) => <span className="text-[12px] text-gray-500">{TARGET_LABELS[p.target] ?? p.target}</span>,
+      render: (p) => <span className="text-[12px] text-cm-text-muted">{TARGET_LABELS[p.target] ?? p.target}</span>,
     },
     {
       key: "status", label: "Statut", sortable: true, width: "100px",
@@ -159,8 +159,8 @@ export default function AdminPromotionsPage() {
       key: "dates", label: "Période", sortable: false, width: "160px",
       render: (p) => (
         <div className="flex flex-col text-[11px]">
-          <span className="text-gray-700">Du {format(new Date(p.starts_at), "d MMM", { locale: fr })}</span>
-          <span className="text-gray-400">{p.expires_at ? `au ${format(new Date(p.expires_at), "d MMM yyyy", { locale: fr })}` : "—"}</span>
+          <span className="text-cm-text-soft">Du {format(new Date(p.starts_at), "d MMM", { locale: fr })}</span>
+          <span className="text-cm-text-muted">{p.expires_at ? `au ${format(new Date(p.expires_at), "d MMM yyyy", { locale: fr })}` : "—"}</span>
         </div>
       ),
     },
@@ -185,12 +185,12 @@ export default function AdminPromotionsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Promotions</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{promotions.length} codes promotionnels</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Promotions</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{promotions.length} codes promotionnels</p>
         </div>
         {canCreate && (
           <button onClick={() => setModalOpen(true)}
-            className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer">
+            className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer">
             <Plus className="w-3.5 h-3.5" /> Nouveau code
           </button>
         )}
@@ -211,14 +211,14 @@ export default function AdminPromotionsPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Code</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Code</label>
               <input type="text" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Type</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Type</label>
               <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300">
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border">
                 <option value="percentage">Pourcentage</option>
                 <option value="fixed">Montant fixe</option>
                 <option value="free_shipping">Livraison offerte</option>
@@ -228,26 +228,26 @@ export default function AdminPromotionsPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Valeur</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Valeur</label>
               <input type="number" value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })}
-                min={0} className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                min={0} className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Commande min. (F)</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Commande min. (F)</label>
               <input type="number" value={form.min_order_amount} onChange={(e) => setForm({ ...form, min_order_amount: e.target.value })}
-                min={0} className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                min={0} className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Utilisations max</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Utilisations max</label>
               <input type="number" value={form.max_uses} onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
-                min={0} className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                min={0} className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Cible</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Cible</label>
               <select value={form.target} onChange={(e) => setForm({ ...form, target: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300">
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border">
                 <option value="all">Tous</option>
                 <option value="clients">Clients</option>
                 <option value="professionals">Professionnels</option>
@@ -257,29 +257,29 @@ export default function AdminPromotionsPage() {
             </div>
           </div>
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Description</label>
             <input type="text" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Date début</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Date début</label>
               <input type="date" value={form.starts_at} onChange={(e) => setForm({ ...form, starts_at: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Date fin</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Date fin</label>
               <input type="date" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
             <button onClick={() => setModalOpen(false)} disabled={saving}
-              className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer disabled:opacity-50">
               Annuler
             </button>
             <button onClick={handleCreate} disabled={saving || !form.code || !form.value}
-              className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
               <Save className="w-3.5 h-3.5" /> {saving ? "Création…" : "Créer"}
             </button>
           </div>

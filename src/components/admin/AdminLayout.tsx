@@ -6,14 +6,14 @@ import AdminBreadcrumb from "./AdminBreadcrumb"
 import { useAdminAuthStore } from "../../stores/adminAuthStore"
 
 export default function AdminLayout() {
-  const { isAuthenticated, initialized } = useAdminAuthStore()
+  const { isAuthenticated, initialized } = useAdminAuthStore
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
   if (!initialized) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--admin-bg)]">
-        <div className="w-8 h-8 border-2 border-gray-300 border-t-[var(--admin-accent)] rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-cm-border border-t-[var(--admin-accent)] rounded-full animate-spin" />
       </div>
     )
   }
@@ -36,7 +36,7 @@ export default function AdminLayout() {
           <AdminBreadcrumb />
           <Outlet />
         </main>
-        <footer className="border-t border-gray-200 py-3 px-6 text-[11px] text-gray-400 text-center">
+        <footer className="border-t border-cm-border py-3 px-6 text-[11px] text-cm-text-muted text-center">
           Ça Match Back Office &copy; {new Date().getFullYear()} &mdash; Propulsé par NEDA
         </footer>
       </div>

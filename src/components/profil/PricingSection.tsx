@@ -13,11 +13,11 @@ export default function PricingSection({ mode, editing, pro, onUpdate }: Section
 
   return (
     <ProfileSection title="Tarifs">
-      <div className="bg-white border border-gray-100 rounded-[20px] p-4 shadow-sm">
+      <div className="bg-white border border-cm-border/40 rounded-[20px] p-4 shadow-sm">
         {rows.map((row, i) => (
           <div key={row.label}
-            className={`flex items-center justify-between py-2.5 ${i > 0 ? "border-t border-gray-100" : ""} ${row.highlighted ? "px-3 -mx-3 bg-gray-900 rounded-[12px] text-white border-t-0 mt-1.5 mb-1.5" : "px-0"}`}>
-            <span className={`text-[12px] font-bold ${row.highlighted ? "text-white" : "text-gray-600"}`}>{row.label}</span>
+            className={`flex items-center justify-between py-2.5 ${i > 0 ? "border-t border-cm-border/40" : ""} ${row.highlighted ? "px-3 -mx-3 bg-cm-text rounded-[12px] text-white border-t-0 mt-1.5 mb-1.5" : "px-0"}`}>
+            <span className={`text-[12px] font-bold ${row.highlighted ? "text-white" : "text-cm-text-soft"}`}>{row.label}</span>
             {editing && row.key ? (
               <EditableField
                 value={row.price}
@@ -27,8 +27,8 @@ export default function PricingSection({ mode, editing, pro, onUpdate }: Section
                 onChange={(v) => onUpdate?.(row.key!, v)}
               />
             ) : (
-              <span className={`text-[14px] font-black tracking-tight ${row.highlighted ? "text-white" : "text-gray-900"}`}>
-                {row.price.toLocaleString("fr-FR")} <span className={`text-[9px] font-bold ${row.highlighted ? "text-white/70" : "text-gray-400"}`}>F</span>
+              <span className={`text-[14px] font-black tracking-tight ${row.highlighted ? "text-white" : "text-cm-text"}`}>
+                {row.price.toLocaleString("fr-FR")} <span className={`text-[9px] font-bold ${row.highlighted ? "text-white/70" : "text-cm-text-muted"}`}>F</span>
               </span>
             )}
           </div>

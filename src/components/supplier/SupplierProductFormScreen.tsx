@@ -143,12 +143,12 @@ export default function SupplierProductFormScreen() {
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate("/supplier/products")}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <div>
-          <h1 className="text-[18px] font-bold text-gray-900">{isEdit ? "Modifier le produit" : "Nouveau produit"}</h1>
-          <p className="text-[12px] text-gray-500">{isEdit ? existingProduct?.name : "Ajoutez un produit à votre catalogue"}</p>
+          <h1 className="text-[18px] font-bold text-cm-text">{isEdit ? "Modifier le produit" : "Nouveau produit"}</h1>
+          <p className="text-[12px] text-cm-text-muted">{isEdit ? existingProduct?.name : "Ajoutez un produit à votre catalogue"}</p>
         </div>
       </div>
 
@@ -158,64 +158,64 @@ export default function SupplierProductFormScreen() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
-        <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-2">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-4">
+        <h2 className="text-[13px] font-semibold text-cm-text flex items-center gap-2">
           <Package className="w-4 h-4" /> Informations générales
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="sm:col-span-2">
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Nom du produit *</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Nom du produit *</label>
             <input value={name} onChange={(e) => setName(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Catégorie *</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Catégorie *</label>
             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none bg-white">
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none bg-cm-elevated">
               <option value="">Sélectionner</option>
               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Unité</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Unité</label>
             <select value={unitType} onChange={(e) => setUnitType(e.target.value as UnitType)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none bg-white">
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none bg-cm-elevated">
               {UNIT_TYPES.map((u) => <option key={u.value} value={u.value}>{u.label}</option>)}
             </select>
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Marque</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Marque</label>
             <input value={brand} onChange={(e) => setBrand(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Référence fabricant</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Référence fabricant</label>
             <input value={manufacturerReference} onChange={(e) => setManufacturerReference(e.target.value)}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
           </div>
           <div className="sm:col-span-2">
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Description</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Description</label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green resize-none" />
+              className="w-full px-3 py-2 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green resize-none" />
           </div>
         </div>
       </div>
 
       {/* Photos */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-2">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-cm-text flex items-center gap-2">
           <ImagePlus className="w-4 h-4" /> Photos
         </h2>
         <input ref={imageInputRef} type="file" accept="image/*" multiple
           onChange={handleImageSelect} className="hidden" />
         <button onClick={() => imageInputRef.current?.click()} disabled={uploading}
-          className="w-full h-20 rounded-xl border-2 border-dashed border-gray-300 hover:border-cm-green bg-gray-50 hover:bg-cm-green/5 flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all">
+          className="w-full h-20 rounded-xl border-2 border-dashed border-cm-border hover:border-cm-green bg-cm-surface hover:bg-cm-green/5 flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all">
           {uploading ? (
             <div className="w-5 h-5 border-2 border-cm-green border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Upload className="w-5 h-5 text-gray-400" />
-              <span className="text-[11px] font-medium text-gray-500">Ajouter des photos</span>
+              <Upload className="w-5 h-5 text-cm-text-muted" />
+              <span className="text-[11px] font-medium text-cm-text-muted">Ajouter des photos</span>
             </>
           )}
         </button>
@@ -224,7 +224,7 @@ export default function SupplierProductFormScreen() {
             {images.map((url, i) => (
               <div key={i} className="relative group">
                 <img src={url} alt={`Photo ${i + 1}`}
-                  className="w-20 h-20 rounded-lg object-cover border border-gray-200" />
+                  className="w-20 h-20 rounded-lg object-cover border border-cm-border" />
                 <button onClick={() => setImages(images.filter((_, j) => j !== i))}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                   <X className="w-3 h-3" />
@@ -233,24 +233,24 @@ export default function SupplierProductFormScreen() {
             ))}
           </div>
         )}
-        <p className="text-[10px] text-gray-400">{images.length} photo{images.length > 1 ? "s" : ""} ajoutée{images.length > 1 ? "s" : ""}</p>
+        <p className="text-[10px] text-cm-text-muted">{images.length} photo{images.length > 1 ? "s" : ""} ajoutée{images.length > 1 ? "s" : ""}</p>
       </div>
 
       {/* Videos */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-2">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-cm-text flex items-center gap-2">
           <Film className="w-4 h-4" /> Vidéos
         </h2>
         <input ref={videoInputRef} type="file" accept="video/*" multiple
           onChange={handleVideoSelect} className="hidden" />
         <button onClick={() => videoInputRef.current?.click()} disabled={uploading}
-          className="w-full h-20 rounded-xl border-2 border-dashed border-gray-300 hover:border-cm-green bg-gray-50 hover:bg-cm-green/5 flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all">
+          className="w-full h-20 rounded-xl border-2 border-dashed border-cm-border hover:border-cm-green bg-cm-surface hover:bg-cm-green/5 flex flex-col items-center justify-center gap-1 cursor-pointer disabled:opacity-50 transition-all">
           {uploading ? (
             <div className="w-5 h-5 border-2 border-cm-green border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Video className="w-5 h-5 text-gray-400" />
-              <span className="text-[11px] font-medium text-gray-500">Ajouter des vidéos</span>
+              <Video className="w-5 h-5 text-cm-text-muted" />
+              <span className="text-[11px] font-medium text-cm-text-muted">Ajouter des vidéos</span>
             </>
           )}
         </button>
@@ -258,7 +258,7 @@ export default function SupplierProductFormScreen() {
           <div className="flex gap-2 flex-wrap">
             {videos.map((url, i) => (
               <div key={i} className="relative group">
-                <video src={url} className="w-24 h-20 rounded-lg object-cover border border-gray-200 bg-black" controls />
+                <video src={url} className="w-24 h-20 rounded-lg object-cover border border-cm-border bg-black" controls />
                 <button onClick={() => setVideos(videos.filter((_, j) => j !== i))}
                   className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                   <X className="w-3 h-3" />
@@ -267,57 +267,57 @@ export default function SupplierProductFormScreen() {
             ))}
           </div>
         )}
-        <p className="text-[10px] text-gray-400">{videos.length} vidéo{videos.length > 1 ? "s" : ""} ajoutée{videos.length > 1 ? "s" : ""}</p>
+        <p className="text-[10px] text-cm-text-muted">{videos.length} vidéo{videos.length > 1 ? "s" : ""} ajoutée{videos.length > 1 ? "s" : ""}</p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
-        <h2 className="text-[13px] font-semibold text-gray-900">💰 Prix</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-4">
+        <h2 className="text-[13px] font-semibold text-cm-text">💰 Prix</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Prix fournisseur *</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Prix fournisseur *</label>
             <input value={supplierPrice || ""} onChange={(e) => setSupplierPrice(Number(e.target.value) || 0)} type="number" min={0}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Prix conseillé</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Prix conseillé</label>
             <input value={recommendedPrice || ""} onChange={(e) => setRecommendedPrice(Number(e.target.value) || 0)} type="number" min={0}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none" />
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Commission</label>
-            <div className="h-9 px-3 bg-gray-50 border border-gray-200 rounded-lg flex items-center text-[13px] text-gray-700">
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Commission</label>
+            <div className="h-9 px-3 bg-cm-surface border border-cm-border rounded-lg flex items-center text-[13px] text-cm-text-soft">
               {commissionRate}%
             </div>
           </div>
         </div>
         <div className="p-3 bg-cm-green/5 rounded-xl border border-cm-green/10">
-          <p className="text-[12px] text-gray-600">
+          <p className="text-[12px] text-cm-text-soft">
             Prix Ça Match : <span className="font-bold text-cm-green">{formatXOF(cmPrice)}</span>
           </p>
-          <p className="text-[10px] text-gray-400 mt-0.5">
+          <p className="text-[10px] text-cm-text-muted mt-0.5">
             Calculé : {formatXOF(supplierPrice)} / (1 - {commissionRate}%) = {formatXOF(cmPrice)}
           </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
-        <h2 className="text-[13px] font-semibold text-gray-900">🏷️ Promo / Solde</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-4">
+        <h2 className="text-[13px] font-semibold text-cm-text">🏷️ Promo / Solde</h2>
         <label className="flex items-center gap-2 cursor-pointer">
           <input checked={saleEnabled} onChange={(e) => setSaleEnabled(e.target.checked)} type="checkbox"
-            className="w-4 h-4 rounded border-gray-300 text-cm-green focus:ring-cm-green/20" />
-          <span className="text-[12px] text-gray-700">Mettre en solde</span>
+            className="w-4 h-4 rounded border-cm-border text-cm-green focus:ring-cm-green/20" />
+          <span className="text-[12px] text-cm-text-soft">Mettre en solde</span>
         </label>
         {saleEnabled && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Prix soldé (FCFA)</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Prix soldé (FCFA)</label>
               <input value={salePrice || ""} onChange={(e) => setSalePrice(Number(e.target.value) || 0)} type="number" min={0}
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
             </div>
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Date de fin</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Date de fin</label>
               <input value={saleEndsAt} onChange={(e) => setSaleEndsAt(e.target.value)} type="date"
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
             </div>
             {salePrice > 0 && supplierPrice > 0 && (
               <div className="sm:col-span-2">
@@ -330,33 +330,33 @@ export default function SupplierProductFormScreen() {
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
-        <h2 className="text-[13px] font-semibold text-gray-900">📦 Stock</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-4">
+        <h2 className="text-[13px] font-semibold text-cm-text">📦 Stock</h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Quantité</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Quantité</label>
             <input value={stock} onChange={(e) => setStock(Number(e.target.value) || 0)} type="number" min={0}
               disabled={unlimitedStock}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green disabled:bg-gray-100 disabled:text-gray-400" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green disabled:bg-cm-surface disabled:text-cm-text-muted" />
           </div>
           <div>
-            <label className="text-[11px] font-medium text-gray-600 block mb-1">Stock minimum d'alerte</label>
+            <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Stock minimum d'alerte</label>
             <input value={lowStockThreshold} onChange={(e) => setLowStockThreshold(Number(e.target.value) || 0)} type="number" min={0}
               disabled={unlimitedStock}
-              className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none disabled:bg-gray-100 disabled:text-gray-400" />
+              className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none disabled:bg-cm-surface disabled:text-cm-text-muted" />
           </div>
           <div className="flex items-end pb-2">
             <label className="flex items-center gap-2 cursor-pointer">
               <input checked={unlimitedStock} onChange={(e) => setUnlimitedStock(e.target.checked)} type="checkbox"
-                className="w-4 h-4 rounded border-gray-300 text-cm-green focus:ring-cm-green/20" />
-              <span className="text-[12px] text-gray-700">Stock illimité</span>
+                className="w-4 h-4 rounded border-cm-border text-cm-green focus:ring-cm-green/20" />
+              <span className="text-[12px] text-cm-text-soft">Stock illimité</span>
             </label>
           </div>
         </div>
         <label className="flex items-center gap-2 cursor-pointer">
           <input checked={isVisible} onChange={(e) => setIsVisible(e.target.checked)} type="checkbox"
-            className="w-4 h-4 rounded border-gray-300 text-cm-green focus:ring-cm-green/20" />
-          <span className="text-[12px] text-gray-700">Visible dans le catalogue</span>
+            className="w-4 h-4 rounded border-cm-border text-cm-green focus:ring-cm-green/20" />
+          <span className="text-[12px] text-cm-text-soft">Visible dans le catalogue</span>
         </label>
       </div>
 

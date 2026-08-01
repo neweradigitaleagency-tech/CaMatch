@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2, Send } from "lucide-react";
 import type { QuoteLineItem } from "../../types";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useQuoteStore } from "../../stores/quoteStore";
 import { useAuthStore } from "../../stores/authStore";
 import { MOCK_PROS } from "../../services/mockData";
@@ -16,8 +17,7 @@ const defaultLineItem = (type: QuoteLineItem["type"]): QuoteLineItem => ({
 });
 
 export default function QuoteCreatePage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, complete } = useAppNavigation();
   const { requestId } = useParams<{ requestId: string }>();
   const createQuote = useQuoteStore((s) => s.createQuote);
 
@@ -78,7 +78,7 @@ export default function QuoteCreatePage() {
       notes,
       attachments: [],
     });
-    nav("/orders");
+    complete();
   };
 
   return (

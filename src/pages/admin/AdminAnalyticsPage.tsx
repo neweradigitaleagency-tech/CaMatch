@@ -48,18 +48,18 @@ export default function AdminAnalyticsPage() {
     <div className="space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Analytics</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">Performance de la plateforme</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Analytics</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">Performance de la plateforme</p>
         </div>
         <div className="flex items-center gap-2">
           {PERIODS.map((p) => (
             <button key={p.key} onClick={() => setPeriod(p.key)}
-              className={`px-3 py-1.5 rounded-lg text-[12px] font-medium cursor-pointer transition-colors ${period === p.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+              className={`px-3 py-1.5 rounded-lg text-[12px] font-medium cursor-pointer transition-colors ${period === p.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
               {p.label}
             </button>
           ))}
           {canExport && (
-            <button className="ml-2 px-3 py-1.5 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+            <button className="ml-2 px-3 py-1.5 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer">
               Exporter
             </button>
           )}
@@ -67,43 +67,43 @@ export default function AdminAnalyticsPage() {
       </div>
 
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Utilisateurs</p>
-          <p className="text-[22px] font-bold text-gray-900 mt-1">{formatCompactNumber(data.users.total)}</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Utilisateurs</p>
+          <p className="text-[22px] font-bold text-cm-text mt-1">{formatCompactNumber(data.users.total)}</p>
+          <p className="text-[11px] text-cm-text-muted mt-0.5">
             <span className="text-[var(--admin-accent)]">+{data.users.new}</span> nouveaux
-            <span className="inline-block w-1 h-1 rounded-full bg-gray-300 mx-1.5 align-middle" />
+            <span className="inline-block w-1 h-1 rounded-full bg-cm-border-soft mx-1.5 align-middle" />
             <span className={data.users.growth >= 0 ? "text-[var(--admin-accent)]" : "text-red-500"}>{formatPercent(data.users.growth)}</span>
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Professionnels</p>
-          <p className="text-[22px] font-bold text-gray-900 mt-1">{formatCompactNumber(data.pros.total)}</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Professionnels</p>
+          <p className="text-[22px] font-bold text-cm-text mt-1">{formatCompactNumber(data.pros.total)}</p>
+          <p className="text-[11px] text-cm-text-muted mt-0.5">
             <span className="text-blue-600">{data.pros.verified} vérifiés</span>
-            <span className="inline-block w-1 h-1 rounded-full bg-gray-300 mx-1.5 align-middle" />
-            <span className="text-gray-400">{Math.round(data.pros.available / data.pros.total * 100)}% dispo</span>
+            <span className="inline-block w-1 h-1 rounded-full bg-cm-border-soft mx-1.5 align-middle" />
+            <span className="text-cm-text-muted">{Math.round(data.pros.available / data.pros.total * 100)}% dispo</span>
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Missions</p>
-          <p className="text-[22px] font-bold text-gray-900 mt-1">{formatCompactNumber(data.missions.total)}</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Missions</p>
+          <p className="text-[22px] font-bold text-cm-text mt-1">{formatCompactNumber(data.missions.total)}</p>
+          <p className="text-[11px] text-cm-text-muted mt-0.5">
             Moy. {formatXOF(data.missions.avg_value)}
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Revenu</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Revenu</p>
           <p className="text-[22px] font-bold text-[var(--admin-accent)] mt-1">{formatCompactNumber(data.revenue.total)} F</p>
-          <p className="text-[11px] text-gray-500 mt-0.5">
+          <p className="text-[11px] text-cm-text-muted mt-0.5">
             <span className={data.revenue.growth >= 0 ? "text-[var(--admin-accent)]" : "text-red-500"}>{formatPercent(data.revenue.growth)}</span>
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Revenus</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Revenus</h3>
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.charts.revenue_over_time}>
@@ -123,8 +123,8 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Croissance</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Croissance</h3>
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.charts.pro_growth}>
@@ -139,8 +139,8 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Missions par statut</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Missions par statut</h3>
           <div className="h-[220px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -155,8 +155,8 @@ export default function AdminAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Top catégories</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Top catégories</h3>
           <div className="space-y-3">
             {data.charts.top_categories.map((cat, i) => {
               const max = Math.max(...data.charts.top_categories.map((c) => c.count))
@@ -164,10 +164,10 @@ export default function AdminAnalyticsPage() {
               return (
                 <div key={cat.category}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[12px] text-gray-700">{getCategoryLabel(cat.category)}</span>
-                    <span className="text-[11px] text-gray-400">{cat.count} missions</span>
+                    <span className="text-[12px] text-cm-text-soft">{getCategoryLabel(cat.category)}</span>
+                    <span className="text-[11px] text-cm-text-muted">{cat.count} missions</span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-cm-surface rounded-full overflow-hidden">
                     <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
                   </div>
                 </div>

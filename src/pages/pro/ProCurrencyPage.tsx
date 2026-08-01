@@ -32,7 +32,7 @@ export default function ProCurrencyPage() {
             <button key={c.code} onClick={() => setSelected(c.code)}
               className="w-full flex items-center justify-between px-5 py-4 border-b border-cm-border last:border-b-0 cursor-pointer active:scale-[0.97]">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-[14px] font-bold text-gray-700">{c.symbol}</div>
+                <div className="w-9 h-9 rounded-full bg-cm-surface flex items-center justify-center text-[14px] font-bold text-cm-text-soft">{c.symbol}</div>
                 <div className="text-left">
                   <p className="text-[13px] font-medium text-cm-text">{c.label}</p>
                   <p className="text-[10px] text-cm-text-muted">{c.country}</p>

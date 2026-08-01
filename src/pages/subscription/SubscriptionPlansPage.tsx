@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { ArrowLeft, Check, Crown, Sparkles, Star, Zap, Loader2 } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useSubscriptionStore } from "../../stores/subscriptionStore"
 import { useAuthStore } from "../../stores/authStore"
 import type { Plan, BillingCycle } from "../../types/subscription"
@@ -15,9 +15,8 @@ const PLAN_ICONS: Record<string, typeof Star> = {
 }
 
 export default function SubscriptionPlansPage() {
-  const nav = useNavigate()
-  const loc = useLocation()
-  const fromHamburger = !!loc.state?.fromHamburger
+  const { navigate: nav, goBack, getFlag, setFlag } = useAppNavigation()
+  const fromHamburger = getFlag("from-hamburger")
   const userId = useAuthStore((s) => s.userId)
   const { availablePlans, currentSubscription, loading, error, fetchPlans, fetchCurrent, changePlan } = useSubscriptionStore()
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly")
@@ -52,7 +51,14 @@ export default function SubscriptionPlansPage() {
     }
   }
 
-  const handleBack = () => nav("/", { state: { reopenMenu: true } })
+  const handleBack = () => {
+    if (fromHamburger) {
+      setFlag("reopen-menu", true)
+      nav("/")
+    } else {
+      goBack()
+    }
+  }
 
   if (error) {
     return (

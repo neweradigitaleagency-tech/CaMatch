@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 import { useAuthStore } from "../stores/authStore";
 import Drawer from "./drawer/Drawer";
 import DrawerHeader from "./drawer/DrawerHeader";
@@ -32,19 +33,19 @@ function ConfirmModal({ open, title, message, confirmLabel, onConfirm, onCancel 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center px-6">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
-      <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl">
-        <h3 className="text-[16px] font-bold text-[#2B2B2B]">{title}</h3>
-        <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">{message}</p>
+      <div className="relative bg-cm-elevated rounded-2xl w-full max-w-sm p-6 shadow-xl">
+        <h3 className="text-[16px] font-bold text-cm-text">{title}</h3>
+        <p className="text-[13px] text-cm-text-muted mt-2 leading-relaxed">{message}</p>
         <div className="flex gap-3 mt-6">
           <button
             onClick={onCancel}
-            className="flex-1 h-11 rounded-xl bg-gray-100 text-[#2B2B2B] text-[14px] font-semibold active:scale-[0.98] transition-transform"
+            className="flex-1 h-11 rounded-xl bg-cm-surface text-cm-text text-[14px] font-semibold active:scale-[0.98] transition-transform"
           >
             Annuler
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 h-11 rounded-xl bg-red-600 text-white text-[14px] font-semibold active:scale-[0.98] transition-transform"
+            className="flex-1 h-11 rounded-xl bg-cm-error text-white text-[14px] font-semibold active:scale-[0.98] transition-transform"
           >
             {confirmLabel}
           </button>
@@ -55,7 +56,7 @@ function ConfirmModal({ open, title, message, confirmLabel, onConfirm, onCancel 
 }
 
 export default function HamburgerDrawer({ open, onClose }: Props) {
-  const nav = useNavigate();
+  const { navigate, setFlag } = useAppNavigation();
   const location = useLocation();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
@@ -73,7 +74,8 @@ export default function HamburgerDrawer({ open, onClose }: Props) {
       onClose();
       return;
     }
-    nav(path, { state: { fromHamburger: true } });
+    setFlag("from-hamburger", true);
+    navigate(path);
     onClose();
   };
 
@@ -135,7 +137,7 @@ export default function HamburgerDrawer({ open, onClose }: Props) {
             <DrawerItem key={item.id} {...item} onClick={makeHandler(item.route, item.onClick)} />
           ))}
           <div className="px-4 py-3">
-            <span className="text-[11px] text-gray-400">{LEGAL_STATIC_INFO.label} {LEGAL_STATIC_INFO.value}</span>
+            <span className="text-[11px] text-cm-text-muted">{LEGAL_STATIC_INFO.label} {LEGAL_STATIC_INFO.value}</span>
           </div>
         </DrawerSection>
       </Drawer>

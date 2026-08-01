@@ -60,8 +60,8 @@ export default function AdminApplicationsPage() {
       key: "name", label: "Candidat", sortable: true, width: "200px",
       render: (a) => (
         <div className="min-w-0">
-          <p className="text-[13px] font-medium text-gray-900">{a.name}</p>
-          <p className="text-[11px] text-gray-400">{a.email}</p>
+          <p className="text-[13px] font-medium text-cm-text">{a.name}</p>
+          <p className="text-[11px] text-cm-text-muted">{a.email}</p>
         </div>
       ),
     },
@@ -70,7 +70,7 @@ export default function AdminApplicationsPage() {
       render: (a) => (
         <div className="flex flex-wrap gap-1">
           {a.categories.map((cat) => (
-            <span key={cat} className="px-1.5 py-0.5 bg-gray-100 rounded text-[11px] text-gray-600">{getCategoryLabel(cat)}</span>
+            <span key={cat} className="px-1.5 py-0.5 bg-cm-surface rounded text-[11px] text-cm-text-soft">{getCategoryLabel(cat)}</span>
           ))}
         </div>
       ),
@@ -85,7 +85,7 @@ export default function AdminApplicationsPage() {
     {
       key: "submitted_at", label: "Date", sortable: true, width: "110px",
       render: (a) => (
-        <span className="text-[12px] text-gray-500">{format(new Date(a.submitted_at), "d MMM", { locale: fr })}</span>
+        <span className="text-[12px] text-cm-text-muted">{format(new Date(a.submitted_at), "d MMM", { locale: fr })}</span>
       ),
     },
     {
@@ -105,15 +105,15 @@ export default function AdminApplicationsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Candidatures Pro</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{applications.length} candidature{applications.length !== 1 ? "s" : ""}</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Candidatures Pro</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{applications.length} candidature{applications.length !== 1 ? "s" : ""}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-2 flex-wrap">
         {STATUS_OPTIONS.map((opt) => (
           <button key={opt.value} onClick={() => setStatusFilter(opt.value)}
-            className={`px-3 h-8 text-[11px] font-medium rounded-lg border cursor-pointer ${statusFilter === opt.value ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
+            className={`px-3 h-8 text-[11px] font-medium rounded-lg border cursor-pointer ${statusFilter === opt.value ? "bg-cm-text text-white border-cm-text" : "bg-white text-cm-text-soft border-cm-border hover:border-cm-border"}`}>
             {opt.label}
           </button>
         ))}

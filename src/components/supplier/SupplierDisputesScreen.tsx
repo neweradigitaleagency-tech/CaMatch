@@ -20,7 +20,7 @@ const STATUS_COLORS: Record<DisputeStatus, string> = {
   under_review: "bg-amber-100 text-amber-800",
   resolved_supplier: "bg-emerald-100 text-emerald-800",
   resolved_client: "bg-blue-100 text-blue-800",
-  rejected: "bg-gray-100 text-gray-800",
+  rejected: "bg-cm-surface text-cm-text",
 }
 
 const STATUS_ICONS: Record<DisputeStatus, typeof AlertTriangle> = {
@@ -58,8 +58,8 @@ export default function SupplierDisputesScreen() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Litiges</h1>
-          <p className="text-[12px] text-gray-500">
+          <h1 className="text-[20px] font-bold text-cm-text">Litiges</h1>
+          <p className="text-[12px] text-cm-text-muted">
             {disputes.length} litiges · {openCount > 0 ? <span className="text-red-600 font-medium">{openCount} en cours</span> : "aucun en cours"}
           </p>
         </div>
@@ -79,9 +79,9 @@ export default function SupplierDisputesScreen() {
       {/* Filters */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 bg-white border border-gray-200 rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green"
+            className="w-full h-9 pl-9 pr-3 bg-cm-elevated border border-cm-border rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green"
             placeholder="Rechercher un litige..." />
         </div>
       </div>
@@ -91,8 +91,8 @@ export default function SupplierDisputesScreen() {
           <button key={s} onClick={() => setStatusFilter(s)}
             className={`shrink-0 px-3 h-7 rounded-full text-[11px] font-medium border cursor-pointer transition-colors ${
               statusFilter === s
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                ? "bg-cm-text text-white border-cm-text"
+                : "bg-cm-elevated text-cm-text-soft border-cm-border hover:border-cm-border"
             }`}>
             {s === "all" ? "Tous" : STATUS_LABELS[s as DisputeStatus]}
           </button>
@@ -100,10 +100,10 @@ export default function SupplierDisputesScreen() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <Scale className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-[14px] font-medium text-gray-500">Aucun litige trouvé</p>
-          <p className="text-[12px] text-gray-400 mt-1">Les litiges apparaîtront ici quand un client contestera une commande</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-8 text-center">
+          <Scale className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+          <p className="text-[14px] font-medium text-cm-text-muted">Aucun litige trouvé</p>
+          <p className="text-[12px] text-cm-text-muted mt-1">Les litiges apparaîtront ici quand un client contestera une commande</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -112,31 +112,31 @@ export default function SupplierDisputesScreen() {
             return (
               <div key={dispute.id}
                 onClick={() => navigate(`/supplier/disputes/${dispute.id}`)}
-                className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 cursor-pointer transition-colors">
+                className="bg-cm-elevated rounded-xl border border-cm-border p-4 hover:border-cm-border cursor-pointer transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <Icon className={`w-4 h-4 ${dispute.status === "opened" ? "text-red-500" : dispute.status === "under_review" ? "text-amber-500" : "text-gray-400"}`} />
-                      <p className="text-[14px] font-semibold text-gray-900">{dispute.reason}</p>
+                      <Icon className={`w-4 h-4 ${dispute.status === "opened" ? "text-red-500" : dispute.status === "under_review" ? "text-amber-500" : "text-cm-text-muted"}`} />
+                      <p className="text-[14px] font-semibold text-cm-text">{dispute.reason}</p>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_COLORS[dispute.status]}`}>
                         {STATUS_LABELS[dispute.status]}
                       </span>
                     </div>
-                    <p className="text-[12px] text-gray-600 mt-1 line-clamp-2">{dispute.description}</p>
-                    <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-500">
+                    <p className="text-[12px] text-cm-text-soft mt-1 line-clamp-2">{dispute.description}</p>
+                    <div className="flex items-center gap-3 mt-2 text-[11px] text-cm-text-muted">
                       <span className="flex items-center gap-1">
                         <MessageCircle className="w-3 h-3" /> {dispute.messages.length} messages
                       </span>
                       <span>{dispute.orderId}</span>
                       {dispute.clientName && <span>{dispute.clientName}</span>}
-                      {dispute.amount > 0 && <span className="font-medium text-gray-700">{formatXOF(dispute.amount)}</span>}
+                      {dispute.amount > 0 && <span className="font-medium text-cm-text-soft">{formatXOF(dispute.amount)}</span>}
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-[10px] text-gray-400">
+                    <p className="text-[10px] text-cm-text-muted">
                       {new Date(dispute.createdAt).toLocaleDateString("fr-FR")}
                     </p>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-gray-300 ml-auto mt-1" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-cm-border-soft ml-auto mt-1" />
                   </div>
                 </div>
               </div>

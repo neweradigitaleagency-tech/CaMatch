@@ -87,8 +87,8 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
             {/* Channel Toggle Header */}
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${pref.enabled ? "bg-cm-accent/20" : "bg-gray-50"}`}>
-                  {pref.enabled ? <Icon className="w-5 h-5 text-cm-accent" /> : <BellOff className="w-5 h-5 text-gray-400" />}
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${pref.enabled ? "bg-cm-accent/20" : "bg-cm-surface"}`}>
+                  {pref.enabled ? <Icon className="w-5 h-5 text-cm-accent" /> : <BellOff className="w-5 h-5 text-cm-text-muted" />}
                 </div>
                 <div>
                   <h4 className="text-xs font-bold">{config.label}</h4>
@@ -97,7 +97,7 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
               </div>
               <button
                 onClick={() => toggleChannel(pref.channel)}
-                className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${pref.enabled ? "bg-cm-accent" : "bg-gray-200"}`}
+                className={`relative w-12 h-7 rounded-full transition-colors cursor-pointer ${pref.enabled ? "bg-cm-accent" : "bg-cm-border-soft"}`}
               >
                 <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${pref.enabled ? "translate-x-5.5 left-0.5" : "translate-x-0.5 left-0"}`} />
               </button>
@@ -114,7 +114,7 @@ export default function ProNotificationSettingsScreen({ preferences, onUpdate, o
                     <button
                       onClick={() => toggleEvent(pref.channel, eventKey)}
                       className={`w-10 h-6 rounded-full transition-colors cursor-pointer ${
-                        (pref.events as any)[eventKey] ? "bg-cm-accent" : "bg-gray-200"
+                        (pref.events as any)[eventKey] ? "bg-cm-accent" : "bg-cm-border-soft"
                       }`}
                     >
                       <div

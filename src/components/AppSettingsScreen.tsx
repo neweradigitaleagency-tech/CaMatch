@@ -23,11 +23,11 @@ function ConfirmDialog({ open, title, message, confirmLabel, dangerous, onConfir
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel} />
-      <div className="relative bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl">
-        <h3 className="text-[16px] font-bold text-[#2B2B2B]">{title}</h3>
-        <p className="text-[13px] text-gray-500 mt-2 leading-relaxed">{message}</p>
+      <div className="relative bg-cm-elevated rounded-2xl w-full max-w-sm p-6 shadow-xl">
+        <h3 className="text-[16px] font-bold text-cm-text">{title}</h3>
+        <p className="text-[13px] text-cm-text-muted mt-2 leading-relaxed">{message}</p>
         <div className="flex gap-3 mt-6">
-          <button onClick={onCancel} className="flex-1 h-11 rounded-xl bg-gray-100 text-[#2B2B2B] text-[14px] font-semibold active:scale-[0.98] transition-transform">Annuler</button>
+          <button onClick={onCancel} className="flex-1 h-11 rounded-xl bg-cm-surface text-cm-text text-[14px] font-semibold active:scale-[0.98] transition-transform">Annuler</button>
           <button onClick={onConfirm} className={`flex-1 h-11 rounded-xl text-white text-[14px] font-semibold active:scale-[0.98] transition-transform ${dangerous ? "bg-red-600" : "bg-[#2B2B2B]"}`}>{confirmLabel}</button>
         </div>
       </div>
@@ -39,13 +39,13 @@ function PhotoSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return (
     <BottomSheet open={open} onClose={onClose} title="Photo de profil">
       <div className="space-y-2 pb-4">
-        <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-gray-50 cursor-pointer active:scale-[0.98] transition-transform text-left">
-          <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center"><Camera className="w-4 h-4 text-[#2B2B2B]" /></div>
-          <span className="text-[14px] font-semibold text-[#2B2B2B]">Prendre une photo</span>
+        <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-cm-surface cursor-pointer active:scale-[0.98] transition-transform text-left">
+          <div className="w-9 h-9 rounded-xl bg-cm-surface flex items-center justify-center"><Camera className="w-4 h-4 text-cm-text" /></div>
+          <span className="text-[14px] font-semibold text-cm-text">Prendre une photo</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-gray-50 cursor-pointer active:scale-[0.98] transition-transform text-left">
-          <div className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center"><ExternalLink className="w-4 h-4 text-[#2B2B2B]" /></div>
-          <span className="text-[14px] font-semibold text-[#2B2B2B]">Choisir depuis la galerie</span>
+        <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-cm-surface cursor-pointer active:scale-[0.98] transition-transform text-left">
+          <div className="w-9 h-9 rounded-xl bg-cm-surface flex items-center justify-center"><ExternalLink className="w-4 h-4 text-cm-text" /></div>
+          <span className="text-[14px] font-semibold text-cm-text">Choisir depuis la galerie</span>
         </button>
         <button className="w-full flex items-center gap-3 px-4 py-3.5 rounded-xl hover:bg-red-50 cursor-pointer active:scale-[0.98] transition-transform text-left text-red-600">
           <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center"><Trash2 className="w-4 h-4 text-red-600" /></div>
@@ -66,12 +66,12 @@ function NameSheet({ open, onClose, firstName, lastName, onSave }: {
     <BottomSheet open={open} onClose={onClose} title="Nom complet">
       <div className="space-y-4 pb-6">
         <div>
-          <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Prénom</label>
-          <input value={f} onChange={(e) => setF(e.target.value)} className="w-full h-11 px-4 rounded-xl bg-gray-100 text-[14px] text-[#2B2B2B] outline-none focus:ring-2 focus:ring-[#7FD356]/30" placeholder="Votre prénom" />
+          <label className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-1.5 block">Prénom</label>
+          <input value={f} onChange={(e) => setF(e.target.value)} className="w-full h-11 px-4 rounded-xl bg-cm-surface text-[14px] text-cm-text outline-none focus:ring-2 focus:ring-cm-accent/30" placeholder="Votre prénom" />
         </div>
         <div>
-          <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Nom</label>
-          <input value={l} onChange={(e) => setL(e.target.value)} className="w-full h-11 px-4 rounded-xl bg-gray-100 text-[14px] text-[#2B2B2B] outline-none focus:ring-2 focus:ring-[#7FD356]/30" placeholder="Votre nom" />
+          <label className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-1.5 block">Nom</label>
+          <input value={l} onChange={(e) => setL(e.target.value)} className="w-full h-11 px-4 rounded-xl bg-cm-surface text-[14px] text-cm-text outline-none focus:ring-2 focus:ring-cm-accent/30" placeholder="Votre nom" />
         </div>
         <button onClick={() => { onSave(f, l); onClose(); }} className="w-full h-11 rounded-xl bg-[#2B2B2B] text-white text-[14px] font-semibold active:scale-[0.98] transition-transform">Enregistrer</button>
       </div>
@@ -88,8 +88,8 @@ function UsernameSheet({ open, onClose, username, onSave }: {
     <BottomSheet open={open} onClose={onClose} title="Nom d'utilisateur">
       <div className="space-y-4 pb-6">
         <div>
-          <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Nom d'utilisateur</label>
-          <input value={val} onChange={(e) => setVal(e.target.value)} className="w-full h-11 px-4 rounded-xl bg-gray-100 text-[14px] text-[#2B2B2B] outline-none focus:ring-2 focus:ring-[#7FD356]/30" placeholder="@utilisateur" />
+          <label className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-1.5 block">Nom d'utilisateur</label>
+          <input value={val} onChange={(e) => setVal(e.target.value)} className="w-full h-11 px-4 rounded-xl bg-cm-surface text-[14px] text-cm-text outline-none focus:ring-2 focus:ring-cm-accent/30" placeholder="@utilisateur" />
         </div>
         <button onClick={() => { onSave(val); onClose(); }} className="w-full h-11 rounded-xl bg-[#2B2B2B] text-white text-[14px] font-semibold active:scale-[0.98] transition-transform">Enregistrer</button>
       </div>
@@ -106,10 +106,10 @@ function PhoneSheet({ open, onClose, phone, onSave }: {
     <BottomSheet open={open} onClose={onClose} title="Numéro de téléphone">
       <div className="space-y-4 pb-6">
         <div>
-          <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Téléphone</label>
-          <input value={val} onChange={(e) => setVal(e.target.value)} type="tel" className="w-full h-11 px-4 rounded-xl bg-gray-100 text-[14px] text-[#2B2B2B] outline-none focus:ring-2 focus:ring-[#7FD356]/30" placeholder="+225 XX XX XX XX" />
+          <label className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-1.5 block">Téléphone</label>
+          <input value={val} onChange={(e) => setVal(e.target.value)} type="tel" className="w-full h-11 px-4 rounded-xl bg-cm-surface text-[14px] text-cm-text outline-none focus:ring-2 focus:ring-cm-accent/30" placeholder="+225 XX XX XX XX" />
         </div>
-        <button className="w-full h-11 rounded-xl bg-gray-100 text-[#2B2B2B] text-[14px] font-semibold active:scale-[0.98] transition-transform">Envoyer le code de vérification</button>
+        <button className="w-full h-11 rounded-xl bg-cm-surface text-cm-text text-[14px] font-semibold active:scale-[0.98] transition-transform">Envoyer le code de vérification</button>
         <button onClick={() => { onSave(val); onClose(); }} className="w-full h-11 rounded-xl bg-[#2B2B2B] text-white text-[14px] font-semibold active:scale-[0.98] transition-transform">Enregistrer</button>
       </div>
     </BottomSheet>
@@ -125,10 +125,10 @@ function EmailSheet({ open, onClose, email, onSave }: {
     <BottomSheet open={open} onClose={onClose} title="Adresse email">
       <div className="space-y-4 pb-6">
         <div>
-          <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Email</label>
-          <input value={val} onChange={(e) => setVal(e.target.value)} type="email" className="w-full h-11 px-4 rounded-xl bg-gray-100 text-[14px] text-[#2B2B2B] outline-none focus:ring-2 focus:ring-[#7FD356]/30" placeholder="email@example.com" />
+          <label className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-1.5 block">Email</label>
+          <input value={val} onChange={(e) => setVal(e.target.value)} type="email" className="w-full h-11 px-4 rounded-xl bg-cm-surface text-[14px] text-cm-text outline-none focus:ring-2 focus:ring-cm-accent/30" placeholder="email@example.com" />
         </div>
-        <button className="w-full h-11 rounded-xl bg-gray-100 text-[#2B2B2B] text-[14px] font-semibold active:scale-[0.98] transition-transform">Vérifier l'adresse email</button>
+        <button className="w-full h-11 rounded-xl bg-cm-surface text-cm-text text-[14px] font-semibold active:scale-[0.98] transition-transform">Vérifier l'adresse email</button>
         <button onClick={() => { onSave(val); onClose(); }} className="w-full h-11 rounded-xl bg-[#2B2B2B] text-white text-[14px] font-semibold active:scale-[0.98] transition-transform">Enregistrer</button>
       </div>
     </BottomSheet>
@@ -144,8 +144,8 @@ function DOBSheet({ open, onClose, dob, onSave }: {
     <BottomSheet open={open} onClose={onClose} title="Date de naissance">
       <div className="space-y-4 pb-6">
         <div>
-          <label className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-1.5 block">Date de naissance</label>
-          <input value={val} onChange={(e) => setVal(e.target.value)} type="date" className="w-full h-11 px-4 rounded-xl bg-gray-100 text-[14px] text-[#2B2B2B] outline-none focus:ring-2 focus:ring-[#7FD356]/30" />
+          <label className="text-[11px] font-semibold text-cm-text-soft uppercase tracking-wider mb-1.5 block">Date de naissance</label>
+          <input value={val} onChange={(e) => setVal(e.target.value)} type="date" className="w-full h-11 px-4 rounded-xl bg-cm-surface text-[14px] text-cm-text outline-none focus:ring-2 focus:ring-cm-accent/30" />
         </div>
         <button onClick={() => { onSave(val); onClose(); }} className="w-full h-11 rounded-xl bg-[#2B2B2B] text-white text-[14px] font-semibold active:scale-[0.98] transition-transform">Enregistrer</button>
       </div>
@@ -239,9 +239,9 @@ export default function AppSettingsScreen({ onBack, onNavigate, onSignOutAllDevi
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-12">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-bg">
         <button onClick={onBack} className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-all">
-          <ArrowLeft className="w-4 h-4 text-[#2B2B2B]" />
+          <ArrowLeft className="w-4 h-4 text-cm-text" />
         </button>
-        <h1 className="text-[15px] font-bold text-[#2B2B2B]">Paramètres du compte</h1>
+        <h1 className="text-[15px] font-bold text-cm-text">Paramètres du compte</h1>
         <div className="w-9 h-9" />
       </header>
 
@@ -270,7 +270,7 @@ export default function AppSettingsScreen({ onBack, onNavigate, onSignOutAllDevi
                     dangerous={item.dangerous}
                     disabled={item.disabled}
                   />
-                  {!isLast && <div className="mx-4 h-px bg-gray-100" />}
+                  {!isLast && <div className="mx-4 h-px bg-cm-border/40" />}
                 </div>
               );
             })}

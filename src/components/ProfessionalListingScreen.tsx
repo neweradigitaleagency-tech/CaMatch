@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "motion/react";
 import { Search, MapPin, Star, ChevronRight, X } from "lucide-react";
 import { SERVICE_CATEGORIES, type ServiceCategory } from "../data/serviceCategories";
 import { LOCATIONS } from "../stores/locationStore";
 import PageHeader from "./ui/PageHeader";
+import FavoriteButton from "./FavoriteButton";
 
 interface ProProfile {
   id: string;
@@ -36,40 +37,74 @@ const PRO_MOCK_DATA: Record<string, ProProfile[]> = {
     { id: "p9", name: "Konaté Awa", title: "Traiteur", category: "evenements", avatarUrl: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=64&h=64&fit=crop&crop=face", rating: 4.7, reviewCount: 84, location: "Bingerville", verified: true, hourlyRate: 20000 },
     { id: "p10", name: "Touré Lassina", title: "DJ professionnel", category: "evenements", avatarUrl: "https://images.unsplash.com/photo-1463453091185-61582044d556?w=64&h=64&fit=crop&crop=face", rating: 4.6, reviewCount: 112, location: "Plateau", verified: false, hourlyRate: 35000 },
   ],
-  "sante-bien-etre": [
-    { id: "p11", name: "Koffi Olivier", title: "Masseur professionnel", category: "sante-bien-etre", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face", rating: 4.8, reviewCount: 76, location: "Cocody", verified: true, hourlyRate: 20000 },
-    { id: "p12", name: "Yao Delphine", title: "Esthéticienne", category: "sante-bien-etre", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face", rating: 4.5, reviewCount: 43, location: "Deux Plateaux", verified: false, hourlyRate: 15000 },
-    { id: "p13", name: "Koné Awa", title: "Coach sportif", category: "sante-bien-etre", avatarUrl: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=64&h=64&fit=crop&crop=face", rating: 4.9, reviewCount: 231, location: "Yopougon", verified: true, hourlyRate: 12000 },
+  "education-formation": [
+    { id: "p20", name: "Gbaka Serge", title: "Répétiteur de maths", category: "education-formation", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face", rating: 4.9, reviewCount: 87, location: "Cocody", verified: true, hourlyRate: 12000 },
+    { id: "p21", name: "Affoué Élise", title: "Professeure d'anglais", category: "education-formation", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face", rating: 4.7, reviewCount: 64, location: "Deux Plateaux", verified: true, hourlyRate: 10000 },
+    { id: "p22", name: "Kouadio Landry", title: "Coach préparation concours", category: "education-formation", avatarUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face", rating: 4.6, reviewCount: 41, location: "Plateau", verified: false, hourlyRate: 15000 },
+  ],
+  "beaute-bien-etre": [
+    { id: "p11", name: "Koffi Olivier", title: "Masseur professionnel", category: "beaute-bien-etre", avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face", rating: 4.8, reviewCount: 76, location: "Cocody", verified: true, hourlyRate: 20000 },
+    { id: "p12", name: "Yao Delphine", title: "Esthéticienne à domicile", category: "beaute-bien-etre", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face", rating: 4.5, reviewCount: 43, location: "Deux Plateaux", verified: false, hourlyRate: 15000 },
+    { id: "p13", name: "Koné Awa", title: "Coach sportif", category: "beaute-bien-etre", avatarUrl: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=64&h=64&fit=crop&crop=face", rating: 4.9, reviewCount: 231, location: "Yopougon", verified: true, hourlyRate: 12000 },
+  ],
+  "sante-domicile": [
+    { id: "p15", name: "N'Dri Christophe", title: "Infirmier à domicile", category: "sante-domicile", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&crop=face", rating: 4.8, reviewCount: 91, location: "Cocody", verified: true, hourlyRate: 20000 },
+    { id: "p16", name: "Manouan Grâce", title: "Kinésithérapeute", category: "sante-domicile", avatarUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=64&h=64&fit=crop&crop=face", rating: 4.7, reviewCount: 58, location: "Marcory", verified: true, hourlyRate: 18000 },
+    { id: "p17", name: "Diarra Salimata", title: "Aide-soignante", category: "sante-domicile", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face", rating: 4.9, reviewCount: 112, location: "Abobo", verified: false, hourlyRate: 9000 },
   ],
   "assistance-services": [
-    { id: "p17", name: "Kouakou Félix", title: "Garde d'enfants", category: "assistance-services", avatarUrl: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=64&h=64&fit=crop&crop=face", rating: 4.9, reviewCount: 312, location: "Cocody", verified: true, hourlyRate: 8000 },
-    { id: "p18", name: "Méité Korotoum", title: "Aide ménagère", category: "assistance-services", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face", rating: 4.4, reviewCount: 48, location: "Abobo", verified: false, hourlyRate: 6000 },
-    { id: "p19", name: "N'Dri Christophe", title: "Infirmier à domicile", category: "assistance-services", avatarUrl: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=64&h=64&fit=crop&crop=face", rating: 4.8, reviewCount: 91, location: "Cocody", verified: true, hourlyRate: 20000 },
+    { id: "p18", name: "Kouakou Félix", title: "Garde d'enfants", category: "assistance-services", avatarUrl: "https://images.unsplash.com/photo-1552058544-f2b08422138a?w=64&h=64&fit=crop&crop=face", rating: 4.9, reviewCount: 312, location: "Cocody", verified: true, hourlyRate: 8000 },
+    { id: "p19", name: "Méité Korotoum", title: "Aide ménagère", category: "assistance-services", avatarUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=64&h=64&fit=crop&crop=face", rating: 4.4, reviewCount: 48, location: "Abobo", verified: false, hourlyRate: 6000 },
+    { id: "p23", name: "Brou Anicet", title: "Assistant administratif", category: "assistance-services", avatarUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=64&h=64&fit=crop&crop=face", rating: 4.5, reviewCount: 37, location: "Plateau", verified: true, hourlyRate: 10000 },
   ],
 };
 
 const CATEGORY_ICONS: Record<string, string> = {
-  "maison-reparations": "🏠",
+  "maison-reparations": "🔧",
   "transport-livraison": "🚗",
   "evenements": "🎉",
-  "sante-bien-etre": "💪",
+  "education-formation": "📚",
+  "beaute-bien-etre": "💇",
+  "sante-domicile": "🩺",
   "assistance-services": "🤝",
 };
 
+function favItemForPro(pro: ProProfile) {
+  return {
+    type: "pro" as const,
+    id: pro.id,
+    name: pro.name,
+    subtitle: pro.title,
+    image: pro.avatarUrl,
+    rating: pro.rating,
+    priceLabel: `${pro.hourlyRate.toLocaleString()} F/h`,
+    route: `/explorer/pro/${pro.id}`,
+  };
+}
+
 export default function ProfessionalListingScreen() {
   const nav = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [showLocationPicker, setShowLocationPicker] = useState(false);
-  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+  const activeCategoryId = searchParams.get("category");
 
   const categories = useMemo(() => {
     return SERVICE_CATEGORIES.filter((c) => PRO_MOCK_DATA[c.id]);
   }, []);
 
+  const activeCategory = useMemo(() => {
+    return categories.find((c) => c.id === activeCategoryId);
+  }, [categories, activeCategoryId]);
+
+  const isCategoryFocused = !!activeCategory;
+
   const filteredCategories = useMemo(() => {
-    if (!query && !locationFilter) return categories.map((cat) => ({ ...cat, pros: PRO_MOCK_DATA[cat.id] || [] }));
-    return categories
+    const source = isCategoryFocused ? categories.filter((c) => c.id === activeCategoryId) : categories;
+    if (!query && !locationFilter) return source.map((cat) => ({ ...cat, pros: PRO_MOCK_DATA[cat.id] || [] }));
+    return source
       .map((cat) => {
         const pros = (PRO_MOCK_DATA[cat.id] || []).filter((pro) => {
           const matchesQuery = !query || pro.name.toLowerCase().includes(query.toLowerCase()) || pro.title.toLowerCase().includes(query.toLowerCase());
@@ -79,12 +114,30 @@ export default function ProfessionalListingScreen() {
         return { ...cat, pros } as ServiceCategory & { pros: ProProfile[] };
       })
       .filter((cat) => cat.pros.length > 0);
-  }, [categories, query, locationFilter]);
+  }, [categories, activeCategoryId, isCategoryFocused, query, locationFilter]);
+
+  const toggleCategory = (catId: string) => {
+    if (activeCategoryId === catId) {
+      setSearchParams(new URLSearchParams());
+    } else {
+      setSearchParams(new URLSearchParams({ category: catId }));
+    }
+  };
+
+  const resetAll = () => {
+    setQuery("");
+    setLocationFilter("");
+    setSearchParams(new URLSearchParams());
+  };
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic bg-[#F5F5F5]">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
       {/* Header */}
-      <PageHeader title="Professionnels" fallbackRoute="/" />
+      <PageHeader
+        title={activeCategory ? activeCategory.name : "Services à domicile"}
+        subtitle={activeCategory ? "Services à domicile" : undefined}
+        fallbackRoute="/"
+      />
 
       {/* Search */}
       <div className="px-4 pt-3 pb-2">
@@ -97,7 +150,7 @@ export default function ProfessionalListingScreen() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="w-full h-11 pl-9 pr-4 text-[13px] bg-cm-elevated border border-cm-border rounded-xl outline-none text-cm-text placeholder:text-cm-text-muted focus:border-cm-forest"
-            placeholder="Rechercher un professionnel..."
+            placeholder={activeCategory ? `Rechercher dans ${activeCategory.name}...` : "Rechercher un professionnel..."}
           />
         </div>
 
@@ -113,9 +166,9 @@ export default function ProfessionalListingScreen() {
       <div className="px-4 pb-2 overflow-x-auto no-scrollbar">
         <div className="flex gap-2">
           {categories.map((cat) => (
-            <button key={cat.id} onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)}
+            <button key={cat.id} onClick={() => toggleCategory(cat.id)}
               className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                expandedCategory === cat.id
+                activeCategoryId === cat.id
                   ? "bg-cm-text text-white"
                   : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:border-cm-text-muted"
               }`}>
@@ -127,7 +180,7 @@ export default function ProfessionalListingScreen() {
       </div>
 
       {/* Results count */}
-      {query && (
+      {(query || isCategoryFocused) && (
         <div className="px-4 py-1.5">
           <p className="text-[11px] text-cm-text-muted">
             {filteredCategories.reduce((sum, c) => sum + c.pros.length, 0)} résultat(s)
@@ -136,7 +189,7 @@ export default function ProfessionalListingScreen() {
       )}
 
       {/* Top Rated Horizontal Carousel */}
-      {!query && !expandedCategory && (
+      {!query && !isCategoryFocused && (
         <div className="pt-3 pb-1">
           <div className="flex items-center justify-between px-4 mb-3">
             <h2 className="text-[13px] font-bold text-cm-text">Top notés</h2>
@@ -152,11 +205,12 @@ export default function ProfessionalListingScreen() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.05, duration: 0.25 }}
                   onClick={() => nav(`/explorer/pro/${pro.id}`)}
-                  className="shrink-0 w-40 bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
+                  className="shrink-0 w-40 relative bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden cursor-pointer active:scale-[0.97] transition-transform"
                 >
                   <div className="relative h-24 overflow-hidden">
                     <img src={pro.avatarUrl} alt={pro.name} className="w-full h-full object-cover object-top" loading="lazy" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                    <FavoriteButton item={favItemForPro(pro)} className="top-2 left-2" />
                     <div className="absolute bottom-2 left-2 right-2">
                       <div className="flex items-center gap-1">
                         <Star className="w-3 h-3 fill-cm-amber text-cm-amber drop-shadow-sm" />
@@ -187,14 +241,14 @@ export default function ProfessionalListingScreen() {
 
       {/* Listing */}
       <section className="flex-1 px-4 pb-6 pt-3">
-        {filteredCategories.length === 0 && query ? (
+        {filteredCategories.length === 0 && (query || isCategoryFocused) ? (
           <div className="flex flex-col items-center justify-center pt-12">
             <div className="w-14 h-14 rounded-xl bg-cm-elevated border border-cm-border flex items-center justify-center mb-3">
               <Search className="w-6 h-6 text-cm-text-muted" />
             </div>
             <p className="text-[13px] font-bold text-cm-text mb-1">Aucun résultat</p>
             <p className="text-[11px] text-cm-text-soft">Essayez d'autres mots-clés</p>
-            <button onClick={() => { setQuery(""); setLocationFilter(""); setExpandedCategory(null); }}
+            <button onClick={resetAll}
               className="mt-3 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-95 transition-transform">
               Réinitialiser
             </button>
@@ -222,7 +276,7 @@ export default function ProfessionalListingScreen() {
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: i * 0.05, duration: 0.25 }}
                         onClick={() => nav(`/explorer/pro/${pro.id}`)}
-                        className="shrink-0 w-56 bg-cm-elevated border border-cm-border rounded-2xl p-3 text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
+                        className="shrink-0 w-56 relative bg-cm-elevated border border-cm-border rounded-2xl p-3 text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
                       >
                         <div className="flex items-center gap-3 mb-2">
                           <div className="relative w-10 h-10 rounded-full overflow-hidden shrink-0 border-2 border-cm-border">
@@ -251,6 +305,7 @@ export default function ProfessionalListingScreen() {
                           <MapPin className="w-2.5 h-2.5 text-cm-text-muted" />
                           <span className="text-[9px] text-cm-text-muted">{pro.location}</span>
                         </div>
+                        <FavoriteButton item={favItemForPro(pro)} />
                       </motion.button>
                     ))}
                   </div>
@@ -265,29 +320,29 @@ export default function ProfessionalListingScreen() {
       {showLocationPicker && (
         <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setShowLocationPicker(false)}>
           <div className="fixed inset-0 bg-black/40" />
-          <div className="relative w-full max-w-md bg-white rounded-t-[20px] p-5 pb-10 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+          <div className="relative w-full max-w-md bg-cm-elevated rounded-t-[20px] p-5 pb-10 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[15px] font-semibold text-[#2B2B2B]">Filtrer par zone</h3>
-              <button onClick={() => setShowLocationPicker(false)} className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer">
-                <X className="w-4 h-4 text-[#2B2B2B]" />
+              <h3 className="text-[15px] font-semibold text-cm-text">Filtrer par zone</h3>
+              <button onClick={() => setShowLocationPicker(false)} className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer">
+                <X className="w-4 h-4 text-cm-text" />
               </button>
             </div>
             <div className="space-y-1">
               <button onClick={() => { setLocationFilter(""); setShowLocationPicker(false); }}
-                className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${!locationFilter ? "bg-[#7FD356]/20 text-[#2B2B2B]" : "text-[#2B2B2B] hover:bg-gray-50"}`}>
+                className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${!locationFilter ? "bg-cm-accent/20 text-cm-text" : "text-cm-text hover:bg-cm-surface"}`}>
                 <MapPin className="w-4 h-4" />
                 <span className="flex-1">Toutes les zones</span>
-                {!locationFilter && <span className="text-[10px] text-[#7FD356] font-semibold">✓</span>}
+                {!locationFilter && <span className="text-[10px] text-cm-accent font-semibold">✓</span>}
               </button>
               {LOCATIONS.map((loc) => {
                 const hood = loc.split(",")[1]?.trim() || loc;
                 const isActive = locationFilter === hood;
                 return (
                   <button key={loc} onClick={() => { setLocationFilter(hood); setShowLocationPicker(false); }}
-                    className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${isActive ? "bg-[#7FD356]/20 text-[#2B2B2B]" : "text-[#2B2B2B] hover:bg-gray-50"}`}>
-                    <MapPin className={`w-4 h-4 ${isActive ? "text-[#7FD356]" : "text-gray-400"}`} />
+                    className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${isActive ? "bg-cm-accent/20 text-cm-text" : "text-cm-text hover:bg-cm-surface"}`}>
+                    <MapPin className={`w-4 h-4 ${isActive ? "text-cm-accent" : "text-cm-text-muted"}`} />
                     <span className="flex-1">{loc}</span>
-                    {isActive && <span className="text-[10px] text-[#7FD356] font-semibold">✓</span>}
+                    {isActive && <span className="text-[10px] text-cm-accent font-semibold">✓</span>}
                   </button>
                 );
               })}

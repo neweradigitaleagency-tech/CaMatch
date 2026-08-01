@@ -39,40 +39,40 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
   const grandTotal = proposal.laborPriceXOF + materialsTotal + deliveryTotal;
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic pb-safe bg-[#EDE8DC]">
-      <header className="sticky top-0 z-10 bg-[#EDE8DC]">
+    <div className="flex flex-col w-full min-h-dynamic pb-safe bg-cm-bg">
+      <header className="sticky top-0 z-10 bg-cm-bg">
         <div className="flex items-center gap-3 px-5 h-12">
           <button
             onClick={onBack}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 cursor-pointer active:scale-95 shrink-0"
+            className="w-9 h-9 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95 shrink-0"
           >
-            <ArrowLeft className="w-4 h-4 text-[#1A1A1A]" />
+            <ArrowLeft className="w-4 h-4 text-cm-text" />
           </button>
-          <h1 className="text-[15px] font-bold text-[#1A1A1A]">Détail de la proposition</h1>
+          <h1 className="text-[15px] font-bold text-cm-text">Détail de la proposition</h1>
         </div>
       </header>
 
       <main className="flex-1 px-5 pt-4 pb-[max(140px,env(safe-area-inset-bottom,140px))] space-y-4 overflow-y-auto">
         {/* Professionnel */}
-        <div className="bg-white rounded-xl p-4 space-y-3 border border-gray-100">
-          <h3 className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Professionnel</h3>
+        <div className="bg-cm-elevated rounded-xl p-4 space-y-3 border border-cm-border/40">
+          <h3 className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider">Professionnel</h3>
           <div className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-[#EDE8DC] border border-gray-200 overflow-hidden shrink-0">
+            <div className="w-14 h-14 rounded-full bg-cm-bg border border-cm-border overflow-hidden shrink-0">
               {proposal.professionalAvatar ? (
                 <img src={proposal.professionalAvatar} alt="" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#1A1A1A] font-bold text-xl">
+                <div className="w-full h-full flex items-center justify-center text-cm-text font-bold text-xl">
                   {proposal.professionalName.charAt(0)}
                 </div>
               )}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
-                <p className="text-[14px] font-bold text-[#1A1A1A]">{proposal.professionalName}</p>
+                <p className="text-[14px] font-bold text-cm-text">{proposal.professionalName}</p>
                 {proposal.isVerified && <VerifiedBadge className="scale-75 origin-left" />}
               </div>
               <RatingStars rating={proposal.professionalRating} size={12} />
-              <div className="flex items-center gap-3 mt-1 text-[10px] text-[#6B7280]">
+              <div className="flex items-center gap-3 mt-1 text-[10px] text-cm-text-muted">
                 <span className="flex items-center gap-0.5">
                   <Award className="w-3 h-3" />
                   {proposal.experienceYears} ans
@@ -90,59 +90,59 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
               { label: "Complétion", value: `${Math.round((proposal.completionRate || 0) * 100)}%`, icon: Check },
               { label: "Interventions", value: `${proposal.completedInterventions}`, icon: Award },
             ].map((stat) => (
-              <div key={stat.label} className="bg-[#EDE8DC] rounded-xl p-2">
+              <div key={stat.label} className="bg-cm-bg rounded-xl p-2">
                 <stat.icon className="w-3.5 h-3.5 mx-auto text-[#AECB2A] mb-0.5" />
-                <p className="text-[11px] font-bold text-[#1A1A1A]">{stat.value}</p>
-                <p className="text-[8px] text-[#6B7280]">{stat.label}</p>
+                <p className="text-[11px] font-bold text-cm-text">{stat.value}</p>
+                <p className="text-[8px] text-cm-text-muted">{stat.label}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Main-d'œuvre */}
-        <div className="bg-white rounded-xl p-4 space-y-2 border border-gray-100">
-          <h3 className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Main-d'œuvre</h3>
+        <div className="bg-cm-elevated rounded-xl p-4 space-y-2 border border-cm-border/40">
+          <h3 className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider">Main-d'œuvre</h3>
           <div className="flex items-center justify-between">
-            <span className="text-[13px] text-[#1A1A1A]">Prix</span>
-            <span className="text-[14px] font-bold text-[#1A1A1A] font-mono">{proposal.laborPriceXOF.toLocaleString()} F</span>
+            <span className="text-[13px] text-cm-text">Prix</span>
+            <span className="text-[14px] font-bold text-cm-text font-mono">{proposal.laborPriceXOF.toLocaleString()} F</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[13px] text-[#1A1A1A]">Durée estimée</span>
-            <span className="text-[12px] font-bold text-[#1A1A1A]">{proposal.estimatedDurationMins} min</span>
+            <span className="text-[13px] text-cm-text">Durée estimée</span>
+            <span className="text-[12px] font-bold text-cm-text">{proposal.estimatedDurationMins} min</span>
           </div>
         </div>
 
         {/* Matériaux */}
-        <div className="bg-white rounded-xl p-4 space-y-3 border border-gray-100">
+        <div className="bg-cm-elevated rounded-xl p-4 space-y-3 border border-cm-border/40">
           <div className="flex items-center justify-between">
-            <h3 className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Matériaux</h3>
+            <h3 className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider">Matériaux</h3>
             {visibleMaterials.length > 0 && (
-              <span className="text-[9px] text-[#6B7280]">
+              <span className="text-[9px] text-cm-text-muted">
                 {visibleMaterials.length} article{visibleMaterials.length > 1 ? "s" : ""}
               </span>
             )}
           </div>
           {visibleMaterials.length === 0 ? (
-            <p className="text-[12px] text-[#6B7280]">Aucun matériau inclus</p>
+            <p className="text-[12px] text-cm-text-muted">Aucun matériau inclus</p>
           ) : (
             <div className="space-y-2">
               {visibleMaterials.map((mat) => {
                 const realProduct = mat.supplierId ? findRealProduct(mat.name) : null;
                 return (
-                  <div key={mat.id} className="bg-[#EDE8DC] rounded-xl p-3 space-y-1.5">
+                  <div key={mat.id} className="bg-cm-bg rounded-xl p-3 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-[12px] font-bold text-[#1A1A1A]">{mat.name}</p>
-                        <p className="text-[10px] text-[#6B7280]">Qté: {mat.quantity}</p>
+                        <p className="text-[12px] font-bold text-cm-text">{mat.name}</p>
+                        <p className="text-[10px] text-cm-text-muted">Qté: {mat.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[12px] font-bold text-[#1A1A1A] font-mono">{mat.totalXOF.toLocaleString()} F</p>
-                        <p className="text-[9px] text-[#6B7280]">{mat.unitPriceXOF.toLocaleString()} F/unité</p>
+                        <p className="text-[12px] font-bold text-cm-text font-mono">{mat.totalXOF.toLocaleString()} F</p>
+                        <p className="text-[9px] text-cm-text-muted">{mat.unitPriceXOF.toLocaleString()} F/unité</p>
                       </div>
                     </div>
 
                     {mat.supplierName && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-[#6B7280] pt-1 border-t border-gray-200/50">
+                      <div className="flex items-center gap-1.5 text-[10px] text-cm-text-muted pt-1 border-t border-cm-border/40">
                         <Store className="w-3 h-3" />
                         <span>{mat.supplierName}</span>
                         {mat.supplierPrice && mat.supplierPrice < mat.unitPriceXOF && (
@@ -161,7 +161,7 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
 
                     {mat.supplierPrice && mat.supplierPrice < mat.unitPriceXOF && (
                       <div className="flex items-center gap-2 pt-1">
-                        <span className="text-[10px] text-[#6B7280] line-through">{mat.unitPriceXOF.toLocaleString()} F</span>
+                        <span className="text-[10px] text-cm-text-muted line-through">{mat.unitPriceXOF.toLocaleString()} F</span>
                         <span className="text-[11px] font-bold text-[#AECB2A]">{mat.supplierPrice.toLocaleString()} F fournisseur</span>
                       </div>
                     )}
@@ -179,7 +179,7 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
                       {realProduct && (
                         <button
                           onClick={() => nav(`/marketplace/item/${realProduct.product.id}`)}
-                          className="flex items-center gap-1 text-[9px] text-[#6B7280] font-medium cursor-pointer hover:underline"
+                          className="flex items-center gap-1 text-[9px] text-cm-text-muted font-medium cursor-pointer hover:underline"
                         >
                           <Store className="w-3 h-3" />
                           Voir le produit
@@ -200,35 +200,35 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
 
           {visibleMaterials.length > 0 && (
             <div className="flex items-center justify-between text-[11px] pt-1">
-              <span className="text-[#6B7280]">Total matériaux</span>
-              <span className="font-bold text-[#1A1A1A] font-mono">{materialsTotal.toLocaleString()} F</span>
+              <span className="text-cm-text-muted">Total matériaux</span>
+              <span className="font-bold text-cm-text font-mono">{materialsTotal.toLocaleString()} F</span>
             </div>
           )}
         </div>
 
         {/* Récapitulatif */}
-        <div className="bg-white rounded-xl p-4 space-y-2 border border-gray-100">
-          <h3 className="text-[11px] font-bold text-[#6B7280] uppercase tracking-wider">Récapitulatif</h3>
+        <div className="bg-cm-elevated rounded-xl p-4 space-y-2 border border-cm-border/40">
+          <h3 className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider">Récapitulatif</h3>
           <div className="flex items-center justify-between text-[12px]">
-            <span className="text-[#6B7280]">Main-d'œuvre</span>
-            <span className="font-bold text-[#1A1A1A] font-mono">{proposal.laborPriceXOF.toLocaleString()} F</span>
+            <span className="text-cm-text-muted">Main-d'œuvre</span>
+            <span className="font-bold text-cm-text font-mono">{proposal.laborPriceXOF.toLocaleString()} F</span>
           </div>
           {materialsTotal > 0 && (
             <div className="flex items-center justify-between text-[12px]">
-              <span className="text-[#6B7280]">Matériaux</span>
-              <span className="font-bold text-[#1A1A1A] font-mono">{materialsTotal.toLocaleString()} F</span>
+              <span className="text-cm-text-muted">Matériaux</span>
+              <span className="font-bold text-cm-text font-mono">{materialsTotal.toLocaleString()} F</span>
             </div>
           )}
           {deliveryTotal > 0 && (
             <div className="flex items-center justify-between text-[12px]">
-              <span className="text-[#6B7280]">Livraison</span>
-              <span className="font-bold text-[#1A1A1A] font-mono">{deliveryTotal.toLocaleString()} F</span>
+              <span className="text-cm-text-muted">Livraison</span>
+              <span className="font-bold text-cm-text font-mono">{deliveryTotal.toLocaleString()} F</span>
             </div>
           )}
-          <div className="h-px bg-gray-100 my-1" />
+          <div className="h-px bg-cm-surface my-1" />
           <div className="flex items-center justify-between text-[15px]">
-            <span className="font-bold text-[#1A1A1A]">Total</span>
-            <span className="font-bold text-[#1A1A1A] font-mono">{grandTotal.toLocaleString()} F</span>
+            <span className="font-bold text-cm-text">Total</span>
+            <span className="font-bold text-cm-text font-mono">{grandTotal.toLocaleString()} F</span>
           </div>
         </div>
 
@@ -240,8 +240,8 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
                 <ShoppingCart className="w-4 h-4 text-[#243318]" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-[#1A1A1A]">Matériaux disponibles chez nos fournisseurs</h4>
-                <p className="text-[10px] text-[#6B7280] mt-0.5">
+                <h4 className="text-xs font-bold text-cm-text">Matériaux disponibles chez nos fournisseurs</h4>
+                <p className="text-[10px] text-cm-text-muted mt-0.5">
                   En choisissant cette proposition, les matériaux seront commandés automatiquement chez les fournisseurs partenaires
                 </p>
                 <button
@@ -262,12 +262,12 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
         )}
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-white/90 backdrop-blur-xl border-t border-gray-100 pb-[env(safe-area-inset-bottom)]">
+      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-cm-elevated/90 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-[448px] mx-auto px-5 py-3">
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-[9px] text-[#6B7280]">Total à payer</p>
-              <p className="text-[16px] font-black text-[#1A1A1A] font-mono">{grandTotal.toLocaleString()} F</p>
+              <p className="text-[9px] text-cm-text-muted">Total à payer</p>
+              <p className="text-[16px] font-black text-cm-text font-mono">{grandTotal.toLocaleString()} F</p>
             </div>
             <button
               onClick={onChoose}

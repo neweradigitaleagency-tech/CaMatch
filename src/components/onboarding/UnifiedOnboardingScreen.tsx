@@ -140,7 +140,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                 <button
                   onClick={() => { setAuthMode("phone"); setError(""); setOtpSent(false); setOtpVerified(false); }}
                   className={`flex-1 h-10 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                    authMode === "phone" ? "bg-white shadow-sm text-cm-accent" : "text-cm-text-soft/60 hover:text-cm-text-soft"
+                    authMode === "phone" ? "bg-cm-elevated shadow-sm text-cm-accent" : "text-cm-text-soft/60 hover:text-cm-text-soft"
                   }`}
                 >
                   <MessageCircle className="w-4 h-4" /> Téléphone
@@ -148,7 +148,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                 <button
                   onClick={() => { setAuthMode("email"); setError(""); }}
                   className={`flex-1 h-10 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                    authMode === "email" ? "bg-white shadow-sm text-cm-accent" : "text-cm-text-soft/60 hover:text-cm-text-soft"
+                    authMode === "email" ? "bg-cm-elevated shadow-sm text-cm-accent" : "text-cm-text-soft/60 hover:text-cm-text-soft"
                   }`}
                 >
                   <Mail className="w-4 h-4" /> Email
@@ -160,7 +160,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                   <div className="space-y-3">
                     <div>
                       <label className="text-xs font-semibold text-cm-text-soft block mb-1.5">Numéro de téléphone</label>
-                      <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-cm-border/30">
+                      <div className="flex items-center gap-2 bg-cm-elevated p-1 rounded-xl border border-cm-border/30">
                         <span className="text-sm font-bold px-3 py-2 bg-cm-accent-soft rounded-lg shrink-0">+225</span>
                         <input
                           type="tel" inputMode="numeric" placeholder="XX XX XX XX"
@@ -198,7 +198,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                           onChange={(e) => handleOtpChange(i, e.target.value)}
                           onKeyDown={(e) => handleOtpKeyDown(i, e.key)}
                           className={`w-11 h-12 sm:w-12 sm:h-14 text-center text-base sm:text-lg font-extrabold rounded-xl border outline-none transition-all ${
-                            digit ? "bg-white border-brand-forest" : "bg-white border-cm-border/30"
+                            digit ? "bg-cm-elevated border-cm-accent" : "bg-cm-elevated border-cm-border/30"
                           }`}
                         />
                       ))}
@@ -221,7 +221,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                         type="email" value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="vous@exemple.com"
-                        className="w-full h-12 pl-10 pr-4 bg-white rounded-xl border border-cm-border text-sm outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
+                        className="w-full h-12 pl-10 pr-4 bg-cm-elevated rounded-xl border border-cm-border text-sm outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
                       />
                     </div>
                   </div>
@@ -234,7 +234,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••"
-                        className="w-full h-12 pl-10 pr-12 bg-white rounded-xl border border-cm-border text-sm outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
+                        className="w-full h-12 pl-10 pr-12 bg-cm-elevated rounded-xl border border-cm-border text-sm outline-none focus:ring-2 focus:ring-cm-accent/30 focus:border-cm-accent transition-all"
                       />
                       <button
                         type="button" tabIndex={-1}
@@ -316,8 +316,8 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                     <Star className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="text-[15px] font-bold text-gray-900">Ça Match Plus</p>
-                    <p className="text-[11px] text-gray-500">Trouvez 2x plus rapidement</p>
+                    <p className="text-[15px] font-bold text-cm-text">Ça Match Plus</p>
+                    <p className="text-[11px] text-cm-text-soft">Trouvez 2x plus rapidement</p>
                   </div>
                 </div>
                 <ul className="space-y-2">
@@ -326,15 +326,15 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                     "Matching IA avancé",
                     "Support prioritaire 24/7",
                   ].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[12px] text-gray-700">
+                    <li key={item} className="flex items-center gap-2 text-[12px] text-cm-text-soft">
                       <Check className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                       {item}
                     </li>
                   ))}
                 </ul>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-[24px] font-extrabold text-gray-900">4 900</span>
-                  <span className="text-[12px] text-gray-500 font-medium">F/mois</span>
+                  <span className="text-[24px] font-extrabold text-cm-text">4 900</span>
+                  <span className="text-[12px] text-cm-text-soft font-medium">F/mois</span>
                 </div>
               </div>
 
@@ -358,15 +358,15 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
       <div className="px-6 pb-8 space-y-2">
         <p className="text-[10px] text-cm-text-soft/40 text-center">Accès rapide — Mode démo</p>
         <button onClick={onDemoClient}
-          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-border hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-2">
           <User className="w-4 h-4 text-cm-text-soft/60" /> Mode démo Client
         </button>
         <button onClick={onDemoPro}
-          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-border hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-2">
           <Briefcase className="w-4 h-4 text-cm-text-soft/60" /> Mode démo Pro
         </button>
         <button onClick={onDemoSupplier}
-          className="w-full h-10 text-xs font-semibold text-cm-text bg-white rounded-xl border border-cm-accent/30 hover:bg-cm-accent/5 transition-all cursor-pointer flex items-center justify-center gap-2">
+          className="w-full h-10 text-xs font-semibold text-cm-text bg-cm-elevated rounded-xl border border-cm-accent/30 hover:bg-cm-accent/5 transition-all cursor-pointer flex items-center justify-center gap-2">
           <Building2 className="w-4 h-4 text-cm-accent" /> Mode démo Fournisseur
         </button>
       </div>

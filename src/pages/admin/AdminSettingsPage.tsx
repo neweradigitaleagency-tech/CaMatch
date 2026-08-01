@@ -110,13 +110,13 @@ export default function AdminSettingsPage() {
     <div className="space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Paramètres</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">Configuration de la plateforme</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Paramètres</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">Configuration de la plateforme</p>
         </div>
         <div className="flex items-center gap-2">
           {!loading && (
             <button onClick={handleSave} disabled={!canUpdate || saving}
-              className="flex items-center gap-1.5 h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+              className="flex items-center gap-1.5 h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
               {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
               {saving ? "Enregistrement…" : saved ? "Enregistré" : "Enregistrer"}
             </button>
@@ -124,10 +124,10 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-cm-border">
         {TABS.map((t) => (
           <button key={t.key} onClick={() => setTab(t.key)}
-            className={`px-4 py-2.5 text-[12px] font-medium border-b-2 transition-colors cursor-pointer ${tab === t.key ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"}`}>
+            className={`px-4 py-2.5 text-[12px] font-medium border-b-2 transition-colors cursor-pointer ${tab === t.key ? "border-cm-text text-cm-text" : "border-transparent text-cm-text-muted hover:text-cm-text-soft"}`}>
             {t.label}
           </button>
         ))}
@@ -136,11 +136,11 @@ export default function AdminSettingsPage() {
       {loading ? (
         <div className="grid grid-cols-2 gap-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 space-y-4">
-              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-              <div className="h-9 bg-gray-100 rounded-lg animate-pulse" />
-              <div className="h-9 bg-gray-100 rounded-lg animate-pulse" />
-              <div className="h-9 bg-gray-100 rounded-lg animate-pulse" />
+            <div key={i} className="bg-cm-elevated border border-cm-border rounded-xl p-5 space-y-4">
+              <div className="h-4 w-24 bg-cm-border-soft rounded animate-pulse" />
+              <div className="h-9 bg-cm-surface rounded-lg animate-pulse" />
+              <div className="h-9 bg-cm-surface rounded-lg animate-pulse" />
+              <div className="h-9 bg-cm-surface rounded-lg animate-pulse" />
             </div>
           ))}
         </div>
@@ -155,15 +155,15 @@ function InputField({ label, sub, value, onChange, disabled, type = "text", min,
 }) {
   return (
     <div>
-      <label className="block text-[12px] font-medium text-gray-700 mb-1">{label}</label>
-      {sub && <p className="text-[11px] text-gray-400 mb-1.5 -mt-0.5">{sub}</p>}
+      <label className="block text-[12px] font-medium text-cm-text-soft mb-1">{label}</label>
+      {sub && <p className="text-[11px] text-cm-text-muted mb-1.5 -mt-0.5">{sub}</p>}
       <div className="relative">
         <input type={type} value={value ?? ""}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled}
           min={min} max={max}
-          className={`w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed ${suffix ? "pr-8" : ""}`} />
-        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-gray-400">{suffix}</span>}
+          className={`w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border disabled:opacity-50 disabled:cursor-not-allowed ${suffix ? "pr-8" : ""}`} />
+        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-cm-text-muted">{suffix}</span>}
       </div>
     </div>
   )
@@ -175,10 +175,10 @@ function SelectField({ label, sub, value, onChange, disabled, options }: {
 }) {
   return (
     <div>
-      <label className="block text-[12px] font-medium text-gray-700 mb-1">{label}</label>
-      {sub && <p className="text-[11px] text-gray-400 mb-1.5 -mt-0.5">{sub}</p>}
+      <label className="block text-[12px] font-medium text-cm-text-soft mb-1">{label}</label>
+      {sub && <p className="text-[11px] text-cm-text-muted mb-1.5 -mt-0.5">{sub}</p>}
       <select value={value ?? ""} onChange={(e) => onChange(e.target.value)} disabled={disabled}
-        className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed">
+        className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border disabled:opacity-50 disabled:cursor-not-allowed">
         {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
       </select>
     </div>
@@ -191,12 +191,12 @@ function ToggleField({ label, sub, value, onChange, disabled, danger }: {
   return (
     <div className="flex items-center justify-between py-2">
       <div>
-        <p className="text-[13px] font-medium text-gray-900">{label}</p>
-        {sub && <p className="text-[11px] text-gray-400">{sub}</p>}
+        <p className="text-[13px] font-medium text-cm-text">{label}</p>
+        {sub && <p className="text-[11px] text-cm-text-muted">{sub}</p>}
       </div>
       <button type="button" onClick={() => !disabled && onChange(!value)} disabled={disabled}
-        className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${value ? (danger ? "bg-red-500" : "bg-[var(--admin-accent)]") : "bg-gray-300"} ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
-        <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`} />
+        className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${value ? (danger ? "bg-red-500" : "bg-[var(--admin-accent)]") : "bg-cm-border-soft"} ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}>
+        <span className={`absolute top-0.5 w-4 h-4 bg-cm-elevated rounded-full shadow transition-transform ${value ? "translate-x-5" : "translate-x-0.5"}`} />
       </button>
     </div>
   )
@@ -204,8 +204,8 @@ function ToggleField({ label, sub, value, onChange, disabled, danger }: {
 
 function Card({ title, children, className }: { title?: string; children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-white border border-gray-200 rounded-xl p-5 space-y-4 ${className ?? ""}`}>
-      {title && <h3 className="text-[13px] font-semibold text-gray-900">{title}</h3>}
+    <div className={`bg-cm-elevated border border-cm-border rounded-xl p-5 space-y-4 ${className ?? ""}`}>
+      {title && <h3 className="text-[13px] font-semibold text-cm-text">{title}</h3>}
       {children}
     </div>
   )

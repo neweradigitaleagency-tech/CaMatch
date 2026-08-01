@@ -20,7 +20,7 @@ const STATUS_COLORS: Record<SupplierPaymentStatus, string> = {
   captured: "bg-emerald-100 text-emerald-800",
   refunded: "bg-red-100 text-red-800",
   partially_refunded: "bg-orange-100 text-orange-800",
-  failed: "bg-gray-100 text-gray-800",
+  failed: "bg-cm-surface text-cm-text",
 }
 
 const PROVIDER_ICONS: Record<SupplierPaymentProvider, string> = {
@@ -68,41 +68,41 @@ export default function SupplierPaymentsScreen() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-[20px] font-bold text-gray-900">Paiements</h1>
-        <p className="text-[12px] text-gray-500">{payments.length} transactions</p>
+        <h1 className="text-[20px] font-bold text-cm-text">Paiements</h1>
+        <p className="text-[12px] text-cm-text-muted">{payments.length} transactions</p>
       </div>
 
       {/* Balance cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">Disponible</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">Disponible</p>
           <p className="text-[18px] font-bold text-emerald-600 mt-1">{formatXOF(balance.available)}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">En attente</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">En attente</p>
           <p className="text-[18px] font-bold text-amber-600 mt-1">{formatXOF(balance.pending)}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">Total reçu</p>
-          <p className="text-[18px] font-bold text-gray-900 mt-1">{formatXOF(capturedTotal)}</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">Total reçu</p>
+          <p className="text-[18px] font-bold text-cm-text mt-1">{formatXOF(capturedTotal)}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">Commission versée</p>
-          <p className="text-[18px] font-bold text-gray-900 mt-1">{formatXOF(balance.totalCommission)}</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">Commission versée</p>
+          <p className="text-[18px] font-bold text-cm-text mt-1">{formatXOF(balance.totalCommission)}</p>
         </div>
       </div>
 
       {/* Recent payouts */}
       {payouts.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-1.5">
+            <h2 className="text-[13px] font-semibold text-cm-text flex items-center gap-1.5">
               <ArrowUpRight className="w-4 h-4" /> Retraits récents
             </h2>
           </div>
           <div className="space-y-2">
             {payouts.slice(0, 3).map((p) => (
-              <div key={p.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+              <div key={p.id} className="flex items-center justify-between p-2 bg-cm-surface rounded-lg">
                 <div className="flex items-center gap-2">
                   <div className={`w-7 h-7 rounded-full ${p.status === "completed" ? "bg-emerald-100" : p.status === "failed" ? "bg-red-100" : "bg-amber-100"} flex items-center justify-center`}>
                     {p.status === "completed" ? <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> :
@@ -110,8 +110,8 @@ export default function SupplierPaymentsScreen() {
                      <Clock className="w-3.5 h-3.5 text-amber-600" />}
                   </div>
                   <div>
-                    <p className="text-[12px] font-medium text-gray-900">{formatXOF(p.amount)}</p>
-                    <p className="text-[10px] text-gray-500">{p.provider.replace("_", " ")} · {new Date(p.requestedAt).toLocaleDateString("fr-FR")}</p>
+                    <p className="text-[12px] font-medium text-cm-text">{formatXOF(p.amount)}</p>
+                    <p className="text-[10px] text-cm-text-muted">{p.provider.replace("_", " ")} · {new Date(p.requestedAt).toLocaleDateString("fr-FR")}</p>
                   </div>
                 </div>
                 <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
@@ -130,14 +130,14 @@ export default function SupplierPaymentsScreen() {
       {/* Filters */}
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 bg-white border border-gray-200 rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green"
+            className="w-full h-9 pl-9 pr-3 bg-cm-elevated border border-cm-border rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green"
             placeholder="Rechercher par commande ou transaction..." />
         </div>
         <button onClick={() => setShowFilters(!showFilters)}
-          className="h-9 w-9 flex items-center justify-center bg-white border border-gray-200 rounded-xl hover:bg-gray-50 cursor-pointer">
-          <Filter className="w-4 h-4 text-gray-600" />
+          className="h-9 w-9 flex items-center justify-center bg-cm-elevated border border-cm-border rounded-xl hover:bg-cm-surface cursor-pointer">
+          <Filter className="w-4 h-4 text-cm-text-soft" />
         </button>
       </div>
 
@@ -147,8 +147,8 @@ export default function SupplierPaymentsScreen() {
           <button key={s} onClick={() => setStatusFilter(s)}
             className={`shrink-0 px-3 h-7 rounded-full text-[11px] font-medium border cursor-pointer transition-colors ${
               statusFilter === s
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                ? "bg-cm-text text-white border-cm-text"
+                : "bg-cm-elevated text-cm-text-soft border-cm-border hover:border-cm-border"
             }`}>
             {s === "all" ? "Tous" : STATUS_LABELS[s as SupplierPaymentStatus]}
           </button>
@@ -156,24 +156,24 @@ export default function SupplierPaymentsScreen() {
       </div>
 
       {/* Summary */}
-      <div className="flex items-center gap-4 text-[11px] text-gray-500 px-1">
+      <div className="flex items-center gap-4 text-[11px] text-cm-text-muted px-1">
         <span className="flex items-center gap-1"><CheckCircle className="w-3 h-3 text-emerald-500" /> {formatXOF(capturedTotal)} reçus</span>
         <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-amber-500" /> {formatXOF(pendingTotal)} en attente</span>
       </div>
 
       {/* Transactions list */}
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <Wallet className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-[14px] font-medium text-gray-500">Aucune transaction trouvée</p>
-          <p className="text-[12px] text-gray-400 mt-1">Les paiements apparaîtront ici une fois les commandes traitées</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-8 text-center">
+          <Wallet className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+          <p className="text-[14px] font-medium text-cm-text-muted">Aucune transaction trouvée</p>
+          <p className="text-[12px] text-cm-text-muted mt-1">Les paiements apparaîtront ici une fois les commandes traitées</p>
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((payment) => (
             <div key={payment.id}
               onClick={() => navigate(`/supplier/payments/${payment.id}`)}
-              className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 cursor-pointer transition-colors">
+              className="bg-cm-elevated rounded-xl border border-cm-border p-4 hover:border-cm-border cursor-pointer transition-colors">
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0 flex-1">
                   <div className={`w-9 h-9 rounded-xl ${PROVIDER_COLORS[payment.provider]} bg-opacity-20 flex items-center justify-center shrink-0`}>
@@ -181,22 +181,22 @@ export default function SupplierPaymentsScreen() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-semibold text-gray-900">{formatXOF(payment.netAmount)}</p>
+                      <p className="text-[14px] font-semibold text-cm-text">{formatXOF(payment.netAmount)}</p>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_COLORS[payment.status]}`}>
                         {STATUS_LABELS[payment.status]}
                       </span>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-0.5">
+                    <p className="text-[11px] text-cm-text-muted mt-0.5">
                       {payment.orderId} · {payment.provider.replace("_", " ")}
                     </p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-400">
+                    <div className="flex items-center gap-3 mt-1 text-[10px] text-cm-text-muted">
                       <span>Sous-total: {formatXOF(payment.subtotal)}</span>
                       <span>Commission: -{formatXOF(payment.commission)}</span>
                     </div>
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-[10px] text-gray-400">
+                  <p className="text-[10px] text-cm-text-muted">
                     {new Date(payment.createdAt).toLocaleDateString("fr-FR")}
                   </p>
                   {payment.status === "refunded" && (

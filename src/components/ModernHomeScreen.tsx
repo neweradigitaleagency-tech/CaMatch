@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, MapPin, Menu, ClipboardPlus, Store, Briefcase, UserPlus, X } from "lucide-react";
+import { Search, MapPin, Menu, ClipboardPlus, Store, UserPlus, X, Star, ChevronRight } from "lucide-react";
 import SponsoredCard from "./SponsoredCard";
 import type { SponsoredItem } from "./SponsoredCard";
 import HamburgerDrawer from "./HamburgerDrawer";
@@ -9,28 +9,22 @@ import NotificationBell from "./ui/NotificationBell";
 import NotificationPanel from "./ui/NotificationPanel";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, LOCATIONS } from "../stores/locationStore";
+import { useAuthStore } from "../stores/authStore";
+import { SERVICE_CATEGORIES } from "../data/serviceCategories";
+import { getAllFreelancers } from "../data/freelanceCategories";
+import { SEARCH_BRANCHES } from "../data/searchMenu";
+import { getBoutiques } from "../data/marketplaceSuppliers";
+import { MARKETPLACE_PRODUCTS } from "../data/marketplaceProducts";
 import { cardAppear } from "../animations/variants";
 
-const MENU_ITEMS = [
-  {
-    id: "professionnel",
-    label: "Services professionnels",
-    icon: Briefcase,
-    route: "/professionals",
-    image: "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=400&h=300&fit=crop",
-    description: "Trouver un professionnel pour vos besoins du quotidien.",
-    categories: ["Plomberie", "Électricité", "BTP", "Beauté", "Services locaux"],
-    ctaLabel: "Explorer les professionnels",
-  },
+const HERO_CARDS = [
   {
     id: "freelance",
     label: "Freelance",
     icon: UserPlus,
     route: "/freelance",
     image: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop",
-    description: "Trouver des experts digitaux pour vos projets.",
-    categories: ["Développement", "Design", "Marketing", "Rédaction", "Conseil"],
-    ctaLabel: "Trouver un freelance",
+    description: "Experts digitaux pour vos projets",
   },
   {
     id: "marketplace",
@@ -38,11 +32,11 @@ const MENU_ITEMS = [
     icon: Store,
     route: "/marketplace",
     image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=400&h=300&fit=crop",
-    description: "Acheter, vendre et découvrir des produits.",
-    categories: ["Électronique", "Immobilier", "Seconde main", "Maison"],
-    ctaLabel: "Explorer",
+    description: "Produits, immobilier, occasion",
   },
 ] as const;
+
+const POPULAR_PRODUCT_IDS = ["mp-25", "mp-27", "mp-26", "mp-32", "mp-31", "mp-28"];
 
 const SPONSORED_ITEMS: SponsoredItem[] = [
   {
@@ -119,6 +113,24 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
   },
 ];
 
+function SectionHeader({ label, onViewAll, badge }: { label: string; onViewAll?: () => void; badge?: string }) {
+  return (
+    <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center gap-2">
+        <h2 className="text-[15px] font-bold text-cm-text tracking-tight">{label}</h2>
+        {badge && (
+          <span className="text-[9px] font-bold text-cm-text bg-cm-accent/20 px-1.5 py-0.5 rounded-full">{badge}</span>
+        )}
+      </div>
+      {onViewAll && (
+        <button onClick={onViewAll} className="text-[11px] font-semibold text-cm-accent flex items-center gap-0.5 cursor-pointer active:scale-95 transition-transform">
+          Voir tout <ChevronRight className="w-3 h-3" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 export default function ModernHomeScreen() {
   const nav = useNavigate();
   const [showDrawer, setShowDrawer] = useState(false);
@@ -132,137 +144,267 @@ export default function ModernHomeScreen() {
   const geocodingSource = useLocationStore((s) => s.geocodingSource);
   const refreshLocation = useLocationStore((s) => s.refreshLocation);
   const setNeighborhood = useLocationStore((s) => s.setNeighborhood);
+  const authUser = useAuthStore((s) => s.user);
+  const firstName = authUser?.user_metadata?.firstName || authUser?.email?.split("@")[0] || "";
+
+  const featuredFreelancers = getAllFreelancers().sort((a, b) => b.rating - a.rating).slice(0, 6);
+  const featuredBoutiques = getBoutiques().slice(0, 6);
+  const popularProducts = POPULAR_PRODUCT_IDS
+    .map((id) => MARKETPLACE_PRODUCTS.find((p) => p.id === id))
+    .filter((p): p is NonNullable<typeof p> => Boolean(p));
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic bg-[#F5F5F5]">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
       {/* ── Header ── */}
-      <header className="px-3 pt-3 pb-1 bg-[#F5F5F5]">
+      <header className="px-3 pt-3 pb-1 bg-cm-bg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[20px] leading-none">🌿</span>
-            <span className="text-[#2B2B2B] text-[18px] font-extrabold tracking-tight">CaMatch</span>
+            <div className="w-8 h-8 rounded-[10px] bg-cm-accent flex items-center justify-center">
+              <span className="text-[14px] font-extrabold text-cm-text leading-none">C</span>
+            </div>
+            <span className="text-cm-text text-[18px] font-extrabold tracking-tight">CaMatch</span>
           </div>
           <div className="flex items-center gap-1">
             <NotificationBell unreadCount={unreadCount} onClick={() => setShowNotifications(true)} variant="client" />
             <button
               onClick={() => setShowDrawer(true)}
-              className="w-8 h-8 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+              className="w-8 h-8 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
               aria-label="Menu"
             >
-              <Menu className="w-4 h-4 text-[#2B2B2B]" />
+              <Menu className="w-4 h-4 text-cm-text" />
             </button>
           </div>
         </div>
         <button
           onClick={() => setShowLocationPicker(true)}
-          className="flex items-center gap-1 text-[12px] font-semibold text-[#2B2B2B]/70 cursor-pointer active:scale-95 transition-transform mt-1 ml-0.5"
+          className="flex items-center gap-1 text-[12px] font-semibold text-cm-text/70 cursor-pointer active:scale-95 transition-transform mt-1 ml-0.5"
         >
           <MapPin className="w-3.5 h-3.5" />
           <span className="truncate max-w-[160px]">{neighborhood}</span>
         </button>
       </header>
 
-      {/* ── Explorer ── */}
-      <section className="px-3 pt-3 pb-1">
-        <h2 className="text-[16px] font-bold text-[#2B2B2B] mb-3">Que recherchez-vous ?</h2>
-        <div className="space-y-3">
-          {MENU_ITEMS.map((item, i) => (
+      {/* ── Greeting ── */}
+      <section className="px-3 pt-2">
+        <h1 className="text-[20px] font-extrabold text-cm-text tracking-tight text-balance">
+          Bonjour{firstName ? `, ${firstName}` : ""} 👋
+        </h1>
+        <p className="text-[12px] text-cm-text-muted mt-0.5">Que pouvons-nous faire pour vous aujourd'hui ?</p>
+      </section>
+
+      {/* ── Search bar (héro) ── */}
+      <section className="px-3 pt-4">
+        <button
+          onClick={() => nav("/search")}
+          className="w-full h-12 pl-3.5 pr-4 bg-cm-elevated rounded-[14px] border border-cm-border-soft shadow-cm-sm flex items-center gap-3 cursor-pointer active:scale-[0.98] transition-all"
+        >
+          <Search className="w-5 h-5 text-cm-text-muted shrink-0" />
+          <span className="flex-1 text-left text-[14px] font-medium text-cm-text-muted truncate">
+            Rechercher un service, un produit, un pro...
+          </span>
+        </button>
+      </section>
+
+      {/* ── Chips rapides : 9 branches ── */}
+      <section className="px-3 pt-3">
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          {SEARCH_BRANCHES.map((branch) => (
+            <button
+              key={branch.id}
+              onClick={() => nav(`/search?branch=${branch.id}`)}
+              className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full bg-cm-elevated border border-cm-border text-[11px] font-semibold text-cm-text cursor-pointer active:scale-95 transition-all hover:border-cm-accent/60"
+            >
+              <span className="text-[14px] leading-none">{branch.icon}</span>
+              <span>{branch.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ── CTA Créer une demande ── */}
+      <section className="px-3 pt-3">
+        <button
+          onClick={() => nav("/orders/new")}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-[16px] bg-cm-text text-white cursor-pointer active:scale-[0.98] transition-all"
+        >
+          <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center shrink-0">
+            <ClipboardPlus className="w-4 h-4" />
+          </div>
+          <div className="flex-1 text-left min-w-0">
+            <span className="block text-[13px] font-bold leading-tight">Créer une demande</span>
+            <span className="block text-[10px] text-white/70 mt-0.5 truncate">Décrivez votre besoin, recevez des propositions</span>
+          </div>
+          <ChevronRight className="w-4 h-4 text-white/60 shrink-0" />
+        </button>
+      </section>
+
+      {/* ── Hero 2-col : Freelance | Marketplace ── */}
+      <section className="px-3 pt-4">
+        <div className="grid grid-cols-2 gap-3">
+          {HERO_CARDS.map((item, i) => (
             <motion.div
               key={item.id}
               variants={cardAppear}
               initial="hidden"
               animate="visible"
               custom={i}
-              className="rounded-[16px] overflow-hidden bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200/60"
+              className="rounded-[20px] overflow-hidden bg-cm-elevated shadow-cm-card border border-cm-border-soft"
             >
-              <button
-                onClick={() => nav(item.route)}
-                className="relative w-full h-[120px] overflow-hidden cursor-pointer text-left group"
-              >
+              <button onClick={() => nav(item.route)} className="relative w-full h-[120px] overflow-hidden cursor-pointer text-left group">
                 <img
                   src={item.image}
                   alt=""
                   loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a]/95 via-[#1a1a1a]/40 to-[#1a1a1a]/20" />
-                <div className="relative z-10 flex flex-col items-start justify-between h-full p-3.5">
-                  <div className="w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="relative z-10 flex flex-col items-start justify-between h-full p-3">
+                  <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                     <item.icon className="w-4 h-4 text-white" />
                   </div>
-                  <span className="text-[13px] font-extrabold text-white leading-tight">{item.label}</span>
+                  <div>
+                    <span className="block text-[13px] font-extrabold text-white leading-tight">{item.label}</span>
+                    <span className="hidden md:block text-[9px] text-white/80 mt-0.5 leading-tight">{item.description}</span>
+                  </div>
                 </div>
               </button>
-              <div className="px-3.5 py-3">
-                <p className="text-[12px] text-[#2B2B2B]/60 leading-relaxed mb-2.5">{item.description}</p>
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {item.categories.map((cat) => (
-                    <span key={cat} className="text-[10px] font-semibold text-[#2B2B2B]/50 bg-[#2B2B2B]/5 rounded-full px-2 py-0.5">
-                      {cat}
-                    </span>
-                  ))}
-                </div>
-                <button
-                  onClick={() => nav(item.route)}
-                  className="w-full py-2 rounded-[10px] bg-[#7FD356]/15 text-[#2B2B2B] text-[12px] font-bold flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.97] transition-all"
-                >
-                  {item.ctaLabel}
-                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* ── Créer une demande ── */}
-      <section className="px-3 pt-3 pb-1">
-        <motion.div
-          variants={cardAppear}
-          initial="hidden"
-          animate="visible"
-          custom={3}
-          className="rounded-[16px] bg-white p-4 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200/60"
-        >
-          <h3 className="text-[14px] font-bold text-[#2B2B2B]">Besoin d'une solution précise ?</h3>
-          <p className="text-[12px] text-[#2B2B2B]/60 mt-1 leading-relaxed">
-            Décrivez votre besoin et recevez des propositions de professionnels adaptées.
-          </p>
+      {/* ── Recommandé : Services à domicile ── */}
+      <section className="px-3 pt-6">
+        <SectionHeader label="Services à domicile" badge="Abidjan" onViewAll={() => nav("/professionals")} />
+        <div className="grid grid-cols-4 gap-2.5">
+          {SERVICE_CATEGORIES.slice(0, 7).map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => nav(`/professionals?category=${cat.id}`)}
+              className="flex flex-col items-center gap-1.5 px-1 py-3 rounded-[16px] bg-cm-elevated border border-cm-border-soft cursor-pointer active:scale-95 transition-all"
+            >
+              <span className="w-9 h-9 rounded-full bg-gradient-to-br from-cm-accent/20 to-cm-bg flex items-center justify-center text-[16px]">
+                {cat.icon}
+              </span>
+              <span className="text-[9px] font-semibold text-cm-text text-center leading-tight line-clamp-2">{cat.name}</span>
+            </button>
+          ))}
           <button
-            onClick={() => nav("/orders/new")}
-            className="w-full mt-3 py-2.5 rounded-[12px] bg-[#7FD356] text-[#2B2B2B] text-[13px] font-bold flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all"
+            onClick={() => nav("/professionals")}
+            className="flex flex-col items-center justify-center gap-1.5 px-1 py-3 rounded-[16px] bg-cm-accent/10 border border-dashed border-cm-accent/40 cursor-pointer active:scale-95 transition-all"
           >
-            <ClipboardPlus className="w-4 h-4" />
-            Créer une demande
+            <ChevronRight className="w-5 h-5 text-cm-accent" />
+            <span className="text-[9px] font-bold text-cm-accent text-center leading-tight">Tout voir</span>
           </button>
-        </motion.div>
+        </div>
       </section>
 
-      {/* ── Search Bar ── */}
-      <section className="px-3 pt-2 pb-1">
-        <div className="relative w-full group">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none z-10">
-            <div className="w-8 h-8 rounded-full bg-[#7FD356] flex items-center justify-center">
-              <Search className="w-4 h-4 text-[#2B2B2B]" />
-            </div>
-          </div>
-          <input
-            type="text"
-            className="w-full h-13 pl-[52px] pr-4 text-[14px] bg-white rounded-[14px] outline-none text-[#2B2B2B] placeholder:text-[#2B2B2B]/40 font-medium shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-200/60 transition-all focus-within:ring-2 focus-within:ring-[#7FD356]/40 focus-within:border-[#7FD356]/30"
-            placeholder="Rechercher plombier..."
-            onFocus={() => nav("/search")}
-            readOnly
-          />
+      {/* ── Recommandé : Freelances en vedette ── */}
+      <section className="pt-6">
+        <div className="px-3">
+          <SectionHeader label="Freelances en vedette" onViewAll={() => nav("/freelance")} />
+        </div>
+        <div className="flex gap-3 overflow-x-auto no-scrollbar px-3 pb-1">
+          {featuredFreelancers.map((pro) => (
+            <button
+              key={pro.id}
+              onClick={() => nav(`/explorer/pro/${pro.id}`)}
+              className="shrink-0 w-44 bg-cm-elevated border border-cm-border rounded-2xl p-3 text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
+            >
+              <div className="flex items-center gap-2.5 mb-2">
+                <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 border-2 border-cm-border">
+                  <img src={pro.avatarUrl} alt={pro.name} className="w-full h-full object-cover" loading="lazy" />
+                  {pro.verified && (
+                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-cm-green rounded-full flex items-center justify-center">
+                      <svg viewBox="0 0 12 12" className="w-2 text-white" fill="none"><path d="M3 6L5 8L9 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[12px] font-bold text-cm-text truncate">{pro.name}</h3>
+                  <p className="text-[10px] text-cm-text-soft truncate">{pro.title}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-cm-border/50">
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-cm-amber">
+                  <Star className="w-2.5 h-2.5 fill-cm-amber text-cm-amber" />{pro.rating}
+                </span>
+                <span className="text-[11px] font-bold text-cm-forest">{pro.hourlyRate.toLocaleString()} F/h</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Recommandé : Boutiques d'Abidjan ── */}
+      <section className="pt-6">
+        <div className="px-3">
+          <SectionHeader label="Boutiques d'Abidjan" onViewAll={() => nav("/marketplace/boutiques")} />
+        </div>
+        <div className="flex gap-3 overflow-x-auto no-scrollbar px-3 pb-1">
+          {featuredBoutiques.map((shop) => (
+            <button
+              key={shop.id}
+              onClick={() => nav(`/marketplace/shop/${shop.id}`)}
+              className="shrink-0 w-44 bg-cm-elevated border border-cm-border rounded-2xl p-3 text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
+            >
+              <div className="flex items-center gap-2.5 mb-2">
+                <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 border border-cm-border bg-cm-surface flex items-center justify-center">
+                  {shop.logo ? (
+                    <img src={shop.logo} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <Store className="w-4 h-4 text-cm-text-muted" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[12px] font-bold text-cm-text truncate">{shop.name}</h3>
+                  <p className="text-[10px] text-cm-text-soft truncate flex items-center gap-0.5">
+                    <MapPin className="w-2.5 h-2.5" />{shop.city}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-cm-border/50">
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-cm-amber">
+                  <Star className="w-2.5 h-2.5 fill-cm-amber text-cm-amber" />{shop.rating > 0 ? shop.rating.toFixed(1) : "Nouveau"}
+                </span>
+                {shop.buyOnline && (
+                  <span className="text-[9px] font-semibold text-cm-forest bg-cm-green/15 px-1.5 py-0.5 rounded-full">En ligne</span>
+                )}
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Recommandé : Produits populaires ── */}
+      <section className="pt-6">
+        <div className="px-3">
+          <SectionHeader label="Produits populaires" onViewAll={() => nav("/marketplace")} />
+        </div>
+        <div className="flex gap-3 overflow-x-auto no-scrollbar px-3 pb-1">
+          {popularProducts.map((prod) => (
+            <button
+              key={prod.id}
+              onClick={() => nav(`/catalog?product=${prod.id}`)}
+              className="shrink-0 w-36 bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
+            >
+              <div className="h-20 overflow-hidden bg-cm-surface">
+                <img src={prod.images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
+              </div>
+              <div className="p-2.5">
+                <h3 className="text-[11px] font-bold text-cm-text leading-tight line-clamp-2">{prod.name}</h3>
+                <p className="text-[11px] font-bold text-cm-accent mt-1">{prod.price.toLocaleString()} F</p>
+              </div>
+            </button>
+          ))}
         </div>
       </section>
 
       {/* ── Sponsored Section ── */}
-      <section className="px-3 pt-2 pb-6">
+      <section className="px-3 pt-6 pb-6">
         <div className="flex items-center gap-2 mb-3">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#7FD356]" />
-          <h2 className="text-[16px] font-bold text-[#2B2B2B]">Sponsorisé</h2>
+          <span className="w-2.5 h-2.5 rounded-full bg-cm-accent" />
+          <h2 className="text-[15px] font-bold text-cm-text tracking-tight">Sponsorisé</h2>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <AnimatePresence mode="popLayout">
@@ -299,12 +441,12 @@ export default function ModernHomeScreen() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[15px] font-semibold text-[#2B2B2B]">Changer de localisation</h3>
+                <h3 className="text-[15px] font-semibold text-cm-text">Changer de localisation</h3>
                 <button
                   onClick={() => setShowLocationPicker(false)}
-                  className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer"
                 >
-                  <X className="w-4 h-4 text-[#2B2B2B]" />
+                  <X className="w-4 h-4 text-cm-text" />
                 </button>
               </div>
               <div className="space-y-1">
@@ -316,35 +458,35 @@ export default function ModernHomeScreen() {
                       key={loc}
                       onClick={() => { setNeighborhood(hood); setShowLocationPicker(false); }}
                       className={`w-full text-left px-4 py-3 rounded-[12px] text-[13px] font-medium transition-all cursor-pointer flex items-center gap-3 ${
-                        isActive ? "bg-[#7FD356]/20 text-[#2B2B2B]" : "text-[#2B2B2B] hover:bg-gray-50"
+                        isActive ? "bg-cm-accent/20 text-cm-text" : "text-cm-text hover:bg-cm-surface"
                       }`}
                     >
-                      <MapPin className={`w-4 h-4 ${isActive ? "text-[#7FD356]" : "text-gray-400"}`} />
+                      <MapPin className={`w-4 h-4 ${isActive ? "text-cm-accent" : "text-cm-text-muted"}`} />
                       <span className="flex-1">{loc}</span>
-                      {isActive && <span className="text-[10px] text-[#7FD356] font-semibold mr-1">✓</span>}
+                      {isActive && <span className="text-[10px] text-cm-accent font-semibold mr-1">✓</span>}
                     </button>
                   );
                 })}
               </div>
               {locStatus === "locating" ? (
-                <div className="w-full mt-4 py-3 bg-[#7FD356]/20 rounded-[12px] text-[13px] font-medium text-[#2B2B2B] flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-[#7FD356] border-t-transparent rounded-full animate-spin" />
+                <div className="w-full mt-4 py-3 bg-cm-accent/20 rounded-[12px] text-[13px] font-medium text-cm-text flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-cm-accent border-t-transparent rounded-full animate-spin" />
                   Détection en cours...
                 </div>
               ) : locStatus === "available" ? (
                 <div className="w-full mt-4 space-y-2">
-                  <div className="flex items-center justify-between px-4 py-2.5 bg-[#7FD356]/20 rounded-[12px]">
-                    <div className="flex items-center gap-2 text-[12px] text-[#2B2B2B]">
+                  <div className="flex items-center justify-between px-4 py-2.5 bg-cm-accent/20 rounded-[12px]">
+                    <div className="flex items-center gap-2 text-[12px] text-cm-text">
                       <span className={`w-2 h-2 rounded-full ${geocodingSource === "nominatim" ? "bg-green-500" : "bg-amber-500"}`} />
                       {geocodingSource === "nominatim" ? "Position précise (GPS)" : "Position estimée"}
                     </div>
                     {gpsAccuracy != null && (
-                      <span className="text-[11px] text-gray-500 font-mono">±{Math.round(gpsAccuracy)} m</span>
+                      <span className="text-[11px] text-cm-text-muted font-mono">±{Math.round(gpsAccuracy)} m</span>
                     )}
                   </div>
                   <button
                     onClick={() => refreshLocation()}
-                    className="w-full py-2.5 bg-[#7FD356]/20 border border-[#7FD356]/30 rounded-[12px] text-[12px] font-medium text-[#2B2B2B] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all"
+                    className="w-full py-2.5 bg-cm-accent/20 border border-cm-accent/30 rounded-[12px] text-[12px] font-medium text-cm-text flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all"
                   >
                     <MapPin className="w-3.5 h-3.5" /> Rafraîchir ma position
                   </button>
@@ -352,7 +494,7 @@ export default function ModernHomeScreen() {
               ) : (
                 <button
                   onClick={() => { refreshLocation(); setShowLocationPicker(false); }}
-                  className="w-full mt-4 py-3 bg-[#7FD356]/20 rounded-[12px] text-[13px] font-medium text-[#2B2B2B] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all"
+                  className="w-full mt-4 py-3 bg-cm-accent/20 rounded-[12px] text-[13px] font-medium text-cm-text flex items-center justify-center gap-2 cursor-pointer active:scale-[0.97] transition-all"
                 >
                   <MapPin className="w-4 h-4" /> Détecter ma position
                 </button>

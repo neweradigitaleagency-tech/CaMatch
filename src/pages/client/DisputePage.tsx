@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ArrowLeft, AlertTriangle, Shield, Send } from "lucide-react";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useRequestStore } from "../../stores/requestStore";
 import { useNotificationStore } from "../../stores/notificationStore";
 
@@ -16,8 +17,7 @@ const DISPUTE_REASONS = [
 
 export default function DisputePage() {
   const { id: missionId } = useParams();
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, navigate, complete } = useAppNavigation();
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -44,7 +44,7 @@ export default function DisputePage() {
         </div>
         <h1 className="text-[18px] font-display font-bold text-cm-text mb-2">Litige soumis</h1>
         <p className="text-[13px] text-cm-text-soft text-center mb-6">Notre équipe va analyser la situation et vous contacter sous 24h.</p>
-        <button onClick={() => nav("/orders")} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour aux missions</button>
+        <button onClick={() => complete()} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour aux missions</button>
       </div>
     );
   }

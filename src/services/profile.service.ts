@@ -52,7 +52,7 @@ export async function getProfile(userId: string): Promise<UnifiedProfile | null>
   const { data: user } = await supabase.auth.getUser();
   const email = user?.user?.email ?? "";
 
-  const { data: profiles } = await supabase
+  const { data: profiles } = await (supabase as any)
     .from("profiles")
     .select("*")
     .eq("user_id", userId);
@@ -71,7 +71,7 @@ export async function getProfile(userId: string): Promise<UnifiedProfile | null>
   const professionalData: Record<string, unknown> = {};
   const supplierData: Record<string, unknown> = {};
 
-  for (const p of profiles) {
+  for (const p of profiles as any[]) {
     profileTypes.push(p.profile_type);
     displayName = p.display_name ?? displayName;
     avatarUrl = p.avatar_url ?? avatarUrl;
@@ -100,6 +100,6 @@ export async function getProfile(userId: string): Promise<UnifiedProfile | null>
     clientData: Object.keys(clientData).length > 0 ? clientData : undefined,
     professionalData: Object.keys(professionalData).length > 0 ? professionalData : undefined,
     supplierData: Object.keys(supplierData).length > 0 ? supplierData : undefined,
-    trustScores: profiles.find((p) => p.data?.trust_scores)?.data?.trust_scores,
+    trustScores: profiles.find((p: any) => p.data?.trust_scores)?.data?.trust_scores,
   };
 }

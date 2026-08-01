@@ -79,8 +79,8 @@ export default function AdminRevenueAnalyticsPage() {
     <div className="space-y-5 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Analytiques revenus</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">Suivi des revenus et métriques d'abonnement</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Analytiques revenus</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">Suivi des revenus et métriques d'abonnement</p>
         </div>
       </div>
 
@@ -100,8 +100,8 @@ export default function AdminRevenueAnalyticsPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Abonnements actifs</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Abonnements actifs</h3>
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
@@ -121,8 +121,8 @@ export default function AdminRevenueAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Revenus par type de plan</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Revenus par type de plan</h3>
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data}>
@@ -137,8 +137,8 @@ export default function AdminRevenueAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Revenus vs Attrition</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">Revenus vs Attrition</h3>
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data}>
@@ -154,8 +154,8 @@ export default function AdminRevenueAnalyticsPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-5">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-4">MRR (Monthly Recurring Revenue)</h3>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-5">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-4">MRR (Monthly Recurring Revenue)</h3>
           <div className="h-[240px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
@@ -176,14 +176,14 @@ export default function AdminRevenueAnalyticsPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
-          <h3 className="text-[13px] font-semibold text-gray-900">Détail mensuel</h3>
+      <div className="bg-cm-elevated border border-cm-border rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-cm-border/40">
+          <h3 className="text-[13px] font-semibold text-cm-text">Détail mensuel</h3>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-[12px]">
             <thead>
-              <tr className="border-b border-gray-100 text-[11px] text-gray-500 font-semibold uppercase tracking-wider">
+              <tr className="border-b border-cm-border/40 text-[11px] text-cm-text-muted font-semibold uppercase tracking-wider">
                 <th className="px-5 py-3">Mois</th>
                 <th className="px-5 py-3 text-right">MRR</th>
                 <th className="px-5 py-3 text-right">Revenus</th>
@@ -193,16 +193,16 @@ export default function AdminRevenueAnalyticsPage() {
                 <th className="px-5 py-3 text-right">Attrition</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-cm-border/40">
               {data.map((row) => (
-                <tr key={row.month} className="hover:bg-gray-50">
-                  <td className="px-5 py-3 text-gray-900 font-medium">{row.month}</td>
-                  <td className="px-5 py-3 text-right text-gray-900">{formatXOF(row.mrr)}</td>
-                  <td className="px-5 py-3 text-right text-gray-900">{formatXOF(row.revenue)}</td>
-                  <td className="px-5 py-3 text-right text-gray-700">{row.activeSubs}</td>
+                <tr key={row.month} className="hover:bg-cm-surface">
+                  <td className="px-5 py-3 text-cm-text font-medium">{row.month}</td>
+                  <td className="px-5 py-3 text-right text-cm-text">{formatXOF(row.mrr)}</td>
+                  <td className="px-5 py-3 text-right text-cm-text">{formatXOF(row.revenue)}</td>
+                  <td className="px-5 py-3 text-right text-cm-text-soft">{row.activeSubs}</td>
                   <td className="px-5 py-3 text-right text-[var(--admin-accent)]">+{row.newSubs}</td>
                   <td className="px-5 py-3 text-right text-red-500">-{row.cancelledSubs}</td>
-                  <td className="px-5 py-3 text-right text-gray-700">{row.churn}%</td>
+                  <td className="px-5 py-3 text-right text-cm-text-soft">{row.churn}%</td>
                 </tr>
               ))}
             </tbody>

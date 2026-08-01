@@ -185,12 +185,12 @@ export default function AdminVerificationsPage() {
       width: "200px",
       render: (v) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-semibold text-gray-600 shrink-0">
+          <div className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center text-[12px] font-semibold text-cm-text-soft shrink-0">
             {(v.user_name || "?").charAt(0)}
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900 truncate">{v.user_name || "Utilisateur"}</p>
-            <p className="text-[11px] text-gray-400 truncate">{v.user_email}</p>
+            <p className="text-[13px] font-medium text-cm-text truncate">{v.user_name || "Utilisateur"}</p>
+            <p className="text-[11px] text-cm-text-muted truncate">{v.user_email}</p>
           </div>
         </div>
       ),
@@ -203,10 +203,10 @@ export default function AdminVerificationsPage() {
       render: (v) => {
         const DocIcon = getDocumentIcon(v.document_type)
         return (
-          <span className="inline-flex items-center gap-1.5 text-[12px] text-gray-600">
+          <span className="inline-flex items-center gap-1.5 text-[12px] text-cm-text-soft">
             <DocIcon className="w-3.5 h-3.5 shrink-0" />
             <span className="truncate">{DOC_LABELS[v.document_type] ?? v.document_type}</span>
-            {v.document_back_url && <span className="text-[10px] text-gray-400 shrink-0">(R+V)</span>}
+            {v.document_back_url && <span className="text-[10px] text-cm-text-muted shrink-0">(R+V)</span>}
           </span>
         )
       },
@@ -217,11 +217,11 @@ export default function AdminVerificationsPage() {
       sortable: true,
       width: "80px",
       render: (v) => {
-        if (!v.liveness) return <span className="text-[11px] text-gray-400">—</span>
+        if (!v.liveness) return <span className="text-[11px] text-cm-text-muted">—</span>
         return (
           <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${
             v.liveness.status === "passed" ? "text-emerald-600" :
-            v.liveness.status === "failed" ? "text-red-600" : "text-gray-400"
+            v.liveness.status === "failed" ? "text-red-600" : "text-cm-text-muted"
           }`}>
             {v.liveness.status === "passed" ? <CheckCircle className="w-3 h-3" /> :
              v.liveness.status === "failed" ? <XCircle className="w-3 h-3" /> :
@@ -240,7 +240,7 @@ export default function AdminVerificationsPage() {
         <span className={`inline-flex items-center gap-1 text-[12px] font-medium ${v.ai_score >= 0.8 ? "text-emerald-600" : v.ai_score >= 0.5 ? "text-amber-600" : "text-red-600"}`}>
           <Star className="w-3 h-3" />{(v.ai_score * 100).toFixed(0)}%
         </span>
-      ) : <span className="text-[11px] text-gray-400">—</span>,
+      ) : <span className="text-[11px] text-cm-text-muted">—</span>,
     },
     {
       key: "status",
@@ -253,7 +253,7 @@ export default function AdminVerificationsPage() {
           <div className="flex items-center gap-1.5">
             <StatusBadge status={cfg.status} label={cfg.label} />
             {v.rejection_reason && (v.status === "rejected" || v.status === "needs_resubmission") && (
-              <span className="text-[10px] text-gray-400 truncate max-w-[80px]" title={REJECTION_REASON_LABEL[v.rejection_reason] ?? v.rejection_reason}>
+              <span className="text-[10px] text-cm-text-muted truncate max-w-[80px]" title={REJECTION_REASON_LABEL[v.rejection_reason] ?? v.rejection_reason}>
                 ({REJECTION_REASON_LABEL[v.rejection_reason] ?? v.rejection_reason})
               </span>
             )}
@@ -267,7 +267,7 @@ export default function AdminVerificationsPage() {
       sortable: true,
       width: "100px",
       render: (v) => (
-        <span className="text-[12px] text-gray-500">
+        <span className="text-[12px] text-cm-text-muted">
           {format(new Date(v.created_at), "d MMM", { locale: fr })}
         </span>
       ),
@@ -293,8 +293,8 @@ export default function AdminVerificationsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Vérifications KYC</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{total} demande{total !== 1 ? "s" : ""}</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Vérifications KYC</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{total} demande{total !== 1 ? "s" : ""}</p>
         </div>
       </div>
 
@@ -305,13 +305,13 @@ export default function AdminVerificationsPage() {
         <MiniStat icon={<AlertTriangle className="w-3.5 h-3.5" />} label="Liveness échoué" value={verifications.filter((v) => v.liveness?.status === "failed").length} />
       </div>
 
-      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar bg-white border border-gray-200 rounded-xl p-1">
+      <div className="flex items-center gap-1 overflow-x-auto no-scrollbar bg-cm-elevated border border-cm-border rounded-xl p-1">
         {DOC_TABS.map((t) => (
           <button
             key={t.key}
             onClick={() => setDocType(t.key)}
             className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${
-              docType === t.key ? "bg-gray-900 text-white" : "text-gray-600 hover:bg-gray-100"
+              docType === t.key ? "bg-cm-text text-white" : "text-cm-text-soft hover:bg-cm-surface"
             }`}
           >
             {t.label}
@@ -326,8 +326,8 @@ export default function AdminVerificationsPage() {
             onClick={() => setStatusFilter(f.key)}
             className={`px-3 py-1.5 rounded-lg text-[11px] font-medium whitespace-nowrap cursor-pointer transition-colors ${
               statusFilter === f.key
-                ? "bg-gray-200 text-gray-900"
-                : "text-gray-500 hover:bg-gray-100"
+                ? "bg-cm-border-soft text-cm-text"
+                : "text-cm-text-muted hover:bg-cm-surface"
             }`}
           >
             {f.label}
@@ -350,11 +350,11 @@ export default function AdminVerificationsPage() {
         emptyMessage="Aucune demande de vérification"
       />
 
-      <div className="bg-white border border-gray-200 rounded-xl">
-        <div className="px-4 py-3 border-b border-gray-100">
-          <h3 className="text-[13px] font-semibold text-gray-900">Historique des vérifications</h3>
+      <div className="bg-cm-elevated border border-cm-border rounded-xl">
+        <div className="px-4 py-3 border-b border-cm-border/40">
+          <h3 className="text-[13px] font-semibold text-cm-text">Historique des vérifications</h3>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-cm-border/40">
           {VERIF_HISTORY.map((h) => (
             <div key={h.id} className="flex items-start gap-3 px-4 py-3">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
@@ -368,17 +368,17 @@ export default function AdminVerificationsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[12px] font-medium text-gray-900">{h.action}</span>
-                  <span className="text-[12px] text-gray-500">— {h.target}</span>
-                  <span className="text-[11px] text-gray-400">({h.doc})</span>
+                  <span className="text-[12px] font-medium text-cm-text">{h.action}</span>
+                  <span className="text-[12px] text-cm-text-muted">— {h.target}</span>
+                  <span className="text-[11px] text-cm-text-muted">({h.doc})</span>
                 </div>
                 {h.reason && (
                   <span className="inline-block mt-0.5 text-[10px] font-medium text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
                     {REJECTION_REASON_LABEL[h.reason as RejectionReason] ?? h.reason}
                   </span>
                 )}
-                {h.note && <p className="text-[11px] text-gray-400 mt-0.5">{h.note}</p>}
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                {h.note && <p className="text-[11px] text-cm-text-muted mt-0.5">{h.note}</p>}
+                <p className="text-[11px] text-cm-text-muted mt-0.5">
                   Par {h.by} — {format(new Date(h.date), "d MMM HH:mm", { locale: fr })}
                 </p>
               </div>
@@ -392,8 +392,8 @@ export default function AdminVerificationsPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[14px] font-semibold text-gray-900">{selected.user_name}</p>
-                <p className="text-[12px] text-gray-500">{DOC_LABELS[selected.document_type] ?? selected.document_type} — {getCategoryLabel(selected.category ?? "") || "—"}</p>
+                <p className="text-[14px] font-semibold text-cm-text">{selected.user_name}</p>
+                <p className="text-[12px] text-cm-text-muted">{DOC_LABELS[selected.document_type] ?? selected.document_type} — {getCategoryLabel(selected.category ?? "") || "—"}</p>
               </div>
               <StatusBadge
                 status={STATUS_CONFIG[selected.status]?.status ?? "pending"}
@@ -403,7 +403,7 @@ export default function AdminVerificationsPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-center text-gray-400 min-h-[160px] border-2 border-dashed border-gray-200">
+              <div className="bg-cm-surface rounded-xl p-4 flex items-center justify-center text-cm-text-muted min-h-[160px] border-2 border-dashed border-cm-border">
                 <div className="text-center">
                   <FileText className="w-10 h-10 mx-auto mb-2" />
                   <p className="text-[13px] font-medium">Document principal</p>
@@ -412,7 +412,7 @@ export default function AdminVerificationsPage() {
               </div>
               <div className="space-y-3">
                 {selected.document_back_url && (
-                  <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-center text-gray-400 min-h-[70px] border-2 border-dashed border-gray-200">
+                  <div className="bg-cm-surface rounded-xl p-4 flex items-center justify-center text-cm-text-muted min-h-[70px] border-2 border-dashed border-cm-border">
                     <div className="text-center">
                       <p className="text-[11px] font-medium">Verso du document</p>
                       <p className="text-[10px] break-all">{selected.document_back_url}</p>
@@ -420,40 +420,40 @@ export default function AdminVerificationsPage() {
                   </div>
                 )}
                 {selected.ocr_data && (
-                  <div className="bg-white border border-gray-200 rounded-xl p-3">
+                  <div className="bg-cm-elevated border border-cm-border rounded-xl p-3">
                     <div className="flex items-center gap-1.5 mb-2">
-                      <Scan className="w-3.5 h-3.5 text-gray-400" />
-                      <p className="text-[11px] font-medium text-gray-600">Données OCR</p>
+                      <Scan className="w-3.5 h-3.5 text-cm-text-muted" />
+                      <p className="text-[11px] font-medium text-cm-text-soft">Données OCR</p>
                     </div>
                     <div className="grid grid-cols-2 gap-x-3 gap-y-1">
                       {selected.ocr_data.first_name && (
                         <>
-                          <span className="text-[10px] text-gray-400">Prénom</span>
-                          <span className="text-[11px] text-gray-900 text-right">{selected.ocr_data.first_name}</span>
+                          <span className="text-[10px] text-cm-text-muted">Prénom</span>
+                          <span className="text-[11px] text-cm-text text-right">{selected.ocr_data.first_name}</span>
                         </>
                       )}
                       {selected.ocr_data.last_name && (
                         <>
-                          <span className="text-[10px] text-gray-400">Nom</span>
-                          <span className="text-[11px] text-gray-900 text-right">{selected.ocr_data.last_name}</span>
+                          <span className="text-[10px] text-cm-text-muted">Nom</span>
+                          <span className="text-[11px] text-cm-text text-right">{selected.ocr_data.last_name}</span>
                         </>
                       )}
                       {selected.ocr_data.birth_date && (
                         <>
-                          <span className="text-[10px] text-gray-400">Date naissance</span>
-                          <span className="text-[11px] text-gray-900 text-right">{format(new Date(selected.ocr_data.birth_date), "dd/MM/yyyy")}</span>
+                          <span className="text-[10px] text-cm-text-muted">Date naissance</span>
+                          <span className="text-[11px] text-cm-text text-right">{format(new Date(selected.ocr_data.birth_date), "dd/MM/yyyy")}</span>
                         </>
                       )}
                       {selected.ocr_data.document_number && (
                         <>
-                          <span className="text-[10px] text-gray-400">N° document</span>
-                          <span className="text-[11px] text-gray-900 text-right font-mono">{selected.ocr_data.document_number}</span>
+                          <span className="text-[10px] text-cm-text-muted">N° document</span>
+                          <span className="text-[11px] text-cm-text text-right font-mono">{selected.ocr_data.document_number}</span>
                         </>
                       )}
                       {selected.ocr_data.expiration_date && (
                         <>
-                          <span className="text-[10px] text-gray-400">Expiration</span>
-                          <span className={`text-[11px] text-right ${new Date(selected.ocr_data.expiration_date) < new Date() ? "text-red-500 font-medium" : "text-gray-900"}`}>
+                          <span className="text-[10px] text-cm-text-muted">Expiration</span>
+                          <span className={`text-[11px] text-right ${new Date(selected.ocr_data.expiration_date) < new Date() ? "text-red-500 font-medium" : "text-cm-text"}`}>
                             {format(new Date(selected.ocr_data.expiration_date), "dd/MM/yyyy")}
                             {new Date(selected.ocr_data.expiration_date) < new Date() && " (expiré)"}
                           </span>
@@ -461,8 +461,8 @@ export default function AdminVerificationsPage() {
                       )}
                       {selected.ocr_data.nationality && (
                         <>
-                          <span className="text-[10px] text-gray-400">Nationalité</span>
-                          <span className="text-[11px] text-gray-900 text-right">{selected.ocr_data.nationality}</span>
+                          <span className="text-[10px] text-cm-text-muted">Nationalité</span>
+                          <span className="text-[11px] text-cm-text text-right">{selected.ocr_data.nationality}</span>
                         </>
                       )}
                     </div>
@@ -472,18 +472,18 @@ export default function AdminVerificationsPage() {
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="bg-white border border-gray-200 rounded-xl p-3">
-                <p className="text-[11px] text-gray-500 font-medium mb-2">Scores IA</p>
+              <div className="bg-cm-elevated border border-cm-border rounded-xl p-3">
+                <p className="text-[11px] text-cm-text-muted font-medium mb-2">Scores IA</p>
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] text-gray-500">Document</span>
+                    <span className="text-[11px] text-cm-text-muted">Document</span>
                     <span className={`text-[12px] font-medium ${(selected.ai_score ?? 0) >= 0.8 ? "text-emerald-600" : (selected.ai_score ?? 0) >= 0.5 ? "text-amber-600" : "text-red-600"}`}>
                       {selected.ai_score ? `${(selected.ai_score * 100).toFixed(0)}%` : "—"}
                     </span>
                   </div>
                   {(selected.document_type.includes("selfie") || selected.face_match_score) && (
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-gray-500">Correspondance faciale</span>
+                      <span className="text-[11px] text-cm-text-muted">Correspondance faciale</span>
                       <span className={`text-[12px] font-medium ${(selected.face_match_score ?? 0) >= 0.8 ? "text-emerald-600" : (selected.face_match_score ?? 0) >= 0.5 ? "text-amber-600" : "text-red-600"}`}>
                         {selected.face_match_score ? `${(selected.face_match_score * 100).toFixed(0)}%` : "—"}
                       </span>
@@ -491,7 +491,7 @@ export default function AdminVerificationsPage() {
                   )}
                   {selected.face_verified !== undefined && (
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-gray-500">Visage vérifié</span>
+                      <span className="text-[11px] text-cm-text-muted">Visage vérifié</span>
                       <span className={`text-[11px] font-medium ${selected.face_verified ? "text-emerald-600" : "text-red-500"}`}>
                         {selected.face_verified ? "Oui" : "Non"}
                       </span>
@@ -500,18 +500,18 @@ export default function AdminVerificationsPage() {
                 </div>
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-xl p-3">
+              <div className="bg-cm-elevated border border-cm-border rounded-xl p-3">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <Video className="w-3.5 h-3.5 text-gray-400" />
-                  <p className="text-[11px] text-gray-500 font-medium">Liveness</p>
+                  <Video className="w-3.5 h-3.5 text-cm-text-muted" />
+                  <p className="text-[11px] text-cm-text-muted font-medium">Liveness</p>
                 </div>
                 {selected.liveness ? (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-gray-500">Statut</span>
+                      <span className="text-[11px] text-cm-text-muted">Statut</span>
                       <span className={`inline-flex items-center gap-1 text-[11px] font-medium ${
                         selected.liveness.status === "passed" ? "text-emerald-600" :
-                        selected.liveness.status === "failed" ? "text-red-600" : "text-gray-400"
+                        selected.liveness.status === "failed" ? "text-red-600" : "text-cm-text-muted"
                       }`}>
                         {selected.liveness.status === "passed" ? <CheckCircle className="w-3 h-3" /> :
                          selected.liveness.status === "failed" ? <XCircle className="w-3 h-3" /> :
@@ -522,50 +522,50 @@ export default function AdminVerificationsPage() {
                     </div>
                     {selected.liveness.score && (
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-gray-500">Score</span>
+                        <span className="text-[11px] text-cm-text-muted">Score</span>
                         <span className={`text-[12px] font-medium ${selected.liveness.score >= 0.8 ? "text-emerald-600" : "text-red-600"}`}>
                           {(selected.liveness.score * 100).toFixed(0)}%
                         </span>
                       </div>
                     )}
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-gray-500">Méthode</span>
-                      <span className="text-[11px] text-gray-700 capitalize">
+                      <span className="text-[11px] text-cm-text-muted">Méthode</span>
+                      <span className="text-[11px] text-cm-text-soft capitalize">
                         {selected.liveness.method === "video" ? "Vidéo 5s" :
                          selected.liveness.method === "selfie_sequence" ? "Selfies multiples" : "—"}
                       </span>
                     </div>
                     {selected.liveness.attempted_at && (
                       <div className="flex items-center justify-between">
-                        <span className="text-[11px] text-gray-500">Tenté le</span>
-                        <span className="text-[11px] text-gray-700">
+                        <span className="text-[11px] text-cm-text-muted">Tenté le</span>
+                        <span className="text-[11px] text-cm-text-soft">
                           {format(new Date(selected.liveness.attempted_at), "HH:mm", { locale: fr })}
                         </span>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <p className="text-[11px] text-gray-400">Aucune vérification liveness</p>
+                  <p className="text-[11px] text-cm-text-muted">Aucune vérification liveness</p>
                 )}
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-xl p-3">
-                <p className="text-[11px] text-gray-500 font-medium mb-2">Vérifications compte</p>
+              <div className="bg-cm-elevated border border-cm-border rounded-xl p-3">
+                <p className="text-[11px] text-cm-text-muted font-medium mb-2">Vérifications compte</p>
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-[11px] text-gray-500"><Mail className="w-3 h-3" /> Email</span>
+                    <span className="flex items-center gap-1 text-[11px] text-cm-text-muted"><Mail className="w-3 h-3" /> Email</span>
                     <span className={`text-[11px] font-medium ${selected.email_verified ? "text-emerald-600" : "text-red-500"}`}>
                       {selected.email_verified ? "Vérifié" : "Non vérifié"}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="flex items-center gap-1 text-[11px] text-gray-500"><Phone className="w-3 h-3" /> Téléphone</span>
+                    <span className="flex items-center gap-1 text-[11px] text-cm-text-muted"><Phone className="w-3 h-3" /> Téléphone</span>
                     <span className={`text-[11px] font-medium ${selected.phone_verified ? "text-emerald-600" : "text-red-500"}`}>
                       {selected.phone_verified ? "Vérifié" : "Non vérifié"}
                     </span>
                   </div>
                 </div>
-                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+                <div className="mt-3 pt-3 border-t border-cm-border/40 flex items-center gap-2">
                   {hasPermission("users.suspend") && (
                     <button onClick={() => setSuspendConfirm(selected)}
                       className="flex items-center gap-1 h-7 px-2.5 rounded-lg text-[10px] font-medium text-amber-600 bg-amber-50 border border-amber-200 hover:bg-amber-100 cursor-pointer">
@@ -583,14 +583,14 @@ export default function AdminVerificationsPage() {
             </div>
 
             {selected.review_notes && (
-              <div className="bg-gray-50 rounded-xl p-3">
-                <p className="text-[11px] text-gray-500 font-medium mb-1">Notes de review précédentes</p>
+              <div className="bg-cm-surface rounded-xl p-3">
+                <p className="text-[11px] text-cm-text-muted font-medium mb-1">Notes de review précédentes</p>
                 {selected.rejection_reason && (
                   <span className="inline-block mb-1.5 text-[10px] font-medium text-red-500 bg-red-50 px-1.5 py-0.5 rounded">
                     Motif : {REJECTION_REASON_LABEL[selected.rejection_reason] ?? selected.rejection_reason}
                   </span>
                 )}
-                <p className="text-[12px] text-gray-700">{selected.review_notes}</p>
+                <p className="text-[12px] text-cm-text-soft">{selected.review_notes}</p>
               </div>
             )}
 
@@ -608,21 +608,21 @@ export default function AdminVerificationsPage() {
               <>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[11px] text-gray-500 font-medium block mb-1">Notes pour le pro</label>
+                    <label className="text-[11px] text-cm-text-muted font-medium block mb-1">Notes pour le pro</label>
                     <textarea
                       value={reviewNotes}
                       onChange={(e) => setReviewNotes(e.target.value)}
                       placeholder="Ajouter une note optionnelle..."
-                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent)] resize-none"
+                      className="w-full border border-cm-border rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent)] resize-none"
                       rows={2}
                     />
                   </div>
                   <div>
-                    <label className="text-[11px] text-gray-500 font-medium block mb-1">Motif de refus</label>
+                    <label className="text-[11px] text-cm-text-muted font-medium block mb-1">Motif de refus</label>
                     <select
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value as RejectionReason | "")}
-                      className="w-full h-9 px-3 text-[12px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 cursor-pointer"
+                      className="w-full h-9 px-3 text-[12px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border cursor-pointer"
                     >
                       <option value="">Sélectionner un motif (optionnel)</option>
                       {REJECTION_REASONS.map((r) => (
@@ -632,7 +632,7 @@ export default function AdminVerificationsPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-[11px] text-gray-500 font-medium block mb-1">
+                  <label className="text-[11px] text-cm-text-muted font-medium block mb-1">
                     <span className="flex items-center gap-1">
                       <Lock className="w-3 h-3" /> Note interne (privée, non visible par le pro)
                     </span>
@@ -641,7 +641,7 @@ export default function AdminVerificationsPage() {
                     value={privateNotes}
                     onChange={(e) => setPrivateNotes(e.target.value)}
                     placeholder="Ajouter une note interne..."
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent)] resize-none"
+                    className="w-full border border-cm-border rounded-lg px-3 py-2 text-[12px] focus:outline-none focus:ring-2 focus:ring-[var(--admin-accent)] resize-none"
                     rows={1}
                   />
                 </div>
@@ -710,11 +710,11 @@ export default function AdminVerificationsPage() {
 
 function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 flex items-center gap-2.5">
-      <span className="text-gray-400 shrink-0">{icon}</span>
+    <div className="bg-cm-elevated border border-cm-border rounded-xl px-3 py-2.5 flex items-center gap-2.5">
+      <span className="text-cm-text-muted shrink-0">{icon}</span>
       <div>
-        <p className="text-[15px] font-bold text-gray-900 leading-tight">{value}</p>
-        <p className="text-[10px] text-gray-500 leading-tight">{label}</p>
+        <p className="text-[15px] font-bold text-cm-text leading-tight">{value}</p>
+        <p className="text-[10px] text-cm-text-muted leading-tight">{label}</p>
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
 import { ArrowLeft, MessageCircle, Star, Store, MapPin, Truck, Clock, Phone, Mail, Share2 } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import CatalogProductCard from "./CatalogProductCard"
 import type { Seller } from "../../types/marketplace"
 import { getProductsBySeller } from "../../data/marketplaceProducts"
@@ -13,8 +13,7 @@ interface ShopScreenV2Props {
 type Tab = "produits" | "propos" | "avis"
 
 export default function ShopScreenV2({ seller }: ShopScreenV2Props) {
-  const nav = useNavigate()
-  const location = useLocation()
+  const { navigate: nav, goBack } = useAppNavigation()
   const [tab, setTab] = useState<Tab>("produits")
 
   const products = useMemo(() => getProductsBySeller(seller.id), [seller.id])
@@ -69,7 +68,7 @@ export default function ShopScreenV2({ seller }: ShopScreenV2Props) {
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
 
-        <button onClick={() => nav(location.state?.from || "/marketplace", { replace: true })} className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
+        <button onClick={() => goBack()} className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
           <ArrowLeft className="w-4 h-4 text-white" />
         </button>
         <button onClick={handleShare} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
@@ -277,7 +276,7 @@ export default function ShopScreenV2({ seller }: ShopScreenV2Props) {
       <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-safe pt-3 bg-cm-elevated/80 backdrop-blur-lg border-t border-cm-border">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => nav(`/messages/new?seller=${seller.id}`, { state: { from: location.pathname } })}
+            onClick={() => nav(`/messages/new?seller=${seller.id}`)}
             className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-xl bg-cm-text text-white text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform"
           >
             <MessageCircle className="w-4 h-4" />

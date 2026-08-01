@@ -1,14 +1,16 @@
 import { useState, useMemo, useRef, useCallback } from "react"
-import { useParams, useNavigate, Link } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { motion } from "motion/react"
 import { ArrowLeft, MapPin, Heart, MessageCircle, Phone, ChevronDown, Eye, Share2, Flag, BadgeCheck, Package, AlertTriangle, ShieldAlert, Star, ShoppingCart } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useBackNavigation } from "../../hooks/useBackNavigation"
 import { getProductById } from "../../data/marketplaceProducts"
 import { getSellerById } from "../../data/marketplaceSuppliers"
 import { useAuthStore } from "../../stores/authStore"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
+import { useFavoritesStore } from "../../stores/favoritesStore"
 import { findConversation, createConversation } from "../../services/chatService"
-import type { Product, MaterialProduct, ShoppingProduct, SecondHandProduct, RealEstateProduct, ProfessionalSeller, MarketplaceVertical } from "../../types/marketplace"
+import type { Product, MaterialProduct, ShoppingProduct, SecondHandProduct, RealEstateProduct, AutomobileProduct, ProfessionalSeller, MarketplaceVertical } from "../../types/marketplace"
 
 function formatPrice(p: number) { return p.toLocaleString("fr-FR") + " F" }
 
@@ -31,18 +33,19 @@ const UNIT_LABELS: Record<string, string> = {
 
 export default function ProductDetail() {
   const { productId } = useParams<{ productId: string }>()
-  const nav = useNavigate()
+  const { navigate: nav } = useAppNavigation()
   const goBack = useBackNavigation("/marketplace")
   const currentUserId = useAuthStore((s) => s.userId)
   const product = useMemo(() => getProductById(productId || ""), [productId])
   const seller = useMemo(() => (product ? getSellerById(product.sellerId) : undefined), [product])
   const [currentImg, setCurrentImg] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
-  const [wished, setWished] = useState(false)
   const touchStartX = useRef(0)
 
   const addToCart = useMarketplaceCartStore((s) => s.addItem)
   const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
+  const toggleFavorite = useFavoritesStore((s) => s.toggle)
+  const isFav = useFavoritesStore((s) => (product ? s.isFavorite("product", product.id) : false))
 
   const [flyPos, setFlyPos] = useState<{ x: number; y: number; image: string } | null>(null)
   const [cartBounce, setCartBounce] = useState(false)
@@ -126,7 +129,7 @@ export default function ProductDetail() {
         </header>
         <div className="flex-1 flex items-center justify-center px-4 text-center py-16">
           <div>
-            <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <Package className="w-12 h-12 text-cm-border-soft mx-auto mb-3" />
             <p className="text-[16px] font-bold text-cm-text mb-1">Annonce introuvable</p>
             <p className="text-[13px] text-cm-text-soft">Cette annonce n'existe pas ou a été supprimée.</p>
           </div>
@@ -140,6 +143,7 @@ export default function ProductDetail() {
   const isSecondHand = product.vertical === "second_hand"
   const isRealEstate = product.vertical === "real_estate"
   const isShopping = product.vertical === "shopping"
+  const isAutomobile = product.vertical === "automobile"
   const condition = "condition" in product ? (product as SecondHandProduct).condition : undefined
 
   const getSpecs = (): { label: string; value: string }[] => {
@@ -194,6 +198,19 @@ export default function ProductDetail() {
         re.amenities?.length ? { label: "Commodités", value: re.amenities.slice(0, 3).join(", ") } : null,
       ].filter(Boolean) as { label: string; value: string }[]
     }
+    if (isAutomobile) {
+      const ap = product as AutomobileProduct
+      return [
+        ap.brand ? { label: "Marque", value: ap.brand } : null,
+        ap.model ? { label: "Modèle", value: ap.model } : null,
+        ap.year ? { label: "Année", value: `${ap.year}` } : null,
+        ap.mileage ? { label: "Kilométrage", value: `${ap.mileage.toLocaleString("fr-FR")} km` } : null,
+        ap.fuel ? { label: "Carburant", value: ap.fuel } : null,
+        ap.transmission ? { label: "Boîte", value: ap.transmission } : null,
+        ap.seats ? { label: "Places", value: `${ap.seats}` } : null,
+        ap.rental ? { label: "Disponibilité", value: "À la location (jour)" } : null,
+      ].filter(Boolean) as { label: string; value: string }[]
+    }
     return []
   }
 
@@ -202,14 +219,14 @@ export default function ProductDetail() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
       {/* Image carousel */}
-      <div className="relative w-full aspect-square bg-gray-100">
+      <div className="relative w-full aspect-square bg-cm-surface">
         {product.images[currentImg] ? (
           <img src={product.images[currentImg]} alt={product.name}
             className="w-full h-full object-cover"
             onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-cm-surface">
-            <Package className="w-16 h-16 text-gray-300" />
+            <Package className="w-16 h-16 text-cm-border-soft" />
           </div>
         )}
 
@@ -221,7 +238,7 @@ export default function ProductDetail() {
           <div className="flex items-center gap-2">
             <motion.button
               ref={cartOverlayRef}
-              onClick={() => nav("/marketplace/cart", { state: { from: window.location.pathname } })}
+              onClick={() => nav("/marketplace/cart")}
               animate={cartBounce ? { scale: [1, 1.35, 0.85, 1.1, 1] } : {}}
               transition={{ duration: 0.4, ease: "easeOut" }}
               className="relative w-9 h-9 rounded-full bg-cm-elevated/15 backdrop-blur-sm flex items-center justify-center cursor-pointer active:scale-90" aria-label="Panier">
@@ -232,9 +249,22 @@ export default function ProductDetail() {
                 </span>
               )}
             </motion.button>
-            <button onClick={() => setWished(!wished)} className="w-9 h-9 rounded-full bg-cm-elevated/15 backdrop-blur-sm flex items-center justify-center cursor-pointer active:scale-90 transition-transform" aria-label="Favoris">
-              <Heart className={`w-5 h-5 ${wished ? "fill-red-500 text-cm-error" : "text-white"}`} />
-            </button>
+            <div
+              role="button"
+              aria-label="Favoris"
+              onClick={() => product && toggleFavorite({
+                type: "product",
+                id: product.id,
+                name: product.name,
+                subtitle: product.category,
+                image: product.images[0],
+                priceLabel: `${product.price.toLocaleString("fr-FR")} F`,
+                route: `/marketplace/item/${product.id}`,
+              })}
+              className="w-9 h-9 rounded-full bg-cm-elevated/15 backdrop-blur-sm flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+            >
+              <Heart className={`w-5 h-5 ${isFav ? "fill-red-500 text-cm-error" : "text-white"}`} />
+            </div>
           </div>
         </div>
 
@@ -304,7 +334,7 @@ export default function ProductDetail() {
           <Link to={isPro ? `/marketplace/supplier/${seller.id}` : "#"}
             className="block bg-cm-elevated rounded-[12px] p-3.5 border border-cm-border hover:border-cm-border transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-cm-surface overflow-hidden shrink-0 flex items-center justify-center">
                 {isPro && (seller as ProfessionalSeller).logo ? (
                   <img src={(seller as ProfessionalSeller).logo} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -331,7 +361,7 @@ export default function ProductDetail() {
               {isPro && <span className="text-[11px] text-cm-forest font-semibold shrink-0">Voir la boutique →</span>}
             </div>
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleContact(); }}
-              className="mt-2.5 w-full h-8 rounded-lg bg-cm-surface border border-cm-border text-[11px] font-bold text-cm-text-soft flex items-center justify-center gap-1.5 cursor-pointer hover:bg-gray-100 active:scale-[0.98] transition-all">
+              className="mt-2.5 w-full h-8 rounded-lg bg-cm-surface border border-cm-border text-[11px] font-bold text-cm-text-soft flex items-center justify-center gap-1.5 cursor-pointer hover:bg-cm-surface active:scale-[0.98] transition-all">
               <MessageCircle className="w-3.5 h-3.5" /> Contacter le vendeur
             </button>
           </Link>

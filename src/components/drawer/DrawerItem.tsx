@@ -14,32 +14,32 @@ export default function DrawerItem({
       disabled={disabled || loading}
       className={`w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer text-left transition-all active:scale-[0.98] ${
         danger
-          ? "text-red-600 hover:bg-red-50"
-          : "text-[#2B2B2B] hover:bg-gray-100"
+          ? "text-cm-error hover:bg-red-50"
+          : "text-cm-text hover:bg-cm-surface"
       } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
     >
       <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
         danger
           ? "bg-red-100"
-          : "bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)]"
+          : "bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border"
       }`}>
         {loading ? (
-          <LoaderCircle className="w-4 h-4 text-[#2B2B2B] animate-spin" />
+          <LoaderCircle className="w-4 h-4 text-cm-text animate-spin" />
         ) : (
-          <Icon className={`w-4 h-4 ${danger ? "text-red-600" : "text-[#2B2B2B]"}`} />
+          <Icon className={`w-4 h-4 ${danger ? "text-cm-error" : "text-cm-text"}`} />
         )}
       </div>
       <div className="flex-1 min-w-0">
         <span className="text-[14px] font-medium block truncate">{label}</span>
         {subtitle && (
-          <span className="text-[11px] text-gray-400 block truncate mt-0.5">{subtitle}</span>
+          <span className="text-[11px] text-cm-text-muted block truncate mt-0.5">{subtitle}</span>
         )}
       </div>
       {badge != null && (
-        <span className="text-[10px] font-bold text-white bg-[#7FD356] px-2 py-0.5 rounded-full shrink-0">{badge}</span>
+        <span className="text-[10px] font-bold text-white bg-cm-accent px-2 py-0.5 rounded-full shrink-0">{badge}</span>
       )}
       {trailing === "chevron" && !loading && (
-        <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+        <ChevronRight className="w-4 h-4 text-cm-border shrink-0" />
       )}
     </button>
   );

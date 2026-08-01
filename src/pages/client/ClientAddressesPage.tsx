@@ -1,7 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import ClientAddressesScreen from "../../components/ClientAddressesScreen";
 
 export default function ClientAddressesPage() {
-  const nav = useNavigate();
-  return <ClientAddressesScreen onBack={() => nav("/", { state: { reopenMenu: true } })} />;
+  const { navigate, setFlag } = useAppNavigation();
+  return <ClientAddressesScreen onBack={() => { setFlag("reopen-menu", true); navigate("/") }} />;
 }

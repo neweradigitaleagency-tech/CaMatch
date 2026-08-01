@@ -19,7 +19,7 @@ const STATUS_DETAILS: Record<DisputeStatus, { icon: typeof AlertTriangle; color:
   under_review: { icon: Clock, color: "text-amber-600", bg: "bg-amber-50" },
   resolved_supplier: { icon: CheckCircle, color: "text-emerald-600", bg: "bg-emerald-50" },
   resolved_client: { icon: CheckCircle, color: "text-blue-600", bg: "bg-blue-50" },
-  rejected: { icon: XCircle, color: "text-gray-600", bg: "bg-gray-50" },
+  rejected: { icon: XCircle, color: "text-cm-text-soft", bg: "bg-cm-surface" },
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -30,7 +30,7 @@ const ROLE_LABELS: Record<string, string> = {
 
 const ROLE_COLORS: Record<string, string> = {
   supplier: "bg-cm-green text-white",
-  client: "bg-gray-100 text-gray-900",
+  client: "bg-cm-surface text-cm-text",
   admin: "bg-blue-100 text-blue-900",
 }
 
@@ -50,10 +50,10 @@ export default function SupplierDisputeDetailScreen() {
   if (!dispute) {
     return (
       <div className="max-w-2xl mx-auto text-center py-12">
-        <AlertTriangle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-        <p className="text-[14px] text-gray-500">Litige introuvable</p>
+        <AlertTriangle className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+        <p className="text-[14px] text-cm-text-muted">Litige introuvable</p>
         <button onClick={() => navigate("/supplier/disputes")}
-          className="mt-4 h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-xl cursor-pointer">
+          className="mt-4 h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-xl cursor-pointer">
           Retour aux litiges
         </button>
       </div>
@@ -96,12 +96,12 @@ export default function SupplierDisputeDetailScreen() {
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate("/supplier/disputes")}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <div>
-          <h1 className="text-[18px] font-bold text-gray-900">Litige {dispute.orderId}</h1>
-          <p className="text-[12px] text-gray-500">{dispute.reason}</p>
+          <h1 className="text-[18px] font-bold text-cm-text">Litige {dispute.orderId}</h1>
+          <p className="text-[12px] text-cm-text-muted">{dispute.reason}</p>
         </div>
       </div>
 
@@ -126,21 +126,21 @@ export default function SupplierDisputeDetailScreen() {
 
       {/* Order info */}
       {order && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-2">
           <div className="flex items-center justify-between">
-            <h2 className="text-[13px] font-semibold text-gray-900">Commande {order.id}</h2>
+            <h2 className="text-[13px] font-semibold text-cm-text">Commande {order.id}</h2>
             <button onClick={() => navigate(`/supplier/orders/${order.id}`)}
               className="text-[11px] text-cm-green font-medium underline cursor-pointer">
               Voir la commande
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2 text-[12px]">
-            <div className="bg-gray-50 rounded-lg p-2">
-              <p className="text-gray-500">Client</p>
+            <div className="bg-cm-surface rounded-lg p-2">
+              <p className="text-cm-text-muted">Client</p>
               <p className="font-medium mt-0.5">{order.clientName}</p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-2">
-              <p className="text-gray-500">Montant</p>
+            <div className="bg-cm-surface rounded-lg p-2">
+              <p className="text-cm-text-muted">Montant</p>
               <p className="font-medium mt-0.5">{formatXOF(order.total)}</p>
             </div>
           </div>
@@ -148,8 +148,8 @@ export default function SupplierDisputeDetailScreen() {
       )}
 
       {/* Messages */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-1.5">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-cm-text flex items-center gap-1.5">
           <MessageCircle className="w-4 h-4" /> Discussion ({dispute.messages.length})
         </h2>
         <div className="space-y-3 max-h-80 overflow-y-auto">
@@ -180,11 +180,11 @@ export default function SupplierDisputeDetailScreen() {
 
       {/* Attachments */}
       {dispute.attachments.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <h2 className="text-[13px] font-semibold text-gray-900 mb-2">Pièces jointes</h2>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <h2 className="text-[13px] font-semibold text-cm-text mb-2">Pièces jointes</h2>
           <div className="flex flex-wrap gap-2">
             {dispute.attachments.map((att, i) => (
-              <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg text-[11px] text-gray-700">
+              <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-cm-surface rounded-lg text-[11px] text-cm-text-soft">
                 <Paperclip className="w-3 h-3" />
                 {att.split("/").pop()}
               </div>
@@ -195,11 +195,11 @@ export default function SupplierDisputeDetailScreen() {
 
       {/* Reply input — only if open */}
       {(dispute.status === "opened" || dispute.status === "under_review") && (
-        <div className="bg-white rounded-xl border border-gray-200 p-3">
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-3">
           <div className="flex gap-2">
             <input value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
-              className="flex-1 h-10 px-3 bg-gray-50 border border-gray-200 rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20"
+              className="flex-1 h-10 px-3 bg-cm-surface border border-cm-border rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20"
               placeholder="Votre réponse..." />
             <button onClick={handleSendMessage} disabled={!newMessage.trim()}
               className="h-10 w-10 flex items-center justify-center bg-cm-green text-white rounded-xl disabled:opacity-50 cursor-pointer hover:opacity-90 transition-all">

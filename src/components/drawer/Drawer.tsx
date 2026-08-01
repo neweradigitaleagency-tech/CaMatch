@@ -44,18 +44,18 @@ export default function Drawer({ open, onClose, header, children, footer }: Draw
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="relative w-full max-w-sm h-full bg-white shadow-[4px_0_24px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden"
+            className="relative w-full max-w-sm h-full bg-cm-elevated shadow-[4px_0_24px_rgba(0,0,0,0.08)] flex flex-col overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto overscroll-contain">
-              {header && <div className="border-b border-gray-100">{header}</div>}
+              {header && <div className="border-b border-cm-border-soft">{header}</div>}
               {children}
             </div>
 
             {/* Footer */}
             {footer && (
-              <div className="border-t border-gray-100">
+              <div className="border-t border-cm-border-soft">
                 {footer}
               </div>
             )}

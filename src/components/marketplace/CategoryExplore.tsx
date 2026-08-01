@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
-import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
+import { useParams, useSearchParams } from "react-router-dom"
 import { motion } from "motion/react"
 import { Search, Package, MapPin, SlidersHorizontal, X, ChevronRight, ChevronDown, ShoppingCart } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
 import PageHeader from "../../components/ui/PageHeader"
 import BottomSheet from "../BottomSheet"
@@ -61,8 +62,7 @@ function parseSearchParams(sp: URLSearchParams) {
 
 export default function CategoryExplore() {
   const { vertical } = useParams<{ vertical: string }>()
-  const nav = useNavigate()
-  const location = useLocation()
+  const { navigate: nav } = useAppNavigation()
   const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -176,7 +176,7 @@ export default function CategoryExplore() {
   }
 
   const cartButton = (
-    <button onClick={() => nav("/marketplace/cart", { state: { from: location.pathname + location.search } })}
+    <button onClick={() => nav("/marketplace/cart")}
       className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-cm-surface cursor-pointer active:scale-90 transition-transform shrink-0">
       <ShoppingCart className="w-4.5 h-4.5 text-cm-text" />
       {cartCount > 0 && (
@@ -206,7 +206,7 @@ export default function CategoryExplore() {
             {subcategories.map((sub) => (
               <button key={sub.id} onClick={() => handleSubChange(sub.id)}
                 className={`shrink-0 px-3.5 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
-                  params.sub === sub.id ? "bg-cm-text text-white" : "bg-cm-surface text-cm-text-soft border border-cm-border hover:border-gray-300"
+                  params.sub === sub.id ? "bg-cm-text text-white" : "bg-cm-surface text-cm-text-soft border border-cm-border hover:border-cm-border-soft"
                 }`}>
                 {sub.name}
               </button>
@@ -223,19 +223,19 @@ export default function CategoryExplore() {
               </span>
             )}
             {(params.min || params.max) && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-cm-text rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-surface text-cm-text rounded-full text-[9px] font-semibold">
                 {params.min ? `${Number(params.min).toLocaleString("fr-FR")} F` : "0"} — {params.max ? `${Number(params.max).toLocaleString("fr-FR")} F` : "∞"}
                 <button onClick={() => { updateParam("min", ""); updateParam("max", "") }} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
             )}
             {params.cond && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-cm-text rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-surface text-cm-text rounded-full text-[9px] font-semibold">
                 {CONDITION_LABELS[params.cond]}
                 <button onClick={() => updateParam("cond", "")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
             )}
             {params.loc && (
-              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-gray-100 text-cm-text rounded-full text-[9px] font-semibold">
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-surface text-cm-text rounded-full text-[9px] font-semibold">
                 <MapPin className="w-2.5 h-2.5" /> {params.loc}
                 <button onClick={() => updateParam("loc", "")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
               </span>
@@ -247,7 +247,7 @@ export default function CategoryExplore() {
           <span className="text-[11px] text-cm-text-soft">{filtered.length} résultat{filtered.length !== 1 ? "s" : ""}</span>
           <div className="relative">
             <button onClick={() => setShowSort(!showSort)}
-              className="flex items-center gap-1 px-2.5 py-1.5 bg-cm-surface border border-cm-border rounded-lg text-[11px] font-medium text-cm-text-soft cursor-pointer hover:bg-gray-100 transition-colors">
+              className="flex items-center gap-1 px-2.5 py-1.5 bg-cm-surface border border-cm-border rounded-lg text-[11px] font-medium text-cm-text-soft cursor-pointer hover:bg-cm-surface transition-colors">
               <SlidersHorizontal className="w-3 h-3" />
               {SORT_OPTIONS.find((o) => o.value === params.sort)?.label}
             </button>
@@ -294,7 +294,7 @@ export default function CategoryExplore() {
       <div className="px-5 pt-4">
         {filtered.length === 0 ? (
           <div className="text-center py-16">
-            <Package className="w-10 h-10 text-gray-300 mx-auto mb-3" />
+            <Package className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
             <p className="text-[14px] font-bold text-cm-text mb-1">Aucune annonce trouvée</p>
             <p className="text-[12px] text-cm-text-soft">Essayez de modifier votre recherche ou vos filtres</p>
             {hasActiveFilters && (
@@ -323,7 +323,7 @@ export default function CategoryExplore() {
             {hasMore && (
               <div className="flex justify-center mt-5">
                 <button onClick={() => setVisibleCount((c) => c + ITEMS_PER_PAGE)}
-                  className="h-10 px-6 rounded-xl bg-cm-elevated border border-cm-border text-[12px] font-semibold text-cm-text cursor-pointer hover:border-gray-300 active:scale-[0.98] transition-all flex items-center gap-1.5">
+                  className="h-10 px-6 rounded-xl bg-cm-elevated border border-cm-border text-[12px] font-semibold text-cm-text cursor-pointer hover:border-cm-border-soft active:scale-[0.98] transition-all flex items-center gap-1.5">
                   <ChevronDown className="w-4 h-4" />
                   Afficher plus ({filtered.length - visibleCount} restant{(filtered.length - visibleCount) > 1 ? "s" : ""})
                 </button>
@@ -373,7 +373,7 @@ export default function CategoryExplore() {
           </div>
         </div>
         <button onClick={clearFilters}
-          className="w-full h-10 rounded-xl bg-gray-100 text-[12px] font-medium text-cm-text-soft cursor-pointer hover:bg-gray-200 transition-colors">
+          className="w-full h-10 rounded-xl bg-cm-surface text-[12px] font-medium text-cm-text-soft cursor-pointer hover:bg-cm-border-soft transition-colors">
           Réinitialiser les filtres
         </button>
       </BottomSheet>

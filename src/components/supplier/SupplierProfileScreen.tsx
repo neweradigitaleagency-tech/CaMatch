@@ -24,7 +24,7 @@ export default function SupplierProfileScreen() {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-gray-200/50 animate-pulse rounded-xl" />)}
+        {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-cm-surface/50 animate-pulse rounded-xl" />)}
       </div>
     )
   }
@@ -32,7 +32,7 @@ export default function SupplierProfileScreen() {
   if (!profile) {
     return (
       <div className="text-center py-12">
-        <p className="text-[14px] text-gray-500">Profil introuvable</p>
+        <p className="text-[14px] text-cm-text-muted">Profil introuvable</p>
       </div>
     )
   }
@@ -73,7 +73,7 @@ export default function SupplierProfileScreen() {
       VERIFIE: "bg-blue-50 text-blue-700",
       ACTIF: "bg-green-50 text-green-700",
       BLOQUE: "bg-red-50 text-red-700",
-      REJETE: "bg-gray-100 text-gray-600",
+      REJETE: "bg-cm-surface text-cm-text-soft",
     }
     const labels: Record<string, string> = {
       EN_ATTENTE: "En attente",
@@ -83,7 +83,7 @@ export default function SupplierProfileScreen() {
       REJETE: "Rejeté",
     }
     return (
-      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${styles[status] ?? "bg-gray-100 text-gray-600"}`}>
+      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${styles[status] ?? "bg-cm-surface text-cm-text-soft"}`}>
         {labels[status] ?? status}
       </span>
     )
@@ -93,24 +93,24 @@ export default function SupplierProfileScreen() {
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Mon profil</h1>
-          <p className="text-[12px] text-gray-500">Gérez vos informations</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Mon profil</h1>
+          <p className="text-[12px] text-cm-text-muted">Gérez vos informations</p>
         </div>
         {!editing && (
           <button onClick={startEditing}
-            className="h-9 px-4 bg-gray-900 text-white text-[12px] font-bold rounded-xl hover:opacity-90 cursor-pointer transition-all flex items-center gap-1.5">
+            className="h-9 px-4 bg-cm-text text-white text-[12px] font-bold rounded-xl hover:opacity-90 cursor-pointer transition-all flex items-center gap-1.5">
             <Edit2 className="w-3.5 h-3.5" /> Modifier
           </button>
         )}
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-4">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-cm-green/10 flex items-center justify-center">
             <Building2 className="w-6 h-6 text-cm-green" />
           </div>
           <div>
-            <h2 className="text-[16px] font-bold text-gray-900">{profile.companyName}</h2>
+            <h2 className="text-[16px] font-bold text-cm-text">{profile.companyName}</h2>
             <StatusBadge status={profile.status} />
           </div>
         </div>
@@ -137,7 +137,7 @@ export default function SupplierProfileScreen() {
             </div>
             <div className="flex gap-2 pt-2">
               <button onClick={() => setEditing(false)}
-                className="h-9 px-4 border border-gray-300 text-gray-700 text-[12px] font-medium rounded-lg cursor-pointer">
+                className="h-9 px-4 border border-cm-border text-cm-text-soft text-[12px] font-medium rounded-lg cursor-pointer">
                 Annuler
               </button>
               <button onClick={handleSave} disabled={saving}
@@ -154,11 +154,11 @@ export default function SupplierProfileScreen() {
 
 function InfoField({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
   return (
-    <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-3">
-      <Icon className="w-4 h-4 text-gray-400 shrink-0" />
+    <div className="bg-cm-surface rounded-lg p-3 flex items-center gap-3">
+      <Icon className="w-4 h-4 text-cm-text-muted shrink-0" />
       <div>
-        <p className="text-[10px] text-gray-400">{label}</p>
-        <p className="text-[13px] font-medium text-gray-900">{value}</p>
+        <p className="text-[10px] text-cm-text-muted">{label}</p>
+        <p className="text-[13px] font-medium text-cm-text">{value}</p>
       </div>
     </div>
   )
@@ -167,9 +167,9 @@ function InfoField({ icon: Icon, label, value }: { icon: any; label: string; val
 function InputField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <label className="text-[11px] font-medium text-gray-600 block mb-1">{label}</label>
+      <label className="text-[11px] font-medium text-cm-text-soft block mb-1">{label}</label>
       <input value={value} onChange={(e) => onChange(e.target.value)}
-        className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
+        className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green" />
     </div>
   )
 }

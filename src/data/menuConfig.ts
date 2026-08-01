@@ -1,6 +1,6 @@
 import {
   ArrowLeftRight, Settings, LifeBuoy, MessageCircle, Flag, UserPlus, Star,
-  Languages, Palette, Bell, FileText, Shield, Info, LogOut, Briefcase,
+  Languages, Palette, Bell, FileText, Shield, Info, LogOut, Briefcase, Heart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -55,6 +55,14 @@ export const ACCOUNT_SECTION: MenuSectionConfig = {
       subtitle: "Basculer entre Client et Professionnel",
       trailing: "none",
       disabled: true,
+    },
+    {
+      id: "favorites",
+      icon: Heart,
+      label: "Mes favoris",
+      subtitle: "Pros, produits et boutiques sauvegardés",
+      route: "/favorites",
+      trailing: "chevron",
     },
     {
       id: "account-settings",

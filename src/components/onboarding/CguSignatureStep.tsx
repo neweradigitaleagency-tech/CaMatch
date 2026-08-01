@@ -102,7 +102,7 @@ export default function CguSignatureStep({ accepted, signature, onAcceptChange, 
           <p className="text-[12px] font-semibold text-cm-text mb-2 flex items-center gap-1.5">
             <PenLine className="w-4 h-4" /> Signature
           </p>
-          <div className="relative bg-white border border-cm-border rounded-[14px] overflow-hidden">
+          <div className="relative bg-cm-elevated border border-cm-border rounded-[14px] overflow-hidden">
             <canvas
               ref={canvasRef}
               width={340}

@@ -18,25 +18,25 @@ export default function SettingsRow({
 }: SettingsRowProps) {
   const content = (
     <div className={`w-full flex items-center gap-3 px-4 py-3.5 text-left min-h-[56px] ${
-      dangerous ? "text-red-600" : "text-[#2B2B2B]"
+      dangerous ? "text-cm-error" : "text-cm-text"
     }`}>
       <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
-        dangerous ? "bg-red-100" : "bg-gray-100"
+        dangerous ? "bg-red-100" : "bg-cm-surface"
       }`}>
-        <Icon className={`w-4 h-4 ${dangerous ? "text-red-600" : "text-[#2B2B2B]"}`} />
+        <Icon className={`w-4 h-4 ${dangerous ? "text-cm-error" : "text-cm-text"}`} />
       </div>
       <div className="flex-1 min-w-0">
         <span className="text-[14px] font-semibold block truncate">{label}</span>
         {subtitle && (
-          <span className="text-[11px] text-gray-400 block truncate mt-0.5">{subtitle}</span>
+          <span className="text-[11px] text-cm-text-muted block truncate mt-0.5">{subtitle}</span>
         )}
       </div>
       {loading ? (
-        <div className="w-5 h-5 rounded-full border-2 border-gray-200 border-t-[#2B2B2B] animate-spin shrink-0" />
+        <div className="w-5 h-5 rounded-full border-2 border-cm-border border-t-cm-text animate-spin shrink-0" />
       ) : trailing != null ? (
         <span className="shrink-0">{trailing}</span>
       ) : onClick ? (
-        <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+        <ChevronRight className="w-4 h-4 text-cm-border shrink-0" />
       ) : null}
     </div>
   );
@@ -60,7 +60,7 @@ export default function SettingsRow({
       className={`w-full cursor-pointer active:scale-[0.98] transition-transform text-left ${
         dangerous
           ? "hover:bg-red-50"
-          : "hover:bg-gray-50"
+          : "hover:bg-cm-surface"
       }`}
     >
       {content}

@@ -30,14 +30,14 @@ function ScoreBar({ label, icon, score, inverted, suffix }: ScoreBarProps) {
   return (
     <div className="min-w-[160px]">
       <div className="flex items-center justify-between mb-1">
-        <span className="flex items-center gap-1 text-[11px] text-gray-500">
+        <span className="flex items-center gap-1 text-[11px] text-cm-text-muted">
           {icon} {label}
         </span>
         <span className={`text-[11px] font-medium ${scoreColor(score, inverted)}`}>
           {score}/100
         </span>
       </div>
-      <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="h-1.5 bg-cm-surface rounded-full overflow-hidden">
         <div
           className={`h-full rounded-full transition-all ${barColor(score, inverted)}`}
           style={{ width: `${Math.min(score, 100)}%` }}
@@ -56,13 +56,13 @@ interface TrustScoreCardProps {
 export default function TrustScoreCard({ scores, loading }: TrustScoreCardProps) {
   if (loading) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-4 animate-pulse">
-        <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4 animate-pulse">
+        <div className="h-4 w-32 bg-cm-border-soft rounded mb-4" />
         <div className="flex flex-wrap items-start gap-6">
-          <div className="w-16 h-16 rounded-full bg-gray-200" />
+          <div className="w-16 h-16 rounded-full bg-cm-border-soft" />
           <div className="space-y-2">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-6 w-40 bg-gray-100 rounded" />
+              <div key={i} className="h-6 w-40 bg-cm-surface rounded" />
             ))}
           </div>
         </div>
@@ -80,11 +80,11 @@ export default function TrustScoreCard({ scores, loading }: TrustScoreCardProps)
   const overallTextColor = scoreColor(scores.overall);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
       <div className="flex items-center gap-2 mb-4">
-        <Shield className="w-4 h-4 text-gray-400" />
-        <h3 className="text-[13px] font-semibold text-gray-900">Score de Confiance</h3>
-        <span className="text-[10px] text-gray-400 ml-auto">
+        <Shield className="w-4 h-4 text-cm-text-muted" />
+        <h3 className="text-[13px] font-semibold text-cm-text">Score de Confiance</h3>
+        <span className="text-[10px] text-cm-text-muted ml-auto">
           {scores.last_assessed
             ? `Mis à jour ${new Date(scores.last_assessed).toLocaleDateString("fr-FR")}`
             : "Non évalué"}
@@ -95,7 +95,7 @@ export default function TrustScoreCard({ scores, loading }: TrustScoreCardProps)
         <div className="flex items-center gap-3 shrink-0">
           <div className="relative w-16 h-16">
             <svg className="w-16 h-16 -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15.5" fill="none" stroke="#e5e7eb" strokeWidth="2.5" />
+              <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--cm-border)" strokeWidth="2.5" />
               <circle
                 cx="18" cy="18" r="15.5" fill="none"
                 stroke={overallRingColor}
@@ -109,7 +109,7 @@ export default function TrustScoreCard({ scores, loading }: TrustScoreCardProps)
             </span>
           </div>
           <div>
-            <p className="text-[12px] font-semibold text-gray-900">Score global</p>
+            <p className="text-[12px] font-semibold text-cm-text">Score global</p>
             <p className={`text-[11px] font-medium ${overallTextColor}`}>
               {statusEmoji} {statusLabel}
             </p>

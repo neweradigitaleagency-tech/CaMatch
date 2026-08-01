@@ -20,6 +20,7 @@ export const VERTICAL_ICONS: Record<MarketplaceVertical, string> = {
 
 export type SellerType = "professional" | "individual" | "ca_match_pro"
 export type SellerVerificationStatus = "pending" | "verified" | "active" | "suspended"
+export type ShopType = "physical" | "online" | "hybrid"
 
 export interface SellerBase {
   id: string
@@ -59,6 +60,8 @@ export interface ProfessionalSeller extends SellerBase {
   categories: string[]
   deliveryZones: DeliveryZone[]
   hasProfessionalPricing: boolean
+  shopType?: ShopType
+  buyOnline?: boolean
 }
 
 export interface IndividualSeller extends SellerBase {
@@ -70,6 +73,8 @@ export interface IndividualSeller extends SellerBase {
   phoneVerified: boolean
   saleHistory: number
   memberSince: string
+  shopType?: ShopType
+  buyOnline?: boolean
 }
 
 export interface CaMatchProSeller extends SellerBase {
@@ -80,6 +85,8 @@ export interface CaMatchProSeller extends SellerBase {
   city: string
   hasProfessionalPricing: boolean
   linkedShopId?: string
+  shopType?: ShopType
+  buyOnline?: boolean
 }
 
 export type Seller = ProfessionalSeller | IndividualSeller | CaMatchProSeller
@@ -101,6 +108,7 @@ export interface ProductBase {
   stock: number
   isAvailable: boolean
   location: string
+  rental?: boolean
   deliveryAvailable: boolean
   deliveryFee?: number
   status: "active" | "draft" | "archived"
@@ -158,7 +166,21 @@ export interface RealEstateProduct extends ProductBase {
   totalFloors?: number
 }
 
-export type Product = MaterialProduct | ShoppingProduct | SecondHandProduct | RealEstateProduct
+export interface AutomobileProduct extends ProductBase {
+  vertical: "automobile"
+  brand: string
+  model: string
+  year?: number
+  mileage?: number
+  fuel?: string
+  transmission?: string
+  seats?: number
+  condition: "new" | "like_new" | "good" | "fair"
+  hasOriginalBox?: boolean
+  hasAccessories?: boolean
+}
+
+export type Product = MaterialProduct | ShoppingProduct | SecondHandProduct | RealEstateProduct | AutomobileProduct
 
 // ─── Registration types ───
 

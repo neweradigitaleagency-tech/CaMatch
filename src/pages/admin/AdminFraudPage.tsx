@@ -46,14 +46,14 @@ function getScoreColor(score: number): string {
   if (score >= 80) return "text-red-600"
   if (score >= 60) return "text-orange-600"
   if (score >= 40) return "text-amber-600"
-  return "text-gray-500"
+  return "text-cm-text-muted"
 }
 
 function getScoreBg(score: number): string {
   if (score >= 80) return "bg-red-50 border-red-200"
   if (score >= 60) return "bg-orange-50 border-orange-200"
   if (score >= 40) return "bg-amber-50 border-amber-200"
-  return "bg-gray-50 border-gray-200"
+  return "bg-cm-surface border-cm-border"
 }
 
 function statusToBadge(status: string): { status: string; label: string } {
@@ -130,15 +130,15 @@ export default function AdminFraudPage() {
             {TYPE_ICONS[f.type] ?? <AlertTriangle className="w-4 h-4" />}
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{FRAUD_TYPE_LABELS[f.type] ?? f.type}</p>
-            <p className="text-[11px] text-gray-400">{f.target_name}</p>
+            <p className="text-[13px] font-medium text-cm-text">{FRAUD_TYPE_LABELS[f.type] ?? f.type}</p>
+            <p className="text-[11px] text-cm-text-muted">{f.target_name}</p>
           </div>
         </div>
       ),
     },
     {
       key: "target_type", label: "Cible", width: "100px",
-      render: (f) => <span className="text-[12px] text-gray-600 capitalize">{f.target_type === "professional" ? "Pro" : f.target_type === "user" ? "Client" : f.target_type === "transaction" ? "Transaction" : "Avis"}</span>,
+      render: (f) => <span className="text-[12px] text-cm-text-soft capitalize">{f.target_type === "professional" ? "Pro" : f.target_type === "user" ? "Client" : f.target_type === "transaction" ? "Transaction" : "Avis"}</span>,
     },
     {
       key: "score", label: "Score", sortable: true, width: "80px",
@@ -155,8 +155,8 @@ export default function AdminFraudPage() {
       key: "created_at", label: "Détectée le", sortable: true, width: "130px",
       render: (f) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-500">{format(new Date(f.created_at), "d MMM yyyy", { locale: fr })}</span>
-          <span className="text-[11px] text-gray-400">{new Date(f.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
+          <span className="text-[12px] text-cm-text-muted">{format(new Date(f.created_at), "d MMM yyyy", { locale: fr })}</span>
+          <span className="text-[11px] text-cm-text-muted">{new Date(f.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</span>
         </div>
       ),
     },
@@ -170,7 +170,7 @@ export default function AdminFraudPage() {
           </button>
           {canReview && f.status === "pending" && (
             <button onClick={(e) => { e.stopPropagation(); setConfirmAction({ alert: f, action: "dismiss" }) }}
-              className="text-[11px] font-medium text-gray-500 hover:underline cursor-pointer px-1">
+              className="text-[11px] font-medium text-cm-text-muted hover:underline cursor-pointer px-1">
               Ignorer
             </button>
           )}
@@ -186,20 +186,20 @@ export default function AdminFraudPage() {
       <PageHeader title="Fraude" description={`${stats.total} alertes · ${stats.open} non traitées`} />
 
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Score moyen</p>
-          <p className="text-[18px] font-bold text-gray-900 mt-1">{stats.avgScore}%</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Score moyen</p>
+          <p className="text-[18px] font-bold text-cm-text mt-1">{stats.avgScore}%</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Alertes ouvertes</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Alertes ouvertes</p>
           <p className="text-[18px] font-bold text-red-600 mt-1">{stats.open}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">En analyse</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">En analyse</p>
           <p className="text-[18px] font-bold text-amber-600 mt-1">{stats.investigating}</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Résolues</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Résolues</p>
           <p className="text-[18px] font-bold text-[var(--admin-accent)] mt-1">{stats.resolved}</p>
         </div>
       </div>
@@ -207,13 +207,13 @@ export default function AdminFraudPage() {
       <div className="flex items-center gap-2 flex-wrap">
         {STATUS_OPTIONS.map((opt) => (
           <button key={opt.value} onClick={() => setStatusFilter(opt.value)}
-            className={`px-3 h-8 text-[11px] font-medium rounded-lg border cursor-pointer ${statusFilter === opt.value ? "bg-gray-900 text-white border-gray-900" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"}`}>
+            className={`px-3 h-8 text-[11px] font-medium rounded-lg border cursor-pointer ${statusFilter === opt.value ? "bg-cm-text text-white border-cm-text" : "bg-white text-cm-text-soft border-cm-border hover:border-cm-border"}`}>
             {opt.label}
           </button>
         ))}
-        <div className="w-px h-6 bg-gray-200 mx-1" />
+        <div className="w-px h-6 bg-cm-border-soft mx-1" />
         <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}
-          className="h-8 px-2 text-[11px] bg-white border border-gray-200 rounded-lg outline-none text-gray-600 cursor-pointer">
+          className="h-8 px-2 text-[11px] bg-cm-elevated border border-cm-border rounded-lg outline-none text-cm-text-soft cursor-pointer">
           {TYPE_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
@@ -240,8 +240,8 @@ export default function AdminFraudPage() {
                 {TYPE_ICONS[detailAlert.type] ?? <AlertTriangle className="w-5 h-5" />}
               </div>
               <div>
-                <p className="text-[15px] font-semibold text-gray-900">{FRAUD_TYPE_LABELS[detailAlert.type] ?? detailAlert.type}</p>
-                <p className="text-[12px] text-gray-400">Cible : {detailAlert.target_name} ({detailAlert.target_type})</p>
+                <p className="text-[15px] font-semibold text-cm-text">{FRAUD_TYPE_LABELS[detailAlert.type] ?? detailAlert.type}</p>
+                <p className="text-[12px] text-cm-text-muted">Cible : {detailAlert.target_name} ({detailAlert.target_type})</p>
               </div>
               <div className="ml-auto">
                 <span className={`text-[14px] font-bold ${getScoreColor(detailAlert.score)}`}>{detailAlert.score}%</span>
@@ -249,49 +249,49 @@ export default function AdminFraudPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Type</p>
-                <p className="text-[13px] text-gray-900 mt-0.5 capitalize">{detailAlert.target_type}</p>
+              <div className="bg-cm-surface rounded-lg p-3">
+                <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider">Type</p>
+                <p className="text-[13px] text-cm-text mt-0.5 capitalize">{detailAlert.target_type}</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">ID cible</p>
-                <p className="text-[13px] text-gray-900 mt-0.5 font-mono text-[11px] break-all">{detailAlert.target_id}</p>
+              <div className="bg-cm-surface rounded-lg p-3">
+                <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider">ID cible</p>
+                <p className="text-[13px] text-cm-text mt-0.5 font-mono text-[11px] break-all">{detailAlert.target_id}</p>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Statut</p>
+              <div className="bg-cm-surface rounded-lg p-3">
+                <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider">Statut</p>
                 <div className="mt-0.5">
                   <StatusBadge {...statusToBadge(detailAlert.status)} />
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Détectée le</p>
-                <p className="text-[13px] text-gray-900 mt-0.5">{new Date(detailAlert.created_at).toLocaleString("fr-FR")}</p>
+              <div className="bg-cm-surface rounded-lg p-3">
+                <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider">Détectée le</p>
+                <p className="text-[13px] text-cm-text mt-0.5">{new Date(detailAlert.created_at).toLocaleString("fr-FR")}</p>
               </div>
               {detailAlert.reviewer_name && (
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Examinée par</p>
-                  <p className="text-[13px] text-gray-900 mt-0.5">{detailAlert.reviewer_name}</p>
+                <div className="bg-cm-surface rounded-lg p-3">
+                  <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider">Examinée par</p>
+                  <p className="text-[13px] text-cm-text mt-0.5">{detailAlert.reviewer_name}</p>
                 </div>
               )}
               {detailAlert.resolved_at && (
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <p className="text-[10px] font-medium text-gray-500 uppercase tracking-wider">Résolue le</p>
-                  <p className="text-[13px] text-gray-900 mt-0.5">{new Date(detailAlert.resolved_at).toLocaleString("fr-FR")}</p>
+                <div className="bg-cm-surface rounded-lg p-3">
+                  <p className="text-[10px] font-medium text-cm-text-muted uppercase tracking-wider">Résolue le</p>
+                  <p className="text-[13px] text-cm-text mt-0.5">{new Date(detailAlert.resolved_at).toLocaleString("fr-FR")}</p>
                 </div>
               )}
             </div>
 
             {detailAlert.description && (
               <div>
-                <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-1">Description</p>
-                <p className="text-[13px] text-gray-700 bg-gray-50 rounded-lg p-3">{detailAlert.description}</p>
+                <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider mb-1">Description</p>
+                <p className="text-[13px] text-cm-text-soft bg-cm-surface rounded-lg p-3">{detailAlert.description}</p>
               </div>
             )}
 
             {detailAlert.metadata && Object.keys(detailAlert.metadata).length > 0 && (
               <div>
-                <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-1">Métadonnées</p>
-                <pre className="text-[11px] text-gray-600 bg-gray-50 rounded-lg p-3 overflow-x-auto">{JSON.stringify(detailAlert.metadata, null, 2)}</pre>
+                <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider mb-1">Métadonnées</p>
+                <pre className="text-[11px] text-cm-text-soft bg-cm-surface rounded-lg p-3 overflow-x-auto">{JSON.stringify(detailAlert.metadata, null, 2)}</pre>
               </div>
             )}
 
@@ -299,7 +299,7 @@ export default function AdminFraudPage() {
               <div className="text-[12px] text-red-600 bg-red-50 rounded-lg px-3 py-2">{actionError}</div>
             )}
             {canReview && detailAlert.status !== "completed" && detailAlert.status !== "rejected" && (
-              <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+              <div className="flex items-center gap-2 pt-2 border-t border-cm-border/40">
                 <button onClick={() => setConfirmAction({ alert: detailAlert, action: "investigate" })}
                   className="h-9 px-4 bg-amber-600 text-white text-[12px] font-medium rounded-lg hover:bg-amber-700 transition-colors cursor-pointer">
                   Investiguer
@@ -309,7 +309,7 @@ export default function AdminFraudPage() {
                   Résoudre
                 </button>
                 <button onClick={() => setConfirmAction({ alert: detailAlert, action: "dismiss" })}
-                  className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                  className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer">
                   Ignorer
                 </button>
               </div>

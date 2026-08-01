@@ -17,7 +17,7 @@ const STATUS_LABELS: Record<DeliveryStatus, string> = {
 }
 
 const STATUS_COLORS: Record<DeliveryStatus, string> = {
-  pending: "bg-gray-100 text-gray-700",
+  pending: "bg-cm-surface text-cm-text-soft",
   preparing: "bg-indigo-100 text-indigo-700",
   picked_up: "bg-blue-100 text-blue-700",
   in_transit: "bg-amber-100 text-amber-700",
@@ -68,8 +68,8 @@ export default function SupplierDeliveriesScreen() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Suivi des livraisons</h1>
-          <p className="text-[12px] text-gray-500">
+          <h1 className="text-[20px] font-bold text-cm-text">Suivi des livraisons</h1>
+          <p className="text-[12px] text-cm-text-muted">
             {deliveries.length} livraisons · {activeCount > 0 ? <span className="text-amber-600 font-medium">{activeCount} en cours</span> : "aucune en cours"}
           </p>
         </div>
@@ -77,9 +77,9 @@ export default function SupplierDeliveriesScreen() {
 
       <div className="flex gap-2">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
           <input value={search} onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-9 pl-9 pr-3 bg-white border border-gray-200 rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green"
+            className="w-full h-9 pl-9 pr-3 bg-cm-elevated border border-cm-border rounded-xl text-[12px] focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green"
             placeholder="Rechercher par commande ou ville..." />
         </div>
       </div>
@@ -89,8 +89,8 @@ export default function SupplierDeliveriesScreen() {
           <button key={s} onClick={() => setStatusFilter(s)}
             className={`shrink-0 px-3 h-7 rounded-full text-[11px] font-medium border cursor-pointer transition-colors ${
               statusFilter === s
-                ? "bg-gray-900 text-white border-gray-900"
-                : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                ? "bg-cm-text text-white border-cm-text"
+                : "bg-cm-elevated text-cm-text-soft border-cm-border hover:border-cm-border"
             }`}>
             {s === "all" ? "Toutes" : STATUS_LABELS[s as DeliveryStatus]}
           </button>
@@ -98,10 +98,10 @@ export default function SupplierDeliveriesScreen() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <Truck className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-[14px] font-medium text-gray-500">Aucune livraison trouvée</p>
-          <p className="text-[12px] text-gray-400 mt-1">
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-8 text-center">
+          <Truck className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+          <p className="text-[14px] font-medium text-cm-text-muted">Aucune livraison trouvée</p>
+          <p className="text-[12px] text-cm-text-muted mt-1">
             {statusFilter !== "all" ? "Essayez un autre filtre" : "Aucune livraison pour le moment"}
           </p>
         </div>
@@ -118,7 +118,7 @@ export default function SupplierDeliveriesScreen() {
             return (
               <div key={delivery.id}
                 onClick={() => navigate(`/supplier/deliveries/${delivery.id}`)}
-                className="bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 cursor-pointer transition-colors">
+                className="bg-cm-elevated rounded-xl border border-cm-border p-4 hover:border-cm-border cursor-pointer transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
@@ -126,14 +126,14 @@ export default function SupplierDeliveriesScreen() {
                         delivery.status === "delivered" ? "text-emerald-500" :
                         delivery.status === "in_transit" ? "text-amber-500" :
                         delivery.status === "failed" ? "text-red-500" :
-                        "text-gray-400"
+                        "text-cm-text-muted"
                       }`} />
-                      <p className="text-[14px] font-semibold text-gray-900">{delivery.orderId}</p>
+                      <p className="text-[14px] font-semibold text-cm-text">{delivery.orderId}</p>
                       <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_COLORS[delivery.status]}`}>
                         {STATUS_LABELS[delivery.status]}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 mt-1.5 text-[12px] text-gray-600">
+                    <div className="flex items-center gap-3 mt-1.5 text-[12px] text-cm-text-soft">
                       <span className="flex items-center gap-1">
                         <MapPin className="w-3 h-3" /> {delivery.city}
                       </span>
@@ -143,7 +143,7 @@ export default function SupplierDeliveriesScreen() {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mt-2 text-[11px] text-gray-500">
+                    <div className="flex items-center gap-3 mt-2 text-[11px] text-cm-text-muted">
                       <span>{stepCount} étape{stepCount > 1 ? "s" : ""}</span>
                       {eta && <span>Prévue: {eta}</span>}
                       {delivery.deliveredAt && (
@@ -154,16 +154,16 @@ export default function SupplierDeliveriesScreen() {
                     </div>
                     {lastStep && ["pending", "preparing", "picked_up", "in_transit"].includes(delivery.status) && (
                       <div className="mt-2 flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="flex-1 h-1.5 bg-cm-surface rounded-full overflow-hidden">
                           <div className="h-full bg-cm-green rounded-full transition-all"
                             style={{ width: `${Math.min(100, (getStepIndex(delivery.status) / 4) * 100)}%` }} />
                         </div>
-                        <span className="text-[10px] text-gray-400">{lastStep.label}</span>
+                        <span className="text-[10px] text-cm-text-muted">{lastStep.label}</span>
                       </div>
                     )}
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-[10px] text-gray-400">
+                    <p className="text-[10px] text-cm-text-muted">
                       {new Date(delivery.updatedAt).toLocaleDateString("fr-FR")}
                     </p>
                     {delivery.failureReason && (

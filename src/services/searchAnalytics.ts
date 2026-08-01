@@ -8,7 +8,7 @@ export async function logSearch(query: string, vertical?: string, resultsCount?:
   try {
     const { data: { user } } = await supabase!.auth.getUser()
 
-    await supabase!.from("search_analytics" as never).insert({
+    await (supabase as any).from("search_analytics").insert({
       user_id: user?.id || null,
       query: query.trim(),
       vertical: vertical || null,
@@ -25,7 +25,7 @@ export async function getTrendingSearches(daysBack = 7, limit = 10): Promise<str
   if (!isSupabaseReady()) return []
 
   try {
-    const { data, error } = await supabase!.rpc("get_trending_searches" as never, {
+    const { data, error } = await (supabase as any).rpc("get_trending_searches", {
       p_days_back: daysBack,
       p_limit: limit,
     })

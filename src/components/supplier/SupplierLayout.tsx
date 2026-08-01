@@ -51,11 +51,11 @@ export default function SupplierLayout() {
 
   return (
     <RealtimeNotificationsProvider>
-    <div className="min-h-dynamic bg-gray-50 flex">
+    <div className="min-h-dynamic bg-cm-surface flex">
       {mobileOpen && (
         <div className="fixed inset-0 bg-black/40 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />
       )}
-      <aside className={`fixed top-0 left-0 bottom-0 z-40 flex flex-col bg-gray-900 w-[260px] transition-transform duration-200
+      <aside className={`fixed top-0 left-0 bottom-0 z-40 flex flex-col bg-cm-text w-[260px] transition-transform duration-200
         ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         <div className="flex items-center gap-3 h-14 px-4 border-b border-white/10">
           <img src="/logo.svg" alt="Ça Match" className="h-6" />
@@ -82,7 +82,7 @@ export default function SupplierLayout() {
                 onClick={() => handleNavClick(item.href)}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-3 h-10 rounded-lg text-[13px] font-medium transition-colors cursor-pointer ${
-                    isActive ? "bg-white/10 text-white" : "text-white/60 hover:bg-white/5 hover:text-white"
+                    isActive ? "bg-cm-elevated/10 text-white" : "text-white/60 hover:bg-cm-elevated/5 hover:text-white"
                   }`
                 }
               >
@@ -95,7 +95,7 @@ export default function SupplierLayout() {
 
         <div className="border-t border-white/10 p-3">
           <button onClick={handleLogout}
-            className="flex items-center gap-3 px-3 h-10 w-full rounded-lg text-[13px] font-medium text-white/50 hover:bg-white/5 hover:text-white cursor-pointer transition-colors">
+            className="flex items-center gap-3 px-3 h-10 w-full rounded-lg text-[13px] font-medium text-white/50 hover:bg-cm-elevated/5 hover:text-white cursor-pointer transition-colors">
             <LogOut className="w-[18px] h-[18px]" />
             <span>Déconnexion</span>
           </button>
@@ -103,18 +103,18 @@ export default function SupplierLayout() {
       </aside>
 
       <div className="flex-1 flex flex-col min-h-screen lg:ml-[260px]">
-        <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 lg:px-6 sticky top-0 z-20">
+        <header className="h-14 bg-cm-elevated border-b border-cm-border flex items-center px-4 lg:px-6 sticky top-0 z-20">
           <button onClick={() => setMobileOpen(true)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer lg:hidden">
-            <Menu className="w-5 h-5 text-gray-700" />
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer lg:hidden">
+            <Menu className="w-5 h-5 text-cm-text-soft" />
           </button>
           <div className="flex items-center gap-2 ml-auto">
             <NotificationBell />
             <div className="relative">
               <NotificationPanel />
             </div>
-            <Building2 className="w-4 h-4 text-gray-400" />
-            <span className="text-[12px] text-gray-500">{profile?.companyName ?? "Fournisseur"}</span>
+            <Building2 className="w-4 h-4 text-cm-text-muted" />
+            <span className="text-[12px] text-cm-text-muted">{profile?.companyName ?? "Fournisseur"}</span>
           </div>
         </header>
         <main className="flex-1 p-4 lg:p-6 max-w-[1400px] w-full mx-auto">

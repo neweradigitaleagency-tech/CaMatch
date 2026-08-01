@@ -32,14 +32,14 @@ export default function AdminLogsPage() {
     {
       key: "created_at", label: "Date", sortable: true, width: "140px",
       render: (l) => (
-        <span className="text-[12px] text-gray-500 whitespace-nowrap">
+        <span className="text-[12px] text-cm-text-muted whitespace-nowrap">
           {format(new Date(l.created_at), "d MMM HH:mm", { locale: fr })}
         </span>
       ),
     },
     {
       key: "admin_name", label: "Admin", sortable: true, width: "130px",
-      render: (l) => <span className="text-[12px] font-medium text-gray-700">{l.admin_name}</span>,
+      render: (l) => <span className="text-[12px] font-medium text-cm-text-soft">{l.admin_name}</span>,
     },
     {
       key: "action", label: "Action", sortable: true, width: "160px",
@@ -47,7 +47,7 @@ export default function AdminLogsPage() {
         const actionLabel = LOG_ACTION_LABELS[l.action] ?? l.action
         const colors: Record<string, string> = {
           login: "text-blue-600 bg-blue-50",
-          logout: "text-gray-600 bg-gray-100",
+          logout: "text-cm-text-soft bg-cm-surface",
           suspend: "text-red-600 bg-red-50",
           ban: "text-red-600 bg-red-50",
           reactivate: "text-green-600 bg-green-50",
@@ -60,7 +60,7 @@ export default function AdminLogsPage() {
           delete: "text-red-600 bg-red-50",
         }
         const colorKey = l.action.split("_")[1] ?? l.action
-        const color = colors[colorKey] ?? "text-gray-600 bg-gray-100"
+        const color = colors[colorKey] ?? "text-cm-text-soft bg-cm-surface"
 
         return <span className={`text-[11px] px-2 py-0.5 rounded-md ${color}`}>{actionLabel}</span>
       },
@@ -69,19 +69,19 @@ export default function AdminLogsPage() {
       key: "target", label: "Cible", sortable: false, width: "180px",
       render: (l) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-700 capitalize">{l.target_type}</span>
-          {l.target_name && <span className="text-[11px] text-gray-400">{l.target_name}</span>}
+          <span className="text-[12px] text-cm-text-soft capitalize">{l.target_type}</span>
+          {l.target_name && <span className="text-[11px] text-cm-text-muted">{l.target_name}</span>}
         </div>
       ),
     },
     {
       key: "details", label: "Détails", sortable: false,
-      render: (l) => <span className="text-[12px] text-gray-500 truncate block max-w-[300px]">{l.details}</span>,
+      render: (l) => <span className="text-[12px] text-cm-text-muted truncate block max-w-[300px]">{l.details}</span>,
     },
     {
       key: "ip_address", label: "IP", sortable: true, width: "110px",
       render: (l) => (
-        <span className="text-[11px] font-mono text-gray-400">{l.ip_address}</span>
+        <span className="text-[11px] font-mono text-cm-text-muted">{l.ip_address}</span>
       ),
     },
   ]
@@ -92,8 +92,8 @@ export default function AdminLogsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Logs d'audit</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{total} entrée{total !== 1 ? "s" : ""}</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Logs d'audit</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{total} entrée{total !== 1 ? "s" : ""}</p>
         </div>
       </div>
 

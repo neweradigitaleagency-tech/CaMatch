@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import {
   ArrowLeft, CreditCard, Receipt, History, RotateCcw, XCircle,
@@ -7,6 +6,7 @@ import {
 } from "lucide-react"
 import { formatDistanceToNow, format } from "date-fns"
 import { fr } from "date-fns/locale"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useSubscriptionStore } from "../../stores/subscriptionStore"
 import { useAuthStore } from "../../stores/authStore"
 import EmptyState from "../../components/ui/EmptyState"
@@ -38,9 +38,8 @@ const PLAN_ICONS: Record<string, typeof Star> = {
 }
 
 export default function SubscriptionDashboardPage() {
-  const nav = useNavigate()
-  const loc = useLocation()
-  const fromHamburger = !!loc.state?.fromHamburger
+  const { navigate: nav, goBack, getFlag, setFlag } = useAppNavigation()
+  const fromHamburger = getFlag("from-hamburger")
   const userId = useAuthStore((s) => s.userId)
   const {
     currentSubscription, usage, loading, error,
@@ -57,7 +56,14 @@ export default function SubscriptionDashboardPage() {
       ))
     : 0
 
-  const handleBack = () => nav("/", { state: { reopenMenu: true } })
+  const handleBack = () => {
+    if (fromHamburger) {
+      setFlag("reopen-menu", true)
+      nav("/")
+    } else {
+      goBack()
+    }
+  }
 
   if (error) {
     return (
@@ -129,7 +135,7 @@ function SubscriptionCard({
   daysUntilRenewal: number
   onCancel: () => void
   onReactivate: () => void
-  nav: ReturnType<typeof useNavigate>
+  nav: ReturnType<typeof useAppNavigation>["navigate"]
 }) {
   const planName = subscription.plan?.name ?? subscription.tier
   const tierKey = planName.toUpperCase()
@@ -285,7 +291,7 @@ function UsageProgress({ usage }: { usage: Array<{ feature_code: string; usage: 
   )
 }
 
-function QuickActions({ nav }: { nav: ReturnType<typeof useNavigate> }) {
+function QuickActions({ nav }: { nav: ReturnType<typeof useAppNavigation>["navigate"] }) {
   const actions = [
     { icon: Receipt, label: "Factures", href: "/settings/subscription/invoices" },
     { icon: History, label: "Historique", href: "/settings/subscription/history" },

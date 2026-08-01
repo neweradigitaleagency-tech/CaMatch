@@ -1,18 +1,15 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import ReviewScreen from "../../components/ReviewScreen";
 import { useEscrowStore } from "../../stores/escrowStore";
-import { useRequestStore } from "../../stores/requestStore";
 import type { Mission } from "../../types";
 
 export default function ReviewPage() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const goBack = () => navigate(-1);
-  const mission = (location.state as { mission: Mission })?.mission;
+  const { goBack, complete, getFlow } = useAppNavigation();
+  const mission = getFlow<Mission>("mission");
   const releasePayment = useEscrowStore((s) => s.releasePayment);
 
   if (!mission) {
-    navigate("/orders", { replace: true });
+    complete({ flow: "mission" });
     return null;
   }
 
@@ -22,7 +19,7 @@ export default function ReviewPage() {
       onBack={goBack}
       onSubmit={(missionId, rating, comment) => {
         releasePayment(missionId);
-        navigate("/orders");
+        complete({ flow: "mission" });
       }}
     />
   );

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Flag, Shield, Send } from "lucide-react";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useNotificationStore } from "../../stores/notificationStore";
 
 const REPORT_REASONS = [
@@ -14,8 +14,7 @@ const REPORT_REASONS = [
 ];
 
 export default function ReportPage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, complete } = useAppNavigation();
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -40,7 +39,7 @@ export default function ReportPage() {
         </div>
         <h1 className="text-[18px] font-display font-bold text-cm-text mb-2">Signalement envoyé</h1>
         <p className="text-[13px] text-cm-text-soft text-center mb-6">Notre équipe de modération va examiner votre signalement.</p>
-        <button onClick={goBack} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour</button>
+        <button onClick={() => complete()} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour</button>
       </div>
     );
   }

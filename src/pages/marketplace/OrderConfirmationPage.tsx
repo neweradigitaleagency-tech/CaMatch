@@ -11,7 +11,7 @@ export default function OrderConfirmationPage() {
   if (!order) {
     return (
       <div className="flex flex-col w-full min-h-dynamic bg-cm-bg items-center justify-center px-5">
-        <Package className="w-12 h-12 text-gray-300 mb-3" />
+        <Package className="w-12 h-12 text-cm-border-soft mb-3" />
         <p className="text-[15px] font-bold text-cm-text">Commande introuvable</p>
         <button onClick={() => nav("/marketplace")}
           className="mt-4 h-11 px-6 rounded-xl bg-cm-text text-cm-elevated text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform">

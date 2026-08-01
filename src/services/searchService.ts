@@ -80,7 +80,7 @@ export async function searchAll(params: SearchParams): Promise<SearchResult[]> {
     return generateMockResults(params.query, params.type);
   }
 
-  const { data, error } = await supabase.rpc("search_all", {
+  const { data, error } = await (supabase as any).rpc("search_all", {
     search_query: params.query,
     user_lat: params.lat ?? null,
     user_lng: params.lng ?? null,
@@ -104,7 +104,7 @@ export async function searchSuggest(query: string, maxResults = 5): Promise<Sear
     return generateMockSuggestions(query);
   }
 
-  const { data, error } = await supabase.rpc("search_suggest", {
+  const { data, error } = await (supabase as any).rpc("search_suggest", {
     query_text: query,
     max_results: maxResults,
   });

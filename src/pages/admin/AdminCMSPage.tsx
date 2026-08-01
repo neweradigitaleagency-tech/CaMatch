@@ -122,19 +122,19 @@ export default function AdminCMSPage() {
       key: "slug", label: "Page", sortable: true, width: "250px",
       render: (p) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-            <FileText className="w-4 h-4 text-gray-500" />
+          <div className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center">
+            <FileText className="w-4 h-4 text-cm-text-muted" />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{p.title}</p>
-            <p className="text-[11px] text-gray-400">/{p.slug}</p>
+            <p className="text-[13px] font-medium text-cm-text">{p.title}</p>
+            <p className="text-[11px] text-cm-text-muted">/{p.slug}</p>
           </div>
         </div>
       ),
     },
     {
       key: "author_name", label: "Auteur", width: "120px",
-      render: (p) => <span className="text-[12px] text-gray-600">{p.author_name ?? "—"}</span>,
+      render: (p) => <span className="text-[12px] text-cm-text-soft">{p.author_name ?? "—"}</span>,
     },
     {
       key: "status", label: "Statut", sortable: true, width: "110px",
@@ -148,7 +148,7 @@ export default function AdminCMSPage() {
     {
       key: "published_at", label: "Publiée le", sortable: true, width: "120px",
       render: (p) => (
-        <span className="text-[12px] text-gray-500">
+        <span className="text-[12px] text-cm-text-muted">
           {p.published_at ? format(new Date(p.published_at), "d MMM yyyy", { locale: fr }) : "—"}
         </span>
       ),
@@ -156,7 +156,7 @@ export default function AdminCMSPage() {
     {
       key: "updated_at", label: "Modifiée le", sortable: true, width: "120px",
       render: (p) => (
-        <span className="text-[12px] text-gray-500">
+        <span className="text-[12px] text-cm-text-muted">
           {format(new Date(p.updated_at), "d MMM yyyy", { locale: fr })}
         </span>
       ),
@@ -170,7 +170,7 @@ export default function AdminCMSPage() {
               <button onClick={() => openEdit(p)}
                 className="text-[11px] font-medium text-[var(--admin-accent)] hover:underline cursor-pointer px-1">Modifier</button>
               <button onClick={() => handlePublish(p)}
-                className="text-[11px] font-medium cursor-pointer px-1 flex items-center gap-0.5 text-gray-500 hover:text-gray-700">
+                className="text-[11px] font-medium cursor-pointer px-1 flex items-center gap-0.5 text-cm-text-muted hover:text-cm-text-soft">
                 {p.status === "published" ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
                 {p.status === "published" ? "Dépublier" : "Publier"}
               </button>
@@ -193,12 +193,12 @@ export default function AdminCMSPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Pages CMS</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{pages.length} pages</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Pages CMS</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{pages.length} pages</p>
         </div>
         {canCreate && (
           <button onClick={openCreate}
-            className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer">
+            className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer">
             <Plus className="w-3.5 h-3.5" /> Nouvelle page
           </button>
         )}
@@ -219,39 +219,39 @@ export default function AdminCMSPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Titre</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Titre</label>
               <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Slug</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Slug</label>
               <input type="text" value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
           </div>
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Contenu</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Contenu</label>
             <textarea value={form.content} onChange={(e) => setForm({ ...form, content: e.target.value })}
               rows={8}
-              className="w-full px-3 py-2 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 resize-y" />
+              className="w-full px-3 py-2 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border resize-y" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Meta titre (SEO)</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Meta titre (SEO)</label>
               <input type="text" value={form.meta_title} onChange={(e) => setForm({ ...form, meta_title: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Meta description</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Meta description</label>
               <input type="text" value={form.meta_description} onChange={(e) => setForm({ ...form, meta_description: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
             <button onClick={() => setModalOpen(false)} disabled={saving}
-              className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer disabled:opacity-50">Annuler</button>
+              className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer disabled:opacity-50">Annuler</button>
             <button onClick={handleSave} disabled={saving || !form.slug || !form.title}
-              className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
               <Save className="w-3.5 h-3.5" /> {saving ? "Enregistrement…" : editId ? "Enregistrer" : "Créer"}
             </button>
           </div>

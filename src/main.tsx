@@ -28,8 +28,6 @@ const RequestWizardPage = lazy(() => import("./pages/client/RequestWizardPage"))
 const MatchingSearchPage = lazy(() => import("./pages/client/MatchingSearchPage"));
 const ProposalsListPage = lazy(() => import("./pages/client/ProposalsListPage"));
 const ProposalDetailPage = lazy(() => import("./pages/client/ProposalDetailPage"));
-const RequestCreationPage = lazy(() => import("./pages/client/RequestCreationPage"));
-const ProSelectionPage = lazy(() => import("./pages/client/ProSelectionPage"));
 const RequestDetailPage = lazy(() => import("./pages/client/RequestDetailPage"));
 const MissionTrackerPage = lazy(() => import("./pages/client/MissionTrackerPage"));
 const ReviewPage = lazy(() => import("./pages/client/ReviewPage"));
@@ -58,6 +56,7 @@ const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotifications
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
 const ProOnboardingPage = lazy(() => import("./pages/ProOnboardingPage"));
 const MarketplaceHome = lazy(() => import("./components/marketplace/MarketplaceHome"));
+const BoutiquesPage = lazy(() => import("./pages/marketplace/BoutiquesPage"));
 const SellerRegistrationPage = lazy(() => import("./pages/marketplace/SellerRegistrationPage"));
 const ShopPage = lazy(() => import("./pages/marketplace/ShopPage"));
 const CartPage = lazy(() => import("./pages/marketplace/CartPage"));
@@ -69,6 +68,7 @@ const CategoryExplore = lazy(() => import("./components/marketplace/CategoryExpl
 const ProductDetail = lazy(() => import("./components/marketplace/ProductDetail"));
 const ProfessionalListingScreen = lazy(() => import("./components/ProfessionalListingScreen"));
 const FreelanceListingScreen = lazy(() => import("./components/FreelanceListingScreen"));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
 const ProDashboardScreen = lazy(() => import("./components/ProDashboardScreen"));
 const ProServicesPage = lazy(() => import("./pages/pro/ProServicesPage"));
 const ProRevenusPage = lazy(() => import("./pages/pro/ProRevenusPage"));
@@ -80,7 +80,6 @@ const ProStatsPage = lazy(() => import("./pages/pro/ProStatsPage"));
 const ProBadgesPage = lazy(() => import("./pages/pro/ProBadgesPage"));
 const ProMissionsPage = lazy(() => import("./pages/pro/ProMissionsPage"));
 const ProPreviewPage = lazy(() => import("./pages/profile/ProPreviewPage"));
-const MatchingScreen = lazy(() => import("./pages/explorer/MatchingScreen"));
 const ProSecurityPage = lazy(() => import("./pages/pro/ProSecurityPage"));
 const ProSettingsPage = lazy(() => import("./pages/pro/ProSettingsPage"));
 const ProSupportPage = lazy(() => import("./pages/pro/ProSupportPage"));
@@ -139,7 +138,6 @@ const SubscriptionPaymentPage = lazy(() => import("./pages/subscription/Subscrip
 const SubscriptionHistoryPage = lazy(() => import("./pages/subscription/SubscriptionHistoryPage"));
 const SubscriptionInvoicesPage = lazy(() => import("./pages/subscription/SubscriptionInvoicesPage"));
 const SubscriptionComparePage = lazy(() => import("./pages/subscription/SubscriptionComparePage"));
-const SubscriptionSuccessPage = lazy(() => import("./pages/subscription/SubscriptionSuccessPage"));
 
 const ProSubscriptionDashboardPage = lazy(() => import("./pages/pro/ProSubscriptionDashboardPage"));
 const ProSubscriptionPlansPage = lazy(() => import("./pages/pro/ProSubscriptionPlansPage"));
@@ -256,9 +254,9 @@ function AuthGate({ children }: { children?: React.ReactNode }) {
 }
 
 function AdminAuthGate({ children }: { children?: React.ReactNode }) {
-  const initialized = useAdminAuthStore((s) => s.initialized);
-  const isAuthenticated = useAdminAuthStore((s) => s.isAuthenticated);
-  const isLoading = useAdminAuthStore((s) => s.isLoading);
+  const initialized = useAdminAuthStore.initialized;
+  const isAuthenticated = useAdminAuthStore.isAuthenticated;
+  const isLoading = useAdminAuthStore.isLoading;
 
   if (!initialized || isLoading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/admin/login" replace />;
@@ -266,8 +264,8 @@ function AdminAuthGate({ children }: { children?: React.ReactNode }) {
 }
 
 function AdminInitGate({ children }: { children?: React.ReactNode }) {
-  const initialize = useAdminAuthStore((s) => s.initialize);
-  const initialized = useAdminAuthStore((s) => s.initialized);
+  const initialize = useAdminAuthStore.initialize;
+  const initialized = useAdminAuthStore.initialized;
   const [ready, setReady] = useState(!initialized);
 
   useEffect(() => {
@@ -489,6 +487,7 @@ function App() {
         <Route path="settings/subscription/history" element={<Suspense fallback={<PageLoader />}><SubscriptionHistoryPage /></Suspense>} />
         <Route path="settings/subscription/invoices" element={<Suspense fallback={<PageLoader />}><SubscriptionInvoicesPage /></Suspense>} />
         <Route path="marketplace" element={<Suspense fallback={<PageLoader />}><MarketplaceHome /></Suspense>} />
+        <Route path="marketplace/boutiques" element={<Suspense fallback={<PageLoader />}><BoutiquesPage /></Suspense>} />
         <Route path="marketplace/register" element={<Suspense fallback={<PageLoader />}><SellerRegistrationPage /></Suspense>} />
         <Route path="marketplace/shop/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
         <Route path="marketplace/supplier/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
@@ -501,13 +500,12 @@ function App() {
         <Route path="marketplace/:categoryId" element={<Suspense fallback={<PageLoader />}><BrowseProducts /></Suspense>} />
         <Route path="professionals" element={<Suspense fallback={<PageLoader />}><ProfessionalListingScreen /></Suspense>} />
         <Route path="freelance" element={<Suspense fallback={<PageLoader />}><FreelanceListingScreen /></Suspense>} />
+        <Route path="favorites" element={<Suspense fallback={<PageLoader />}><FavoritesPage /></Suspense>} />
 
         {/* Legacy explorer redirects */}
         <Route path="explorer" element={<Navigate to="/" replace />} />
         <Route path="requests" element={<Navigate to="/orders" replace />} />
         <Route path="requests/*" element={<Navigate to="/orders" replace />} />
-        <Route path="explorer/request-creation" element={<Navigate to="/orders/new" replace />} />
-        <Route path="explorer/pro-selection" element={<Navigate to="/search" replace />} />
         <Route path="explorer/categories" element={<Navigate to="/search" replace />} />
         <Route path="explorer/search" element={<Navigate to="/search" replace />} />
         <Route path="explorer/category/:categoryId" element={<Navigate to="/search" replace />} />

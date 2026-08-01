@@ -12,18 +12,18 @@ export default function SettingsSection({ label, description, dangerous, childre
     <div className="mb-6">
       <div className="px-4 mb-2">
         <span className={`text-[11px] font-semibold uppercase tracking-wider ${
-          dangerous ? "text-red-500" : "text-gray-400"
+          dangerous ? "text-cm-error" : "text-cm-text-muted"
         }`}>
           {label}
         </span>
         {description && (
-          <p className="text-[12px] text-gray-400 mt-1 leading-relaxed">{description}</p>
+          <p className="text-[12px] text-cm-text-muted mt-1 leading-relaxed">{description}</p>
         )}
       </div>
       <div className={`mx-4 rounded-2xl border overflow-hidden ${
         dangerous
-          ? "bg-white border-red-200 shadow-sm"
-          : "bg-white border-gray-100 shadow-cm-card"
+          ? "bg-cm-elevated border-red-200 shadow-sm"
+          : "bg-cm-elevated border-cm-border-soft shadow-cm-card"
       }`}>
         {children}
       </div>

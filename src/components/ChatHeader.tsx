@@ -10,10 +10,10 @@ interface ChatHeaderProps {
 
 const STATE_DOT: Record<string, string> = {
   active: "bg-green-500",
-  waiting: "bg-amber-400",
-  read_only: "bg-gray-400",
-  archived: "bg-gray-300",
-  locked: "bg-red-400",
+  waiting: "bg-cm-amber",
+  read_only: "bg-cm-text-muted",
+  archived: "bg-cm-border",
+  locked: "bg-cm-error",
 };
 
 const STATE_LABEL: Record<string, string> = {
@@ -39,12 +39,12 @@ export default function ChatHeader({ conversation, onBack }: ChatHeaderProps) {
             {conversation.otherUserName}
           </h2>
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className={`w-1.5 h-1.5 rounded-full ${STATE_DOT[conversation.state] || "bg-gray-400"}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${STATE_DOT[conversation.state] || "bg-cm-text-muted"}`} />
             <span className="text-[11px] text-cm-text-muted">
               {STATE_LABEL[conversation.state] || conversation.state}
             </span>
             {conversation.metadata.flags.dispute && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-[4px] bg-red-50 text-red-600 font-medium">
+              <span className="text-[10px] px-1.5 py-0.5 rounded-[4px] bg-red-50 text-cm-error font-medium">
                 Litige
               </span>
             )}
@@ -53,17 +53,17 @@ export default function ChatHeader({ conversation, onBack }: ChatHeaderProps) {
         <div className="flex items-center gap-1">
           <button
             onClick={() => {}}
-            className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer transition-colors"
+            className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer transition-colors"
             title="Appel audio"
           >
-            <Phone className="w-4 h-4 text-[#2B2B2B]" />
+            <Phone className="w-4 h-4 text-cm-text" />
           </button>
           <button
             onClick={() => {}}
-            className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer transition-colors"
+            className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer transition-colors"
             title="Appel vidéo"
           >
-            <Video className="w-4 h-4 text-[#2B2B2B]" />
+            <Video className="w-4 h-4 text-cm-text" />
           </button>
         </div>
       </div>

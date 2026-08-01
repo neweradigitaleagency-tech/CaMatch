@@ -1,12 +1,11 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import MessagingScreen from "../../components/MessagingScreen";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useChatStore } from "../../stores/chatStore";
 import { useAuthStore } from "../../stores/authStore";
 
 export default function MessagingListPage() {
-  const navigate = useNavigate();
-  const goBack = () => navigate(-1);
+  const { goBack, navigate } = useAppNavigation();
   const conversations = useChatStore((s) => s.conversations);
   const initialize = useChatStore((s) => s.initialize);
   const markRead = useChatStore((s) => s.markRead);

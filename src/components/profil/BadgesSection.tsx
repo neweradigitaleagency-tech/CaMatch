@@ -17,18 +17,18 @@ interface BadgesSectionProps {
 export default function BadgesSection({ badges }: BadgesSectionProps) {
   return (
     <ProfileSection>
-      <div className="bg-white border border-gray-100 rounded-[20px] p-4 shadow-sm">
+      <div className="bg-white border border-cm-border/40 rounded-[20px] p-4 shadow-sm">
         <div className="flex items-center gap-1.5 mb-3">
-          <Award className="w-4 h-4 text-gray-700" />
-          <h3 className="text-[11px] font-black text-gray-700 uppercase tracking-wider">
+          <Award className="w-4 h-4 text-cm-text-soft" />
+          <h3 className="text-[11px] font-black text-cm-text-soft uppercase tracking-wider">
             Badges {(badges?.length || 0) > 0 ? `(${badges!.length + PREMIUM_BADGES.length})` : `(${PREMIUM_BADGES.length})`}
           </h3>
         </div>
         <div className="flex flex-wrap gap-2">
           {badges?.map((badge) => (
-            <div key={badge.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-[10px] border border-gray-100" title={badge.description}>
+            <div key={badge.id} className="flex items-center gap-1.5 px-3 py-1.5 bg-cm-surface rounded-[10px] border border-cm-border/40" title={badge.description}>
               <span className="text-[14px]">{badge.icon}</span>
-              <span className="text-[11px] font-black text-gray-700">{badge.name}</span>
+              <span className="text-[11px] font-black text-cm-text-soft">{badge.name}</span>
             </div>
           ))}
           {PREMIUM_BADGES.map((badge, i) => {

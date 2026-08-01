@@ -1,5 +1,4 @@
-import { useNavigate } from "react-router-dom";
-import { useBackNavigation } from "../../hooks/useBackNavigation";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, Send, Wallet, ChevronDown, CheckCircle } from "lucide-react";
 import { useState } from "react";
@@ -7,8 +6,7 @@ import { MOCK_FINANCE_SUMMARY } from "../../services/mockData";
 import { PAYMENT_METHODS } from "../../data/plans";
 
 export default function ProWithdrawPage() {
-  const nav = useNavigate();
-  const goBack = useBackNavigation("/pro/dashboard");
+  const { goBack, complete } = useAppNavigation();
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("orange_money");
   const [showMethods, setShowMethods] = useState(false);
@@ -34,7 +32,7 @@ export default function ProWithdrawPage() {
           <p className="text-[13px] text-cm-text-muted mb-6">
             {numAmount.toLocaleString("fr-FR")} F vers {PAYMENT_METHODS.find((p) => p.value === method)?.label || method}
           </p>
-          <button onClick={() => nav("/pro/wallet")}
+          <button onClick={() => complete()}
             className="h-11 px-6 bg-cm-text text-white text-[12px] font-bold rounded-[14px] cursor-pointer active:scale-[0.97]">
             Voir le portefeuille
           </button>

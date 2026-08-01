@@ -1,13 +1,12 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { CheckCircle, X } from "lucide-react"
-import PageHeader from "../../components/ui/PageHeader"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useAuthStore } from "../../stores/authStore"
 import { useSellerRegistrationStore } from "../../stores/sellerRegistrationStore"
 import SellerRegistrationWizard from "../../components/marketplace/SellerRegistrationWizard"
 
 export default function SellerRegistrationPage() {
-  const nav = useNavigate()
+  const { goBack, complete } = useAppNavigation()
   const user = useAuthStore((s) => s.user)
   const { draft, reset } = useSellerRegistrationStore()
   const [loading, setLoading] = useState(false)
@@ -68,7 +67,7 @@ export default function SellerRegistrationPage() {
           <p className="text-[13px] text-cm-text-soft mb-6">
             Votre demande d'inscription a été soumise. Notre équipe la vérifiera sous 24-48h.
           </p>
-          <button onClick={() => nav("/marketplace", { replace: true })}
+          <button onClick={() => complete()}
             className="h-10 px-6 bg-cm-text text-cm-elevated text-[12px] font-bold rounded-xl cursor-pointer transition-all hover:opacity-90">
             Retour au marketplace
           </button>
@@ -87,7 +86,7 @@ export default function SellerRegistrationPage() {
         </div>
       )}
       <SellerRegistrationWizard
-        onBack={goBack}
+        onBack={() => goBack()}
         onSubmit={handleSubmit}
         loading={loading}
       />

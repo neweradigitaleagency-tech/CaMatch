@@ -1,9 +1,9 @@
 import { useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { ArrowLeft, History, CreditCard, RotateCcw, Circle } from "lucide-react"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useSubscriptionStore } from "../../stores/subscriptionStore"
 import { useAuthStore } from "../../stores/authStore"
 import type { Subscription, Payment, PaymentStatus } from "../../types/subscription"
@@ -43,9 +43,8 @@ const PAYMENT_STATUS_COLORS: Record<PaymentStatus, string> = {
 }
 
 export default function SubscriptionHistoryPage() {
-  const nav = useNavigate()
-  const loc = useLocation()
-  const fromHamburger = !!loc.state?.fromHamburger
+  const { navigate, goBack, getFlag, setFlag } = useAppNavigation()
+  const fromHamburger = getFlag("from-hamburger")
   const userId = useAuthStore((s) => s.userId)
   const {
     subscriptionHistory, paymentHistory, loading, error,
@@ -56,7 +55,14 @@ export default function SubscriptionHistoryPage() {
     if (userId) fetchAll(userId)
   }, [userId])
 
-  const handleBack = () => nav("/", { state: { reopenMenu: true } })
+  const handleBack = () => {
+    if (fromHamburger) {
+      setFlag("reopen-menu", true)
+      navigate("/")
+    } else {
+      goBack()
+    }
+  }
 
   if (error) {
     return (

@@ -155,11 +155,11 @@ export default function AdminCouponsPage() {
       key: "code", label: "Code", sortable: true, width: "160px",
       render: (c) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-            <Ticket className="w-4 h-4 text-gray-500" />
+          <div className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center">
+            <Ticket className="w-4 h-4 text-cm-text-muted" />
           </div>
           <div className="min-w-0">
-            <code className="text-[13px] font-bold text-gray-900">{c.code}</code>
+            <code className="text-[13px] font-bold text-cm-text">{c.code}</code>
             <span className={`ml-2 inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${COUPON_TYPE_COLORS[c.type]}`}>
               <span className="w-2.5 h-2.5 flex items-center justify-center text-[9px] font-bold">{COUPON_TYPE_SYMBOLS[c.type]}</span>
               {COUPON_TYPE_LABELS[c.type]}
@@ -171,7 +171,7 @@ export default function AdminCouponsPage() {
     {
       key: "value", label: "Valeur", sortable: true, width: "100px",
       render: (c) => (
-        <span className="text-[13px] font-medium text-gray-900">
+        <span className="text-[13px] font-medium text-cm-text">
           {c.type === "percentage" ? `${c.value}%` : c.type === "free_month" ? `${c.value} mois` : formatXOF(c.value)}
         </span>
       ),
@@ -180,10 +180,10 @@ export default function AdminCouponsPage() {
       key: "usage", label: "Utilisations", sortable: true, width: "120px",
       render: (c) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-700">{c.current_usage}{c.max_usage ? ` / ${c.max_usage}` : ""}</span>
+          <span className="text-[12px] text-cm-text-soft">{c.current_usage}{c.max_usage ? ` / ${c.max_usage}` : ""}</span>
           {c.max_usage && (
-            <div className="mt-1 h-1.5 bg-gray-100 rounded-full overflow-hidden w-20">
-              <div className="h-full bg-gray-900 rounded-full" style={{ width: `${Math.min(100, (c.current_usage / c.max_usage) * 100)}%` }} />
+            <div className="mt-1 h-1.5 bg-cm-surface rounded-full overflow-hidden w-20">
+              <div className="h-full bg-cm-text rounded-full" style={{ width: `${Math.min(100, (c.current_usage / c.max_usage) * 100)}%` }} />
             </div>
           )}
         </div>
@@ -192,22 +192,22 @@ export default function AdminCouponsPage() {
     {
       key: "min_plan_type", label: "Type plan", width: "100px",
       render: (c) => (
-        <span className="text-[12px] text-gray-500">{c.min_plan_type ? (c.min_plan_type === "CLIENT" ? "Client" : "Pro") : "Tous"}</span>
+        <span className="text-[12px] text-cm-text-muted">{c.min_plan_type ? (c.min_plan_type === "CLIENT" ? "Client" : "Pro") : "Tous"}</span>
       ),
     },
     {
       key: "expires_at", label: "Expire le", sortable: true, width: "110px",
       render: (c) => {
-        if (!c.expires_at) return <span className="text-[12px] text-gray-400">Jamais</span>
+        if (!c.expires_at) return <span className="text-[12px] text-cm-text-muted">Jamais</span>
         const expired = new Date(c.expires_at) < new Date()
-        return <span className={`text-[12px] ${expired ? "text-red-500" : "text-gray-500"}`}>{format(new Date(c.expires_at), "d MMM yyyy", { locale: fr })}</span>
+        return <span className={`text-[12px] ${expired ? "text-red-500" : "text-cm-text-muted"}`}>{format(new Date(c.expires_at), "d MMM yyyy", { locale: fr })}</span>
       },
     },
     {
       key: "is_active", label: "Actif", width: "80px",
       render: (c) => (
         <button onClick={(e) => { e.stopPropagation(); handleToggleActive(c) }}
-          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium cursor-pointer transition-colors ${c.is_active ? "bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]" : "bg-gray-100 text-gray-500"}`}>
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium cursor-pointer transition-colors ${c.is_active ? "bg-[var(--admin-accent-soft)] text-[var(--admin-accent)]" : "bg-cm-surface text-cm-text-muted"}`}>
           {c.is_active ? <ToggleRight className="w-3.5 h-3.5" /> : <ToggleLeft className="w-3.5 h-3.5" />}
           {c.is_active ? "Actif" : "Inactif"}
         </button>
@@ -216,7 +216,7 @@ export default function AdminCouponsPage() {
     {
       key: "created_at", label: "Création", sortable: true, width: "90px",
       render: (c) => (
-        <span className="text-[11px] text-gray-500">{format(new Date(c.created_at), "d MMM", { locale: fr })}</span>
+        <span className="text-[11px] text-cm-text-muted">{format(new Date(c.created_at), "d MMM", { locale: fr })}</span>
       ),
     },
     {
@@ -238,11 +238,11 @@ export default function AdminCouponsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Codes promo</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{coupons.length} codes ({coupons.filter((c) => c.is_active).length} actifs)</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Codes promo</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{coupons.length} codes ({coupons.filter((c) => c.is_active).length} actifs)</p>
         </div>
         <button onClick={openCreate}
-          className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer">
+          className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer">
           <Plus className="w-3.5 h-3.5" /> Nouveau code
         </button>
       </div>
@@ -261,42 +261,42 @@ export default function AdminCouponsPage() {
         title={editId ? "Modifier le code promo" : "Nouveau code promo"} size="md">
         <div className="space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Code</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Code</label>
             <input type="text" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
               placeholder="CODE promo"
-              className="w-full h-9 px-3 text-[13px] font-mono uppercase bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-full h-9 px-3 text-[13px] font-mono uppercase bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Type</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Type</label>
               <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as CouponType })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300">
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border">
                 {Object.entries(COUPON_TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">
                 {form.type === "percentage" ? "Pourcentage" : form.type === "free_month" ? "Nombre de mois" : "Montant (F CFA)"}
               </label>
               <input type="number" value={form.value} onChange={(e) => setForm({ ...form, value: Number(e.target.value) })}
                 min={0}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Utilisations max</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Utilisations max</label>
               <input type="number" value={form.max_usage ?? ""} onChange={(e) => setForm({ ...form, max_usage: e.target.value ? Number(e.target.value) : null })}
                 placeholder="Illimité"
                 min={1}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Type de plan minimum</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Type de plan minimum</label>
               <select value={form.min_plan_type ?? ""} onChange={(e) => setForm({ ...form, min_plan_type: (e.target.value || null) as PlanType | null })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300">
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border">
                 <option value="">Tous les plans</option>
                 <option value="CLIENT">Client</option>
                 <option value="PRO">Pro</option>
@@ -305,22 +305,22 @@ export default function AdminCouponsPage() {
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Expire le</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Expire le</label>
             <input type="date" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
           </div>
 
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
-              className="w-3.5 h-3.5 rounded border-gray-300 text-gray-900 accent-gray-900" />
-            <span className="text-[12px] text-gray-700">Actif</span>
+              className="w-3.5 h-3.5 rounded border-cm-border text-cm-text accent-cm-text" />
+            <span className="text-[12px] text-cm-text-soft">Actif</span>
           </label>
 
           <div className="flex items-center justify-end gap-2 pt-2">
             <button onClick={() => setModalOpen(false)} disabled={saving}
-              className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer disabled:opacity-50">Annuler</button>
+              className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer disabled:opacity-50">Annuler</button>
             <button onClick={handleSave} disabled={saving || !form.code || form.value <= 0}
-              className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
               <Save className="w-3.5 h-3.5" /> {saving ? "Enregistrement…" : editId ? "Enregistrer" : "Créer"}
             </button>
           </div>

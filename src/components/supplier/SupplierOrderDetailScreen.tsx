@@ -44,8 +44,8 @@ export default function SupplierOrderDetailScreen() {
   if (isLoading) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          {[1, 2, 3].map((i) => <div key={i} className="h-4 bg-gray-200/50 animate-pulse rounded w-3/4" />)}
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-6 space-y-4">
+          {[1, 2, 3].map((i) => <div key={i} className="h-4 bg-cm-surface/50 animate-pulse rounded w-3/4" />)}
         </div>
       </div>
     )
@@ -54,10 +54,10 @@ export default function SupplierOrderDetailScreen() {
   if (!order) {
     return (
       <div className="max-w-2xl mx-auto text-center py-12">
-        <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-        <p className="text-[14px] text-gray-500">Commande introuvable</p>
+        <AlertCircle className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+        <p className="text-[14px] text-cm-text-muted">Commande introuvable</p>
         <button onClick={() => navigate("/supplier/orders")}
-          className="mt-4 h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-xl cursor-pointer">
+          className="mt-4 h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-xl cursor-pointer">
           Retour aux commandes
         </button>
       </div>
@@ -74,80 +74,80 @@ export default function SupplierOrderDetailScreen() {
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate("/supplier/orders")}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-[18px] font-bold text-gray-900">{order.id.toUpperCase()}</h1>
+            <h1 className="text-[18px] font-bold text-cm-text">{order.id.toUpperCase()}</h1>
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${getStatusColor(order.status)}`}>
               {getStatusLabel(order.status)}
             </span>
           </div>
-          <p className="text-[12px] text-gray-500">Commande du {new Date(order.createdAt).toLocaleDateString("fr-FR")} à {new Date(order.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</p>
+          <p className="text-[12px] text-cm-text-muted">Commande du {new Date(order.createdAt).toLocaleDateString("fr-FR")} à {new Date(order.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h2 className="text-[13px] font-semibold text-gray-900">👤 Client</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-cm-text">👤 Client</h2>
         <div className="grid grid-cols-2 gap-3 text-[12px]">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Client</p>
-            <p className="text-gray-900 font-medium">{order.clientName ?? "N/A"}</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Client</p>
+            <p className="text-cm-text font-medium">{order.clientName ?? "N/A"}</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Professionnel</p>
-            <p className="text-gray-900 font-medium">{order.professionalName ?? "N/A"}</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Professionnel</p>
+            <p className="text-cm-text font-medium">{order.professionalName ?? "N/A"}</p>
           </div>
           {order.deliveryCity && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-gray-500">Livraison</p>
-              <p className="text-gray-900 font-medium">{order.deliveryCity}{order.deliveryAddress ? `, ${order.deliveryAddress}` : ""}</p>
+            <div className="bg-cm-surface rounded-lg p-3">
+              <p className="text-cm-text-muted">Livraison</p>
+              <p className="text-cm-text font-medium">{order.deliveryCity}{order.deliveryAddress ? `, ${order.deliveryAddress}` : ""}</p>
             </div>
           )}
           {order.deliveryCost > 0 && (
-            <div className="bg-gray-50 rounded-lg p-3">
-              <p className="text-gray-500">Frais livraison</p>
-              <p className="text-gray-900 font-medium">{formatXOF(order.deliveryCost)}</p>
+            <div className="bg-cm-surface rounded-lg p-3">
+              <p className="text-cm-text-muted">Frais livraison</p>
+              <p className="text-cm-text font-medium">{formatXOF(order.deliveryCost)}</p>
             </div>
           )}
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h2 className="text-[13px] font-semibold text-gray-900">📦 Produits</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-cm-text">📦 Produits</h2>
         {order.items && order.items.length > 0 ? (
           <div className="space-y-2">
             {order.items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+              <div key={item.id} className="flex items-center justify-between p-2 bg-cm-surface rounded-lg">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] font-medium text-gray-900">{item.productName}</p>
-                  <p className="text-[11px] text-gray-500">{formatXOF(item.unitPrice)} × {item.quantity}</p>
+                  <p className="text-[12px] font-medium text-cm-text">{item.productName}</p>
+                  <p className="text-[11px] text-cm-text-muted">{formatXOF(item.unitPrice)} × {item.quantity}</p>
                 </div>
-                <p className="text-[12px] font-semibold text-gray-900 shrink-0 ml-3">{formatXOF(item.totalPrice)}</p>
+                <p className="text-[12px] font-semibold text-cm-text shrink-0 ml-3">{formatXOF(item.totalPrice)}</p>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-[12px] text-gray-400">Détails non disponibles</p>
+          <p className="text-[12px] text-cm-text-muted">Détails non disponibles</p>
         )}
 
-        <div className="border-t border-gray-200 pt-3 space-y-1">
+        <div className="border-t border-cm-border pt-3 space-y-1">
           <div className="flex justify-between text-[12px]">
-            <span className="text-gray-500">Sous-total</span>
-            <span className="text-gray-700">{formatXOF(order.subtotal)}</span>
+            <span className="text-cm-text-muted">Sous-total</span>
+            <span className="text-cm-text-soft">{formatXOF(order.subtotal)}</span>
           </div>
           {order.deliveryCost > 0 && (
             <div className="flex justify-between text-[12px]">
-              <span className="text-gray-500">Livraison</span>
-              <span className="text-gray-700">{formatXOF(order.deliveryCost)}</span>
+              <span className="text-cm-text-muted">Livraison</span>
+              <span className="text-cm-text-soft">{formatXOF(order.deliveryCost)}</span>
             </div>
           )}
           <div className="flex justify-between text-[12px]">
-            <span className="text-gray-500">Commission Ça Match</span>
-            <span className="text-gray-500">-{formatXOF(order.commission)}</span>
+            <span className="text-cm-text-muted">Commission Ça Match</span>
+            <span className="text-cm-text-muted">-{formatXOF(order.commission)}</span>
           </div>
-          <div className="flex justify-between text-[14px] font-bold text-gray-900 pt-1 border-t border-gray-100">
+          <div className="flex justify-between text-[14px] font-bold text-cm-text pt-1 border-t border-cm-border/40">
             <span>Total</span>
             <span>{formatXOF(order.total)}</span>
           </div>
@@ -155,14 +155,14 @@ export default function SupplierOrderDetailScreen() {
       </div>
 
       {order.notes && (
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">Notes</p>
-          <p className="text-[12px] text-gray-900 mt-1">{order.notes}</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">Notes</p>
+          <p className="text-[12px] text-cm-text mt-1">{order.notes}</p>
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <h2 className="text-[13px] font-semibold text-gray-900">🔗 Liens associés</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <h2 className="text-[13px] font-semibold text-cm-text">🔗 Liens associés</h2>
         <div className="flex gap-2 flex-wrap">
           {linkedDelivery && (
             <button onClick={() => navigate(`/supplier/deliveries/${linkedDelivery.id}`)}
@@ -177,7 +177,7 @@ export default function SupplierOrderDetailScreen() {
             </button>
           )}
           <button onClick={() => window.location.href = `tel:${order.clientName ? "N/A" : ""}`}
-            className="flex items-center gap-1.5 h-9 px-4 bg-gray-50 text-gray-700 text-[12px] font-medium rounded-lg hover:bg-gray-100 cursor-pointer transition-colors">
+            className="flex items-center gap-1.5 h-9 px-4 bg-cm-surface text-cm-text-soft text-[12px] font-medium rounded-lg hover:bg-cm-surface cursor-pointer transition-colors">
             <Phone className="w-3.5 h-3.5" /> Contacter le client
           </button>
         </div>
@@ -185,7 +185,7 @@ export default function SupplierOrderDetailScreen() {
 
       {actions.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[13px] font-semibold text-gray-900">Actions</p>
+          <p className="text-[13px] font-semibold text-cm-text">Actions</p>
           {actions.map((action) => {
             const Icon = action.icon
             return (

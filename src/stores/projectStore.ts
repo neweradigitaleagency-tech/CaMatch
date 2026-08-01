@@ -57,6 +57,7 @@ interface ProjectState {
   projects: Project[];
   activeProject: Project | null;
   alerts: ProAlert[];
+  activeAlert: ProAlert | null;
   isAvailable: boolean;
 
   setPerspective: (p: ProjectPerspective) => void;
@@ -161,6 +162,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
   projects: [],
   activeProject: null,
   alerts: [],
+  activeAlert: null,
   isAvailable: true,
 
   setPerspective: (perspective) => set({ perspective }),

@@ -80,9 +80,9 @@ export default function AdminMissionsPage() {
       key: "id", label: "Mission", sortable: true, width: "200px",
       render: (m) => (
         <div className="min-w-0">
-          <p className="text-[13px] font-medium text-gray-900 truncate">{getCategoryLabel(m.category)}</p>
-          <p className="text-[11px] text-gray-400 truncate">{m.description?.slice(0, 60) || m.address}</p>
-          <p className="text-[11px] text-gray-400 flex items-center gap-1 mt-0.5">
+          <p className="text-[13px] font-medium text-cm-text truncate">{getCategoryLabel(m.category)}</p>
+          <p className="text-[11px] text-cm-text-muted truncate">{m.description?.slice(0, 60) || m.address}</p>
+          <p className="text-[11px] text-cm-text-muted flex items-center gap-1 mt-0.5">
             <MapPin className="w-3 h-3" /> {m.address}
           </p>
         </div>
@@ -92,8 +92,8 @@ export default function AdminMissionsPage() {
       key: "client_name", label: "Client", sortable: true, width: "140px",
       render: (m) => (
         <div>
-          <p className="text-[12px] text-gray-700">{m.client_name || "—"}</p>
-          {m.client_phone && <p className="text-[11px] text-gray-400">{m.client_phone}</p>}
+          <p className="text-[12px] text-cm-text-soft">{m.client_name || "—"}</p>
+          {m.client_phone && <p className="text-[11px] text-cm-text-muted">{m.client_phone}</p>}
         </div>
       ),
     },
@@ -101,8 +101,8 @@ export default function AdminMissionsPage() {
       key: "pro_name", label: "Professionnel", sortable: true, width: "140px",
       render: (m) => (
         <div>
-          <p className="text-[12px] text-gray-700">{m.pro_name || "—"}</p>
-          {m.pro_phone && <p className="text-[11px] text-gray-400">{m.pro_phone}</p>}
+          <p className="text-[12px] text-cm-text-soft">{m.pro_name || "—"}</p>
+          {m.pro_phone && <p className="text-[11px] text-cm-text-muted">{m.pro_phone}</p>}
         </div>
       ),
     },
@@ -116,21 +116,21 @@ export default function AdminMissionsPage() {
     {
       key: "urgency", label: "Urgence", sortable: true, width: "80px",
       render: (m) => {
-        const colors: Record<string, string> = { low: "text-gray-500", medium: "text-amber-600", high: "text-orange-600", emergency: "text-red-600 font-semibold" }
-        return <span className={`text-[12px] capitalize ${colors[m.urgency] ?? "text-gray-500"}`}>{URGENCY_LABELS[m.urgency]}</span>
+        const colors: Record<string, string> = { low: "text-cm-text-muted", medium: "text-amber-600", high: "text-orange-600", emergency: "text-red-600 font-semibold" }
+        return <span className={`text-[12px] capitalize ${colors[m.urgency] ?? "text-cm-text-muted"}`}>{URGENCY_LABELS[m.urgency]}</span>
       },
     },
     {
       key: "final_price", label: "Prix", sortable: true, width: "100px",
       render: (m) => {
-        if (m.final_price) return <span className="text-[12px] font-medium text-gray-900">{m.final_price.toLocaleString()} F</span>
-        if (m.estimated_price_min) return <span className="text-[12px] text-gray-500">{m.estimated_price_min.toLocaleString()} – {m.estimated_price_max?.toLocaleString()} F</span>
-        return <span className="text-[12px] text-gray-400">—</span>
+        if (m.final_price) return <span className="text-[12px] font-medium text-cm-text">{m.final_price.toLocaleString()} F</span>
+        if (m.estimated_price_min) return <span className="text-[12px] text-cm-text-muted">{m.estimated_price_min.toLocaleString()} – {m.estimated_price_max?.toLocaleString()} F</span>
+        return <span className="text-[12px] text-cm-text-muted">—</span>
       },
     },
     {
       key: "created_at", label: "Créée le", sortable: true, width: "90px",
-      render: (m) => <span className="text-[12px] text-gray-500">{format(new Date(m.created_at), "d MMM", { locale: fr })}</span>,
+      render: (m) => <span className="text-[12px] text-cm-text-muted">{format(new Date(m.created_at), "d MMM", { locale: fr })}</span>,
     },
   ]
 
@@ -140,19 +140,19 @@ export default function AdminMissionsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Missions</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{total} mission{total !== 1 ? "s" : ""}</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Missions</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{total} mission{total !== 1 ? "s" : ""}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-5 gap-3">
         {stats.map((s) => (
-          <div key={s.label} className="bg-white border border-gray-200 rounded-xl p-4">
+          <div key={s.label} className="bg-cm-elevated border border-cm-border rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-gray-400">{s.icon}</span>
-              <span className="text-[11px] text-gray-500 font-medium">{s.label}</span>
+              <span className="text-cm-text-muted">{s.icon}</span>
+              <span className="text-[11px] text-cm-text-muted font-medium">{s.label}</span>
             </div>
-            <p className="text-[18px] font-bold text-gray-900">{s.value}</p>
+            <p className="text-[18px] font-bold text-cm-text">{s.value}</p>
           </div>
         ))}
       </div>
@@ -160,7 +160,7 @@ export default function AdminMissionsPage() {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {FILTERS.map((f) => (
           <button key={f.key} onClick={() => setFilter(f.key)}
-            className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${filter === f.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+            className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${filter === f.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
             {f.label}
             {f.key !== "all" && <span className="ml-1.5 text-[11px] opacity-60">({missions.filter((m) => m.status === f.key).length})</span>}
           </button>

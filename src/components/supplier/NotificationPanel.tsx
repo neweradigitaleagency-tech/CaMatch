@@ -28,7 +28,7 @@ export default function SupplierNotificationPanel() {
     actionUrl: n.link,
   }));
 
-  function handleNotificationClick(notif: typeof mappedNotifications[number]) {
+  function handleNotificationClick(notif: { id: string }) {
     const original = notifications.find((n) => n.id === notif.id);
     if (!original) return;
     const link = original.link || NOTIFICATION_ACTIONS[original.type]?.defaultLink;

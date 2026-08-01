@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import RequestWizardScreen from "../../components/wizard/RequestWizardScreen";
 import { useRequestWizardStore } from "../../stores/requestWizardStore";
 import { useRequestStore } from "../../stores/requestStore";
@@ -19,8 +19,7 @@ function mapUrgency(u: string): ProAlert["urgency"] {
 }
 
 export default function RequestWizardPage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, navigate } = useAppNavigation();
   const { draft, reset } = useRequestWizardStore();
   const addRequest = useRequestStore((s) => s.addRequest);
   const proAlerts = useProStore((s) => s.alerts);
@@ -84,7 +83,7 @@ export default function RequestWizardPage() {
     useMatchingStore.getState().proposals[requestId] = mockProposals;
     reset();
 
-    nav(`/orders/matching/${requestId}`);
+    navigate(`/orders/matching/${requestId}`);
   };
 
   return (

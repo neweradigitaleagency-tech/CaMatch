@@ -212,12 +212,12 @@ export default function AdminSubscriptionsPage() {
       key: "user", label: "Utilisateur", sortable: true, width: "180px",
       render: (s) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-semibold text-gray-600 shrink-0">
+          <div className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center text-[12px] font-semibold text-cm-text-soft shrink-0">
             {(USER_NAMES[s.user_id] ?? s.user_id).charAt(0)}
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{USER_NAMES[s.user_id] ?? s.user_id}</p>
-            <p className="text-[11px] text-gray-400 font-mono">{s.user_id}</p>
+            <p className="text-[13px] font-medium text-cm-text">{USER_NAMES[s.user_id] ?? s.user_id}</p>
+            <p className="text-[11px] text-cm-text-muted font-mono">{s.user_id}</p>
           </div>
         </div>
       ),
@@ -226,11 +226,11 @@ export default function AdminSubscriptionsPage() {
       key: "plan", label: "Formule", sortable: true, width: "140px",
       render: (s) => {
         const plan = s.plan ?? MOCK_PLANS.find((p) => p.id === s.plan_id)
-        if (!plan) return <span className="text-[12px] text-gray-400">—</span>
+        if (!plan) return <span className="text-[12px] text-cm-text-muted">—</span>
         return (
           <div className="flex flex-col">
-            <span className="text-[13px] font-medium text-gray-900">{plan.name}</span>
-            <span className="text-[11px] text-gray-400">{plan.type === "CLIENT" ? "Client" : "Pro"}</span>
+            <span className="text-[13px] font-medium text-cm-text">{plan.name}</span>
+            <span className="text-[11px] text-cm-text-muted">{plan.type === "CLIENT" ? "Client" : "Pro"}</span>
           </div>
         )
       },
@@ -244,7 +244,7 @@ export default function AdminSubscriptionsPage() {
     {
       key: "billing_cycle", label: "Cycle", sortable: true, width: "90px",
       render: (s) => (
-        <span className="text-[12px] text-gray-600">{s.billing_cycle === "monthly" ? "Mensuel" : "Annuel"}</span>
+        <span className="text-[12px] text-cm-text-soft">{s.billing_cycle === "monthly" ? "Mensuel" : "Annuel"}</span>
       ),
     },
     {
@@ -253,7 +253,7 @@ export default function AdminSubscriptionsPage() {
         const plan = s.plan ?? MOCK_PLANS.find((p) => p.id === s.plan_id)
         const amount = s.billing_cycle === "yearly" ? (plan?.price_yearly ?? s.price_monthly) : (plan?.price_monthly ?? s.price_monthly)
         return (
-          <span className="text-[13px] font-medium text-gray-900">{amount === 0 ? "Gratuit" : formatXOF(amount)}</span>
+          <span className="text-[13px] font-medium text-cm-text">{amount === 0 ? "Gratuit" : formatXOF(amount)}</span>
         )
       },
     },
@@ -261,15 +261,15 @@ export default function AdminSubscriptionsPage() {
       key: "period", label: "Période", sortable: true, width: "120px",
       render: (s) => (
         <div className="flex flex-col">
-          <span className="text-[11px] text-gray-500">{format(new Date(s.current_period_start), "dd/MM/yy", { locale: fr })}</span>
-          <span className="text-[11px] text-gray-400">→ {format(new Date(s.current_period_end), "dd/MM/yy", { locale: fr })}</span>
+          <span className="text-[11px] text-cm-text-muted">{format(new Date(s.current_period_start), "dd/MM/yy", { locale: fr })}</span>
+          <span className="text-[11px] text-cm-text-muted">→ {format(new Date(s.current_period_end), "dd/MM/yy", { locale: fr })}</span>
         </div>
       ),
     },
     {
       key: "created_at", label: "Création", sortable: true, width: "90px",
       render: (s) => (
-        <span className="text-[12px] text-gray-500">{format(new Date(s.created_at), "dd/MM/yy", { locale: fr })}</span>
+        <span className="text-[12px] text-cm-text-muted">{format(new Date(s.created_at), "dd/MM/yy", { locale: fr })}</span>
       ),
     },
     {
@@ -278,23 +278,23 @@ export default function AdminSubscriptionsPage() {
         <div className="relative">
           <button
             onClick={(e) => { e.stopPropagation(); setOpenDropdown(openDropdown === s.id ? null : s.id) }}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 cursor-pointer"
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-cm-text-muted hover:text-cm-text-soft hover:bg-cm-surface cursor-pointer"
           >
             <MoreHorizontal className="w-4 h-4" />
           </button>
           {openDropdown === s.id && (
-            <div ref={dropdownRef} className="absolute right-0 top-full mt-1 z-50 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-1 overflow-hidden">
+            <div ref={dropdownRef} className="absolute right-0 top-full mt-1 z-50 w-48 bg-cm-elevated border border-cm-border rounded-xl shadow-lg py-1 overflow-hidden">
               <button
                 onClick={(e) => { e.stopPropagation(); setOpenDropdown(null) }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 cursor-pointer"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-cm-text-soft hover:bg-cm-surface cursor-pointer"
               >
-                <Eye className="w-3.5 h-3.5 text-gray-400" /> Voir détails
+                <Eye className="w-3.5 h-3.5 text-cm-text-muted" /> Voir détails
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); setOpenDropdown(null); setChangePlanModal(s); setSelectedPlanId(s.plan_id ?? "") }}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-gray-700 hover:bg-gray-50 cursor-pointer"
+                className="w-full flex items-center gap-2 px-4 py-2.5 text-[13px] text-cm-text-soft hover:bg-cm-surface cursor-pointer"
               >
-                <ArrowLeftRight className="w-3.5 h-3.5 text-gray-400" /> Changer plan
+                <ArrowLeftRight className="w-3.5 h-3.5 text-cm-text-muted" /> Changer plan
               </button>
               <button
                 onClick={(e) => { e.stopPropagation(); setOpenDropdown(null); setConfirmSuspend(s) }}
@@ -319,8 +319,8 @@ export default function AdminSubscriptionsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Abonnements</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">Gérer les abonnements des utilisateurs</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Abonnements</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">Gérer les abonnements des utilisateurs</p>
         </div>
       </div>
 
@@ -342,7 +342,7 @@ export default function AdminSubscriptionsPage() {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {STATUS_OPTIONS.map((f) => (
           <button key={f.key} onClick={() => setStatusFilter(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${statusFilter === f.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${statusFilter === f.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
             {f.label}
             {f.key !== "all" && <span className="ml-1.5 text-[11px] opacity-60">({subscriptions.filter((s) => s.status === f.key).length})</span>}
           </button>
@@ -352,7 +352,7 @@ export default function AdminSubscriptionsPage() {
       <div className="flex items-center gap-2">
         {PLAN_TYPE_OPTIONS.map((f) => (
           <button key={f.key} onClick={() => setPlanTypeFilter(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${planTypeFilter === f.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${planTypeFilter === f.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
             {f.label}
           </button>
         ))}
@@ -370,27 +370,27 @@ export default function AdminSubscriptionsPage() {
 
       <Modal isOpen={!!changePlanModal} onClose={() => setChangePlanModal(null)} title="Changer de plan" size="sm">
         <div className="space-y-4">
-          <p className="text-[13px] text-gray-500">
+          <p className="text-[13px] text-cm-text-muted">
             {changePlanModal && `Nouveau plan pour ${USER_NAMES[changePlanModal.user_id] ?? changePlanModal.user_id}`}
           </p>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {MOCK_PLANS.filter((p) => p.active).map((plan) => (
-              <label key={plan.id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${selectedPlanId === plan.id ? "border-gray-900 bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}>
-                <input type="radio" name="plan" checked={selectedPlanId === plan.id} onChange={() => setSelectedPlanId(plan.id)} className="w-4 h-4 accent-gray-900" />
+              <label key={plan.id} className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-colors ${selectedPlanId === plan.id ? "border-cm-text bg-cm-surface" : "border-cm-border hover:border-cm-border"}`}>
+                <input type="radio" name="plan" checked={selectedPlanId === plan.id} onChange={() => setSelectedPlanId(plan.id)} className="w-4 h-4 accent-cm-text" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13px] font-medium text-gray-900">{plan.name}</span>
+                    <span className="text-[13px] font-medium text-cm-text">{plan.name}</span>
                     {plan.badge && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">{plan.badge}</span>}
                   </div>
-                  <p className="text-[11px] text-gray-400">{plan.type === "CLIENT" ? "Client" : "Pro"}</p>
+                  <p className="text-[11px] text-cm-text-muted">{plan.type === "CLIENT" ? "Client" : "Pro"}</p>
                 </div>
-                <span className="text-[13px] font-medium text-gray-900">{plan.price_monthly === 0 ? "Gratuit" : formatXOF(plan.price_monthly)}</span>
+                <span className="text-[13px] font-medium text-cm-text">{plan.price_monthly === 0 ? "Gratuit" : formatXOF(plan.price_monthly)}</span>
               </label>
             ))}
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
-            <button onClick={() => setChangePlanModal(null)} className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">Annuler</button>
-            <button onClick={handleChangePlan} disabled={!selectedPlanId} className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 cursor-pointer disabled:opacity-50 flex items-center gap-1.5">
+            <button onClick={() => setChangePlanModal(null)} className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer">Annuler</button>
+            <button onClick={handleChangePlan} disabled={!selectedPlanId} className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 cursor-pointer disabled:opacity-50 flex items-center gap-1.5">
               <Check className="w-3.5 h-3.5" /> Confirmer
             </button>
           </div>

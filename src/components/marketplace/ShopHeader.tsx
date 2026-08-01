@@ -32,21 +32,21 @@ export default function ShopHeader({ seller, productCount }: ShopHeaderProps) {
             {logo ? (
               <img src={logo} alt={name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                <Store className="w-8 h-8 text-gray-400" />
+              <div className="w-full h-full flex items-center justify-center bg-cm-surface">
+                <Store className="w-8 h-8 text-cm-text-muted" />
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0 pb-1">
-            <h1 className="text-lg font-bold text-[#1A1A1A] truncate">{name}</h1>
+            <h1 className="text-lg font-bold text-cm-text truncate">{name}</h1>
             <div className="flex items-center gap-2 mt-0.5 flex-wrap">
               <div className="flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 fill-[#F59E0B] text-[#F59E0B]" />
-                <span className="text-sm font-semibold text-[#1A1A1A]">{formatSellerRating(rating)}</span>
-                <span className="text-xs text-[#6B7280]">({seller.reviewCount} avis)</span>
+                <span className="text-sm font-semibold text-cm-text">{formatSellerRating(rating)}</span>
+                <span className="text-xs text-cm-text-muted">({seller.reviewCount} avis)</span>
               </div>
               {verified && (
-                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-[#AECB2A] text-[#1A1A1A]">
+                <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-[#AECB2A] text-cm-text">
                   Vérifié
                 </span>
               )}
@@ -60,15 +60,15 @@ export default function ShopHeader({ seller, productCount }: ShopHeaderProps) {
         </div>
 
         <div className="flex items-center gap-4 mt-3">
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-cm-text-muted">
             <MapPin className="w-3.5 h-3.5" />
             {city}
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-cm-text-muted">
             <Package className="w-3.5 h-3.5" />
             {productCount} produits
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-[#6B7280]">
+          <div className="flex items-center gap-1.5 text-xs text-cm-text-muted">
             <Store className="w-3.5 h-3.5" />
             {seller.totalSales} ventes
           </div>

@@ -7,8 +7,8 @@ const PLANS = [
     price: 0,
     period: "/mois",
     features: ["3 missions max/mois", "Commission 15%", "Support standard", "Profil basique"],
-    color: "bg-gray-100",
-    textColor: "text-gray-600",
+    color: "bg-cm-surface",
+    textColor: "text-cm-text-soft",
     icon: Star,
   },
   {

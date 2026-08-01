@@ -22,7 +22,7 @@ const TX_TYPE_COLORS: Record<string, string> = {
   spend: "text-red-600 bg-red-50",
   refund: "text-blue-600 bg-blue-50",
   bonus: "text-purple-600 bg-purple-50",
-  expired: "text-gray-500 bg-gray-100",
+  expired: "text-cm-text-muted bg-cm-surface",
 };
 
 export default function ProCreditsPage() {

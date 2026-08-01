@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
 import MissionTrackerScreen from "../../components/MissionTrackerScreen";
 import ProControlPanel from "../../components/ProControlPanel";
-import InvoiceScreen from "../../components/InvoiceScreen";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useRequestStore } from "../../stores/requestStore";
 import { useProStore } from "../../stores/proStore";
 import { useChatStore } from "../../stores/chatStore";
@@ -10,41 +10,11 @@ import { useAuthStore } from "../../stores/authStore";
 import { findConversation, createConversation } from "../../services/chatService";
 import { useNotifications } from "../../hooks/useNotifications";
 import { MOCK_PRO_JOBS, MOCK_PRO_ALERTS } from "../../services/mockData";
-import type { MissionStatus, Invoice, ProJobStatus } from "../../types";
-
-const MOCK_INVOICE: Invoice = {
-  id: "INV-2026-001",
-  missionId: "m1",
-  clientId: "client_marie",
-  proId: "pro3",
-  clientName: "Marie Kouadio",
-  proName: "Mamadou K.",
-  category: "ac",
-  address: "Cocody Riviera 3, Abidjan",
-  reason: "Diagnostic et recharge fréon du split climatisation ne soufflant que de l'air chaud.",
-  laborCostXOF: 15000,
-  materialsCostXOF: 12000,
-  travelCostXOF: 5000,
-  totalXOF: 35000,
-  commissionPercent: 15,
-  commissionXOF: 5250,
-  proAmountXOF: 29750,
-  beforePhotos: [
-    "https://images.unsplash.com/photo-1585774923346-0ac6d18c29b0?w=400&h=300&fit=crop",
-  ],
-  afterPhotos: [
-    "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=400&h=300&fit=crop",
-  ],
-  clientRating: 9,
-  clientComment: "Très professionnel, intervention rapide et propre. Je recommande !",
-  createdAt: "2026-06-17T12:00:00Z",
-  paidAt: "2026-06-17T12:30:00Z",
-};
+import type { MissionStatus } from "../../types";
 
 export default function MissionTrackerPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const goBack = () => navigate(-1);
+  const { goBack, navigate, startFlow } = useAppNavigation();
   const isPro = useAuthStore((s) => s.isPro);
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === id));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
@@ -52,7 +22,6 @@ export default function MissionTrackerPage() {
   const setProJobs = useProStore((s) => s.setJobs);
   const updateProJobStatus = useProStore((s) => s.updateJobStatus);
   const conversations = useChatStore((s) => s.conversations);
-  const [showInvoice, setShowInvoice] = useState(false);
 
   const { sendLocalNotification } = useNotifications();
 
@@ -95,45 +64,45 @@ export default function MissionTrackerPage() {
     );
   }
 
+  const openFlow = (path: string) => {
+    startFlow("mission", mission);
+    navigate(path);
+  };
+
   return (
-    <>
-      {showInvoice ? (
-        <InvoiceScreen mission={mission} invoice={MOCK_INVOICE} onBack={() => setShowInvoice(false)} />
-      ) : (
-        <MissionTrackerScreen
-          mission={mission}
-          onBack={goBack}
-          onOpenChat={async () => {
-            if (!mission) return;
-            const conv = conversations.find((c) => c.missionId === mission.id);
-            if (conv) {
-              navigate(`/messages/${conv.id}`);
-              return;
+    <MissionTrackerScreen
+      mission={mission}
+      onBack={goBack}
+      onOpenChat={async () => {
+        if (!mission) return;
+        const conv = conversations.find((c) => c.missionId === mission.id);
+        if (conv) {
+          navigate(`/messages/${conv.id}`);
+          return;
+        }
+        const userId = useAuthStore.getState().userId;
+        if (userId && mission.proId) {
+          const existing = await findConversation(userId, mission.proId, mission.id);
+          if (existing) {
+            navigate(`/messages/${existing}`);
+          } else {
+            const created = await createConversation({
+              participant1: userId,
+              participant2: mission.proId,
+              jobId: mission.id,
+            });
+            if (created) {
+              navigate(`/messages/${created}`);
             }
-            const userId = useAuthStore.getState().userId;
-            if (userId && mission.proId) {
-              const existing = await findConversation(userId, mission.proId, mission.id);
-              if (existing) {
-                navigate(`/messages/${existing}`);
-              } else {
-                const created = await createConversation({
-                  participant1: userId,
-                  participant2: mission.proId,
-                  jobId: mission.id,
-                });
-                if (created) {
-                  navigate(`/messages/${created}`);
-                }
-              }
-            }
-          }}
-          onOpenInvoice={() => setShowInvoice(true)}
-          onUpdateStatus={(status: MissionStatus) => updateMissionStatus(mission.id, status)}
-          onReview={(m) => navigate("/orders/review", { state: { mission: m } })}
-          onDispute={(id) => navigate(`/orders/dispute/${id}`)}
-          onCancel={(id) => navigate(`/orders/cancel/${id}`)}
-        />
-      )}
-    </>
+          }
+        }
+      }}
+      onOpenInvoice={() => openFlow("/orders/invoice")}
+      onQRPayment={() => openFlow("/orders/qr-payment")}
+      onUpdateStatus={(status: MissionStatus) => updateMissionStatus(mission.id, status)}
+      onReview={(m) => openFlow("/orders/review")}
+      onDispute={(id) => navigate(`/orders/dispute/${id}`)}
+      onCancel={(id) => navigate(`/orders/cancel/${id}`)}
+    />
   );
 }

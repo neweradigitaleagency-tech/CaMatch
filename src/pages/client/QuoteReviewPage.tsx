@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ArrowLeft, Check, X, MessageSquare, Clock, FileText } from "lucide-react";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useQuoteStore } from "../../stores/quoteStore";
 import { useRequestStore } from "../../stores/requestStore";
 import { QUOTE_STATUS_LABELS } from "../../types";
 import type { QuoteVersion, Mission } from "../../types";
 
 export default function QuoteReviewPage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, navigate } = useAppNavigation();
   const { requestId } = useParams<{ requestId: string }>();
   const quote = useQuoteStore((s) => requestId ? s.quotes[requestId] : undefined);
   const acceptQuote = useQuoteStore((s) => s.acceptQuote);
@@ -50,7 +50,7 @@ export default function QuoteReviewPage() {
       createdAt: new Date().toISOString(),
     };
     addMission(mission);
-    nav(`/orders/payment/${mission.id}`);
+    navigate(`/orders/payment/${mission.id}`);
   };
 
   const handleRefuse = () => {

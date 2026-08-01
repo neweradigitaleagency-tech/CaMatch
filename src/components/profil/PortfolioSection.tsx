@@ -32,7 +32,7 @@ export default function PortfolioSection({
     <ProfileSection title="Portfolio" subtitle={isOwnerEdit ? `${portfolio.length} photo${portfolio.length > 1 ? "s" : ""}` : undefined}>
       <div className="grid grid-cols-3 gap-1.5">
         {portfolio.map((item) => (
-          <div key={item.id} className="relative aspect-square rounded-[12px] overflow-hidden bg-gray-100 group">
+          <div key={item.id} className="relative aspect-square rounded-[12px] overflow-hidden bg-cm-surface group">
             <img src={item.imageUrl} alt={item.caption || "Photo"} className="w-full h-full object-cover" />
             {isOwnerEdit && (
               <button onClick={() => onDeletePortfolio?.(item.id)}
@@ -49,7 +49,7 @@ export default function PortfolioSection({
         ))}
         {isOwnerEdit && (
           <button onClick={() => fileRef.current?.click()}
-            className="aspect-square rounded-[12px] border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-1 text-gray-300 hover:text-gray-500 hover:border-gray-300 transition-all cursor-pointer active:scale-[0.97]">
+            className="aspect-square rounded-[12px] border-2 border-dashed border-cm-border-soft flex flex-col items-center justify-center gap-1 text-cm-border-soft hover:text-cm-text-muted hover:border-cm-border transition-all cursor-pointer active:scale-[0.97]">
             <Camera className="w-5 h-5" />
             <span className="text-[7px] font-black uppercase tracking-wider">Ajouter</span>
           </button>
@@ -63,11 +63,11 @@ export default function PortfolioSection({
             <img src={previewUrl} alt="Aperçu" className="w-full aspect-square object-cover" />
             <div className="p-4 flex gap-2">
               <button onClick={() => { setShowAdd(false); setPreviewUrl(""); }}
-                className="flex-1 h-11 rounded-[12px] border border-gray-200 text-gray-500 text-[11px] font-black cursor-pointer active:scale-[0.98]">
+                className="flex-1 h-11 rounded-[12px] border border-cm-border-soft text-cm-text-muted text-[11px] font-black cursor-pointer active:scale-[0.98]">
                 Annuler
               </button>
               <button onClick={confirmAdd}
-                className="flex-1 h-11 rounded-[12px] bg-gray-900 text-white text-[11px] font-black cursor-pointer active:scale-[0.98] hover:bg-gray-800">
+                className="flex-1 h-11 rounded-[12px] bg-cm-text text-white text-[11px] font-black cursor-pointer active:scale-[0.98] hover:bg-cm-text/90">
                 Ajouter
               </button>
             </div>

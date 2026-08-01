@@ -1,5 +1,5 @@
 import { MapPin, Package, Star, Store, Share2, MessageCircle, ArrowLeft } from "lucide-react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import type { Seller } from "../../types/marketplace"
 
 interface ShopHeroProps {
@@ -8,8 +8,7 @@ interface ShopHeroProps {
 }
 
 export default function ShopHero({ seller, productCount }: ShopHeroProps) {
-  const nav = useNavigate()
-  const location = useLocation()
+  const { navigate: nav, goBack } = useAppNavigation()
   const isPro = seller.type === "professional" || seller.type === "ca_match_pro"
   const name = isPro && "companyName" in seller ? seller.companyName
     : "displayName" in seller ? seller.displayName
@@ -43,7 +42,7 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
         <button
-          onClick={() => nav(location.state?.from || "/marketplace", { replace: true })}
+          onClick={() => goBack()}
           className="absolute top-3 left-3 w-9 h-9 rounded-full bg-white/20 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
         >
           <ArrowLeft className="w-4 h-4 text-white" />
@@ -62,8 +61,8 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
               {logo ? (
                 <img src={logo} alt={name} className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                  <Store className="w-8 h-8 text-gray-400" />
+                <div className="w-full h-full flex items-center justify-center bg-cm-surface">
+                  <Store className="w-8 h-8 text-cm-text-muted" />
                 </div>
               )}
             </div>
@@ -76,7 +75,7 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
                   <span className="text-xs text-white/70">({seller.reviewCount} avis)</span>
                 </div>
                 {verified && (
-                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#AECB2A] text-[#1A1A1A]">
+                  <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#AECB2A] text-cm-text">
                     Vérifié
                   </span>
                 )}
@@ -105,7 +104,7 @@ export default function ShopHero({ seller, productCount }: ShopHeroProps) {
         <div className="flex items-center gap-2 mt-2.5">
           <button
             onClick={() => {
-              nav(`/messages/new?seller=${seller.id}`, { state: { from: location.pathname } })
+              nav(`/messages/new?seller=${seller.id}`)
             }}
             className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-cm-text text-white text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform"
           >

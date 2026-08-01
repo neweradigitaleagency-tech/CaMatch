@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
-import { useParams, useNavigate, useSearchParams, useLocation } from "react-router-dom"
+import { useParams, useSearchParams, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { Search, Package, MapPin, SlidersHorizontal, X, ChevronDown, Store, ShoppingCart } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
 import { MARKETPLACE_PRODUCTS } from "../../data/marketplaceProducts"
 import { getCategoryById } from "../../data/marketplaceCategories"
@@ -54,7 +55,7 @@ function getSuggestions(filtered: Product[], allProducts: Product[]): Product[] 
 
 export default function BrowseProducts() {
   const { categoryId } = useParams<{ categoryId: string }>()
-  const nav = useNavigate()
+  const { navigate: nav } = useAppNavigation()
   const location = useLocation()
   const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
   const [searchParams, setSearchParams] = useSearchParams()
@@ -163,7 +164,7 @@ export default function BrowseProducts() {
                 <span className="w-4 h-4 rounded-full bg-cm-accent text-cm-forest text-[8px] font-bold flex items-center justify-center">{activeFilterCount}</span>
               )}
             </button>
-            <button onClick={() => nav("/marketplace/cart", { state: { from: location.pathname + location.search } })}
+            <button onClick={() => nav("/marketplace/cart")}
               className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-cm-surface cursor-pointer active:scale-90 transition-transform shrink-0">
               <ShoppingCart className="w-4.5 h-4.5 text-cm-text" />
               {cartCount > 0 && (
@@ -250,7 +251,7 @@ export default function BrowseProducts() {
                 <p className="text-[13px] font-bold text-cm-text mb-3">Vous aimerez aussi</p>
                 <div className="grid grid-cols-2 gap-3">
                   {suggestions.map((product, i) => (
-                    <button key={product.id} onClick={() => nav(`/marketplace/item/${product.id}`, { state: { from: location.pathname + location.search } })}
+                    <button key={product.id} onClick={() => nav(`/marketplace/item/${product.id}`)}
                       className="text-left bg-cm-elevated rounded-xl overflow-hidden border border-cm-border cursor-pointer active:scale-[0.98] transition-transform hover:border-cm-border">
                       <div className="aspect-square bg-cm-surface">
                         {product.images[0] ? (
@@ -273,7 +274,7 @@ export default function BrowseProducts() {
           <>
             <div className="grid grid-cols-2 gap-3">
               {visibleProducts.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} onClick={() => nav(`/marketplace/item/${product.id}${location.search}`, { state: { from: location.pathname + location.search } })} />
+                <ProductCard key={product.id} product={product} index={i} onClick={() => nav(`/marketplace/item/${product.id}${location.search}`)} />
               ))}
             </div>
             {hasMore && (

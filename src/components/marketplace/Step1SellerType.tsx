@@ -21,8 +21,8 @@ export default function Step1SellerType() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h2 className="text-xl font-bold text-[#1A1A1A]">Quel type de vendeur êtes-vous ?</h2>
-        <p className="text-sm text-[#6B7280] mt-1">Nous adapterons votre expérience en fonction de votre profil</p>
+        <h2 className="text-xl font-bold text-cm-text">Quel type de vendeur êtes-vous ?</h2>
+        <p className="text-sm text-cm-text-muted mt-1">Nous adapterons votre expérience en fonction de votre profil</p>
       </div>
 
       <div className="flex flex-col gap-2.5">
@@ -34,20 +34,20 @@ export default function Step1SellerType() {
               onClick={() => setSellerType(t.value)}
               whileTap={{ scale: 0.98 }}
               className={`w-full flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
-                selected ? "border-[#243318] bg-[#243318]/5" : "border-gray-100 bg-white hover:border-gray-200"
+                selected ? "border-[#243318] bg-[#243318]/5" : "border-cm-border bg-cm-elevated hover:border-cm-border-soft"
               }`}
             >
               <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                selected ? "bg-[#243318] text-white" : "bg-gray-100 text-gray-600"
+                selected ? "bg-[#243318] text-white" : "bg-cm-surface text-cm-text-soft"
               }`}>
                 <span className="text-lg">{t.icon === "store" ? "🏪" : t.icon === "user" ? "👤" : "💼"}</span>
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm text-[#1A1A1A]">{t.label}</span>
+                  <span className="font-semibold text-sm text-cm-text">{t.label}</span>
                   {selected && <span className="text-[10px] font-bold text-[#243318]">✓</span>}
                 </div>
-                <p className="text-xs text-[#6B7280] mt-0.5">{t.desc}</p>
+                <p className="text-xs text-cm-text-muted mt-0.5">{t.desc}</p>
               </div>
             </motion.button>
           )
@@ -60,7 +60,7 @@ export default function Step1SellerType() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col gap-2.5"
         >
-          <h3 className="text-sm font-semibold text-[#1A1A1A]">Vous vendez dans quelle catégorie ?</h3>
+          <h3 className="text-sm font-semibold text-cm-text">Vous vendez dans quelle catégorie ?</h3>
           <div className="grid grid-cols-2 gap-2">
             {VERTICALS.map((v) => {
               const selected = draft.vertical === v.value
@@ -70,13 +70,13 @@ export default function Step1SellerType() {
                   onClick={() => setVertical(v.value)}
                   whileTap={{ scale: 0.97 }}
                   className={`p-3 rounded-xl border-2 text-left transition-all cursor-pointer ${
-                    selected ? "border-[#243318] bg-[#243318]/5" : "border-gray-100 bg-white hover:border-gray-200"
+                    selected ? "border-[#243318] bg-[#243318]/5" : "border-cm-border bg-cm-elevated hover:border-cm-border-soft"
                   }`}
                 >
-                  <span className={`text-xs font-semibold ${selected ? "text-[#243318]" : "text-[#1A1A1A]"}`}>
+                  <span className={`text-xs font-semibold ${selected ? "text-[#243318]" : "text-cm-text"}`}>
                     {v.label}
                   </span>
-                  <p className="text-[10px] text-[#6B7280] mt-0.5">{v.desc}</p>
+                  <p className="text-[10px] text-cm-text-muted mt-0.5">{v.desc}</p>
                 </motion.button>
               )
             })}

@@ -1,5 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ProfilProScreen from "../../components/ProfilProScreen";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { MOCK_PROS, MOCK_SERVICES, MOCK_PORTFOLIO, MOCK_VERIFICATION, getReviewsForPro, getBadgesForXp } from "../../services/mockData";
 import type { Service } from "../../types";
 
@@ -49,8 +50,7 @@ function getDefaultServices(proId: string, category: string): Service[] {
 }
 
 export default function ProProfilePage() {
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack } = useAppNavigation();
   const { id } = useParams<{ id: string }>();
 
   const pro = MOCK_PROS.find((p) => p.id === id) ?? MOCK_PROS[0]!;

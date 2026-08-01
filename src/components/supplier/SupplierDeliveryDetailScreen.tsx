@@ -39,10 +39,10 @@ export default function SupplierDeliveryDetailScreen() {
   if (!delivery) {
     return (
       <div className="max-w-2xl mx-auto text-center py-12">
-        <AlertCircle className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-        <p className="text-[14px] text-gray-500">Livraison introuvable</p>
+        <AlertCircle className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+        <p className="text-[14px] text-cm-text-muted">Livraison introuvable</p>
         <button onClick={() => navigate("/supplier/deliveries")}
-          className="mt-4 h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-xl cursor-pointer">
+          className="mt-4 h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-xl cursor-pointer">
           Retour aux livraisons
         </button>
       </div>
@@ -53,70 +53,70 @@ export default function SupplierDeliveryDetailScreen() {
     <div className="max-w-2xl mx-auto space-y-4">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate("/supplier/deliveries")}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-[18px] font-bold text-gray-900">{delivery.orderId}</h1>
+            <h1 className="text-[18px] font-bold text-cm-text">{delivery.orderId}</h1>
             <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
               delivery.status === "delivered" ? "bg-emerald-100 text-emerald-700" :
               delivery.status === "in_transit" ? "bg-amber-100 text-amber-700" :
               delivery.status === "failed" ? "bg-red-100 text-red-700" :
-              "bg-gray-100 text-gray-700"
+              "bg-cm-surface text-cm-text-soft"
             }`}>
               {STATUS_LABELS[delivery.status]}
             </span>
           </div>
-          <p className="text-[12px] text-gray-500 mt-0.5">Livraison · {delivery.city}</p>
+          <p className="text-[12px] text-cm-text-muted mt-0.5">Livraison · {delivery.city}</p>
         </div>
       </div>
 
       {/* Address card */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
-        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Adresse de livraison</p>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-2">
+        <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Adresse de livraison</p>
         <div className="flex items-start gap-2">
-          <MapPin className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+          <MapPin className="w-4 h-4 text-cm-text-muted mt-0.5 shrink-0" />
           <div>
-            <p className="text-[14px] font-semibold text-gray-900">{delivery.address}</p>
-            <p className="text-[12px] text-gray-500">{delivery.city}</p>
+            <p className="text-[14px] font-semibold text-cm-text">{delivery.address}</p>
+            <p className="text-[12px] text-cm-text-muted">{delivery.city}</p>
           </div>
         </div>
       </div>
 
       {/* Driver info */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Transporteur</p>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Transporteur</p>
         {delivery.driverName ? (
           <>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <User className="w-5 h-5 text-gray-500" />
+              <div className="w-10 h-10 rounded-full bg-cm-surface flex items-center justify-center">
+                <User className="w-5 h-5 text-cm-text-muted" />
               </div>
               <div>
-                <p className="text-[14px] font-semibold text-gray-900">{delivery.driverName}</p>
+                <p className="text-[14px] font-semibold text-cm-text">{delivery.driverName}</p>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="flex items-center gap-1 text-[12px] text-gray-500">
+                  <span className="flex items-center gap-1 text-[12px] text-cm-text-muted">
                     <Phone className="w-3 h-3" /> {delivery.driverPhone}
                   </span>
                 </div>
               </div>
             </div>
             {delivery.vehicleInfo && (
-              <div className="flex items-center gap-2 text-[12px] text-gray-600 bg-gray-50 rounded-lg px-3 py-2">
-                <Truck className="w-3.5 h-3.5 text-gray-400" />
+              <div className="flex items-center gap-2 text-[12px] text-cm-text-soft bg-cm-surface rounded-lg px-3 py-2">
+                <Truck className="w-3.5 h-3.5 text-cm-text-muted" />
                 {delivery.vehicleInfo}
               </div>
             )}
           </>
         ) : (
-          <p className="text-[13px] text-gray-400">Non assigné</p>
+          <p className="text-[13px] text-cm-text-muted">Non assigné</p>
         )}
       </div>
 
       {/* Timeline */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider">Suivi</p>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 space-y-3">
+        <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider">Suivi</p>
         <div className="space-y-0">
           {delivery.trackingSteps.map((step, index) => {
             const isComplete = step.status === "delivered"
@@ -129,28 +129,28 @@ export default function SupplierDeliveryDetailScreen() {
                   <div className={`w-7 h-7 rounded-full flex items-center justify-center ${
                     isComplete ? "bg-emerald-100" :
                     isActive ? "bg-amber-100" :
-                    "bg-gray-100"
+                    "bg-cm-surface"
                   }`}>
                     {isComplete ? (
                       <CheckCircle className="w-4 h-4 text-emerald-600" />
                     ) : isActive ? (
                       <Clock className="w-3.5 h-3.5 text-amber-600" />
                     ) : (
-                      <Circle className="w-3 h-3 text-gray-400" />
+                      <Circle className="w-3 h-3 text-cm-text-muted" />
                     )}
                   </div>
-                  {!isLast && <div className="w-px flex-1 bg-gray-200 my-1" />}
+                  {!isLast && <div className="w-px flex-1 bg-cm-border-soft my-1" />}
                 </div>
                 <div className={`pb-4 ${isLast ? "pb-0" : ""}`}>
                   <p className={`text-[13px] font-medium ${
                     isComplete ? "text-emerald-700" :
                     isActive ? "text-amber-700" :
-                    "text-gray-500"
+                    "text-cm-text-muted"
                   }`}>
                     {step.label}
                   </p>
-                  <p className="text-[12px] text-gray-500 mt-0.5">{step.description}</p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">{formatDate(step.timestamp)}</p>
+                  <p className="text-[12px] text-cm-text-muted mt-0.5">{step.description}</p>
+                  <p className="text-[10px] text-cm-text-muted mt-0.5">{formatDate(step.timestamp)}</p>
                 </div>
               </div>
             )
@@ -159,30 +159,30 @@ export default function SupplierDeliveryDetailScreen() {
       </div>
 
       {/* Times */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-3">Horaires</p>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+        <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider mb-3">Horaires</p>
         <div className="grid grid-cols-2 gap-3 text-[12px]">
           {delivery.estimatedPickupAt && (
             <>
-              <span className="text-gray-500">Enlèvement prévu</span>
-              <span className="text-gray-900 font-medium text-right">{formatDate(delivery.estimatedPickupAt)}</span>
+              <span className="text-cm-text-muted">Enlèvement prévu</span>
+              <span className="text-cm-text font-medium text-right">{formatDate(delivery.estimatedPickupAt)}</span>
             </>
           )}
           {delivery.pickedUpAt && (
             <>
-              <span className="text-gray-500">Enlèvement effectué</span>
-              <span className="text-gray-900 font-medium text-right">{formatDate(delivery.pickedUpAt)}</span>
+              <span className="text-cm-text-muted">Enlèvement effectué</span>
+              <span className="text-cm-text font-medium text-right">{formatDate(delivery.pickedUpAt)}</span>
             </>
           )}
           {delivery.estimatedDeliveryAt && (
             <>
-              <span className="text-gray-500">Livraison prévue</span>
-              <span className="text-gray-900 font-medium text-right">{formatDate(delivery.estimatedDeliveryAt)}</span>
+              <span className="text-cm-text-muted">Livraison prévue</span>
+              <span className="text-cm-text font-medium text-right">{formatDate(delivery.estimatedDeliveryAt)}</span>
             </>
           )}
           {delivery.deliveredAt && (
             <>
-              <span className="text-gray-500">Livrée le</span>
+              <span className="text-cm-text-muted">Livrée le</span>
               <span className="text-emerald-600 font-medium text-right">{formatDate(delivery.deliveredAt)}</span>
             </>
           )}
@@ -197,10 +197,10 @@ export default function SupplierDeliveryDetailScreen() {
       {/* Linked order info */}
       {order && (
         <button onClick={() => navigate(`/supplier/orders/${order.id}`)}
-          className="w-full bg-white rounded-xl border border-gray-200 p-4 hover:border-gray-300 cursor-pointer transition-colors text-left">
-          <p className="text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-2">Commande associée</p>
-          <p className="text-[14px] font-semibold text-gray-900">{order.id}</p>
-          <p className="text-[12px] text-gray-500">{order.items?.length ?? 0} article{((order.items?.length ?? 0) > 1) ? "s" : ""} · {order.clientName}</p>
+          className="w-full bg-cm-elevated rounded-xl border border-cm-border p-4 hover:border-cm-border cursor-pointer transition-colors text-left">
+          <p className="text-[11px] font-medium text-cm-text-muted uppercase tracking-wider mb-2">Commande associée</p>
+          <p className="text-[14px] font-semibold text-cm-text">{order.id}</p>
+          <p className="text-[12px] text-cm-text-muted">{order.items?.length ?? 0} article{((order.items?.length ?? 0) > 1) ? "s" : ""} · {order.clientName}</p>
         </button>
       )}
     </div>

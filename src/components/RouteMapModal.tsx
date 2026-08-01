@@ -113,25 +113,25 @@ export default function RouteMapModal({
           >
             <div className="flex items-center justify-between px-4 pt-4 pb-2">
               <div>
-                <h2 className="text-[16px] font-bold text-gray-900">Itinéraire</h2>
-                {job && <p className="text-[11px] text-gray-500">{job.clientLocation}</p>}
+                <h2 className="text-[16px] font-bold text-cm-text">Itinéraire</h2>
+                {job && <p className="text-[11px] text-cm-text-muted">{job.clientLocation}</p>}
               </div>
               <button onClick={onClose}
-                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center cursor-pointer active:scale-90">
-                <X className="w-4 h-4 text-gray-700" />
+                className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center cursor-pointer active:scale-90">
+                <X className="w-4 h-4 text-cm-text-soft" />
               </button>
             </div>
 
             <div ref={mapRef} className="w-full h-64" />
 
             <div className="p-4 space-y-2.5">
-              <div className="flex items-center gap-3 text-[12px] text-gray-600">
-                <div className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center shrink-0">
+              <div className="flex items-center gap-3 text-[12px] text-cm-text-soft">
+                <div className="w-6 h-6 rounded-full bg-cm-text flex items-center justify-center shrink-0">
                   <MapPin className="w-3 h-3 text-white" />
                 </div>
                 <span>Vous · {PRO_COORDS.lat.toFixed(4)}, {PRO_COORDS.lng.toFixed(4)}</span>
               </div>
-              <div className="flex items-center gap-3 text-[12px] text-gray-600">
+              <div className="flex items-center gap-3 text-[12px] text-cm-text-soft">
                 <div className="w-6 h-6 rounded-full bg-[#AECB2A] flex items-center justify-center shrink-0">
                   <MapPin className="w-3 h-3 text-white" />
                 </div>
@@ -139,7 +139,7 @@ export default function RouteMapModal({
               </div>
 
               <button onClick={openGoogleMapsDirections}
-                className="w-full h-11 rounded-[12px] bg-gray-900 text-white text-[12px] font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-800 flex items-center justify-center gap-2 shadow-sm">
+                className="w-full h-11 rounded-[12px] bg-cm-text text-white text-[12px] font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-text/90 flex items-center justify-center gap-2 shadow-sm">
                 <Navigation className="w-4 h-4" /> Ouvrir dans Google Maps
               </button>
             </div>

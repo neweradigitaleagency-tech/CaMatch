@@ -31,7 +31,7 @@ const TYPE_STYLES: Record<string, string> = {
   info: "text-blue-700 bg-blue-50 border-blue-200",
   warning: "text-amber-700 bg-amber-50 border-amber-200",
   promotion: "text-purple-700 bg-purple-50 border-purple-200",
-  system: "text-gray-600 bg-gray-100 border-gray-200",
+  system: "text-cm-text-soft bg-cm-surface border-cm-border",
 }
 
 export default function AdminNotificationsPage() {
@@ -67,15 +67,15 @@ export default function AdminNotificationsPage() {
       render: (n) => (
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium border ${TYPE_STYLES[n.type] ?? "text-gray-500 bg-gray-100 border-gray-200"}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium border ${TYPE_STYLES[n.type] ?? "text-cm-text-muted bg-cm-surface border-cm-border"}`}>
               {NOTIF_TYPE_LABELS[n.type] ?? n.type}
             </span>
-            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${n.channel === "email" ? "text-blue-600 bg-blue-50 border-blue-200" : n.channel === "sms" ? "text-green-600 bg-green-50 border-green-200" : "text-gray-600 bg-gray-100 border-gray-200"}`}>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full border ${n.channel === "email" ? "text-blue-600 bg-blue-50 border-blue-200" : n.channel === "sms" ? "text-green-600 bg-green-50 border-green-200" : "text-cm-text-soft bg-cm-surface border-cm-border"}`}>
               {NOTIF_CHANNEL_LABELS[n.channel] ?? n.channel}
             </span>
           </div>
-          <p className="text-[13px] font-medium text-gray-900 truncate mt-1">{n.title}</p>
-          <p className="text-[11px] text-gray-400 truncate">{n.content}</p>
+          <p className="text-[13px] font-medium text-cm-text truncate mt-1">{n.title}</p>
+          <p className="text-[11px] text-cm-text-muted truncate">{n.content}</p>
         </div>
       ),
     },
@@ -83,8 +83,8 @@ export default function AdminNotificationsPage() {
       key: "target", label: "Cible", sortable: true, width: "100px",
       render: (n) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-700 capitalize">{n.target === "all" ? "Tous" : n.target === "clients" ? "Clients" : n.target === "professionals" ? "Pros" : "Spécifique"}</span>
-          {n.target_users && <span className="text-[11px] text-gray-400">{n.target_users} utilisateur{(n.target_users) > 1 ? "s" : ""}</span>}
+          <span className="text-[12px] text-cm-text-soft capitalize">{n.target === "all" ? "Tous" : n.target === "clients" ? "Clients" : n.target === "professionals" ? "Pros" : "Spécifique"}</span>
+          {n.target_users && <span className="text-[11px] text-cm-text-muted">{n.target_users} utilisateur{(n.target_users) > 1 ? "s" : ""}</span>}
         </div>
       ),
     },
@@ -92,7 +92,7 @@ export default function AdminNotificationsPage() {
       key: "delivery", label: "Délivrées", sortable: false, width: "100px",
       render: (n) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-700">{n.sent_count}</span>
+          <span className="text-[12px] text-cm-text-soft">{n.sent_count}</span>
           {n.failed_count > 0 && <span className="text-[11px] text-red-500">{n.failed_count} échec{n.failed_count > 1 ? "s" : ""}</span>}
         </div>
       ),
@@ -108,8 +108,8 @@ export default function AdminNotificationsPage() {
       key: "created_at", label: "Créée le", sortable: true, width: "110px",
       render: (n) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-500">{format(new Date(n.created_at), "d MMM HH:mm", { locale: fr })}</span>
-          {n.created_by && <span className="text-[11px] text-gray-400">{n.created_by}</span>}
+          <span className="text-[12px] text-cm-text-muted">{format(new Date(n.created_at), "d MMM HH:mm", { locale: fr })}</span>
+          {n.created_by && <span className="text-[11px] text-cm-text-muted">{n.created_by}</span>}
         </div>
       ),
     },
@@ -121,11 +121,11 @@ export default function AdminNotificationsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Notifications</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{total} notification{total !== 1 ? "s" : ""}</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Notifications</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{total} notification{total !== 1 ? "s" : ""}</p>
         </div>
         {canSend && (
-          <button onClick={() => navigate("/admin/notifications/create")} className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors cursor-pointer">
+          <button onClick={() => navigate("/admin/notifications/create")} className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors cursor-pointer">
             Nouvelle notification
           </button>
         )}
@@ -134,7 +134,7 @@ export default function AdminNotificationsPage() {
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {FILTERS.map((f) => (
           <button key={f.key} onClick={() => setFilter(f.key)}
-            className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${filter === f.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+            className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${filter === f.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
             {f.label}
             {f.key !== "all" && (
               <span className="ml-1.5 text-[11px] opacity-60">

@@ -100,13 +100,13 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
     : [];
 
   return (
-    <div className="flex flex-col w-full min-h-dynamic bg-gray-50 pb-32">
-      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-white border-b border-gray-100">
+    <div className="flex flex-col w-full min-h-dynamic bg-cm-surface pb-32">
+      <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-bg border-b border-cm-border/40">
         <button onClick={onBack}
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-white cursor-pointer active:scale-90 transition-all">
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          className="w-9 h-9 flex items-center justify-center rounded-xl border border-cm-border bg-cm-elevated cursor-pointer active:scale-90 transition-all">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
-        <h1 className="text-[15px] font-bold text-gray-900">Mes adresses</h1>
+        <h1 className="text-[15px] font-bold text-cm-text">Mes adresses</h1>
         <div className="w-9 h-9" />
       </header>
 
@@ -114,31 +114,31 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
         {!showAdd ? (
           <>
             {addresses.map((a) => (
-              <div key={a.id} className="bg-white border border-gray-200 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center shrink-0">
-                  <a.icon className="w-4 h-4 text-gray-900" />
+              <div key={a.id} className="bg-cm-elevated border border-cm-border rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-cm-surface flex items-center justify-center shrink-0">
+                  <a.icon className="w-4 h-4 text-cm-text" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-[13px] font-semibold text-gray-900">{a.label}</p>
+                    <p className="text-[13px] font-semibold text-cm-text">{a.label}</p>
                     {a.default && (
-                      <span className="text-[9px] font-medium bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded-full">Par défaut</span>
+                      <span className="text-[9px] font-medium bg-cm-surface text-cm-text-muted px-1.5 py-0.5 rounded-full">Par défaut</span>
                     )}
                   </div>
-                  <p className="text-[12px] text-gray-400 mt-0.5 truncate">{a.addr}</p>
+                  <p className="text-[12px] text-cm-text-muted mt-0.5 truncate">{a.addr}</p>
                 </div>
                 <div className="flex items-center gap-1">
                   {!a.default && (
                     <>
                       <button onClick={() => setDefault(a.id)}
-                        className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-colors"
+                        className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center cursor-pointer hover:bg-cm-border-soft transition-colors"
                         title="Définir par défaut">
-                        <Check className="w-3.5 h-3.5 text-gray-500" />
+                        <Check className="w-3.5 h-3.5 text-cm-text-muted" />
                       </button>
                       <button onClick={() => handleDelete(a.id)}
-                        className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center cursor-pointer hover:bg-red-50 transition-colors"
+                        className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center cursor-pointer hover:bg-red-50 transition-colors"
                         title="Supprimer">
-                        <Trash2 className="w-3.5 h-3.5 text-gray-500 hover:text-red-500" />
+                        <Trash2 className="w-3.5 h-3.5 text-cm-text-muted hover:text-red-500" />
                       </button>
                     </>
                   )}
@@ -147,38 +147,38 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
             ))}
 
             <button onClick={() => setShowAdd(true)}
-              className="w-full h-12 bg-gray-900 rounded-2xl text-[12px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-all active:scale-[0.97]">
+              className="w-full h-12 bg-cm-text rounded-2xl text-[12px] font-bold text-white flex items-center justify-center gap-2 cursor-pointer hover:opacity-90 transition-all active:scale-[0.97]">
               <Plus className="w-4 h-4" /> Ajouter une adresse
             </button>
           </>
         ) : (
           <div className="space-y-3">
             {/* Search bar */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-              <p className="text-[13px] font-semibold text-gray-900 mb-3">Où se trouve l'adresse ?</p>
+            <div className="bg-cm-elevated border border-cm-border rounded-2xl p-4 shadow-sm">
+              <p className="text-[13px] font-semibold text-cm-text mb-3">Où se trouve l'adresse ?</p>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
                 <input type="text" value={searchQuery} onChange={(e) => handleSearch(e.target.value)}
                   placeholder="Rechercher un quartier à Abidjan..."
-                  className="w-full h-11 pl-10 pr-4 text-[13px] bg-gray-50 border border-gray-200 rounded-xl text-gray-900 outline-none focus:border-gray-400 placeholder:text-gray-400" />
+                  className="w-full h-11 pl-10 pr-4 text-[13px] bg-cm-surface border border-cm-border rounded-xl text-cm-text outline-none focus:border-cm-text-muted placeholder:text-cm-text-muted" />
                 {searchQuery && (
                   <button onClick={() => { setSearchQuery(""); setResults([]); }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer">
-                    <X className="w-4 h-4 text-gray-400" />
+                    <X className="w-4 h-4 text-cm-text-muted" />
                   </button>
                 )}
               </div>
 
               {/* Autocomplete results */}
               {results.length > 0 && (
-                <div className="mt-2 border border-gray-200 rounded-xl overflow-hidden bg-white">
+                <div className="mt-2 border border-cm-border rounded-xl overflow-hidden bg-cm-elevated">
                   {results.map((d, i) => (
                     <button key={i} onClick={() => selectDistrict(d)}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 cursor-pointer text-left border-b border-gray-50 last:border-0">
-                      <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                      className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-cm-surface cursor-pointer text-left border-b border-cm-border/20 last:border-0">
+                      <MapPin className="w-3.5 h-3.5 text-cm-text-muted shrink-0" />
                       <div>
-                        <p className="text-[12px] font-medium text-gray-900">{d.name}</p>
-                        <p className="text-[10px] text-gray-400">{d.commune}</p>
+                        <p className="text-[12px] font-medium text-cm-text">{d.name}</p>
+                        <p className="text-[10px] text-cm-text-muted">{d.commune}</p>
                       </div>
                     </button>
                   ))}
@@ -187,13 +187,13 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
 
               {/* Ma position */}
               <button onClick={handleUseMap}
-                className="w-full flex items-center justify-center gap-2 mt-3 h-10 bg-gray-100 rounded-xl text-[11px] font-semibold text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                className="w-full flex items-center justify-center gap-2 mt-3 h-10 bg-cm-surface rounded-xl text-[11px] font-semibold text-cm-text-soft cursor-pointer hover:bg-cm-border-soft transition-colors">
                 <Navigation className="w-4 h-4" /> Utiliser ma position actuelle
               </button>
             </div>
 
             {/* Map */}
-            <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden shadow-sm">
               <div className="h-48">
                 <MapView
                   center={mapCenter}
@@ -204,8 +204,8 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
                 />
               </div>
               {selectedCoords && (
-                <div className="px-4 py-2 border-t border-gray-100">
-                  <p className="text-[10px] text-gray-400 font-mono">
+                <div className="px-4 py-2 border-t border-cm-border/40">
+                  <p className="text-[10px] text-cm-text-muted font-mono">
                     {selectedCoords.lat.toFixed(5)}, {selectedCoords.lng.toFixed(5)}
                   </p>
                 </div>
@@ -213,21 +213,21 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
             </div>
 
             {/* Label input */}
-            <div className="bg-white border border-gray-200 rounded-2xl p-4 shadow-sm">
-              <p className="text-[13px] font-semibold text-gray-900 mb-2">Donnez un nom à cette adresse</p>
+            <div className="bg-cm-elevated border border-cm-border rounded-2xl p-4 shadow-sm">
+              <p className="text-[13px] font-semibold text-cm-text mb-2">Donnez un nom à cette adresse</p>
               <input type="text" value={newLabel} onChange={(e) => setNewLabel(e.target.value)}
                 placeholder="Ex: Domicile, Bureau, Parents..."
-                className="w-full h-11 px-4 text-[13px] bg-gray-50 border border-gray-200 rounded-xl text-gray-900 outline-none focus:border-gray-400 placeholder:text-gray-400" />
+                className="w-full h-11 px-4 text-[13px] bg-cm-surface border border-cm-border rounded-xl text-cm-text outline-none focus:border-cm-text-muted placeholder:text-cm-text-muted" />
             </div>
 
             {/* Action buttons */}
             <div className="flex gap-2">
               <button onClick={() => setShowAdd(false)}
-                className="flex-1 h-12 border border-gray-200 rounded-2xl text-[12px] font-semibold text-gray-600 cursor-pointer hover:bg-gray-50 transition-colors active:scale-[0.97]">
+                className="flex-1 h-12 border border-cm-border rounded-2xl text-[12px] font-semibold text-cm-text-soft cursor-pointer hover:bg-cm-surface transition-colors active:scale-[0.97]">
                 Annuler
               </button>
               <button onClick={handleAddAddress} disabled={!newLabel || !selectedCoords}
-                className="flex-1 h-12 bg-gray-900 rounded-2xl text-[12px] font-bold text-white cursor-pointer disabled:opacity-40 hover:opacity-90 transition-all active:scale-[0.97]">
+                className="flex-1 h-12 bg-cm-text rounded-2xl text-[12px] font-bold text-white cursor-pointer disabled:opacity-40 hover:opacity-90 transition-all active:scale-[0.97]">
                 Enregistrer
               </button>
             </div>

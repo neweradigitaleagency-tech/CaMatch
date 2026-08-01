@@ -42,13 +42,13 @@ export default function HeroSection({ mode, editing, pro, onUpdate }: SectionBas
       <div className="absolute bottom-0 left-0 right-0 p-4 pb-5">
         <div className="flex items-end gap-3">
           <div className="relative shrink-0">
-            <div className="w-[64px] h-[64px] rounded-full overflow-hidden border-[3px] border-white shadow-lg bg-gray-200">
+            <div className="w-[64px] h-[64px] rounded-full overflow-hidden border-[3px] border-white shadow-lg bg-cm-border-soft">
               <img src={pro.avatarUrl} alt={pro.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
             {isOwnerEdit && (
               <>
                 <button onClick={() => avatarRef.current?.click()}
-                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-gray-900 flex items-center justify-center border-2 border-white cursor-pointer active:scale-90 hover:bg-gray-800">
+                  className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-cm-text flex items-center justify-center border-2 border-white cursor-pointer active:scale-90 hover:bg-cm-text/90">
                   <Camera className="w-3 h-3 text-white" />
                 </button>
                 <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={() => handleFile(avatarRef, "avatarUrl")} />

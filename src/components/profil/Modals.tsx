@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import type { OfferModalProps, ServiceModalProps } from "./types";
 
@@ -39,8 +39,8 @@ export function OfferModal({ open, mode, initial, onClose, onSave }: OfferModalP
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="bg-white rounded-t-[24px] sm:rounded-[24px] w-full max-w-sm p-6 pb-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-[16px] font-black text-gray-900">{mode === "edit" ? "Modifier l'offre" : "Nouvelle offre"}</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 cursor-pointer">
+          <h3 className="text-[16px] font-black text-cm-text">{mode === "edit" ? "Modifier l'offre" : "Nouvelle offre"}</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-cm-text-muted hover:bg-cm-surface cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -58,7 +58,7 @@ export function OfferModal({ open, mode, initial, onClose, onSave }: OfferModalP
           <InputField label="Prix original (optionnel)" value={originalPrice || 0} onChange={(v) => setOriginalPrice(Number(v) || undefined)} type="number" suffix="F" />
         </div>
         <button onClick={handleSave}
-          className="w-full h-12 rounded-[14px] bg-gray-900 text-white text-[12px] font-black uppercase tracking-wider mt-6 cursor-pointer active:scale-[0.98] hover:bg-gray-800">
+          className="w-full h-12 rounded-[14px] bg-cm-text text-white text-[12px] font-black uppercase tracking-wider mt-6 cursor-pointer active:scale-[0.98] hover:bg-cm-text/90">
           {mode === "edit" ? "Enregistrer" : "Ajouter l'offre"}
         </button>
       </div>
@@ -97,8 +97,8 @@ export function ServiceModal({ open, mode, initial, onClose, onSave }: ServiceMo
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center" onClick={onClose}>
       <div className="bg-white rounded-t-[24px] sm:rounded-[24px] w-full max-w-sm p-6 pb-8" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-[16px] font-black text-gray-900">{mode === "edit" ? "Modifier le service" : "Nouveau service"}</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 cursor-pointer">
+          <h3 className="text-[16px] font-black text-cm-text">{mode === "edit" ? "Modifier le service" : "Nouveau service"}</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center text-cm-text-muted hover:bg-cm-surface cursor-pointer">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -108,7 +108,7 @@ export function ServiceModal({ open, mode, initial, onClose, onSave }: ServiceMo
           <InputField label="Prix" value={priceEstimateXOF} onChange={(v) => setPriceEstimateXOF(Number(v))} type="number" suffix="F" />
         </div>
         <button onClick={handleSave}
-          className="w-full h-12 rounded-[14px] bg-gray-900 text-white text-[12px] font-black uppercase tracking-wider mt-6 cursor-pointer active:scale-[0.98] hover:bg-gray-800">
+          className="w-full h-12 rounded-[14px] bg-cm-text text-white text-[12px] font-black uppercase tracking-wider mt-6 cursor-pointer active:scale-[0.98] hover:bg-cm-text/90">
           {mode === "edit" ? "Enregistrer" : "Ajouter le service"}
         </button>
       </div>
@@ -122,12 +122,12 @@ function InputField({ label, value, onChange, type = "text", suffix, placeholder
 }) {
   return (
     <div>
-      <label className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1.5 block">{label}</label>
+      <label className="text-[9px] font-black text-cm-text-muted uppercase tracking-wider mb-1.5 block">{label}</label>
       <div className="relative">
         <input type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-          className="w-full h-11 rounded-[12px] border border-gray-200 bg-white px-3 text-[13px] outline-none focus:ring-1 focus:ring-gray-300 transition-all" />
+          className="w-full h-11 rounded-[12px] border border-cm-border bg-white px-3 text-[13px] outline-none focus:ring-1 focus:ring-gray-300 transition-all" />
         {suffix && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-gray-400">{suffix}</span>
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-cm-text-muted">{suffix}</span>
         )}
       </div>
     </div>
@@ -139,9 +139,9 @@ function TextField({ label, value, onChange, placeholder }: {
 }) {
   return (
     <div>
-      <label className="text-[9px] font-black text-gray-500 uppercase tracking-wider mb-1.5 block">{label}</label>
+      <label className="text-[9px] font-black text-cm-text-muted uppercase tracking-wider mb-1.5 block">{label}</label>
       <textarea value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} rows={3}
-        className="w-full rounded-[12px] border border-gray-200 bg-white px-3 py-2.5 text-[13px] resize-none outline-none focus:ring-1 focus:ring-gray-300 transition-all" />
+        className="w-full rounded-[12px] border border-cm-border bg-white px-3 py-2.5 text-[13px] resize-none outline-none focus:ring-1 focus:ring-gray-300 transition-all" />
     </div>
   );
 }

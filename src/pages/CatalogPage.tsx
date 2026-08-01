@@ -1,13 +1,14 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom"
-import { Search, Filter, Store, Package, SlidersHorizontal, X, ChevronDown, MapPin, ShoppingCart, Sparkles, Award, Plus, ArrowRight, TrendingUp, LayoutGrid } from "lucide-react"
+import { useSearchParams } from "react-router-dom"
+import { Search, Filter, Store, Package, SlidersHorizontal, X, ChevronDown, MapPin, ShoppingCart, Sparkles, Award, Plus, ArrowRight, TrendingUp, LayoutGrid, KeyRound } from "lucide-react"
 import { motion } from "motion/react"
+import { useAppNavigation } from "../navigation/useAppNavigation"
 import PageHeader from "../components/ui/PageHeader"
 import { useMarketplaceCartStore } from "../stores/marketplaceCartStore"
 import type { MarketplaceVertical, Product } from "../types/marketplace"
 import { PROFESSIONAL_SELLERS } from "../data/marketplaceSuppliers"
 import { MARKETPLACE_PRODUCTS, searchProducts } from "../data/marketplaceProducts"
-import { MARKETPLACE_CATEGORIES } from "../data/marketplaceCategories"
+import { MARKETPLACE_CATEGORIES, getSubcategoryById } from "../data/marketplaceCategories"
 import CatalogSupplierCard from "../components/marketplace/CatalogSupplierCard"
 import CatalogProductCard from "../components/marketplace/CatalogProductCard"
 import BottomSheet from "../components/BottomSheet"
@@ -15,6 +16,22 @@ import { logSearch } from "../services/searchAnalytics"
 import { useTrendingSearches } from "../hooks/useTrendingSearches"
 
 const ITEMS_PER_PAGE = 10
+
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/\s+/g, "-")
+}
+
+function filterBySubcategory(products: Product[], subId: string): Product[] {
+  const resolved = getSubcategoryById(subId)
+  if (!resolved) return products
+  const subSlug = slugify(resolved.sub.name)
+  const exact = products.filter((p) => {
+    const cat = slugify(p.category)
+    const sub = slugify(p.subcategory)
+    return cat === subSlug || sub === subSlug || sub.startsWith(subSlug + "-")
+  })
+  return exact.length > 0 ? exact : products
+}
 
 function getSuggestions(filtered: Product[], pool: Product[]): Product[] {
   if (filtered.length > 0) return []
@@ -75,27 +92,29 @@ function parseSearchParams(sp: URLSearchParams) {
     max: sp.get("max") || "",
     cond: sp.get("cond") || "",
     loc: sp.get("loc") || "",
+    sub: sp.get("sub") || "",
+    rental: sp.get("rental") === "1",
   }
 }
 
 function SupplierCardSkeleton() {
   return (
     <div className="bg-cm-elevated border border-cm-border rounded-xl overflow-hidden animate-pulse">
-      <div className="h-14 bg-gray-200/50" />
+      <div className="h-14 bg-cm-border-soft/50" />
       <div className="px-4 -mt-7 pb-3">
         <div className="flex items-end gap-3 mb-3">
-          <div className="w-12 h-12 rounded-xl bg-gray-200/50 border-2 border-white" />
+          <div className="w-12 h-12 rounded-xl bg-cm-border-soft/50 border-2 border-white" />
           <div className="flex-1 pb-0.5 space-y-2">
-            <div className="h-4 bg-gray-200/50 rounded w-3/4" />
-            <div className="h-3 bg-gray-200/50 rounded w-1/2" />
+            <div className="h-4 bg-cm-border-soft/50 rounded w-3/4" />
+            <div className="h-3 bg-cm-border-soft/50 rounded w-1/2" />
           </div>
         </div>
         <div className="flex gap-1.5 mb-3">
-          <div className="h-5 bg-gray-200/50 rounded-full w-16" />
-          <div className="h-5 bg-gray-200/50 rounded-full w-20" />
+          <div className="h-5 bg-cm-border-soft/50 rounded-full w-16" />
+          <div className="h-5 bg-cm-border-soft/50 rounded-full w-20" />
         </div>
         <div className="pt-2.5 border-t border-cm-border/50">
-          <div className="h-3 bg-gray-200/50 rounded w-2/3" />
+          <div className="h-3 bg-cm-border-soft/50 rounded w-2/3" />
         </div>
       </div>
     </div>
@@ -105,19 +124,18 @@ function SupplierCardSkeleton() {
 function ProductCardSkeleton() {
   return (
     <div className="bg-cm-elevated border border-cm-border rounded-xl overflow-hidden animate-pulse">
-      <div className="aspect-square bg-gray-200/50" />
+      <div className="aspect-square bg-cm-border-soft/50" />
       <div className="p-2.5 space-y-2">
-        <div className="h-3 bg-gray-200/50 rounded w-full" />
-        <div className="h-3 bg-gray-200/50 rounded w-2/3" />
-        <div className="h-4 bg-gray-200/50 rounded w-1/2" />
+        <div className="h-3 bg-cm-border-soft/50 rounded w-full" />
+        <div className="h-3 bg-cm-border-soft/50 rounded w-2/3" />
+        <div className="h-4 bg-cm-border-soft/50 rounded w-1/2" />
       </div>
     </div>
   )
 }
 
 export default function CatalogPage() {
-  const nav = useNavigate()
-  const location = useLocation()
+  const { navigate: nav } = useAppNavigation()
   const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -154,6 +172,7 @@ export default function CatalogPage() {
       const next = new URLSearchParams(prev)
       if (value && value !== "all") next.set(key, value)
       else next.delete(key)
+      if (key === "vert") next.delete("sub")
       return next
     })
     setVisibleCount(ITEMS_PER_PAGE)
@@ -182,8 +201,13 @@ export default function CatalogPage() {
     }, 300)
   }
 
-  const hasActiveFilters = params.min || params.max || params.cond || params.loc
-  const activeFilterCount = [params.min || params.max, params.cond, params.loc].filter(Boolean).length
+  const hasActiveFilters = !!(params.min || params.max || params.cond || params.loc || params.sub || params.rental)
+  const activeFilterCount = [params.min || params.max, params.cond, params.loc, params.sub, params.rental].filter(Boolean).length
+
+  const subLabel = useMemo(() => {
+    if (!params.sub) return ""
+    return getSubcategoryById(params.sub)?.sub.name || params.sub
+  }, [params.sub])
 
   const clearFilters = () => {
     const vert = params.vert
@@ -192,7 +216,7 @@ export default function CatalogPage() {
     setDebouncedQuery("")
   }
 
-  const isBrowsing = !debouncedQuery
+  const isBrowsing = !debouncedQuery && !hasActiveFilters
 
   // ─── Suppliers ───
   const filteredSuppliers = useMemo(() => {
@@ -209,14 +233,17 @@ export default function CatalogPage() {
 
   // ─── Products ───
   const filteredProducts = useMemo(() => {
+    let result: Product[]
     if (debouncedQuery) {
-      const searched = searchProducts(debouncedQuery)
-      if (params.vert === "all") return searched
-      return searched.filter((p) => p.vertical === params.vert)
+      result = searchProducts(debouncedQuery)
+      if (params.vert !== "all") result = result.filter((p) => p.vertical === params.vert)
+    } else {
+      result = [...MARKETPLACE_PRODUCTS]
+      if (params.vert !== "all") result = result.filter((p) => p.vertical === params.vert)
     }
 
-    let result = [...MARKETPLACE_PRODUCTS]
-    if (params.vert !== "all") result = result.filter((p) => p.vertical === params.vert)
+    if (params.rental) result = result.filter((p) => p.rental)
+    if (params.sub) result = filterBySubcategory(result, params.sub)
 
     if (params.min) { const min = Number(params.min); if (!isNaN(min)) result = result.filter((p) => p.price >= min) }
     if (params.max) { const max = Number(params.max); if (!isNaN(max)) result = result.filter((p) => p.price <= max) }
@@ -230,7 +257,7 @@ export default function CatalogPage() {
       default: result.sort((a, b) => (b.originalPrice ? b.originalPrice - b.price : 0) - (a.originalPrice ? a.originalPrice - a.price : 0)); break
     }
     return result
-  }, [debouncedQuery, params, params.vert, params.sort, params.min, params.max, params.cond, params.loc])
+  }, [debouncedQuery, params])
 
   const promotedProducts = useMemo(() => {
     return filteredProducts.filter((p) => p.originalPrice && p.originalPrice > p.price).slice(0, 6)
@@ -273,7 +300,7 @@ export default function CatalogPage() {
   // ─── Buttons ───
   const cartButton = (
     <div className="relative shrink-0">
-      <button onClick={() => nav("/marketplace/cart", { state: { from: location.pathname + location.search } })}
+      <button onClick={() => nav("/marketplace/cart")}
         className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-cm-elevated cursor-pointer active:scale-90 transition-transform touch-min" aria-label="Panier">
         <ShoppingCart className="w-5 h-5 text-cm-text" />
       </button>
@@ -287,7 +314,7 @@ export default function CatalogPage() {
 
   const vendreButton = (
     <button onClick={() => nav("/marketplace/register")}
-      className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-[#2A2A2A] shrink-0">
+      className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-text/80 shrink-0">
       <Plus className="w-3.5 h-3.5" />
       Vendre
     </button>
@@ -372,6 +399,18 @@ export default function CatalogPage() {
 
         {hasActiveFilters && (
           <div className="flex gap-1.5 overflow-x-auto no-scrollbar mt-2">
+            {params.rental && (
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-forest/10 text-cm-forest rounded-full text-[9px] font-semibold">
+                <KeyRound className="w-2.5 h-2.5" />Location
+                <button onClick={() => updateParam("rental", "")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
+              </span>
+            )}
+            {params.sub && subLabel && (
+              <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-forest/10 text-cm-forest rounded-full text-[9px] font-semibold">
+                {subLabel}
+                <button onClick={() => updateParam("sub", "")} className="cursor-pointer"><X className="w-2.5 h-2.5" /></button>
+              </span>
+            )}
             {(params.min || params.max) && (
               <span className="shrink-0 flex items-center gap-1 px-2 py-1 bg-cm-surface text-cm-text rounded-full text-[9px] font-semibold">
                 {params.min ? `${Number(params.min).toLocaleString("fr-FR")} F` : "0"} — {params.max ? `${Number(params.max).toLocaleString("fr-FR")} F` : "∞"}
@@ -460,7 +499,7 @@ export default function CatalogPage() {
                   onClick={() => nav(`/marketplace/browse/${cat.vertical}`)}
                   className="rounded-2xl overflow-hidden relative cursor-pointer text-left bg-cm-elevated border border-cm-border"
                 >
-                  <div className={`aspect-square p-3 flex flex-col justify-between bg-gradient-to-br ${VERTICAL_GRADIENTS[cat.vertical] || "from-gray-100"}`}>
+                  <div className={`aspect-square p-3 flex flex-col justify-between bg-gradient-to-br ${VERTICAL_GRADIENTS[cat.vertical] || "from-cm-surface"}`}>
                     <div className="w-9 h-9 rounded-xl bg-white/80 backdrop-blur-sm flex items-center justify-center text-lg">
                       <span className="text-xl">{VERTICAL_EMOJI[cat.vertical] || "📦"}</span>
                     </div>
@@ -500,7 +539,7 @@ export default function CatalogPage() {
         <div className="flex items-center gap-1.5 mb-3">
           <Package className="w-4 h-4" />
           <h2 className="text-sm font-bold text-cm-text">
-            {debouncedQuery ? `Résultats pour "${debouncedQuery}"` : "Tous les produits"}
+            {debouncedQuery ? `Résultats pour "${debouncedQuery}"` : params.sub && subLabel ? subLabel : params.rental ? "Location" : "Tous les produits"}
           </h2>
         </div>
 
@@ -543,7 +582,7 @@ export default function CatalogPage() {
             {hasMore && (
               <div className="flex justify-center mt-5">
                 <button onClick={() => setVisibleCount((c) => c + ITEMS_PER_PAGE)}
-                  className="h-10 px-6 rounded-xl bg-cm-elevated border border-cm-border text-[12px] font-semibold text-cm-text cursor-pointer hover:border-gray-300 active:scale-[0.98] transition-all flex items-center gap-1.5 touch-min">
+                  className="h-10 px-6 rounded-xl bg-cm-elevated border border-cm-border text-[12px] font-semibold text-cm-text cursor-pointer hover:border-cm-text-muted active:scale-[0.98] transition-all flex items-center gap-1.5 touch-min">
                   <ChevronDown className="w-4 h-4" />
                   Afficher plus ({filteredProducts.length - visibleCount - (debouncedQuery ? 0 : promotedProducts.length)} restant{(filteredProducts.length - visibleCount - (debouncedQuery ? 0 : promotedProducts.length)) > 1 ? "s" : ""})
                 </button>
@@ -559,7 +598,7 @@ export default function CatalogPage() {
               <h3 className="text-base font-bold text-white">Vous avez des articles à vendre ?</h3>
               <p className="text-xs text-white/70 mt-1">Créez votre boutique et vendez facilement sur Ça Match.</p>
               <button onClick={() => nav("/marketplace/register")}
-                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-cm-forest text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-50">
+                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-cm-forest text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface">
                 Commencer à vendre
               </button>
             </div>
@@ -567,7 +606,7 @@ export default function CatalogPage() {
               <h3 className="text-base font-bold text-white">Vous êtes un fournisseur professionnel ?</h3>
               <p className="text-xs text-white/70 mt-1">Proposez vos matériaux et équipements aux professionnels de Ça Match.</p>
               <button onClick={() => nav("/supplier/register")}
-                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-amber-700 text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-gray-50">
+                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-amber-700 text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface">
                 Devenir fournisseur
               </button>
             </div>

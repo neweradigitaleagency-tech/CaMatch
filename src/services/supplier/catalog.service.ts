@@ -69,6 +69,7 @@ function mapCatalogProduct(data: any): SupplierProduct {
     name: data.name,
     description: data.description ?? undefined,
     images: data.images ?? [],
+    videos: data.videos ?? [],
     brand: data.brand ?? undefined,
     manufacturerReference: data.manufacturer_reference ?? undefined,
     barcode: data.barcode ?? undefined,

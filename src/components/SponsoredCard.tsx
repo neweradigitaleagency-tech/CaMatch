@@ -36,7 +36,7 @@ export default function SponsoredCard({ item, index }: SponsoredCardProps) {
       whileHover={{ y: -4, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => nav(item.link)}
-      className={`${sizeClasses[item.size]} relative rounded-[12px] overflow-hidden cursor-pointer shadow-[0_2px_12px_rgba(0,0,0,0.08)] group`}
+      className={`${sizeClasses[item.size]} relative rounded-[20px] overflow-hidden cursor-pointer shadow-cm-card group`}
     >
       <img
         src={item.image}
@@ -44,9 +44,9 @@ export default function SponsoredCard({ item, index }: SponsoredCardProps) {
         loading="lazy"
         className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#2B2B2B]/90 via-[#2B2B2B]/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
       <div className="absolute top-2.5 left-2.5">
-        <span className="inline-block px-2 py-0.5 rounded-full bg-[#7FD356] text-[#2B2B2B] text-[10px] font-bold leading-tight">
+        <span className="inline-block px-2 py-0.5 rounded-full bg-cm-accent text-cm-text text-[10px] font-bold leading-tight">
           {item.category}
         </span>
       </div>

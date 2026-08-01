@@ -5,7 +5,7 @@ import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
 
 export default function AdminLoginPage() {
   const navigate = useNavigate()
-  const { login, demoLogin, isAuthenticated, isLoading, initialized, error } = useAdminAuthStore()
+  const { login, demoLogin, isAuthenticated, isLoading, initialized, error } = useAdminAuthStore
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -36,24 +36,24 @@ export default function AdminLoginPage() {
 
   if (!initialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-cm-surface">
+        <Loader2 className="w-6 h-6 text-cm-text-muted animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-cm-surface px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img src="/logo.svg" alt="Ça Match" className="h-12 mx-auto mb-4" />
-          <h1 className="text-[22px] font-bold text-gray-900">Admin</h1>
-          <p className="text-[13px] text-gray-500 mt-1">Connectez-vous pour accéder au back-office</p>
+          <h1 className="text-[22px] font-bold text-cm-text">Admin</h1>
+          <p className="text-[13px] text-cm-text-muted mt-1">Connectez-vous pour accéder au back-office</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm space-y-4">
+        <form onSubmit={handleSubmit} className="bg-cm-elevated border border-cm-border rounded-2xl p-6 shadow-sm space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1.5">Email</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1.5">Email</label>
             <input
               type="email"
               value={email}
@@ -61,12 +61,12 @@ export default function AdminLoginPage() {
               placeholder="admin@camatch.ci"
               autoComplete="email"
               autoFocus
-              className="w-full h-11 px-3.5 text-[14px] bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:border-gray-300 focus:bg-white transition-colors"
+              className="w-full h-11 px-3.5 text-[14px] bg-cm-surface border border-cm-border rounded-xl outline-none text-cm-text placeholder:text-cm-text-muted focus:border-cm-border focus:bg-white transition-colors"
             />
           </div>
 
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1.5">Mot de passe</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1.5">Mot de passe</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -74,12 +74,12 @@ export default function AdminLoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                className="w-full h-11 px-3.5 pr-10 text-[14px] bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-900 placeholder-gray-400 focus:border-gray-300 focus:bg-white transition-colors"
+                className="w-full h-11 px-3.5 pr-10 text-[14px] bg-cm-surface border border-cm-border rounded-xl outline-none text-cm-text placeholder:text-cm-text-muted focus:border-cm-border focus:bg-white transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-cm-text-muted hover:text-cm-text-soft cursor-pointer"
               >
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
@@ -95,7 +95,7 @@ export default function AdminLoginPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full h-11 bg-gray-900 text-white text-[13px] font-bold rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full h-11 bg-cm-text text-white text-[13px] font-bold rounded-xl hover:bg-cm-text/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
             {submitting ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Connexion...</>
@@ -107,22 +107,22 @@ export default function AdminLoginPage() {
           <div className="text-center">
             <button
               type="button"
-              className="text-[12px] text-gray-500 hover:text-gray-700 cursor-pointer"
+              className="text-[12px] text-cm-text-muted hover:text-cm-text-soft cursor-pointer"
             >
               Mot de passe oublié ?
             </button>
           </div>
         </form>
 
-        <p className="text-center mt-6 text-[11px] text-gray-400">
+        <p className="text-center mt-6 text-[11px] text-cm-text-muted">
           Accès réservé au personnel autorisé
         </p>
 
-        <div className="mt-4 pt-4 border-t border-gray-100">
-          <p className="text-[10px] text-gray-400 text-center mb-2">Accès rapide — Mode démo</p>
+        <div className="mt-4 pt-4 border-t border-cm-border/40">
+          <p className="text-[10px] text-cm-text-muted text-center mb-2">Accès rapide — Mode démo</p>
           <button onClick={demoLogin}
-            className="w-full h-10 text-xs font-semibold text-gray-700 bg-white rounded-xl border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer flex items-center justify-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-gray-400" /> Mode démo Admin
+            className="w-full h-10 text-xs font-semibold text-cm-text-soft bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-cm-text-muted" /> Mode démo Admin
           </button>
         </div>
       </div>

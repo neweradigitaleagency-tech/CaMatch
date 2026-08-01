@@ -27,7 +27,7 @@ const MOVEMENT_FILTERS: { value: MovementFilter; label: string; icon: typeof Arr
 ]
 
 function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <div className={`bg-gray-200/50 animate-pulse rounded-xl ${className}`} />
+  return <div className={`bg-cm-surface/50 animate-pulse rounded-xl ${className}`} />
 }
 
 function MovementModal({ onClose }: { onClose: () => void }) {
@@ -61,7 +61,7 @@ function MovementModal({ onClose }: { onClose: () => void }) {
         exit={{ y: "100%" }}
         transition={{ type: "spring", damping: 25, stiffness: 300 }}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-md bg-white rounded-t-[20px] sm:rounded-[20px] p-5 max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-md bg-cm-elevated rounded-t-[20px] sm:rounded-[20px] p-5 max-h-[90vh] overflow-y-auto"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-[16px] font-bold">Nouveau mouvement</h3>
@@ -70,14 +70,14 @@ function MovementModal({ onClose }: { onClose: () => void }) {
 
         <div className="space-y-4">
           <div>
-            <p className="text-[12px] font-medium text-gray-700 mb-2">Type de mouvement</p>
+            <p className="text-[12px] font-medium text-cm-text-soft mb-2">Type de mouvement</p>
             <div className="flex flex-wrap gap-1.5">
               {MOVEMENT_FILTERS.slice(1).map((f) => {
                 const Icon = f.icon
                 return (
                   <button key={f.value} onClick={() => setType(f.value as StockMovementType)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
-                      type === f.value ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      type === f.value ? "bg-cm-text text-white" : "bg-cm-surface text-cm-text-soft hover:bg-cm-border-soft"
                     }`}>
                     <Icon className="w-3.5 h-3.5" /> {f.label}
                   </button>
@@ -87,9 +87,9 @@ function MovementModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <div>
-            <p className="text-[12px] font-medium text-gray-700 mb-2">Produit</p>
+            <p className="text-[12px] font-medium text-cm-text-soft mb-2">Produit</p>
             <select value={productId} onChange={(e) => setProductId(e.target.value)}
-              className="w-full h-10 px-3 rounded-xl border border-gray-200 text-[13px] bg-white focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green">
+              className="w-full h-10 px-3 rounded-xl border border-cm-border text-[13px] bg-cm-elevated focus:outline-none focus:ring-2 focus:ring-cm-green/20 focus:border-cm-green">
               <option value="">Sélectionner un produit</option>
               {products?.map((p) => (
                 <option key={p.id} value={p.id} disabled={type === "exit" && p.availableStock <= 0}>
@@ -100,31 +100,31 @@ function MovementModal({ onClose }: { onClose: () => void }) {
           </div>
 
           <div>
-            <p className="text-[12px] font-medium text-gray-700 mb-2">Quantité</p>
+            <p className="text-[12px] font-medium text-cm-text-soft mb-2">Quantité</p>
             <div className="flex items-center gap-2">
               <button onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700 font-bold cursor-pointer hover:bg-gray-200">−</button>
+                className="w-10 h-10 rounded-xl bg-cm-surface flex items-center justify-center text-cm-text-soft font-bold cursor-pointer hover:bg-cm-border-soft">−</button>
               <input type="number" value={quantity} onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                 min={1} max={type === "exit" ? maxExit : undefined}
-                className="flex-1 h-10 text-center rounded-xl border border-gray-200 text-[14px] font-bold focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
+                className="flex-1 h-10 text-center rounded-xl border border-cm-border text-[14px] font-bold focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
               <button onClick={() => setQuantity(quantity + 1)}
-                className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-700 font-bold cursor-pointer hover:bg-gray-200">+</button>
+                className="w-10 h-10 rounded-xl bg-cm-surface flex items-center justify-center text-cm-text-soft font-bold cursor-pointer hover:bg-cm-border-soft">+</button>
             </div>
             {selectedProduct && (
-              <p className="text-[11px] text-gray-500 mt-1">
+              <p className="text-[11px] text-cm-text-muted mt-1">
                 Stock actuel: {selectedProduct.stock} {type === "exit" ? `· Max sortie: ${maxExit}` : `· Après: ${type === "entry" || type === "return" ? selectedProduct.stock + quantity : Math.max(0, selectedProduct.stock - quantity)}`}
               </p>
             )}
           </div>
 
           <div>
-            <p className="text-[12px] font-medium text-gray-700 mb-2">Notes (optionnel)</p>
+            <p className="text-[12px] font-medium text-cm-text-soft mb-2">Notes (optionnel)</p>
             <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Raison du mouvement..."
-              className="w-full h-10 px-3 rounded-xl border border-gray-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
+              className="w-full h-10 px-3 rounded-xl border border-cm-border text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
           </div>
 
           <button onClick={handleSubmit} disabled={!canSubmit}
-            className="w-full h-11 rounded-xl bg-gray-900 text-white text-[13px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-all active:scale-[0.98]">
+            className="w-full h-11 rounded-xl bg-cm-text text-white text-[13px] font-bold cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed hover:opacity-90 transition-all active:scale-[0.98]">
             {createMovement.isPending ? "Création..." : "Créer le mouvement"}
           </button>
         </div>
@@ -138,33 +138,33 @@ function ProductStockCard({ product, onAdjust }: { product: NonNullable<ReturnTy
   const isLowStock = !product.unlimitedStock && product.availableStock > 0 && product.availableStock <= product.lowStockThreshold
   const stockBarPercent = product.unlimitedStock ? 100 : Math.min(100, (product.availableStock / Math.max(product.lowStockThreshold * 3, 1)) * 100)
   return (
-    <div className={`bg-white rounded-xl border p-4 ${isOutOfStock ? "border-red-200" : isLowStock ? "border-orange-200" : "border-gray-200"}`}>
+    <div className={`bg-cm-elevated rounded-xl border p-4 ${isOutOfStock ? "border-red-200" : isLowStock ? "border-orange-200" : "border-cm-border"}`}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <p className="text-[13px] font-semibold text-gray-900 truncate">{product.name}</p>
+            <p className="text-[13px] font-semibold text-cm-text truncate">{product.name}</p>
             {isOutOfStock && <AlertTriangle className="w-3.5 h-3.5 text-red-500 shrink-0" />}
           </div>
-          <p className="text-[11px] text-gray-500 mt-0.5">{product.brand ?? "—"} · {product.categoryName}</p>
-          <p className="text-[11px] text-gray-400 mt-0.5">
+          <p className="text-[11px] text-cm-text-muted mt-0.5">{product.brand ?? "—"} · {product.categoryName}</p>
+          <p className="text-[11px] text-cm-text-muted mt-0.5">
             {isOutOfStock ? "En rupture de stock" : `${product.availableStock} disponibles`}
             {!product.unlimitedStock && ` · Seuil: ${product.lowStockThreshold}`}
           </p>
         </div>
         <button onClick={() => onAdjust(product.id)}
-          className="shrink-0 h-8 px-3 rounded-lg bg-gray-100 text-gray-700 text-[11px] font-semibold hover:bg-gray-200 cursor-pointer transition-colors">
+          className="shrink-0 h-8 px-3 rounded-lg bg-cm-surface text-cm-text-soft text-[11px] font-semibold hover:bg-cm-border-soft cursor-pointer transition-colors">
           Ajuster
         </button>
       </div>
       {!product.unlimitedStock && (
-        <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="mt-3 h-1.5 bg-cm-surface rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all ${isOutOfStock ? "bg-red-500" : isLowStock ? "bg-orange-400" : "bg-cm-green"}`} style={{ width: `${stockBarPercent}%` }} />
         </div>
       )}
       <div className="flex items-center gap-4 mt-2 text-[11px]">
-        <span className="text-gray-500">Stock: <strong className="text-gray-800">{product.stock}</strong></span>
-        <span className="text-gray-500">Réservé: <strong className="text-gray-800">{product.reservedStock}</strong></span>
-        <span className="text-gray-500">Dispo: <strong className={`${isOutOfStock ? "text-red-600" : isLowStock ? "text-orange-600" : "text-green-600"}`}>{product.availableStock}</strong></span>
+        <span className="text-cm-text-muted">Stock: <strong className="text-cm-text">{product.stock}</strong></span>
+        <span className="text-cm-text-muted">Réservé: <strong className="text-cm-text">{product.reservedStock}</strong></span>
+        <span className="text-cm-text-muted">Dispo: <strong className={`${isOutOfStock ? "text-red-600" : isLowStock ? "text-orange-600" : "text-green-600"}`}>{product.availableStock}</strong></span>
       </div>
     </div>
   )
@@ -174,7 +174,7 @@ function MovementRow({ movement }: { movement: NonNullable<ReturnType<typeof use
   const typeInfo = MOVEMENT_TYPE_LABELS[movement.type]
   const colorClass = MOVEMENT_TYPE_COLORS[movement.type]
   return (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-50 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-cm-border/40 last:border-0">
       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${colorClass}`}>
         {movement.type === "entry" ? <ArrowDownToLine className="w-4 h-4" /> :
          movement.type === "exit" ? <ArrowUpFromLine className="w-4 h-4" /> :
@@ -185,17 +185,17 @@ function MovementRow({ movement }: { movement: NonNullable<ReturnType<typeof use
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${colorClass}`}>{typeInfo}</span>
-          <span className="text-[12px] font-semibold text-gray-900">{movement.productName}</span>
+          <span className="text-[12px] font-semibold text-cm-text">{movement.productName}</span>
         </div>
-        <p className="text-[11px] text-gray-500 mt-0.5">
-          Qté: <strong className="text-gray-700">{movement.quantity}</strong>
+        <p className="text-[11px] text-cm-text-muted mt-0.5">
+          Qté: <strong className="text-cm-text-soft">{movement.quantity}</strong>
           {movement.type !== "inventory" && (
-            <> · Stock: {movement.stockBefore} → <strong className="text-gray-700">{movement.stockAfter}</strong></>
+            <> · Stock: {movement.stockBefore} → <strong className="text-cm-text-soft">{movement.stockAfter}</strong></>
           )}
         </p>
-        {movement.notes && <p className="text-[10px] text-gray-400 mt-0.5 truncate">{movement.notes}</p>}
+        {movement.notes && <p className="text-[10px] text-cm-text-muted mt-0.5 truncate">{movement.notes}</p>}
       </div>
-      <span className="text-[10px] text-gray-400 shrink-0">{new Date(movement.createdAt).toLocaleDateString("fr-FR")}</span>
+      <span className="text-[10px] text-cm-text-muted shrink-0">{new Date(movement.createdAt).toLocaleDateString("fr-FR")}</span>
     </div>
   )
 }
@@ -240,20 +240,20 @@ export default function SupplierStockScreen() {
     <div className="space-y-5">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-bold text-gray-900">Gestion des stocks</h1>
-          <p className="text-[13px] text-gray-500 mt-1">Suivez et gérez votre inventaire</p>
+          <h1 className="text-[22px] font-bold text-cm-text">Gestion des stocks</h1>
+          <p className="text-[13px] text-cm-text-muted mt-1">Suivez et gérez votre inventaire</p>
         </div>
         <button onClick={() => { setAdjustProductId(null); setShowModal(true) }}
-          className="h-9 px-4 bg-gray-900 text-white text-[12px] font-bold rounded-xl hover:opacity-90 cursor-pointer transition-all flex items-center gap-1.5">
+          className="h-9 px-4 bg-cm-text text-white text-[12px] font-bold rounded-xl hover:opacity-90 cursor-pointer transition-all flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Mouvement
         </button>
       </div>
 
-      <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+      <div className="flex gap-1 bg-cm-surface p-1 rounded-xl">
         {tabs.map((tab) => (
           <button key={tab.value} onClick={() => setActiveTab(tab.value)}
             className={`flex-1 h-9 rounded-lg text-[12px] font-semibold cursor-pointer transition-all ${
-              activeTab === tab.value ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"
+              activeTab === tab.value ? "bg-cm-elevated text-cm-text shadow-sm" : "text-cm-text-muted hover:text-cm-text-soft"
             }`}>
             {tab.label}{tab.count !== undefined ? ` (${tab.count})` : ""}
           </button>
@@ -264,15 +264,15 @@ export default function SupplierStockScreen() {
         {activeTab === "stock" && (
           <motion.div key="stock" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un produit..."
-                className="w-full h-10 pl-9 pr-3 rounded-xl border border-gray-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
+                className="w-full h-10 pl-9 pr-3 rounded-xl border border-cm-border text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
             </div>
             <div className="flex gap-1.5 flex-wrap">
               {STOCK_FILTERS.map((f) => (
                 <button key={f.value} onClick={() => setStockFilter(f.value)}
                   className={`px-3 py-1.5 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
-                    stockFilter === f.value ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                    stockFilter === f.value ? "bg-cm-text text-white" : "bg-cm-surface text-cm-text-muted hover:bg-cm-border-soft"
                   }`}>{f.label}</button>
               ))}
             </div>
@@ -280,9 +280,9 @@ export default function SupplierStockScreen() {
               <div className="space-y-3">{[1,2,3,4].map((i) => <SkeletonBlock key={i} className="h-28" />)}</div>
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-12">
-                <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-[13px] font-medium text-gray-500">Aucun produit trouvé</p>
-                <p className="text-[11px] text-gray-400 mt-1">Ajoutez des produits dans votre catalogue</p>
+                <Package className="w-12 h-12 text-cm-border-soft mx-auto mb-3" />
+                <p className="text-[13px] font-medium text-cm-text-muted">Aucun produit trouvé</p>
+                <p className="text-[11px] text-cm-text-muted mt-1">Ajoutez des produits dans votre catalogue</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -295,30 +295,30 @@ export default function SupplierStockScreen() {
         {activeTab === "movements" && (
           <motion.div key="movements" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted" />
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Rechercher un produit..."
-                className="w-full h-10 pl-9 pr-3 rounded-xl border border-gray-200 text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
+                className="w-full h-10 pl-9 pr-3 rounded-xl border border-cm-border text-[13px] focus:outline-none focus:ring-2 focus:ring-cm-green/20" />
             </div>
             <div className="flex gap-1.5 flex-wrap">
               {MOVEMENT_FILTERS.map((f) => (
                 <button key={f.value} onClick={() => setMovementFilter(f.value)}
                   className={`px-3 py-1.5 rounded-full text-[11px] font-semibold cursor-pointer transition-all ${
-                    movementFilter === f.value ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                    movementFilter === f.value ? "bg-cm-text text-white" : "bg-cm-surface text-cm-text-muted hover:bg-cm-border-soft"
                   }`}>{f.label}</button>
               ))}
             </div>
             {movementsLoading ? (
               <div className="space-y-3">{[1,2,3,4].map((i) => <SkeletonBlock key={i} className="h-16" />)}</div>
             ) : movements && movements.length > 0 ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
                 {movements.filter((m) => !search || m.productName?.toLowerCase().includes(search.toLowerCase())).map((m) => (
                   <MovementRow key={m.id} movement={m} />
                 ))}
               </div>
             ) : (
               <div className="text-center py-12">
-                <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-[13px] font-medium text-gray-500">Aucun mouvement</p>
+                <Package className="w-12 h-12 text-cm-border-soft mx-auto mb-3" />
+                <p className="text-[13px] font-medium text-cm-text-muted">Aucun mouvement</p>
               </div>
             )}
           </motion.div>
@@ -327,18 +327,18 @@ export default function SupplierStockScreen() {
         {activeTab === "alerts" && (
           <motion.div key="alerts" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} className="space-y-6">
             <div>
-              <h2 className="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-[15px] font-bold text-cm-text mb-3 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-red-500" />
                 En rupture ({alerts?.outOfStock.length ?? 0})
               </h2>
               {!alerts || alerts.outOfStock.length === 0 ? (
-                <p className="text-[12px] text-gray-400 py-4 text-center bg-white rounded-xl border border-gray-200">Aucun produit en rupture</p>
+                <p className="text-[12px] text-cm-text-muted py-4 text-center bg-cm-elevated rounded-xl border border-cm-border">Aucun produit en rupture</p>
               ) : (
                 <div className="space-y-2">
                   {alerts.outOfStock.map((p) => (
-                    <div key={p.id} className="bg-white rounded-xl border border-red-200 p-4 flex items-center justify-between">
+                    <div key={p.id} className="bg-cm-elevated rounded-xl border border-red-200 p-4 flex items-center justify-between">
                       <div>
-                        <p className="text-[13px] font-semibold text-gray-900">{p.name}</p>
+                        <p className="text-[13px] font-semibold text-cm-text">{p.name}</p>
                         <p className="text-[11px] text-red-600 mt-0.5">Stock: 0 · Seuil: {p.lowStockThreshold}</p>
                       </div>
                       <button onClick={() => openAdjust(p.id)}
@@ -352,18 +352,18 @@ export default function SupplierStockScreen() {
             </div>
 
             <div>
-              <h2 className="text-[15px] font-bold text-gray-900 mb-3 flex items-center gap-2">
+              <h2 className="text-[15px] font-bold text-cm-text mb-3 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-orange-500" />
                 Stock faible ({alerts?.lowStock.length ?? 0})
               </h2>
               {!alerts || alerts.lowStock.length === 0 ? (
-                <p className="text-[12px] text-gray-400 py-4 text-center bg-white rounded-xl border border-gray-200">Aucun stock faible</p>
+                <p className="text-[12px] text-cm-text-muted py-4 text-center bg-cm-elevated rounded-xl border border-cm-border">Aucun stock faible</p>
               ) : (
                 <div className="space-y-2">
                   {alerts.lowStock.map((p) => (
-                    <div key={p.id} className="bg-white rounded-xl border border-orange-200 p-4 flex items-center justify-between">
+                    <div key={p.id} className="bg-cm-elevated rounded-xl border border-orange-200 p-4 flex items-center justify-between">
                       <div>
-                        <p className="text-[13px] font-semibold text-gray-900">{p.name}</p>
+                        <p className="text-[13px] font-semibold text-cm-text">{p.name}</p>
                         <p className="text-[11px] text-orange-600 mt-0.5">Stock: {p.availableStock} · Seuil: {p.lowStockThreshold}</p>
                       </div>
                       <button onClick={() => openAdjust(p.id)}

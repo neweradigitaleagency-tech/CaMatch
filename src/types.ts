@@ -413,6 +413,9 @@ export interface ConversationMetadata {
     service_type: "on_demand" | "scheduled";
   };
   created_from: "job_accept" | "manual";
+  productId?: string;
+  productName?: string;
+  sellerId?: string;
 }
 
 // ── Message taxonomy ──

@@ -44,7 +44,7 @@ export default function SupplierDeliveryZonesScreen() {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-gray-200/50 animate-pulse rounded-xl" />)}
+        {[1, 2, 3].map((i) => <div key={i} className="h-16 bg-cm-surface/50 animate-pulse rounded-xl" />)}
       </div>
     )
   }
@@ -53,8 +53,8 @@ export default function SupplierDeliveryZonesScreen() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Zones de livraison</h1>
-          <p className="text-[12px] text-gray-500">{zones.length} zones configurées</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Zones de livraison</h1>
+          <p className="text-[12px] text-cm-text-muted">{zones.length} zones configurées</p>
         </div>
         {availableCities.length > 0 && (
           <button onClick={() => setShowForm(true)}
@@ -65,31 +65,31 @@ export default function SupplierDeliveryZonesScreen() {
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-xl border border-cm-green/30 p-4 space-y-3">
-          <h2 className="text-[13px] font-semibold text-gray-900">Nouvelle zone</h2>
+        <div className="bg-cm-elevated rounded-xl border border-cm-green/30 p-4 space-y-3">
+          <h2 className="text-[13px] font-semibold text-cm-text">Nouvelle zone</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Commune</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Commune</label>
               <select value={newCity} onChange={(e) => setNewCity(e.target.value)}
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none bg-white">
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none bg-cm-elevated">
                 <option value="">Sélectionner</option>
                 {availableCities.map((c) => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Prix livraison (FCFA)</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Prix livraison (FCFA)</label>
               <input value={newPrice || ""} onChange={(e) => setNewPrice(Number(e.target.value) || 0)} type="number" min={0}
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none" />
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none" />
             </div>
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Délai estimé (heures)</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Délai estimé (heures)</label>
               <input value={newDelay || ""} onChange={(e) => setNewDelay(Number(e.target.value) || 0)} type="number" min={1}
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none" />
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none" />
             </div>
           </div>
           <div className="flex gap-2">
             <button onClick={() => setShowForm(false)}
-              className="h-9 px-4 border border-gray-300 text-gray-700 text-[12px] font-medium rounded-lg cursor-pointer">
+              className="h-9 px-4 border border-cm-border text-cm-text-soft text-[12px] font-medium rounded-lg cursor-pointer">
               Annuler
             </button>
             <button onClick={() => upsertMutation.mutate()} disabled={!newCity || upsertMutation.isPending}
@@ -101,29 +101,29 @@ export default function SupplierDeliveryZonesScreen() {
       )}
 
       {zones.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-          <MapPin className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-[14px] font-medium text-gray-500">Aucune zone de livraison</p>
-          <p className="text-[12px] text-gray-400 mt-1">Ajoutez les communes où vous livrez</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-8 text-center">
+          <MapPin className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
+          <p className="text-[14px] font-medium text-cm-text-muted">Aucune zone de livraison</p>
+          <p className="text-[12px] text-cm-text-muted mt-1">Ajoutez les communes où vous livrez</p>
         </div>
       ) : (
         <div className="space-y-2">
           {zones.map((zone) => (
             <div key={zone.id}
-              className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+              className="bg-cm-elevated rounded-xl border border-cm-border p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-cm-green/10 flex items-center justify-center">
                   <MapPin className="w-4 h-4 text-cm-green" />
                 </div>
                 <div>
-                  <p className="text-[14px] font-semibold text-gray-900">{zone.city}</p>
-                  <p className="text-[11px] text-gray-500">
+                  <p className="text-[14px] font-semibold text-cm-text">{zone.city}</p>
+                  <p className="text-[11px] text-cm-text-muted">
                     {formatXOF(zone.price)} · {zone.estimatedDelayHours}h délai
                   </p>
                 </div>
               </div>
               <button onClick={() => deleteMutation.mutate(zone.id)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 cursor-pointer transition-colors">
+                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 text-cm-text-muted hover:text-red-500 cursor-pointer transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>

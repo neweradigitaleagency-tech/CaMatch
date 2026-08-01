@@ -46,8 +46,8 @@ export default function SupplierSettingsScreen() {
   function Toggle({ on, onChange }: { on: boolean; onChange: (v: boolean) => void }) {
     return (
       <div onClick={() => onChange(!on)}
-        className={`relative w-9 h-[18px] rounded-full transition-colors cursor-pointer shrink-0 ${on ? "bg-cm-green" : "bg-gray-200"}`}>
-        <div className={`absolute top-[1px] w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${on ? "translate-x-[18px]" : "translate-x-[1px]"}`} />
+        className={`relative w-9 h-[18px] rounded-full transition-colors cursor-pointer shrink-0 ${on ? "bg-cm-green" : "bg-cm-border-soft"}`}>
+        <div className={`absolute top-[1px] w-4 h-4 bg-cm-elevated rounded-full shadow-sm transition-transform ${on ? "translate-x-[18px]" : "translate-x-[1px]"}`} />
       </div>
     )
   }
@@ -56,7 +56,7 @@ export default function SupplierSettingsScreen() {
     return (
       <button onClick={() => setTab(t.key)}
         className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-medium transition-colors cursor-pointer ${
-          active ? "bg-cm-green text-white" : "text-gray-500 hover:bg-gray-100"
+          active ? "bg-cm-green text-white" : "text-cm-text-muted hover:bg-cm-surface"
         }`}>
         <t.icon className="w-3.5 h-3.5" />
         {t.label}
@@ -66,12 +66,12 @@ export default function SupplierSettingsScreen() {
 
   function SectionCard({ title, icon: Icon, children }: { title: string; icon: typeof Bell; children: React.ReactNode }) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-100">
-          <Icon className="w-4 h-4 text-gray-400" />
-          <h2 className="text-[13px] font-semibold text-gray-900">{title}</h2>
+      <div className="bg-cm-elevated rounded-xl border border-cm-border overflow-hidden">
+        <div className="flex items-center gap-2 px-4 py-3 border-b border-cm-border/40">
+          <Icon className="w-4 h-4 text-cm-text-muted" />
+          <h2 className="text-[13px] font-semibold text-cm-text">{title}</h2>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-cm-border/40">
           {children}
         </div>
       </div>
@@ -81,8 +81,8 @@ export default function SupplierSettingsScreen() {
   return (
     <div className="max-w-2xl mx-auto space-y-4">
       <div>
-        <h1 className="text-[20px] font-bold text-gray-900">Paramètres</h1>
-        <p className="text-[12px] text-gray-500 mt-1">Gérez votre entreprise et vos préférences</p>
+        <h1 className="text-[20px] font-bold text-cm-text">Paramètres</h1>
+        <p className="text-[12px] text-cm-text-muted mt-1">Gérez votre entreprise et vos préférences</p>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -101,10 +101,10 @@ export default function SupplierSettingsScreen() {
             { label: "Horaires", value: company.hours, icon: Clock },
           ].map((item) => (
             <div key={item.label} className="flex items-center gap-3 px-4 py-3">
-              <item.icon className="w-4 h-4 text-gray-300 shrink-0" />
+              <item.icon className="w-4 h-4 text-cm-border-soft shrink-0" />
               <div className="min-w-0 flex-1">
-                <p className="text-[11px] text-gray-400">{item.label}</p>
-                <p className="text-[13px] text-gray-800 font-medium truncate">{item.value}</p>
+                <p className="text-[11px] text-cm-text-muted">{item.label}</p>
+                <p className="text-[13px] text-cm-text font-medium truncate">{item.value}</p>
               </div>
               <button className="text-[11px] text-cm-green font-semibold hover:underline cursor-pointer shrink-0">
                 Modifier
@@ -122,8 +122,8 @@ export default function SupplierSettingsScreen() {
               { label: "Paiements reçus", value: notifEmailPayment, set: setNotifEmailPayment },
               { label: "Litiges", value: notifEmailDispute, set: setNotifEmailDispute },
             ].map((item) => (
-              <label key={item.label} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
-                <span className="text-[13px] text-gray-700">{item.label}</span>
+              <label key={item.label} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-cm-surface transition-colors">
+                <span className="text-[13px] text-cm-text-soft">{item.label}</span>
                 <Toggle on={item.value} onChange={item.set} />
               </label>
             ))}
@@ -133,8 +133,8 @@ export default function SupplierSettingsScreen() {
               { label: "Nouvelles commandes", value: notifSmsOrder, set: setNotifSmsOrder },
               { label: "Livraisons", value: notifSmsDelivery, set: setNotifSmsDelivery },
             ].map((item) => (
-              <label key={item.label} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
-                <span className="text-[13px] text-gray-700">{item.label}</span>
+              <label key={item.label} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-cm-surface transition-colors">
+                <span className="text-[13px] text-cm-text-soft">{item.label}</span>
                 <Toggle on={item.value} onChange={item.set} />
               </label>
             ))}
@@ -145,8 +145,8 @@ export default function SupplierSettingsScreen() {
               { label: "Paiements reçus", value: notifPushPayment, set: setNotifPushPayment },
               { label: "Stock faible", value: notifPushStock, set: setNotifPushStock },
             ].map((item) => (
-              <label key={item.label} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
-                <span className="text-[13px] text-gray-700">{item.label}</span>
+              <label key={item.label} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-cm-surface transition-colors">
+                <span className="text-[13px] text-cm-text-soft">{item.label}</span>
                 <Toggle on={item.value} onChange={item.set} />
               </label>
             ))}
@@ -157,32 +157,32 @@ export default function SupplierSettingsScreen() {
       {tab === "securite" && (
         <>
           <SectionCard title="Authentification" icon={Shield}>
-            <label className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors">
+            <label className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-cm-surface transition-colors">
               <div>
-                <p className="text-[13px] text-gray-700">Authentification à deux facteurs (2FA)</p>
-                <p className="text-[11px] text-gray-400 mt-0.5">Code de vérification à chaque connexion</p>
+                <p className="text-[13px] text-cm-text-soft">Authentification à deux facteurs (2FA)</p>
+                <p className="text-[11px] text-cm-text-muted mt-0.5">Code de vérification à chaque connexion</p>
               </div>
               <Toggle on={twoFactor} onChange={setTwoFactor} />
             </label>
-            <button className="w-full flex items-center justify-between px-4 py-3 text-[13px] text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+            <button className="w-full flex items-center justify-between px-4 py-3 text-[13px] text-cm-text-soft hover:bg-cm-surface transition-colors cursor-pointer">
               <span>Changer le mot de passe</span>
-              <ChevronRight className="w-4 h-4 text-gray-300" />
+              <ChevronRight className="w-4 h-4 text-cm-border-soft" />
             </button>
           </SectionCard>
           <SectionCard title="Sessions actives" icon={Monitor}>
             {sessions.length === 0 ? (
-              <div className="px-4 py-6 text-center text-[12px] text-gray-400">
+              <div className="px-4 py-6 text-center text-[12px] text-cm-text-muted">
                 Aucune session active
               </div>
             ) : sessions.map((s) => (
               <div key={s.id} className="flex items-center gap-3 px-4 py-3">
-                <Monitor className="w-4 h-4 text-gray-300 shrink-0" />
+                <Monitor className="w-4 h-4 text-cm-border-soft shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-[13px] text-gray-800 font-medium truncate">
+                  <p className="text-[13px] text-cm-text font-medium truncate">
                     {s.device}
                     {s.isCurrent && <span className="ml-2 text-[10px] text-cm-green font-semibold">(cette session)</span>}
                   </p>
-                  <p className="text-[11px] text-gray-400">{s.browser} · {s.ip}</p>
+                  <p className="text-[11px] text-cm-text-muted">{s.browser} · {s.ip}</p>
                 </div>
                 {!s.isCurrent && (
                   <button className="text-[11px] text-red-500 font-medium hover:underline cursor-pointer shrink-0">
@@ -205,15 +205,15 @@ export default function SupplierSettingsScreen() {
       {tab === "equipe" && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <p className="text-[12px] text-gray-500">{team.length} membre{team.length > 1 ? "s" : ""}</p>
+            <p className="text-[12px] text-cm-text-muted">{team.length} membre{team.length > 1 ? "s" : ""}</p>
             <button className="text-[12px] text-cm-green font-semibold hover:underline cursor-pointer">
               + Inviter
             </button>
           </div>
           {team.length === 0 ? (
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-              <Users className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-              <p className="text-[13px] text-gray-500">Aucun membre dans votre équipe</p>
+            <div className="bg-cm-elevated rounded-xl border border-cm-border p-8 text-center">
+              <Users className="w-8 h-8 text-cm-border-soft mx-auto mb-2" />
+              <p className="text-[13px] text-cm-text-muted">Aucun membre dans votre équipe</p>
             </div>
           ) : team.map((member) => {
             const roleColors: Record<SupplierUserRole, string> = {
@@ -224,13 +224,13 @@ export default function SupplierSettingsScreen() {
               accountant: "bg-cyan-100 text-cyan-700",
             }
             return (
-              <div key={member.id} className="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[13px] font-bold text-gray-500 shrink-0">
+              <div key={member.id} className="bg-cm-elevated rounded-xl border border-cm-border px-4 py-3 flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center text-[13px] font-bold text-cm-text-muted shrink-0">
                   {member.name.charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-[13px] text-gray-800 font-medium truncate">{member.name}</p>
+                    <p className="text-[13px] text-cm-text font-medium truncate">{member.name}</p>
                     <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${roleColors[member.role]}`}>
                       {ROLE_LABELS[member.role]}
                     </span>
@@ -238,12 +238,12 @@ export default function SupplierSettingsScreen() {
                       <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-red-100 text-red-600">Inactif</span>
                     )}
                   </div>
-                  <p className="text-[11px] text-gray-400">{member.email}</p>
+                  <p className="text-[11px] text-cm-text-muted">{member.email}</p>
                   {member.lastActiveAt && (
-                    <p className="text-[10px] text-gray-300 mt-0.5">Actif·ve {new Date(member.lastActiveAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                    <p className="text-[10px] text-cm-border-soft mt-0.5">Actif·ve {new Date(member.lastActiveAt).toLocaleDateString("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
                   )}
                 </div>
-                <button className="text-[11px] text-gray-400 hover:text-gray-700 cursor-pointer shrink-0">
+                <button className="text-[11px] text-cm-text-muted hover:text-cm-text-soft cursor-pointer shrink-0">
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
@@ -252,7 +252,7 @@ export default function SupplierSettingsScreen() {
         </div>
       )}
 
-      <p className="text-[11px] text-gray-400 text-center pb-4">
+      <p className="text-[11px] text-cm-text-muted text-center pb-4">
         Ça Match Fournisseur v1.0.0
       </p>
     </div>

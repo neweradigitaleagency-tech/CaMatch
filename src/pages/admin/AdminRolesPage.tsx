@@ -42,7 +42,7 @@ interface RoleForm {
 const emptyRoleForm: RoleForm = { name: "", description: "", permissions: {} }
 
 function getRoleStyle(name: string): string {
-  return ROLE_STYLES[name] ?? "text-gray-600 bg-gray-50 border-gray-200"
+  return ROLE_STYLES[name] ?? "text-cm-text-soft bg-cm-surface border-cm-border"
 }
 
 function getRoleLabel(name: string): string {
@@ -156,12 +156,12 @@ export default function AdminRolesPage() {
       key: "name", label: "Administrateur", sortable: true, width: "220px",
       render: (a) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-semibold text-gray-600 shrink-0">
+          <div className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center text-[12px] font-semibold text-cm-text-soft shrink-0">
             {(a.firstname?.charAt(0) ?? "") + (a.lastname?.charAt(0) ?? "") || a.email.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{a.firstname} {a.lastname}</p>
-            <p className="text-[11px] text-gray-400">{a.email}</p>
+            <p className="text-[13px] font-medium text-cm-text">{a.firstname} {a.lastname}</p>
+            <p className="text-[11px] text-cm-text-muted">{a.email}</p>
           </div>
         </div>
       ),
@@ -170,7 +170,7 @@ export default function AdminRolesPage() {
       key: "roles", label: "Rôles", width: "200px",
       render: (a) => (
         <div className="flex flex-wrap gap-1">
-          {a.roles.length === 0 && <span className="text-[11px] text-gray-400">Aucun rôle</span>}
+          {a.roles.length === 0 && <span className="text-[11px] text-cm-text-muted">Aucun rôle</span>}
           {a.roles.map((r) => (
             <span key={r.id} className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full border ${getRoleStyle(r.name)}`}>
               {getRoleLabel(r.name)}
@@ -182,7 +182,7 @@ export default function AdminRolesPage() {
           ))}
           {canUpdate && (
             <button onClick={() => { setAssignAdmin(a); setAssignModalOpen(true) }}
-              className="text-[10px] px-1.5 py-0.5 rounded-full border border-dashed border-gray-300 text-gray-400 hover:text-gray-600 hover:border-gray-400 cursor-pointer">
+              className="text-[10px] px-1.5 py-0.5 rounded-full border border-dashed border-cm-border text-cm-text-muted hover:text-cm-text-soft hover:border-cm-text-muted cursor-pointer">
               + Ajouter
             </button>
           )}
@@ -196,7 +196,7 @@ export default function AdminRolesPage() {
     {
       key: "last_login", label: "Dernière connexion", sortable: true, width: "140px",
       render: (a) => (
-        <span className="text-[12px] text-gray-500">
+        <span className="text-[12px] text-cm-text-muted">
           {a.last_login ? format(new Date(a.last_login), "d MMM HH:mm", { locale: fr }) : "—"}
         </span>
       ),
@@ -208,27 +208,27 @@ export default function AdminRolesPage() {
       key: "name", label: "Rôle", sortable: true, width: "180px",
       render: (r) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-            <ShieldCheck className="w-4 h-4 text-gray-500" />
+          <div className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center">
+            <ShieldCheck className="w-4 h-4 text-cm-text-muted" />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{getRoleLabel(r.name)}</p>
-            <p className="text-[11px] text-gray-400">{r.name}</p>
+            <p className="text-[13px] font-medium text-cm-text">{getRoleLabel(r.name)}</p>
+            <p className="text-[11px] text-cm-text-muted">{r.name}</p>
           </div>
         </div>
       ),
     },
     {
       key: "description", label: "Description",
-      render: (r) => <span className="text-[12px] text-gray-500">{r.description ?? "—"}</span>,
+      render: (r) => <span className="text-[12px] text-cm-text-muted">{r.description ?? "—"}</span>,
     },
     {
       key: "is_system", label: "Système", width: "80px",
-      render: (r) => <span className="text-[12px] text-gray-500">{r.is_system ? "Oui" : "Non"}</span>,
+      render: (r) => <span className="text-[12px] text-cm-text-muted">{r.is_system ? "Oui" : "Non"}</span>,
     },
     {
       key: "admin_count", label: "Admins", sortable: true, width: "80px",
-      render: (r) => <span className="text-[12px] text-gray-700">{r.admin_count}</span>,
+      render: (r) => <span className="text-[12px] text-cm-text-soft">{r.admin_count}</span>,
     },
     {
       key: "actions", label: "", width: "100px",
@@ -253,26 +253,26 @@ export default function AdminRolesPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Rôles & permissions</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">
+          <h1 className="text-[20px] font-bold text-cm-text">Rôles & permissions</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">
             {tab === "admins" ? `${admins.length} administrateurs` : `${roles.length} rôles`}
           </p>
         </div>
         {tab === "roles" && canCreate && (
           <button onClick={openRoleCreate}
-            className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer">
+            className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer">
             <Plus className="w-3.5 h-3.5" /> Nouveau rôle
           </button>
         )}
       </div>
 
-      <div className="flex gap-1 border-b border-gray-200">
+      <div className="flex gap-1 border-b border-cm-border">
         <button onClick={() => setTab("admins")}
-          className={`flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-medium border-b-2 transition-colors cursor-pointer ${tab === "admins" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"}`}>
+          className={`flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-medium border-b-2 transition-colors cursor-pointer ${tab === "admins" ? "border-cm-text text-cm-text" : "border-transparent text-cm-text-muted hover:text-cm-text-soft"}`}>
           <UserCog className="w-3.5 h-3.5" /> Administrateurs
         </button>
         <button onClick={() => setTab("roles")}
-          className={`flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-medium border-b-2 transition-colors cursor-pointer ${tab === "roles" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-400 hover:text-gray-600"}`}>
+          className={`flex items-center gap-1.5 px-4 py-2.5 text-[12px] font-medium border-b-2 transition-colors cursor-pointer ${tab === "roles" ? "border-cm-text text-cm-text" : "border-transparent text-cm-text-muted hover:text-cm-text-soft"}`}>
           <Shield className="w-3.5 h-3.5" /> Rôles
         </button>
       </div>
@@ -306,29 +306,29 @@ export default function AdminRolesPage() {
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Nom</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Nom</label>
               <input type="text" value={roleForm.name} onChange={(e) => setRoleForm({ ...roleForm, name: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
             <div>
-              <label className="block text-[12px] font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Description</label>
               <input type="text" value={roleForm.description} onChange={(e) => setRoleForm({ ...roleForm, description: e.target.value })}
-                className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+                className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
             </div>
           </div>
           <div>
-            <p className="text-[12px] font-medium text-gray-700 mb-2">Permissions</p>
+            <p className="text-[12px] font-medium text-cm-text-soft mb-2">Permissions</p>
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {Object.entries(PERMISSION_GROUPS).map(([key, group]) => (
                 <div key={key}>
-                  <p className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1.5">{group.label}</p>
+                  <p className="text-[11px] font-semibold text-cm-text-muted uppercase tracking-wider mb-1.5">{group.label}</p>
                   <div className="flex flex-wrap gap-2">
                     {group.permissions.map((perm) => (
                       <label key={perm} className="flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" checked={!!roleForm.permissions[perm]}
                           onChange={() => togglePermission(perm)}
-                          className="w-3.5 h-3.5 rounded border-gray-300 text-gray-900 accent-gray-900 cursor-pointer" />
-                        <span className="text-[11px] text-gray-600">{perm}</span>
+                          className="w-3.5 h-3.5 rounded border-cm-border text-cm-text accent-cm-text cursor-pointer" />
+                        <span className="text-[11px] text-cm-text-soft">{perm}</span>
                       </label>
                     ))}
                   </div>
@@ -338,9 +338,9 @@ export default function AdminRolesPage() {
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
             <button onClick={() => setRoleModalOpen(false)} disabled={saving}
-              className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer disabled:opacity-50">Annuler</button>
+              className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer disabled:opacity-50">Annuler</button>
             <button onClick={handleRoleSave} disabled={saving || !roleForm.name}
-              className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
               <Save className="w-3.5 h-3.5" /> {saving ? "Enregistrement…" : editRoleId ? "Enregistrer" : "Créer"}
             </button>
           </div>
@@ -354,13 +354,13 @@ export default function AdminRolesPage() {
             .filter((r) => !assignAdmin?.roles.some((ar) => ar.id === r.id))
             .map((r) => (
               <button key={r.id} onClick={() => handleAssignRole(r.id)}
-                className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer">
+                className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-cm-text-soft bg-cm-surface border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer">
                 {getRoleLabel(r.name)}
-                <span className="text-[11px] text-gray-400 ml-2">{r.description}</span>
+                <span className="text-[11px] text-cm-text-muted ml-2">{r.description}</span>
               </button>
             ))}
           {roles.filter((r) => !assignAdmin?.roles.some((ar) => ar.id === r.id)).length === 0 && (
-            <p className="text-[13px] text-gray-400 text-center py-4">Tous les rôles sont déjà attribués</p>
+            <p className="text-[13px] text-cm-text-muted text-center py-4">Tous les rôles sont déjà attribués</p>
           )}
         </div>
       </Modal>

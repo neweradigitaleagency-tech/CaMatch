@@ -21,7 +21,7 @@ const PAYOUT_STATUS_LABELS: Record<PayoutStatus, string> = {
 }
 
 const PAYOUT_STATUS_COLORS: Record<PayoutStatus, string> = {
-  pending: "bg-gray-100 text-gray-700",
+  pending: "bg-cm-surface text-cm-text-soft",
   processing: "bg-amber-100 text-amber-700",
   completed: "bg-emerald-100 text-emerald-700",
   failed: "bg-red-100 text-red-700",
@@ -49,8 +49,8 @@ export default function SupplierBalanceScreen() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Solde et retraits</h1>
-          <p className="text-[12px] text-gray-500">Gérez vos fonds disponibles</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Solde et retraits</h1>
+          <p className="text-[12px] text-cm-text-muted">Gérez vos fonds disponibles</p>
         </div>
       </div>
 
@@ -65,18 +65,18 @@ export default function SupplierBalanceScreen() {
             </p>
           )}
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">En attente</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">En attente</p>
           <p className="text-[18px] font-bold text-amber-600 mt-1">{formatXOF(balance.pending)}</p>
-          <p className="text-[10px] text-gray-400 mt-1">Paiements non encore disponibles</p>
+          <p className="text-[10px] text-cm-text-muted mt-1">Paiements non encore disponibles</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">Gagné au total</p>
-          <p className="text-[18px] font-bold text-gray-900 mt-1">{formatXOF(balance.totalEarned)}</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">Gagné au total</p>
+          <p className="text-[18px] font-bold text-cm-text mt-1">{formatXOF(balance.totalEarned)}</p>
         </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <p className="text-[11px] text-gray-500">Commission versée</p>
-          <p className="text-[18px] font-bold text-gray-900 mt-1">{formatXOF(balance.totalCommission)}</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+          <p className="text-[11px] text-cm-text-muted">Commission versée</p>
+          <p className="text-[18px] font-bold text-cm-text mt-1">{formatXOF(balance.totalCommission)}</p>
         </div>
       </div>
 
@@ -90,20 +90,20 @@ export default function SupplierBalanceScreen() {
 
       {/* Payout request form */}
       {showRequestForm && (
-        <div className="bg-white rounded-xl border border-cm-green/30 p-4 space-y-3">
-          <h2 className="text-[13px] font-semibold text-gray-900">Nouveau retrait</h2>
-          <p className="text-[11px] text-gray-500">Disponible: {formatXOF(balance.available)}</p>
+        <div className="bg-cm-elevated rounded-xl border border-cm-green/30 p-4 space-y-3">
+          <h2 className="text-[13px] font-semibold text-cm-text">Nouveau retrait</h2>
+          <p className="text-[11px] text-cm-text-muted">Disponible: {formatXOF(balance.available)}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Montant (FCFA)</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Montant (FCFA)</label>
               <input value={requestAmount || ""} onChange={(e) => setRequestAmount(Number(e.target.value) || 0)}
                 type="number" min={1000} max={balance.available} step={1000}
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none" />
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none" />
             </div>
             <div>
-              <label className="text-[11px] font-medium text-gray-600 block mb-1">Mode de paiement</label>
+              <label className="text-[11px] font-medium text-cm-text-soft block mb-1">Mode de paiement</label>
               <select value={requestProvider} onChange={(e) => setRequestProvider(e.target.value as SupplierPaymentProvider)}
-                className="w-full h-9 px-3 border border-gray-300 rounded-lg text-[13px] focus:outline-none bg-white">
+                className="w-full h-9 px-3 border border-cm-border rounded-lg text-[13px] focus:outline-none bg-cm-elevated">
                 {(["orange_money", "mtn_momo", "wave"] as SupplierPaymentProvider[]).map((p) => (
                   <option key={p} value={p}>{PROVIDER_LABELS[p]}</option>
                 ))}
@@ -115,7 +115,7 @@ export default function SupplierBalanceScreen() {
           )}
           <div className="flex gap-2">
             <button onClick={() => { setShowRequestForm(false); setRequestAmount(0) }}
-              className="h-9 px-4 border border-gray-300 text-gray-700 text-[12px] font-medium rounded-lg cursor-pointer">
+              className="h-9 px-4 border border-cm-border text-cm-text-soft text-[12px] font-medium rounded-lg cursor-pointer">
               Annuler
             </button>
             <button onClick={handleRequestPayout}
@@ -128,21 +128,21 @@ export default function SupplierBalanceScreen() {
       )}
 
       {/* Payout history */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-[13px] font-semibold text-gray-900 flex items-center gap-1.5">
+          <h2 className="text-[13px] font-semibold text-cm-text flex items-center gap-1.5">
             <ArrowUpRight className="w-4 h-4" /> Historique des retraits
           </h2>
         </div>
         {payouts.length === 0 ? (
           <div className="text-center py-6">
-            <Wallet className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            <p className="text-[13px] text-gray-500">Aucun retrait pour le moment</p>
+            <Wallet className="w-8 h-8 text-cm-border-soft mx-auto mb-2" />
+            <p className="text-[13px] text-cm-text-muted">Aucun retrait pour le moment</p>
           </div>
         ) : (
           <div className="space-y-2">
             {payouts.map((p) => (
-              <div key={p.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={p.id} className="flex items-center justify-between p-3 bg-cm-surface rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     p.status === "completed" ? "bg-emerald-100" :
@@ -154,8 +154,8 @@ export default function SupplierBalanceScreen() {
                      <Clock className="w-4 h-4 text-amber-600" />}
                   </div>
                   <div>
-                    <p className="text-[13px] font-semibold text-gray-900">{formatXOF(p.amount)}</p>
-                    <div className="flex items-center gap-2 text-[11px] text-gray-500">
+                    <p className="text-[13px] font-semibold text-cm-text">{formatXOF(p.amount)}</p>
+                    <div className="flex items-center gap-2 text-[11px] text-cm-text-muted">
                       <span>{PROVIDER_LABELS[p.provider]}</span>
                       {p.providerReference && <span>· Ref: {p.providerReference}</span>}
                     </div>
@@ -165,7 +165,7 @@ export default function SupplierBalanceScreen() {
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${PAYOUT_STATUS_COLORS[p.status]}`}>
                     {PAYOUT_STATUS_LABELS[p.status]}
                   </span>
-                  <p className="text-[10px] text-gray-400 mt-1">
+                  <p className="text-[10px] text-cm-text-muted mt-1">
                     {new Date(p.requestedAt).toLocaleDateString("fr-FR")}
                   </p>
                   {p.failureReason && (

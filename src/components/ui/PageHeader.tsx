@@ -8,7 +8,7 @@ interface PageHeaderProps {
   subtitle?: string
 }
 
-export default function PageHeader({ title, fallbackRoute = "/", rightAction, subtitle }: PageHeaderProps) {
+export default function PageHeader({ title, fallbackRoute, rightAction, subtitle }: PageHeaderProps) {
   const goBack = useBackNavigation(fallbackRoute)
 
   return (

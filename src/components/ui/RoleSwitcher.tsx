@@ -26,11 +26,12 @@ export default function RoleSwitcher() {
 
   if (availableModes.length <= 1) return null;
 
-  const current = MODE_CONFIG[activeMode] ?? MODE_CONFIG.client;
+  const current = MODE_CONFIG[activeMode] ?? MODE_CONFIG.client!;
   const others = availableModes.filter((m) => m !== activeMode);
 
   const handleSwitch = (mode: string) => {
     const cfg = MODE_CONFIG[mode];
+    if (!cfg) return;
     setActiveMode(mode as "client" | "pro" | "supplier");
     setOpen(false);
     nav(cfg.route);
@@ -51,6 +52,7 @@ export default function RoleSwitcher() {
         <div className="absolute top-full left-0 mt-1 w-36 bg-white border border-gray-200 rounded-[12px] shadow-lg overflow-hidden z-20">
           {others.map((mode) => {
             const cfg = MODE_CONFIG[mode];
+            if (!cfg) return null;
             const isActiveRoute = location.pathname.startsWith(cfg.route);
             return (
               <button

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import {
   ArrowLeft, Check, CreditCard, Loader2, AlertTriangle,
   ChevronDown, Percent, Smartphone, Building2, Globe,
 } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useSubscriptionStore } from "../../stores/subscriptionStore"
 import { useAuthStore } from "../../stores/authStore"
 import { validateCoupon } from "../../services/subscriptionService"
@@ -21,9 +21,8 @@ const PROVIDERS: { id: PaymentProvider; name: string; icon: typeof Smartphone }[
 ]
 
 export default function SubscriptionPaymentPage() {
-  const nav = useNavigate()
-  const loc = useLocation()
-  const fromHamburger = !!loc.state?.fromHamburger
+  const { navigate: nav, goBack, getFlag, setFlag, complete } = useAppNavigation()
+  const fromHamburger = getFlag("from-hamburger")
   const userId = useAuthStore((s) => s.userId)
   const { currentSubscription, availablePlans, fetchCurrent, loading, error, clearError } = useSubscriptionStore()
 
@@ -79,7 +78,14 @@ export default function SubscriptionPaymentPage() {
     }
   }
 
-  const handleBack = () => nav("/", { state: { reopenMenu: true } })
+  const handleBack = () => {
+    if (fromHamburger) {
+      setFlag("reopen-menu", true)
+      nav("/")
+    } else {
+      goBack()
+    }
+  }
 
   if (paymentResult) {
     return (
@@ -88,7 +94,7 @@ export default function SubscriptionPaymentPage() {
         <SuccessState
           payment={paymentResult}
           planName={plan?.name ?? "Abonnement"}
-          onDone={() => nav("/settings/subscription")}
+          onDone={() => complete()}
         />
       </div>
     )

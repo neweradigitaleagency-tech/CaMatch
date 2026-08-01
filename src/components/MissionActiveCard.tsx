@@ -23,9 +23,9 @@ const BADGE: Record<string, { label: string; style: string }> = {
   en_route: { label: "Professionnel en route", style: "bg-blue-50 text-blue-700 border border-blue-200" },
   arrived: { label: "Arrivé sur place", style: "bg-indigo-50 text-indigo-700 border border-indigo-200" },
   in_progress: { label: "Intervention en cours", style: "bg-violet-50 text-violet-700 border border-violet-200" },
-  completed: { label: "Mission terminée", style: "bg-gray-900 text-white" },
-  client_validation: { label: "Mission terminée", style: "bg-gray-900 text-white" },
-  client_validated: { label: "Mission terminée", style: "bg-gray-900 text-white" },
+  completed: { label: "Mission terminée", style: "bg-cm-text text-white" },
+  client_validation: { label: "Mission terminée", style: "bg-cm-text text-white" },
+  client_validated: { label: "Mission terminée", style: "bg-cm-text text-white" },
   disputed: { label: "Litige en cours", style: "bg-red-50 text-red-700 border border-red-200" },
 } as Record<string, { label: string; style: string }>;
 

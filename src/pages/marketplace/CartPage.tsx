@@ -24,11 +24,11 @@ export default function CartPage() {
         <div className="flex-1 px-4 pt-2 space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-cm-elevated rounded-[var(--radius-cm)] p-4 border border-cm-border flex gap-3">
-              <div className="w-16 h-16 rounded-xl bg-gray-100 animate-pulse shrink-0" />
+              <div className="w-16 h-16 rounded-xl bg-cm-surface animate-pulse shrink-0" />
               <div className="flex-1 space-y-2">
-                <div className="w-3/4 h-3 rounded-full bg-gray-100 animate-pulse" />
-                <div className="w-1/2 h-2 rounded-full bg-gray-100 animate-pulse" />
-                <div className="w-1/4 h-3 rounded-full bg-gray-100 animate-pulse" />
+                <div className="w-3/4 h-3 rounded-full bg-cm-surface animate-pulse" />
+                <div className="w-1/2 h-2 rounded-full bg-cm-surface animate-pulse" />
+                <div className="w-1/4 h-3 rounded-full bg-cm-surface animate-pulse" />
               </div>
             </div>
           ))}
@@ -83,7 +83,7 @@ export default function CartPage() {
                       Vider
                     </button>
                     <button onClick={() => setConfirmClear(false)}
-                      className="flex-1 h-10 rounded-lg bg-gray-100 text-cm-text text-[10px] font-bold cursor-pointer active:scale-95 transition-transform">
+                      className="flex-1 h-10 rounded-lg bg-cm-surface text-cm-text text-[10px] font-bold cursor-pointer active:scale-95 transition-transform">
                       Annuler
                     </button>
                   </div>
@@ -103,11 +103,11 @@ export default function CartPage() {
             animate={{ opacity: 1, y: 0 }}
             className="bg-cm-elevated rounded-[var(--radius-cm)] p-4 border border-cm-border flex gap-3"
           >
-            <div className="w-16 h-16 rounded-xl bg-gray-50 overflow-hidden shrink-0 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-xl bg-cm-surface overflow-hidden shrink-0 flex items-center justify-center">
               {item.productImage ? (
                 <img src={item.productImage} alt={item.productName} className="w-full h-full object-cover" />
               ) : (
-                <Package className="w-6 h-6 text-gray-300" />
+                <Package className="w-6 h-6 text-cm-border-soft" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -117,7 +117,7 @@ export default function CartPage() {
                 {(item.price * item.quantity).toLocaleString("fr-FR")} F
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <div className="flex items-center gap-0.5 bg-gray-50 rounded-lg border border-cm-border">
+                <div className="flex items-center gap-0.5 bg-cm-surface rounded-lg border border-cm-border">
                   <button onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                     className="w-9 h-9 flex items-center justify-center cursor-pointer active:scale-90 transition-transform text-cm-text-soft hover:text-cm-text touch-min" aria-label="Diminuer quantité">
                     <Minus className="w-3.5 h-3.5" />

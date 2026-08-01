@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { CreditCard, Truck, ChevronRight } from "lucide-react"
 import PageHeader from "../../components/ui/PageHeader"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
 import { useLocationStore } from "../../stores/locationStore"
 
@@ -17,7 +17,7 @@ const PAYMENT_OPTIONS: { value: PaymentMethod; label: string; icon: string }[] =
 ]
 
 export default function CheckoutPage() {
-  const nav = useNavigate()
+  const { replace, complete } = useAppNavigation()
   const { items, subtotal, checkout } = useMarketplaceCartStore()
   const neighborhood = useLocationStore((s) => s.neighborhood)
 
@@ -39,12 +39,12 @@ export default function CheckoutPage() {
     const orderId = checkout(deliveryCity.trim(), deliveryAddress.trim(), paymentMethod)
     setSubmitting(false)
     if (orderId) {
-      nav(`/marketplace/order/confirm/${orderId}`, { replace: true })
+      complete({ to: `/marketplace/order/confirm/${orderId}` })
     }
   }
 
   if (items.length === 0) {
-    nav("/marketplace/cart", { replace: true })
+    replace("/marketplace/cart")
     return null
   }
 
@@ -63,13 +63,13 @@ export default function CheckoutPage() {
             value={deliveryCity}
             onChange={(e) => setDeliveryCity(e.target.value)}
             placeholder="Ville / quartier"
-            className="w-full h-10 px-3 rounded-xl bg-gray-50 border border-gray-100 text-[13px] text-cm-text outline-none mb-2 placeholder:text-[#9CA3AF]"
+            className="w-full h-10 px-3 rounded-xl bg-cm-surface border border-cm-border-soft text-[13px] text-cm-text outline-none mb-2 placeholder:text-cm-text-muted"
           />
           <input
             value={deliveryAddress}
             onChange={(e) => setDeliveryAddress(e.target.value)}
             placeholder="Adresse complète"
-            className="w-full h-10 px-3 rounded-xl bg-gray-50 border border-gray-100 text-[13px] text-cm-text outline-none placeholder:text-[#9CA3AF]"
+            className="w-full h-10 px-3 rounded-xl bg-cm-surface border border-cm-border-soft text-[13px] text-cm-text outline-none placeholder:text-cm-text-muted"
           />
         </div>
 
@@ -87,7 +87,7 @@ export default function CheckoutPage() {
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left cursor-pointer transition-all active:scale-[0.99] ${
                   paymentMethod === opt.value
                     ? "bg-cm-text text-cm-elevated"
-                    : "bg-gray-50 text-cm-text hover:bg-gray-100"
+                    : "bg-cm-surface text-cm-text hover:bg-cm-border-soft"
                 }`}
               >
                 <span className="text-[16px]">{opt.icon}</span>
@@ -114,7 +114,7 @@ export default function CheckoutPage() {
               </div>
             ))}
           </div>
-          <div className="mt-3 pt-3 border-t border-gray-100 space-y-1">
+          <div className="mt-3 pt-3 border-t border-cm-border-soft space-y-1">
             <div className="flex justify-between text-[11px] text-cm-text-soft">
               <span>Sous-total</span>
               <span>{subtotal().toLocaleString("fr-FR")} F</span>
@@ -123,7 +123,7 @@ export default function CheckoutPage() {
               <span>Livraison</span>
               <span>{deliveryCost === 0 ? "Gratuite" : `${deliveryCost.toLocaleString("fr-FR")} F`}</span>
             </div>
-            <div className="flex justify-between text-[11px] text-cm-text-soft pb-1 border-b border-gray-100">
+            <div className="flex justify-between text-[11px] text-cm-text-soft pb-1 border-b border-cm-border-soft">
               <span>Commission ({Math.round(COMMISSION_RATE * 100)}%)</span>
               <span className="text-cm-accent">-{commission.toLocaleString("fr-FR")} F</span>
             </div>

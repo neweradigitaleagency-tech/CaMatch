@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { ArrowLeft, XCircle, Shield, AlertTriangle } from "lucide-react";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useRequestStore } from "../../stores/requestStore";
 import { useEscrowStore } from "../../stores/escrowStore";
 import { useNotificationStore } from "../../stores/notificationStore";
@@ -16,8 +17,7 @@ const CANCEL_REASONS = [
 
 export default function CancellationPage() {
   const { id: missionId } = useParams();
-  const nav = useNavigate();
-  const goBack = () => nav(-1);
+  const { goBack, navigate, complete } = useAppNavigation();
   const mission = useRequestStore((s) => s.missions.find((m) => m.id === missionId));
   const updateMissionStatus = useRequestStore((s) => s.updateMissionStatus);
   const refundPayment = useEscrowStore((s) => s.refundPayment);
@@ -31,7 +31,7 @@ export default function CancellationPage() {
     return (
       <div className="flex items-center justify-center min-h-dynamic bg-cm-bg p-4">
         <p className="text-[14px] text-cm-text-soft">Mission introuvable</p>
-        <button onClick={() => nav("/orders")} className="mt-4 text-cm-accent text-[13px] font-bold">Retour</button>
+        <button onClick={() => navigate("/orders")} className="mt-4 text-cm-accent text-[13px] font-bold">Retour</button>
       </div>
     );
   }
@@ -61,7 +61,7 @@ export default function CancellationPage() {
         <p className="text-[13px] text-cm-text-soft text-center mb-6">
           {hasPayment ? "Un remboursement vous sera effectué sous 48h." : "Aucun paiement n'a été effectué."}
         </p>
-        <button onClick={() => nav("/orders")} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour aux missions</button>
+        <button onClick={() => complete()} className="w-full py-4 rounded-[14px] bg-cm-text text-cm-bg font-bold text-[13px] cursor-pointer active:scale-[0.97]">Retour aux missions</button>
       </div>
     );
   }

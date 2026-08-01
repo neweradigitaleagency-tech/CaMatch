@@ -88,12 +88,12 @@ export default function AdminInvoicesPage() {
       key: "invoice_number", label: "Facture", sortable: true, width: "160px",
       render: (inv) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-            <FileText className="w-4 h-4 text-gray-500" />
+          <div className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center">
+            <FileText className="w-4 h-4 text-cm-text-muted" />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{inv.invoice_number}</p>
-            <p className="text-[11px] text-gray-400 font-mono">{inv.id}</p>
+            <p className="text-[13px] font-medium text-cm-text">{inv.invoice_number}</p>
+            <p className="text-[11px] text-cm-text-muted font-mono">{inv.id}</p>
           </div>
         </div>
       ),
@@ -102,22 +102,22 @@ export default function AdminInvoicesPage() {
       key: "user", label: "Client", sortable: true, width: "160px",
       render: (inv) => (
         <div className="flex flex-col">
-          <span className="text-[13px] text-gray-700">{inv.user_name ?? inv.user_id}</span>
-          <span className="text-[11px] text-gray-400 font-mono">{inv.user_id}</span>
+          <span className="text-[13px] text-cm-text-soft">{inv.user_name ?? inv.user_id}</span>
+          <span className="text-[11px] text-cm-text-muted font-mono">{inv.user_id}</span>
         </div>
       ),
     },
     {
       key: "amount", label: "Montant HT", sortable: true, width: "100px",
-      render: (inv) => <span className="text-[12px] text-gray-700">{formatXOF(inv.amount)}</span>,
+      render: (inv) => <span className="text-[12px] text-cm-text-soft">{formatXOF(inv.amount)}</span>,
     },
     {
       key: "tax", label: "Taxe", sortable: true, width: "80px",
-      render: (inv) => <span className="text-[12px] text-gray-500">{formatXOF(inv.tax)}</span>,
+      render: (inv) => <span className="text-[12px] text-cm-text-muted">{formatXOF(inv.tax)}</span>,
     },
     {
       key: "total", label: "Total TTC", sortable: true, width: "100px",
-      render: (inv) => <span className="text-[13px] font-medium text-gray-900">{formatXOF(inv.total)}</span>,
+      render: (inv) => <span className="text-[13px] font-medium text-cm-text">{formatXOF(inv.total)}</span>,
     },
     {
       key: "status", label: "Statut", sortable: true, width: "100px",
@@ -129,7 +129,7 @@ export default function AdminInvoicesPage() {
       key: "date", label: "Date", sortable: true, width: "120px",
       render: (inv) => (
         <div className="flex flex-col">
-          <span className="text-[12px] text-gray-500">{format(new Date(inv.created_at), "dd MMM yyyy", { locale: fr })}</span>
+          <span className="text-[12px] text-cm-text-muted">{format(new Date(inv.created_at), "dd MMM yyyy", { locale: fr })}</span>
           {inv.paid_at && <span className="text-[11px] text-[var(--admin-accent)]">Payée le {format(new Date(inv.paid_at), "dd/MM/yy", { locale: fr })}</span>}
         </div>
       ),
@@ -139,7 +139,7 @@ export default function AdminInvoicesPage() {
       render: (inv) => (
         <button
           onClick={(e) => { e.stopPropagation(); downloadInvoice(inv) }}
-          className="flex items-center gap-1 px-2 h-7 rounded-lg text-[11px] font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 cursor-pointer"
+          className="flex items-center gap-1 px-2 h-7 rounded-lg text-[11px] font-medium text-cm-text-soft bg-cm-surface hover:bg-cm-surface cursor-pointer"
         >
           <Download className="w-3 h-3" /> Télécharger
         </button>
@@ -151,15 +151,15 @@ export default function AdminInvoicesPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Factures</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{invoices.length} factures émises</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Factures</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{invoices.length} factures émises</p>
         </div>
       </div>
 
       <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {STATUS_OPTIONS.map((f) => (
           <button key={f.key} onClick={() => setStatusFilter(f.key)}
-            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${statusFilter === f.key ? "bg-gray-900 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+            className={`px-3 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${statusFilter === f.key ? "bg-cm-text text-white" : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"}`}>
             {f.label}
             {f.key !== "all" && <span className="ml-1.5 text-[11px] opacity-60">({invoices.filter((inv) => inv.status === f.key).length})</span>}
           </button>

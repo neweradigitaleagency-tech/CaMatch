@@ -113,13 +113,13 @@ export default function AdminProsPage() {
       width: "200px",
       render: (p) => (
         <div className="flex items-center gap-2.5">
-          <div className="relative w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[12px] font-semibold text-gray-600 shrink-0">
+          <div className="relative w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center text-[12px] font-semibold text-cm-text-soft shrink-0">
             {getProName(p).charAt(0)}
-            <span className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 border-2 border-white rounded-full ${p.is_online ? "bg-green-500" : "bg-gray-300"}`} />
+            <span className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 border-2 border-white rounded-full ${p.is_online ? "bg-green-500" : "bg-cm-border-soft"}`} />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900 truncate">{getProName(p)}</p>
-            <p className="text-[11px] text-gray-400 truncate">{p.business_name || getCategoryLabel(p.categories[0] || "")}</p>
+            <p className="text-[13px] font-medium text-cm-text truncate">{getProName(p)}</p>
+            <p className="text-[11px] text-cm-text-muted truncate">{p.business_name || getCategoryLabel(p.categories[0] || "")}</p>
           </div>
         </div>
       ),
@@ -145,15 +145,15 @@ export default function AdminProsPage() {
       sortable: true,
       width: "80px",
       render: (p) => p.city ? (
-        <span className="flex items-center gap-1 text-[12px] text-gray-600"><MapPin className="w-3 h-3 text-gray-400" /> {p.city}</span>
-      ) : <span className="text-[12px] text-gray-400">—</span>,
+        <span className="flex items-center gap-1 text-[12px] text-cm-text-soft"><MapPin className="w-3 h-3 text-cm-text-muted" /> {p.city}</span>
+      ) : <span className="text-[12px] text-cm-text-muted">—</span>,
     },
     {
       key: "commune",
       label: "Commune",
       sortable: true,
       width: "100px",
-      render: (p) => <span className="text-[12px] text-gray-600">{p.commune || "—"}</span>,
+      render: (p) => <span className="text-[12px] text-cm-text-soft">{p.commune || "—"}</span>,
     },
     {
       key: "verification_level",
@@ -171,7 +171,7 @@ export default function AdminProsPage() {
       sortable: true,
       width: "70px",
       render: (p) => (
-        <span className="inline-flex items-center gap-1 text-[12px] font-medium text-gray-700">
+        <span className="inline-flex items-center gap-1 text-[12px] font-medium text-cm-text-soft">
           <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
           {p.rating.toFixed(1)}
         </span>
@@ -182,21 +182,21 @@ export default function AdminProsPage() {
       label: "Missions",
       sortable: true,
       width: "70px",
-      render: (p) => <span className="text-[12px] font-medium text-gray-700">{p.total_jobs}</span>,
+      render: (p) => <span className="text-[12px] font-medium text-cm-text-soft">{p.total_jobs}</span>,
     },
     {
       key: "total_earned",
       label: "CA",
       sortable: true,
       width: "100px",
-      render: (p) => <span className="text-[12px] font-medium text-gray-700">{formatXOF(p.total_earned)}</span>,
+      render: (p) => <span className="text-[12px] font-medium text-cm-text-soft">{formatXOF(p.total_earned)}</span>,
     },
     {
       key: "hourly_rate",
       label: "Tarif/h",
       sortable: true,
       width: "80px",
-      render: (p) => <span className="text-[12px] text-gray-600">{p.hourly_rate ? `${p.hourly_rate.toLocaleString()} F` : "—"}</span>,
+      render: (p) => <span className="text-[12px] text-cm-text-soft">{p.hourly_rate ? `${p.hourly_rate.toLocaleString()} F` : "—"}</span>,
     },
     {
       key: "is_available",
@@ -204,8 +204,8 @@ export default function AdminProsPage() {
       sortable: true,
       width: "65px",
       render: (p) => (
-        <span className={`inline-flex items-center gap-1.5 text-[12px] ${p.is_available ? "text-emerald-600" : "text-gray-400"}`}>
-          <span className={`w-2 h-2 rounded-full ${p.is_available ? "bg-emerald-500" : "bg-gray-300"}`} />
+        <span className={`inline-flex items-center gap-1.5 text-[12px] ${p.is_available ? "text-emerald-600" : "text-cm-text-muted"}`}>
+          <span className={`w-2 h-2 rounded-full ${p.is_available ? "bg-emerald-500" : "bg-cm-border-soft"}`} />
           {p.is_available ? "Oui" : "Non"}
         </span>
       ),
@@ -250,8 +250,8 @@ export default function AdminProsPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Professionnels</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">
+          <h1 className="text-[20px] font-bold text-cm-text">Professionnels</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">
             {total} pro{total !== 1 ? "s" : ""} sur la plateforme
           </p>
         </div>
@@ -272,8 +272,8 @@ export default function AdminProsPage() {
             onClick={() => setFilter(f.key)}
             className={`px-3.5 py-1.5 rounded-lg text-[12px] font-medium whitespace-nowrap cursor-pointer transition-colors ${
               filter === f.key
-                ? "bg-gray-900 text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                ? "bg-cm-text text-white"
+                : "bg-cm-elevated border border-cm-border text-cm-text-soft hover:bg-cm-surface"
             }`}
           >
             {f.label}
@@ -309,11 +309,11 @@ export default function AdminProsPage() {
 
 function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl px-3 py-2.5 flex items-center gap-2.5">
-      <span className="text-gray-400 shrink-0">{icon}</span>
+    <div className="bg-cm-elevated border border-cm-border rounded-xl px-3 py-2.5 flex items-center gap-2.5">
+      <span className="text-cm-text-muted shrink-0">{icon}</span>
       <div>
-        <p className="text-[15px] font-bold text-gray-900 leading-tight">{value}</p>
-        <p className="text-[10px] text-gray-500 leading-tight">{label}</p>
+        <p className="text-[15px] font-bold text-cm-text leading-tight">{value}</p>
+        <p className="text-[10px] text-cm-text-muted leading-tight">{label}</p>
       </div>
     </div>
   )

@@ -1,11 +1,11 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import RequestDetailScreen from "../../components/RequestDetailScreen";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import { useRequestStore } from "../../stores/requestStore";
 
 export default function RequestDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
-  const goBack = () => navigate(-1);
+  const { goBack, complete } = useAppNavigation();
   const request = useRequestStore((s) => s.requests.find((r) => r.id === id));
   const removeRequest = useRequestStore((s) => s.removeRequest);
 
@@ -23,7 +23,7 @@ export default function RequestDetailPage() {
       onBack={goBack}
       onDelete={(id) => {
         removeRequest(id);
-        navigate("/orders");
+        complete();
       }}
     />
   );

@@ -46,18 +46,18 @@ export default function AdminApplicationDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-dynamic bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin" />
+      <div className="min-h-dynamic bg-cm-surface flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-cm-border border-t-cm-text rounded-full animate-spin" />
       </div>
     )
   }
 
   if (error || !app) {
     return (
-      <div className="min-h-dynamic bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-[13px] text-gray-500">{error ?? "Candidature introuvable."}</p>
+      <div className="min-h-dynamic bg-cm-surface flex flex-col items-center justify-center gap-4">
+        <p className="text-[13px] text-cm-text-muted">{error ?? "Candidature introuvable."}</p>
         <button onClick={() => navigate("/admin/applications")}
-          className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg cursor-pointer">
+          className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg cursor-pointer">
           Retour
         </button>
       </div>
@@ -68,57 +68,57 @@ export default function AdminApplicationDetail() {
     <div className="max-w-2xl mx-auto space-y-4 animate-fade-in">
       <div className="flex items-center gap-3">
         <button onClick={() => navigate("/admin/applications")}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-gray-700" />
+          className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <div>
-          <h1 className="text-[18px] font-bold text-gray-900">{app.name}</h1>
-          <p className="text-[12px] text-gray-500">{app.email} · {app.phone}</p>
+          <h1 className="text-[18px] font-bold text-cm-text">{app.name}</h1>
+          <p className="text-[12px] text-cm-text-muted">{app.email} · {app.phone}</p>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4 space-y-4">
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4 space-y-4">
         <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-gray-500" />
-          <span className="text-[13px] font-semibold text-gray-900">Détails de la candidature</span>
+          <Eye className="w-4 h-4 text-cm-text-muted" />
+          <span className="text-[13px] font-semibold text-cm-text">Détails de la candidature</span>
         </div>
         <div className="grid grid-cols-2 gap-3 text-[12px]">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Localisation</p>
-            <p className="text-gray-900 font-medium">{app.location}</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Localisation</p>
+            <p className="text-cm-text font-medium">{app.location}</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Métiers</p>
-            <p className="text-gray-900 font-medium">{app.categories.map((c) => getCategoryLabel(c)).join(", ")}</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Métiers</p>
+            <p className="text-cm-text font-medium">{app.categories.map((c) => getCategoryLabel(c)).join(", ")}</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Expérience</p>
-            <p className="text-gray-900 font-medium">{app.experience_years} ans</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Expérience</p>
+            <p className="text-cm-text font-medium">{app.experience_years} ans</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Taux horaire</p>
-            <p className="text-gray-900 font-medium">{app.hourly_rate.toLocaleString("fr-FR")} F</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Taux horaire</p>
+            <p className="text-cm-text font-medium">{app.hourly_rate.toLocaleString("fr-FR")} F</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Statut</p>
-            <p className="text-gray-900 font-medium">{app.status === "SUBMITTED" ? "Soumise" : app.status === "UNDER_REVIEW" ? "En révision" : app.status === "APPROVED" ? "Approuvée" : "Rejetée"}</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Statut</p>
+            <p className="text-cm-text font-medium">{app.status === "SUBMITTED" ? "Soumise" : app.status === "UNDER_REVIEW" ? "En révision" : app.status === "APPROVED" ? "Approuvée" : "Rejetée"}</p>
           </div>
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-gray-500">Documents</p>
-            <p className="text-gray-900 font-medium">{app.documents_count} fichier{app.documents_count !== 1 ? "s" : ""}</p>
+          <div className="bg-cm-surface rounded-lg p-3">
+            <p className="text-cm-text-muted">Documents</p>
+            <p className="text-cm-text font-medium">{app.documents_count} fichier{app.documents_count !== 1 ? "s" : ""}</p>
           </div>
         </div>
       </div>
 
       {app.title && (
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <p className="text-[12px] font-semibold text-gray-900 mb-1">{app.title}</p>
-          <p className="text-[12px] text-gray-500">{app.bio}</p>
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <p className="text-[12px] font-semibold text-cm-text mb-1">{app.title}</p>
+          <p className="text-[12px] text-cm-text-muted">{app.bio}</p>
         </div>
       )}
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <label className="text-[12px] font-semibold text-gray-900 mb-2 flex items-center gap-1.5">
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+        <label className="text-[12px] font-semibold text-cm-text mb-2 flex items-center gap-1.5">
           <MessageSquare className="w-3.5 h-3.5" /> Notes de révision
         </label>
         <textarea
@@ -126,7 +126,7 @@ export default function AdminApplicationDetail() {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Ajouter une note..."
           rows={3}
-          className="w-full text-[13px] bg-gray-50 border border-gray-200 rounded-lg p-3 outline-none text-gray-900 placeholder-gray-400 resize-none"
+          className="w-full text-[13px] bg-cm-surface border border-cm-border rounded-lg p-3 outline-none text-cm-text placeholder:text-cm-text-muted resize-none"
         />
       </div>
 
@@ -158,16 +158,16 @@ export default function AdminApplicationDetail() {
 
       {showConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-xl px-6 py-5 mx-4 w-full max-w-sm shadow-xl">
-            <h3 className="text-[15px] font-bold text-gray-900 text-center mb-2">
+          <div className="bg-cm-elevated rounded-xl px-6 py-5 mx-4 w-full max-w-sm shadow-xl">
+            <h3 className="text-[15px] font-bold text-cm-text text-center mb-2">
               {showConfirm === "approve" ? "Approuver cette candidature ?" : "Rejeter cette candidature ?"}
             </h3>
-            <p className="text-[12px] text-gray-500 text-center mb-5">
+            <p className="text-[12px] text-cm-text-muted text-center mb-5">
               Cette action enverra une notification au professionnel.
             </p>
             <div className="flex gap-3">
               <button onClick={() => setShowConfirm(null)}
-                className="flex-1 h-11 rounded-xl text-[13px] font-semibold text-gray-600 border border-gray-200 cursor-pointer">
+                className="flex-1 h-11 rounded-xl text-[13px] font-semibold text-cm-text-soft border border-cm-border cursor-pointer">
                 Annuler
               </button>
               <button onClick={() => handleAction(showConfirm)}

@@ -1,6 +1,6 @@
-import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "motion/react"
 import { Store, Star, MapPin, BadgeCheck, ChevronRight } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import type { ProfessionalSeller } from "../../types/marketplace"
 
 interface CatalogSupplierCardProps {
@@ -18,8 +18,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 }
 
 export default function CatalogSupplierCard({ seller, productCount, index, featured }: CatalogSupplierCardProps) {
-  const nav = useNavigate()
-  const location = useLocation()
+  const { navigate: nav } = useAppNavigation()
 
   const displayCategories = seller.categories.slice(0, 2)
 
@@ -28,7 +27,7 @@ export default function CatalogSupplierCard({ seller, productCount, index, featu
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      onClick={() => nav(`/marketplace/shop/${seller.id}`, { state: { from: location.pathname + location.search } })}
+      onClick={() => nav(`/marketplace/shop/${seller.id}`)}
       className="w-full text-left bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden cursor-pointer hover:border-cm-accent/40 active:scale-[0.99] transition-all shadow-cm-card hover:shadow-cm-card-hov transition-shadow flex flex-col min-h-64"
     >
       {/* Banner */}

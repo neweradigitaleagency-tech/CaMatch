@@ -27,14 +27,14 @@ const ACTIVITY_COLORS: Record<string, string> = {
 }
 
 function SkeletonBlock({ className = "" }: { className?: string }) {
-  return <div className={`bg-gray-200/50 animate-pulse rounded-[14px] ${className}`} />
+  return <div className={`bg-cm-surface/50 animate-pulse rounded-[14px] ${className}`} />
 }
 
 function KpiCard({ icon: Icon, label, value, sub, trend, color }: { icon: typeof TrendingUp; label: string; value: string; sub?: string; trend?: { value: number; positive: boolean }; color?: string }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-3.5">
+    <div className="bg-cm-elevated rounded-xl border border-cm-border p-3.5">
       <div className="flex items-center justify-between mb-2">
-        <Icon className={`w-4 h-4 ${color ?? "text-gray-400"}`} />
+        <Icon className={`w-4 h-4 ${color ?? "text-cm-text-muted"}`} />
         {trend && (
           <span className={`flex items-center gap-0.5 text-[10px] font-semibold ${trend.positive ? "text-green-600" : "text-red-500"}`}>
             {trend.positive ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
@@ -42,31 +42,31 @@ function KpiCard({ icon: Icon, label, value, sub, trend, color }: { icon: typeof
           </span>
         )}
       </div>
-      <p className="text-[18px] font-bold text-gray-900 leading-tight">{value}</p>
-      <p className="text-[10px] text-gray-500 mt-0.5">{label}</p>
-      {sub && <p className="text-[9px] text-gray-400 mt-0.5">{sub}</p>}
+      <p className="text-[18px] font-bold text-cm-text leading-tight">{value}</p>
+      <p className="text-[10px] text-cm-text-muted mt-0.5">{label}</p>
+      {sub && <p className="text-[9px] text-cm-text-muted mt-0.5">{sub}</p>}
     </div>
   )
 }
 
 function ActivityRow({ activity }: { activity: DashboardRecentActivity }) {
   const Icon = ACTIVITY_ICONS[activity.type] ?? Clock
-  const color = ACTIVITY_COLORS[activity.type] ?? "bg-gray-100 text-gray-600"
+  const color = ACTIVITY_COLORS[activity.type] ?? "bg-cm-surface text-cm-text-soft"
   const navigate = useNavigate()
   return (
-    <div className="flex items-start gap-3 py-2.5 border-b border-gray-50 last:border-0">
+    <div className="flex items-start gap-3 py-2.5 border-b border-cm-border/40 last:border-0">
       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${color}`}>
         <Icon className="w-4 h-4" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-[12px] font-medium text-gray-900">{activity.label}</p>
-        <p className="text-[11px] text-gray-500">{activity.description}</p>
+        <p className="text-[12px] font-medium text-cm-text">{activity.label}</p>
+        <p className="text-[11px] text-cm-text-muted">{activity.description}</p>
         {activity.amount !== undefined && (
-          <p className="text-[11px] font-semibold text-gray-700 mt-0.5">{formatXOF(activity.amount)}</p>
+          <p className="text-[11px] font-semibold text-cm-text-soft mt-0.5">{formatXOF(activity.amount)}</p>
         )}
       </div>
       <div className="flex flex-col items-end gap-1 shrink-0">
-        <span className="text-[10px] text-gray-400">{new Date(activity.createdAt).toLocaleDateString("fr-FR")}</span>
+        <span className="text-[10px] text-cm-text-muted">{new Date(activity.createdAt).toLocaleDateString("fr-FR")}</span>
         {activity.referenceUrl && (
           <button onClick={() => navigate(activity.referenceUrl!)}
             className="text-[10px] text-cm-green font-semibold cursor-pointer hover:underline">
@@ -117,10 +117,10 @@ export default function SupplierDashboardScreen() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[22px] font-bold text-gray-900">
+          <h1 className="text-[22px] font-bold text-cm-text">
             Bonjour 👋
           </h1>
-          <p className="text-[13px] text-gray-500 mt-1">Aujourd'hui — {new Date().toLocaleDateString("fr-FR")}</p>
+          <p className="text-[13px] text-cm-text-muted mt-1">Aujourd'hui — {new Date().toLocaleDateString("fr-FR")}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => navigate("/supplier/products/new")}
@@ -153,48 +153,48 @@ export default function SupplierDashboardScreen() {
           color={(stats?.overdueInvoices ?? 0) > 0 ? "text-red-500" : "text-amber-500"} />
         <KpiCard icon={AlertTriangle} label="Stock faible" value={String(stats?.lowStockCount ?? 0)}
           sub={`${stats?.outOfStockCount ?? 0} en rupture`}
-          color={(stats?.lowStockCount ?? 0) > 0 ? "text-orange-500" : "text-gray-300"} />
+          color={(stats?.lowStockCount ?? 0) > 0 ? "text-orange-500" : "text-cm-border-soft"} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl border border-gray-200 p-4 lg:col-span-2 space-y-4">
+        <div className="bg-cm-elevated rounded-xl border border-cm-border p-4 lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-[15px] font-bold text-gray-900">Aperçu revenus (7 jours)</h2>
-            <span className="text-[11px] text-gray-400">
-              Total: <strong className="text-gray-700">{formatXOF(revenueData.reduce((s, r) => s + r.amount, 0))}</strong>
+            <h2 className="text-[15px] font-bold text-cm-text">Aperçu revenus (7 jours)</h2>
+            <span className="text-[11px] text-cm-text-muted">
+              Total: <strong className="text-cm-text-soft">{formatXOF(revenueData.reduce((s, r) => s + r.amount, 0))}</strong>
             </span>
           </div>
           <div className="flex items-end justify-between gap-2 h-32">
             {revenueData.map((r) => (
               <div key={r.day} className="flex-1 flex flex-col items-center gap-1">
                 <div className="w-full bg-cm-green/10 rounded-t-md relative transition-all duration-300 hover:bg-cm-green/20" style={{ height: `${Math.max(4, (r.amount / maxRevenue) * 100)}%` }}>
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-medium text-gray-600 whitespace-nowrap">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-medium text-cm-text-soft whitespace-nowrap">
                     {Math.round(r.amount / 1000)}k
                   </div>
                 </div>
-                <span className="text-[10px] text-gray-400">{r.day}</span>
+                <span className="text-[10px] text-cm-text-muted">{r.day}</span>
               </div>
             ))}
           </div>
 
-          <h2 className="text-[15px] font-bold text-gray-900 mt-2">Dernières commandes</h2>
+          <h2 className="text-[15px] font-bold text-cm-text mt-2">Dernières commandes</h2>
           {recentOrders.length === 0 ? (
-            <p className="text-[12px] text-gray-400 py-4 text-center">Aucune commande récente</p>
+            <p className="text-[12px] text-cm-text-muted py-4 text-center">Aucune commande récente</p>
           ) : (
             <div className="space-y-1">
               {recentOrders.map((order) => (
                 <div key={order.id} onClick={() => navigate(`/supplier/orders/${order.id}`)}
-                  className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                  className="flex items-center justify-between p-3 rounded-lg hover:bg-cm-surface transition-colors cursor-pointer">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-medium text-gray-900">{order.id.toUpperCase()}</p>
-                    <p className="text-[11px] text-gray-500 truncate">{order.clientName ?? "Client"} · {formatXOF(order.total)}</p>
+                    <p className="text-[13px] font-medium text-cm-text">{order.id.toUpperCase()}</p>
+                    <p className="text-[11px] text-cm-text-muted truncate">{order.clientName ?? "Client"} · {formatXOF(order.total)}</p>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
                     order.status === "PENDING_SUPPLIER" ? "bg-yellow-50 text-yellow-700" :
                     order.status === "PREPARING" ? "bg-indigo-50 text-indigo-600" :
                     order.status === "DELIVERED" ? "bg-green-50 text-green-700" :
                     order.status === "DELIVERING" ? "bg-blue-50 text-blue-600" :
-                    "bg-gray-50 text-gray-600"
+                    "bg-cm-surface text-cm-text-soft"
                   }`}>{getStatusLabel(order.status)}</span>
                 </div>
               ))}
@@ -203,22 +203,22 @@ export default function SupplierDashboardScreen() {
         </div>
 
         <div className="space-y-3">
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
             <div className="flex items-center justify-between mb-3">
-              <h2 className="text-[15px] font-bold text-gray-900">Activité récente</h2>
-              <Activity className="w-4 h-4 text-gray-400" />
+              <h2 className="text-[15px] font-bold text-cm-text">Activité récente</h2>
+              <Activity className="w-4 h-4 text-cm-text-muted" />
             </div>
-            <div className="divide-y divide-gray-50">
+            <div className="divide-y divide-cm-border/40">
               {activities && activities.length > 0 ? (
                 activities.slice(0, 6).map((a) => <ActivityRow key={a.id} activity={a} />)
               ) : (
-                <p className="text-[12px] text-gray-400 py-4 text-center">Aucune activité récente</p>
+                <p className="text-[12px] text-cm-text-muted py-4 text-center">Aucune activité récente</p>
               )}
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <h2 className="text-[15px] font-bold text-gray-900 mb-3">Actions rapides</h2>
+          <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+            <h2 className="text-[15px] font-bold text-cm-text mb-3">Actions rapides</h2>
             <div className="space-y-2">
               <button onClick={() => navigate("/supplier/products/new")}
                 className="w-full flex items-center gap-3 p-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer text-left">
@@ -264,23 +264,23 @@ export default function SupplierDashboardScreen() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
               <div className="flex items-center justify-between mb-2">
                 <Scale className="w-4 h-4 text-red-500" />
               </div>
-              <p className="text-[18px] font-bold text-gray-900">{stats?.openDisputes ?? 0}</p>
-              <p className="text-[10px] text-gray-500">Litiges ouverts</p>
+              <p className="text-[18px] font-bold text-cm-text">{stats?.openDisputes ?? 0}</p>
+              <p className="text-[10px] text-cm-text-muted">Litiges ouverts</p>
               {(stats?.openDisputes ?? 0) > 0 && (
                 <button onClick={() => navigate("/supplier/disputes")}
                   className="mt-2 text-[10px] text-cm-green font-semibold cursor-pointer hover:underline">Voir</button>
               )}
             </div>
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
               <div className="flex items-center justify-between mb-2">
                 <Truck className="w-4 h-4 text-blue-500" />
               </div>
-              <p className="text-[18px] font-bold text-gray-900">{stats?.activeDeliveries ?? 0}</p>
-              <p className="text-[10px] text-gray-500">Livraisons en cours</p>
+              <p className="text-[18px] font-bold text-cm-text">{stats?.activeDeliveries ?? 0}</p>
+              <p className="text-[10px] text-cm-text-muted">Livraisons en cours</p>
               {(stats?.activeDeliveries ?? 0) > 0 && (
                 <button onClick={() => navigate("/supplier/deliveries")}
                   className="mt-2 text-[10px] text-cm-green font-semibold cursor-pointer hover:underline">Voir</button>
@@ -288,8 +288,8 @@ export default function SupplierDashboardScreen() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 p-4">
-            <h2 className="text-[15px] font-bold text-gray-900 mb-3">
+          <div className="bg-cm-elevated rounded-xl border border-cm-border p-4">
+            <h2 className="text-[15px] font-bold text-cm-text mb-3">
               Stock ⚠️
               {onSaleProducts.length > 0 && (
                 <span className="ml-2 px-1.5 py-0.5 bg-red-100 rounded text-[10px] text-red-600 font-bold">{onSaleProducts.length} en promo</span>
@@ -297,8 +297,8 @@ export default function SupplierDashboardScreen() {
             </h2>
             {lowStockProducts.length === 0 && outOfStockProducts.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-4 text-center">
-                <Package className="w-8 h-8 text-gray-300 mb-2" />
-                <p className="text-[12px] text-gray-400">Tout est en stock</p>
+                <Package className="w-8 h-8 text-cm-border-soft mb-2" />
+                <p className="text-[12px] text-cm-text-muted">Tout est en stock</p>
               </div>
             ) : (
               <div className="space-y-1">
@@ -316,10 +316,10 @@ export default function SupplierDashboardScreen() {
                 ))}
               </div>
             )}
-            <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
+            <div className="mt-3 pt-3 border-t border-cm-border/40 flex items-center gap-2">
               <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-              <span className="text-[13px] font-semibold text-gray-900">{stats?.rating ?? 0}</span>
-              <span className="text-[11px] text-gray-500">Note fournisseur</span>
+              <span className="text-[13px] font-semibold text-cm-text">{stats?.rating ?? 0}</span>
+              <span className="text-[11px] text-cm-text-muted">Note fournisseur</span>
             </div>
           </div>
         </div>

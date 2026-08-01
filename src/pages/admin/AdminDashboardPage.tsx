@@ -71,8 +71,8 @@ export default function AdminDashboardPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Dashboard</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">Vue d'ensemble de la plateforme</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Dashboard</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">Vue d'ensemble de la plateforme</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ function AlertsSection({ alerts, navigate }: { alerts: DashboardStats["alerts"];
             <button
               key={alert.type}
               onClick={() => navigate(alert.link)}
-              className="flex items-center gap-3 bg-white border border-red-200 rounded-xl p-3 hover:shadow-sm transition-all cursor-pointer text-left"
+              className="flex items-center gap-3 bg-cm-elevated border border-red-200 rounded-xl p-3 hover:shadow-sm transition-all cursor-pointer text-left"
             >
               <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center shrink-0">
                 <Icon className="w-[18px] h-[18px] text-red-500" />
@@ -161,8 +161,8 @@ function KPIsSection({ stats }: { stats: DashboardStats }) {
 function ChartsSection({ stats }: { stats: DashboardStats }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Évolution des inscriptions (30 jours)</h3>
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+        <h3 className="text-[13px] font-semibold text-cm-text mb-4">Évolution des inscriptions (30 jours)</h3>
         <div className="h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={stats.charts.registrations}>
@@ -187,8 +187,8 @@ function ChartsSection({ stats }: { stats: DashboardStats }) {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Chiffre d'affaires (7 jours)</h3>
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+        <h3 className="text-[13px] font-semibold text-cm-text mb-4">Chiffre d'affaires (7 jours)</h3>
         <div className="h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={stats.charts.revenue}>
@@ -202,8 +202,8 @@ function ChartsSection({ stats }: { stats: DashboardStats }) {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Missions par catégorie</h3>
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+        <h3 className="text-[13px] font-semibold text-cm-text mb-4">Missions par catégorie</h3>
         <div className="h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={stats.charts.missions_by_category} layout="vertical">
@@ -217,8 +217,8 @@ function ChartsSection({ stats }: { stats: DashboardStats }) {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
-        <h3 className="text-[13px] font-semibold text-gray-900 mb-4">Villes les plus actives</h3>
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+        <h3 className="text-[13px] font-semibold text-cm-text mb-4">Villes les plus actives</h3>
         <div className="h-[220px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={stats.charts.cities} layout="vertical">
@@ -237,36 +237,36 @@ function ChartsSection({ stats }: { stats: DashboardStats }) {
 
 function ActivitySection({ stats }: { stats: DashboardStats }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl">
-      <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-[13px] font-semibold text-gray-900">Activité récente</h3>
-        <span className="flex items-center gap-1 text-[11px] text-gray-400">
+    <div className="bg-cm-elevated border border-cm-border rounded-xl">
+      <div className="px-4 py-3 border-b border-cm-border/40 flex items-center justify-between">
+        <h3 className="text-[13px] font-semibold text-cm-text">Activité récente</h3>
+        <span className="flex items-center gap-1 text-[11px] text-cm-text-muted">
           <Clock className="w-3 h-3" /> Temps réel
         </span>
       </div>
-      <div className="divide-y divide-gray-50 max-h-[380px] overflow-y-auto">
+      <div className="divide-y divide-cm-border/40 max-h-[380px] overflow-y-auto">
         {stats.activity.length === 0 ? (
-          <div className="px-4 py-8 text-center text-[13px] text-gray-400">
+          <div className="px-4 py-8 text-center text-[13px] text-cm-text-muted">
             Aucune activité récente
           </div>
         ) : (
           stats.activity.map((a) => {
-            const iconDef = ACTIVITY_ICONS[a.type] ?? { icon: Clock, bg: "bg-gray-100", text: "text-gray-500" }
+            const iconDef = ACTIVITY_ICONS[a.type] ?? { icon: Clock, bg: "bg-cm-surface", text: "text-cm-text-muted" }
             const Icon = iconDef.icon
             return (
-              <div key={a.id} className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition-colors">
+              <div key={a.id} className="flex items-start gap-3 px-4 py-3 hover:bg-cm-surface transition-colors">
                 <div className={`w-8 h-8 rounded-lg ${iconDef.bg} ${iconDef.text} flex items-center justify-center shrink-0`}>
                   <Icon className="w-[15px] h-[15px]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     {a.user_name && (
-                      <span className="text-[13px] font-medium text-gray-900">{a.user_name}</span>
+                      <span className="text-[13px] font-medium text-cm-text">{a.user_name}</span>
                     )}
-                    <span className="text-[12px] text-gray-500">{a.description}</span>
+                    <span className="text-[12px] text-cm-text-muted">{a.description}</span>
                   </div>
                 </div>
-                <span className="text-[11px] text-gray-400 whitespace-nowrap">{a.time}</span>
+                <span className="text-[11px] text-cm-text-muted whitespace-nowrap">{a.time}</span>
               </div>
             )
           })
@@ -278,25 +278,25 @@ function ActivitySection({ stats }: { stats: DashboardStats }) {
 
 function CitiesSection({ cities }: { cities: { city: string; count: number }[] }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl">
-      <div className="px-4 py-3 border-b border-gray-100">
-        <h3 className="text-[13px] font-semibold text-gray-900">Top villes</h3>
+    <div className="bg-cm-elevated border border-cm-border rounded-xl">
+      <div className="px-4 py-3 border-b border-cm-border/40">
+        <h3 className="text-[13px] font-semibold text-cm-text">Top villes</h3>
       </div>
-      <div className="divide-y divide-gray-50">
+      <div className="divide-y divide-cm-border/40">
         {cities.length === 0 ? (
-          <div className="px-4 py-8 text-center text-[13px] text-gray-400">
+          <div className="px-4 py-8 text-center text-[13px] text-cm-text-muted">
             Aucune donnée disponible
           </div>
         ) : (
           cities.map((c, i) => (
             <div key={c.city} className="flex items-center gap-3 px-4 py-2.5">
-              <span className="w-5 text-[11px] font-medium text-gray-400 text-center">#{i + 1}</span>
+              <span className="w-5 text-[11px] font-medium text-cm-text-muted text-center">#{i + 1}</span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] text-gray-700">{c.city}</span>
-                  <span className="text-[12px] font-medium text-gray-900">{c.count}</span>
+                  <span className="text-[13px] text-cm-text-soft">{c.city}</span>
+                  <span className="text-[12px] font-medium text-cm-text">{c.count}</span>
                 </div>
-                <div className="mt-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="mt-1 h-1.5 bg-cm-surface rounded-full overflow-hidden">
                   <div className="h-full bg-blue-500 rounded-full" style={{ width: `${Math.min(100, (c.count / (cities[0]?.count || 1)) * 100)}%` }} />
                 </div>
               </div>
@@ -313,18 +313,18 @@ function DashboardSkeleton() {
     <div className="space-y-4 animate-pulse">
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
         {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="h-3 bg-gray-200 rounded w-1/2 mb-3" />
-            <div className="h-7 bg-gray-200 rounded w-1/3 mb-2" />
-            <div className="h-3 bg-gray-200 rounded w-1/4" />
+          <div key={i} className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+            <div className="h-3 bg-cm-border-soft rounded w-1/2 mb-3" />
+            <div className="h-7 bg-cm-border-soft rounded w-1/3 mb-2" />
+            <div className="h-3 bg-cm-border-soft rounded w-1/4" />
           </div>
         ))}
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="h-3 bg-gray-200 rounded w-1/4 mb-4" />
-            <div className="h-[220px] bg-gray-100 rounded-lg" />
+          <div key={i} className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+            <div className="h-3 bg-cm-border-soft rounded w-1/4 mb-4" />
+            <div className="h-[220px] bg-cm-surface rounded-lg" />
           </div>
         ))}
       </div>

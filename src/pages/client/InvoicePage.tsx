@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useAppNavigation } from "../../navigation/useAppNavigation";
 import InvoiceScreen from "../../components/InvoiceScreen";
 import type { Mission, Invoice } from "../../types";
 
@@ -32,13 +32,11 @@ const MOCK_INVOICE: Invoice = {
 };
 
 export default function InvoicePage() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const goBack = () => navigate(-1);
-  const mission = (location.state as { mission: Mission })?.mission;
+  const { goBack, complete, getFlow } = useAppNavigation();
+  const mission = getFlow<Mission>("mission");
 
   if (!mission) {
-    navigate("/orders", { replace: true });
+    complete({ flow: "mission" });
     return null;
   }
 

@@ -88,23 +88,23 @@ export default function AdminProDetailPage() {
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div className="flex items-center gap-3">
-        <button onClick={() => navigate("/admin/pros")} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 cursor-pointer">
-          <ArrowLeft className="w-4 h-4 text-gray-600" />
+        <button onClick={() => navigate("/admin/pros")} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-cm-surface cursor-pointer">
+          <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Profil professionnel</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">Détails et gestion du compte pro</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Profil professionnel</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">Détails et gestion du compte pro</p>
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-6">
         <div className="flex flex-col sm:flex-row items-start gap-5">
-          <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-[20px] font-bold text-gray-600 shrink-0">
+          <div className="w-16 h-16 rounded-full bg-cm-surface flex items-center justify-center text-[20px] font-bold text-cm-text-soft shrink-0">
             {getInitials(pro.first_name, pro.last_name)}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-[18px] font-bold text-gray-900">{name}</h2>
+              <h2 className="text-[18px] font-bold text-cm-text">{name}</h2>
               {pro.is_online && (
                 <span className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
                   <Circle className="w-2 h-2 fill-emerald-500" /> En ligne
@@ -117,22 +117,22 @@ export default function AdminProDetailPage() {
               />
             </div>
             {pro.business_name && (
-              <p className="text-[14px] font-medium text-gray-600 mt-0.5">{pro.business_name}</p>
+              <p className="text-[14px] font-medium text-cm-text-soft mt-0.5">{pro.business_name}</p>
             )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3">
-              <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+              <div className="flex items-center gap-1.5 text-[12px] text-cm-text-muted">
                 <Mail className="w-3.5 h-3.5" /> {pro.email}
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+              <div className="flex items-center gap-1.5 text-[12px] text-cm-text-muted">
                 <Phone className="w-3.5 h-3.5" /> {pro.phone_number || "—"}
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+              <div className="flex items-center gap-1.5 text-[12px] text-cm-text-muted">
                 <Briefcase className="w-3.5 h-3.5" /> {pro.categories.map((c) => getCategoryLabel(c)).join(", ")}
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+              <div className="flex items-center gap-1.5 text-[12px] text-cm-text-muted">
                 <MapPin className="w-3.5 h-3.5" /> {pro.city || "—"}{pro.commune ? ` — ${pro.commune}` : ""}
               </div>
-              <div className="flex items-center gap-1.5 text-[12px] text-gray-500">
+              <div className="flex items-center gap-1.5 text-[12px] text-cm-text-muted">
                 <Calendar className="w-3.5 h-3.5" /> Membre depuis {format(new Date(pro.created_at), "MMMM yyyy", { locale: fr })}
               </div>
             </div>
@@ -140,7 +140,7 @@ export default function AdminProDetailPage() {
         </div>
 
         {hasPermission("pros.verify") && (
-          <div className="flex flex-wrap gap-2 mt-6 pt-5 border-t border-gray-100">
+          <div className="flex flex-wrap gap-2 mt-6 pt-5 border-t border-cm-border/40">
             {!pro.is_verified && (
               <button onClick={() => handleVerify(true)} disabled={actionLoading === "verify"}
                 className="flex items-center gap-1.5 h-9 px-4 rounded-lg text-[12px] font-medium cursor-pointer disabled:opacity-50 transition-colors bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100">
@@ -202,31 +202,31 @@ export default function AdminProDetailPage() {
           <DetailRow label="Revenu total" value={formatXOF(pro.total_earned)} />
           <DetailRow label="Portefeuille" value={formatXOF(pro.wallet_balance ?? 0)} />
           {pro.bio && (
-            <div className="mt-4 pt-4 border-t border-gray-100 col-span-full">
-              <p className="text-[11px] text-gray-500 font-medium mb-1.5">Bio</p>
-              <p className="text-[12px] text-gray-700 leading-relaxed">{pro.bio}</p>
+            <div className="mt-4 pt-4 border-t border-cm-border/40 col-span-full">
+              <p className="text-[11px] text-cm-text-muted font-medium mb-1.5">Bio</p>
+              <p className="text-[12px] text-cm-text-soft leading-relaxed">{pro.bio}</p>
             </div>
           )}
         </Section>
 
         <Section title="Localisation">
-          <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+          <div className="flex flex-col items-center justify-center py-6 text-cm-text-muted">
             <MapPin className="w-8 h-8 mb-2" />
-            <p className="text-[13px] font-medium text-gray-500">{pro.city || "Ville non renseignée"}{pro.commune ? ` — ${pro.commune}` : ""}</p>
-            <p className="text-[11px] text-gray-400">Cliquez pour voir sur la carte</p>
+            <p className="text-[13px] font-medium text-cm-text-muted">{pro.city || "Ville non renseignée"}{pro.commune ? ` — ${pro.commune}` : ""}</p>
+            <p className="text-[11px] text-cm-text-muted">Cliquez pour voir sur la carte</p>
           </div>
         </Section>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-3 flex items-center gap-2">
             <FileText className="w-4 h-4" /> Documents de vérification
           </h3>
           <div className="space-y-2">
             {["Pièce d'identité", "Diplôme / Certificat", "Justificatif de domicile", "Assurance"].map((label) => (
-              <div key={label} className="flex items-center justify-between p-3 rounded-lg bg-gray-50">
-                <span className="text-[12px] text-gray-700">{label}</span>
+              <div key={label} className="flex items-center justify-between p-3 rounded-lg bg-cm-surface">
+                <span className="text-[12px] text-cm-text-soft">{label}</span>
                 <span className="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
                   <CheckCircle className="w-3 h-3" /> Reçu
                 </span>
@@ -235,8 +235,8 @@ export default function AdminProDetailPage() {
           </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <h3 className="text-[13px] font-semibold text-gray-900 mb-3 flex items-center gap-2">
+        <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+          <h3 className="text-[13px] font-semibold text-cm-text mb-3 flex items-center gap-2">
             <Award className="w-4 h-4" /> Badges
           </h3>
           <div className="flex flex-wrap gap-2">
@@ -249,14 +249,14 @@ export default function AdminProDetailPage() {
         </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl">
-        <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="flex items-center gap-2 text-[13px] font-semibold text-gray-900">
+      <div className="bg-cm-elevated border border-cm-border rounded-xl">
+        <div className="px-4 py-3 border-b border-cm-border/40 flex items-center justify-between">
+          <h3 className="flex items-center gap-2 text-[13px] font-semibold text-cm-text">
             <MessageSquare className="w-4 h-4" /> Avis récents
           </h3>
-          <span className="text-[11px] text-gray-400">—</span>
+          <span className="text-[11px] text-cm-text-muted">—</span>
         </div>
-        <div className="px-4 py-8 text-center text-[13px] text-gray-400">
+        <div className="px-4 py-8 text-center text-[13px] text-cm-text-muted">
           Chargement des avis depuis la base de données en cours...
         </div>
       </div>
@@ -266,20 +266,20 @@ export default function AdminProDetailPage() {
 
 function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-gray-400">{icon}</span>
-        <span className="text-[11px] text-gray-500 font-medium">{label}</span>
+        <span className="text-cm-text-muted">{icon}</span>
+        <span className="text-[11px] text-cm-text-muted font-medium">{label}</span>
       </div>
-      <p className="text-[15px] font-bold text-gray-900">{value}</p>
+      <p className="text-[15px] font-bold text-cm-text">{value}</p>
     </div>
   )
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
-      <h3 className="text-[13px] font-semibold text-gray-900 mb-3">{title}</h3>
+    <div className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+      <h3 className="text-[13px] font-semibold text-cm-text mb-3">{title}</h3>
       <dl className="space-y-2.5">{children}</dl>
     </div>
   )
@@ -288,8 +288,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between">
-      <dt className="text-[12px] text-gray-500">{label}</dt>
-      <dd className="text-[12px] font-medium text-gray-900 text-right">{value}</dd>
+      <dt className="text-[12px] text-cm-text-muted">{label}</dt>
+      <dd className="text-[12px] font-medium text-cm-text text-right">{value}</dd>
     </div>
   )
 }
@@ -298,27 +298,27 @@ function DetailSkeleton() {
   return (
     <div className="space-y-6 animate-pulse max-w-4xl">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-gray-200 rounded-lg" />
+        <div className="w-8 h-8 bg-cm-border-soft rounded-lg" />
         <div className="space-y-1">
-          <div className="h-5 bg-gray-200 rounded w-56" />
-          <div className="h-3 bg-gray-200 rounded w-32" />
+          <div className="h-5 bg-cm-border-soft rounded w-56" />
+          <div className="h-3 bg-cm-border-soft rounded w-32" />
         </div>
       </div>
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <div className="bg-cm-elevated border border-cm-border rounded-xl p-6">
         <div className="flex items-start gap-5">
-          <div className="w-16 h-16 bg-gray-200 rounded-full" />
+          <div className="w-16 h-16 bg-cm-border-soft rounded-full" />
           <div className="flex-1 space-y-2">
-            <div className="h-5 bg-gray-200 rounded w-56" />
-            <div className="h-3 bg-gray-200 rounded w-48" />
-            <div className="h-3 bg-gray-200 rounded w-72" />
+            <div className="h-5 bg-cm-border-soft rounded w-56" />
+            <div className="h-3 bg-cm-border-soft rounded w-48" />
+            <div className="h-3 bg-cm-border-soft rounded w-72" />
           </div>
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="bg-white border border-gray-200 rounded-xl p-4">
-            <div className="h-3 bg-gray-200 rounded w-16 mb-2" />
-            <div className="h-5 bg-gray-200 rounded w-24" />
+          <div key={i} className="bg-cm-elevated border border-cm-border rounded-xl p-4">
+            <div className="h-3 bg-cm-border-soft rounded w-16 mb-2" />
+            <div className="h-5 bg-cm-border-soft rounded w-24" />
           </div>
         ))}
       </div>

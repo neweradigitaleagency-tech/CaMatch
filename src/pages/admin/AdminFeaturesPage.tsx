@@ -115,23 +115,23 @@ export default function AdminFeaturesPage() {
       key: "name", label: "Nom", sortable: true, width: "250px",
       render: (f) => (
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-            <Puzzle className="w-4 h-4 text-gray-500" />
+          <div className="w-8 h-8 rounded-lg bg-cm-surface flex items-center justify-center">
+            <Puzzle className="w-4 h-4 text-cm-text-muted" />
           </div>
           <div className="min-w-0">
-            <p className="text-[13px] font-medium text-gray-900">{f.name}</p>
-            <p className="text-[11px] text-gray-400">{f.description ?? "—"}</p>
+            <p className="text-[13px] font-medium text-cm-text">{f.name}</p>
+            <p className="text-[11px] text-cm-text-muted">{f.description ?? "—"}</p>
           </div>
         </div>
       ),
     },
     {
       key: "code", label: "Code", sortable: true, width: "180px",
-      render: (f) => <code className="text-[12px] font-mono text-gray-600 bg-gray-50 px-1.5 py-0.5 rounded">{f.code}</code>,
+      render: (f) => <code className="text-[12px] font-mono text-cm-text-soft bg-cm-surface px-1.5 py-0.5 rounded">{f.code}</code>,
     },
     {
       key: "id", label: "ID", width: "120px",
-      render: (f) => <span className="text-[11px] font-mono text-gray-400">{f.id}</span>,
+      render: (f) => <span className="text-[11px] font-mono text-cm-text-muted">{f.id}</span>,
     },
     {
       key: "actions", label: "", width: "100px",
@@ -152,11 +152,11 @@ export default function AdminFeaturesPage() {
     <div className="space-y-4 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[20px] font-bold text-gray-900">Fonctionnalités</h1>
-          <p className="text-[13px] text-gray-500 mt-0.5">{features.length} fonctionnalités disponibles</p>
+          <h1 className="text-[20px] font-bold text-cm-text">Fonctionnalités</h1>
+          <p className="text-[13px] text-cm-text-muted mt-0.5">{features.length} fonctionnalités disponibles</p>
         </div>
         <button onClick={openCreate}
-          className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer">
+          className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer">
           <Plus className="w-3.5 h-3.5" /> Nouvelle fonctionnalité
         </button>
       </div>
@@ -175,26 +175,26 @@ export default function AdminFeaturesPage() {
         title={editId ? "Modifier la fonctionnalité" : "Nouvelle fonctionnalité"} size="md">
         <div className="space-y-4">
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Nom</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Nom</label>
             <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
           </div>
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Code</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Code</label>
             <input type="text" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })}
               placeholder="feature_code"
-              className="w-full h-9 px-3 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300" />
+              className="w-full h-9 px-3 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border" />
           </div>
           <div>
-            <label className="block text-[12px] font-medium text-gray-700 mb-1">Description</label>
+            <label className="block text-[12px] font-medium text-cm-text-soft mb-1">Description</label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full h-20 px-3 py-2 text-[13px] bg-gray-50 border border-gray-200 rounded-lg outline-none text-gray-900 focus:border-gray-300 resize-none" />
+              className="w-full h-20 px-3 py-2 text-[13px] bg-cm-surface border border-cm-border rounded-lg outline-none text-cm-text focus:border-cm-border resize-none" />
           </div>
           <div className="flex items-center justify-end gap-2 pt-2">
             <button onClick={() => setModalOpen(false)} disabled={saving}
-              className="h-9 px-4 text-[12px] font-medium text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer disabled:opacity-50">Annuler</button>
+              className="h-9 px-4 text-[12px] font-medium text-cm-text-soft bg-cm-elevated border border-cm-border rounded-lg hover:bg-cm-surface cursor-pointer disabled:opacity-50">Annuler</button>
             <button onClick={handleSave} disabled={saving || !form.name || !form.code}
-              className="h-9 px-4 bg-gray-900 text-white text-[12px] font-medium rounded-lg hover:bg-gray-800 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
+              className="h-9 px-4 bg-cm-text text-white text-[12px] font-medium rounded-lg hover:bg-cm-text/80 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50">
               <Save className="w-3.5 h-3.5" /> {saving ? "Enregistrement…" : editId ? "Enregistrer" : "Créer"}
             </button>
           </div>

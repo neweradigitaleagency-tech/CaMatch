@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Search, Star, ChevronRight, MapPin, X, Bell, ChevronDown, Menu, ClipboardList, SlidersHorizontal, MessageCircle, Sparkles, ArrowRight } from "lucide-react";
 import { ProfessionalDetails, Mission } from "../types";
@@ -13,6 +13,7 @@ import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, haversineKm, LOCATIONS } from "../stores/locationStore";
 import { smartSearchSuggestions } from "../data/serviceCategories";
 import { useProFilters } from "../hooks/useProFilters";
+import { useNavigationStore } from "../navigation/navigationStore";
 import NotificationPanel from "./NotificationPanel";
 import HamburgerDrawer from "./HamburgerDrawer";
 
@@ -41,14 +42,16 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
   const [searched, setSearched] = useState(false);
   const taskManagerRef = useRef<HTMLDivElement>(null);
   const nav = useNavigate();
-  const loc = useLocation();
+
+  const reopenMenu = useNavigationStore((s) => s.flags["reopen-menu"] === true);
+  const clearFlag = useNavigationStore((s) => s.clearFlag);
 
   useEffect(() => {
-    if (loc.state?.reopenMenu) {
+    if (reopenMenu) {
       setShowDrawer(true);
-      window.history.replaceState({}, "");
+      clearFlag("reopen-menu");
     }
-  }, [loc.state?.reopenMenu]);
+  }, [reopenMenu, clearFlag]);
 
   const user = useAuthStore((s) => s.user);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Marie";
@@ -250,7 +253,7 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
           <div className="mt-2 flex flex-wrap gap-1.5">
             {smartSearchSuggestions(filters.query).map((s) => (
               <button key={s.subName} onClick={() => { setFilter("query", s.subName); setSearched(true); }}
-                className="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-full text-[11px] font-medium text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors">
+                className="px-3 py-1.5 bg-cm-surface border border-cm-border rounded-full text-[11px] font-medium text-cm-text cursor-pointer hover:bg-cm-surface/80 transition-colors">
                 {s.label}
               </button>
             ))}
@@ -270,9 +273,9 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
                   <div className="w-9 h-9 rounded-xl bg-amber-500 flex items-center justify-center">
                     <Sparkles className="w-4 h-4 text-white" />
                   </div>
-                  <p className="text-[14px] font-bold text-gray-900">Passez à Ça Match Plus</p>
+                  <p className="text-[14px] font-bold text-cm-text">Passez à Ça Match Plus</p>
                 </div>
-                <p className="text-[12px] text-gray-600 ml-12">Trouvez le bon professionnel 2x plus rapidement.</p>
+                <p className="text-[12px] text-cm-text-soft ml-12">Trouvez le bon professionnel 2x plus rapidement.</p>
                 <div className="flex items-center gap-1 text-[12px] font-semibold text-amber-600 mt-1.5 ml-12">
                   Découvrir <ArrowRight className="w-3.5 h-3.5" />
                 </div>
@@ -383,32 +386,32 @@ export default function ExplorerScreen({ onSelectPro, recommendedPros, activeMis
                   const rating = (pro.rating / 10).toFixed(1);
                   return (
                     <motion.div layout key={`nearby-${pro.id}`} onClick={() => onSelectPro(pro)}
-                      className="flex items-center gap-3 p-3.5 bg-white border border-gray-200 rounded-2xl cursor-pointer hover:border-gray-300 transition-all shadow-sm group">
-                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-100 shrink-0">
+                      className="flex items-center gap-3 p-3.5 bg-cm-elevated border border-cm-border rounded-2xl cursor-pointer hover:border-cm-text-muted transition-all shadow-sm group">
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-cm-border-soft shrink-0">
                         <img alt={pro.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" referrerPolicy="no-referrer" src={pro.avatarUrl} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <h4 className="text-[13px] font-semibold text-gray-900 truncate">{pro.name}</h4>
+                          <h4 className="text-[13px] font-semibold text-cm-text truncate">{pro.name}</h4>
                           {pro.isVerified && (
                             <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 text-blue-500 shrink-0" fill="none" xmlns="http://www.w3.org/2000/svg">
                               <circle cx="12" cy="12" r="10" fill="currentColor" />
                               <path d="M7 12.5L10.5 16L17 9" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           )}
-                          <span className="text-[11px] text-gray-400 shrink-0 flex items-center gap-0.5 ml-auto">
+                          <span className="text-[11px] text-cm-text-muted shrink-0 flex items-center gap-0.5 ml-auto">
                             <MapPin className="w-2.5 h-2.5" />{dist.toFixed(1)} km
                           </span>
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] text-gray-900 font-medium truncate">{pro.title || pro.subCategory}</span>
-                          <span className="text-[11px] text-gray-400 flex items-center gap-0.5">
+                          <span className="text-[11px] text-cm-text font-medium truncate">{pro.title || pro.subCategory}</span>
+                          <span className="text-[11px] text-cm-text-muted flex items-center gap-0.5">
                             <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />{rating}
                           </span>
                         </div>
                       </div>
                       <button onClick={(e) => { e.stopPropagation(); onSelectPro(pro); }}
-                        className="shrink-0 text-[12px] font-bold bg-gray-900 text-white px-4 py-2 rounded-full cursor-pointer hover:opacity-90 active:scale-95 transition-all">
+                        className="shrink-0 text-[12px] font-bold bg-cm-text text-cm-elevated px-4 py-2 rounded-full cursor-pointer hover:opacity-90 active:scale-95 transition-all">
                         Voir
                       </button>
                     </motion.div>
