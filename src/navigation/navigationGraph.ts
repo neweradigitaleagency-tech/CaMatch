@@ -138,14 +138,20 @@ export const NAVIGATION_GRAPH: NavigationNode[] = [
   { route: "/settings/subscription/history", type: "settings", roles: ["client"], parent: "/settings/subscription", fallback: "/settings/subscription" },
   { route: "/settings/subscription/invoices", type: "settings", roles: ["client"], parent: "/settings/subscription", fallback: "/settings/subscription" },
 
-  // Marketplace (littéraux AVANT /marketplace/:categoryId)
+  // Marketplace (littéraux AVANT les patterns AVANT le catch-all)
   { route: "/marketplace", type: "exploration", roles: ["client"], parent: "/", fallback: "/" },
+  { route: "/marketplace/explore", type: "listing", roles: ["client"], parent: "/marketplace", fallback: "/marketplace" },
+  { route: "/marketplace/publish", type: "wizard", roles: ["client"], parent: "/marketplace", fallback: "/marketplace", completion: "/marketplace", hideNav: true },
+  { route: "/marketplace/profile", type: "profile", roles: ["client"], parent: "/marketplace", fallback: "/marketplace" },
   { route: "/marketplace/boutiques", type: "listing", roles: ["client"], parent: "/marketplace", fallback: "/marketplace" },
   { route: "/marketplace/register", type: "wizard", roles: ["client"], parent: "/marketplace", fallback: "/marketplace", completion: "/marketplace", hideNav: true },
   { route: "/marketplace/cart", type: "transactional", roles: ["client"], parent: "/marketplace", fallback: "/marketplace" },
   { route: "/marketplace/checkout", type: "transactional", roles: ["client"], parent: "/marketplace/cart", fallback: "/marketplace/cart", completion: "/marketplace/order/confirm/:orderId", hideNav: true },
   { route: "/marketplace/orders", type: "profile", roles: ["client"], parent: "/marketplace", fallback: "/marketplace" },
+  { route: "/marketplace/seller", type: "profile", roles: ["client"], parent: "/marketplace", fallback: "/marketplace", hideNav: true },
   { route: "/marketplace/order/confirm/:orderId", type: "transactional", roles: ["client"], parent: "/marketplace/checkout", fallback: "/marketplace", hideNav: true },
+  { route: "/marketplace/orders/:orderId", type: "profile", roles: ["client"], parent: "/marketplace/orders", fallback: "/marketplace/orders", hideNav: true },
+  { route: "/marketplace/dispute/:orderId", type: "transactional", roles: ["client"], parent: "/marketplace/orders", fallback: "/marketplace/orders", hideNav: true },
   { route: "/marketplace/browse/:vertical", type: "listing", roles: ["client"], parent: "/marketplace", fallback: "/marketplace" },
   { route: "/marketplace/shop/:sellerId", type: "profile", roles: ["client"], parent: "/marketplace/boutiques", fallback: "/marketplace", hideNav: true },
   { route: "/marketplace/supplier/:sellerId", type: "profile", roles: ["client"], parent: "/marketplace", fallback: "/marketplace", hideNav: true },

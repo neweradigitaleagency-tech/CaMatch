@@ -3,7 +3,7 @@ import type { MarketplaceCategory } from "../types/marketplace"
 export const MARKETPLACE_CATEGORIES: MarketplaceCategory[] = [
   // ── Pro Supply ──
   {
-    id: "pro_supply", vertical: "pro_supply", name: "Pro Supply",
+    id: "pro_supply", vertical: "pro_supply", name: "Quincailleries",
     slug: "pro-supply", description: "Matériaux & fournitures pour professionnels",
     icon: "building-2", color: "#243318",
     children: [

@@ -1,11 +1,13 @@
 import { useState, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 import { motion } from "motion/react";
 import { Search, MapPin, Star, X } from "lucide-react";
 import { LOCATIONS } from "../stores/locationStore";
 import PageHeader from "./ui/PageHeader";
 import { FREELANCE_CATEGORIES, FREELANCERS, getAllFreelancers } from "../data/freelanceCategories";
 import FavoriteButton from "./FavoriteButton";
+import { formatPriceLabel } from "../data/pricing";
 import type { FreelancerProfile } from "../data/freelanceCategories";
 
 function favItemForPro(pro: FreelancerProfile) {
@@ -16,13 +18,13 @@ function favItemForPro(pro: FreelancerProfile) {
     subtitle: pro.title,
     image: pro.avatarUrl,
     rating: pro.rating,
-    priceLabel: `${pro.hourlyRate.toLocaleString()} F/h`,
+    priceLabel: formatPriceLabel(pro.hourlyRate),
     route: `/explorer/pro/${pro.id}`,
   };
 }
 
 export default function FreelanceListingScreen() {
-  const nav = useNavigate();
+  const { navigate: nav } = useAppNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
@@ -58,16 +60,16 @@ export default function FreelanceListingScreen() {
 
   const toggleCategory = (catId: string) => {
     if (activeCategoryId === catId) {
-      setSearchParams(new URLSearchParams());
+      setSearchParams(new URLSearchParams(), { replace: true });
     } else {
-      setSearchParams(new URLSearchParams({ category: catId }));
+      setSearchParams(new URLSearchParams({ category: catId }), { replace: true });
     }
   };
 
   const resetAll = () => {
     setQuery("");
     setLocationFilter("");
-    setSearchParams(new URLSearchParams());
+    setSearchParams(new URLSearchParams(), { replace: true });
   };
 
   return (
@@ -161,7 +163,7 @@ export default function FreelanceListingScreen() {
                     <span className="text-[10px] text-cm-text-soft flex items-center gap-0.5">
                       <MapPin className="w-2.5 h-2.5" />{pro.location}
                     </span>
-                    <span className="text-[10px] font-bold text-cm-forest">{pro.hourlyRate.toLocaleString()} F</span>
+                    <span className="text-[10px] font-bold text-cm-forest truncate min-w-0">{formatPriceLabel(pro.hourlyRate)}</span>
                   </div>
                 </div>
               </motion.button>
@@ -232,7 +234,7 @@ export default function FreelanceListingScreen() {
                           </span>
                           <span className="text-[9px] text-cm-text-muted">({pro.reviewCount})</span>
                         </div>
-                        <span className="text-[11px] font-bold text-cm-forest">{pro.hourlyRate.toLocaleString()} F/h</span>
+                        <span className="text-[11px] font-bold text-cm-forest truncate">{formatPriceLabel(pro.hourlyRate)}</span>
                       </div>
                       <div className="flex items-center gap-1 mt-1.5">
                         <MapPin className="w-2.5 h-2.5 text-cm-text-muted" />

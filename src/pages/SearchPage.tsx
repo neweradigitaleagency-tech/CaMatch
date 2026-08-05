@@ -1,12 +1,16 @@
 import { useState, useMemo, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 import PageHeader from "../components/ui/PageHeader";
-import { Search, X, Star, MapPin, ChevronRight, ArrowLeft, Wrench, Package, ClipboardList } from "lucide-react";
+import RotarySelector from "../components/ui/RotarySelector";
+import { Search, X, Star, MapPin, ChevronRight, Wrench, Package, ClipboardList } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useLocationStore } from "../stores/locationStore";
 import { useRequestStore } from "../stores/requestStore";
 import { useUnifiedSearch } from "../hooks/useUnifiedSearch";
-import { SEARCH_BRANCHES, getSearchBranchById, type SearchBranch, type SearchSubcategory } from "../data/searchMenu";
+import { SEARCH_BRANCHES, getSearchBranchById, type SearchBranch } from "../data/searchMenu";
+import { categoriesWithPros, tradesWithCounts } from "../data/serviceTrades";
+import { formatPriceLabel } from "../data/pricing";
 import type { SearchResult } from "../services/searchService";
 import type { MatchedService, SimilarRequest } from "../hooks/useUnifiedSearch";
 
@@ -48,7 +52,7 @@ function ProResultCard({ result, onClick }: { result: SearchResult; onClick?: ()
         </div>
       </div>
       {result.price > 0 && (
-        <span className="text-[11px] font-bold text-cm-accent shrink-0">{result.price.toLocaleString()} F/h</span>
+        <span className="text-[11px] font-bold text-cm-accent shrink-0">{formatPriceLabel(result.price)}</span>
       )}
     </motion.button>
   );
@@ -146,22 +150,58 @@ function BranchCard({ branch, onClick }: { branch: SearchBranch; onClick?: () =>
   );
 }
 
-function SubcategoryRow({ sub, onClick }: { sub: SearchSubcategory; onClick?: () => void }) {
+function TradePicker() {
+  const { navigate: nav } = useAppNavigation();
+  const [activeCatId, setActiveCatId] = useState<string | null>(null);
+
+  const categories = useMemo(
+    () => categoriesWithPros().filter((c) => tradesWithCounts(c.id).length > 0),
+    []
+  );
+  const activeCat = categories.find((c) => c.id === activeCatId) ?? categories[0];
+  if (!activeCat) return null;
+
+  const trades = tradesWithCounts(activeCat.id);
+
   return (
-    <motion.button onClick={onClick} variants={fadeUp}
-      className="w-full flex items-center gap-3 px-4 py-3.5 bg-cm-elevated rounded-[12px] text-left cursor-pointer active:scale-[0.98] transition-transform border border-cm-border-soft hover:border-cm-accent/40"
-    >
-      <div className="w-10 h-10 rounded-[12px] bg-cm-surface border border-cm-border flex items-center justify-center text-[17px] shrink-0">
-        {sub.icon}
+    <div className="mt-4">
+      <h3 className="text-[13px] font-bold text-cm-text mb-2">Choisissez un métier</h3>
+
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-4 px-4">
+        {categories.map((cat) => (
+          <button
+            key={cat.id}
+            onClick={() => setActiveCatId(cat.id)}
+            className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+              activeCat.id === cat.id
+                ? "bg-cm-text text-white"
+                : "bg-cm-elevated border border-cm-border text-cm-text-soft"
+            }`}
+          >
+            <span>{cat.icon}</span>
+            <span>{cat.name}</span>
+          </button>
+        ))}
       </div>
-      <span className="text-[13px] font-semibold text-cm-text flex-1">{sub.name}</span>
-      <ChevronRight className="w-4 h-4 text-cm-border shrink-0" />
-    </motion.button>
+
+      <RotarySelector
+        key={activeCat.id}
+        options={trades.map((t) => ({
+          key: t.name,
+          label: t.name,
+          icon: activeCat.icon,
+          sublabel: `${t.count} pro${t.count > 1 ? "s" : ""}`,
+        }))}
+        ctaLabel="Voir les pros"
+        hint="Glissez pour naviguer ou touchez une carte"
+        onSelect={(opt) => nav(`/professionals?category=${activeCat.id}&sub=${encodeURIComponent(opt.label)}`)}
+      />
+    </div>
   );
 }
 
 export default function SearchPage() {
-  const nav = useNavigate();
+  const { navigate: nav } = useAppNavigation();
   const [searchParams] = useSearchParams();
   const qParam = searchParams.get("q");
   const branchParam = searchParams.get("branch");
@@ -181,7 +221,7 @@ export default function SearchPage() {
         nav(`/explorer/pro/${result.id}`);
         break;
       case "product":
-        nav(`/catalog?product=${result.id}`);
+        nav(`/marketplace/item/${result.id}`);
         break;
       case "supplier":
         nav(`/catalog?supplier=${result.id}`);
@@ -219,12 +259,7 @@ export default function SearchPage() {
           {showSelection ? (
             branch ? (
               <motion.div key={`branch-${branch.id}`} variants={container} initial="hidden" animate="show" exit={{ opacity: 0 }} className="pb-4">
-                <button onClick={() => nav("/search")}
-                  className="flex items-center gap-1 text-[11px] font-semibold text-cm-accent mt-3 cursor-pointer active:scale-95 transition-transform">
-                  <ArrowLeft className="w-3.5 h-3.5" /> Toutes les branches
-                </button>
-
-                <div className="flex items-center gap-3 p-4 mt-2.5 bg-cm-elevated rounded-[var(--radius-cm)] border border-cm-border">
+                <div className="flex items-center gap-3 p-4 mt-3 bg-cm-elevated rounded-[var(--radius-cm)] border border-cm-border">
                   <div className={`w-12 h-12 rounded-[14px] bg-gradient-to-br ${branch.color} border border-cm-border-soft flex items-center justify-center text-[22px] shrink-0`}>
                     {branch.icon}
                   </div>
@@ -234,12 +269,22 @@ export default function SearchPage() {
                   </div>
                 </div>
 
-                <h3 className="text-[13px] font-bold text-cm-text mt-4 mb-2">Choisissez une catégorie</h3>
-                <div className="space-y-2">
-                  {branch.subcategories.map((sub) => (
-                    <SubcategoryRow key={sub.id} sub={sub} onClick={() => nav(sub.target)} />
-                  ))}
-                </div>
+                {branch.id === "services-domicile" ? (
+                  <TradePicker />
+                ) : (
+                  <div className="mt-4">
+                    <h3 className="text-[13px] font-bold text-cm-text mb-2">Choisissez une catégorie</h3>
+                    <RotarySelector
+                      options={branch.subcategories.map((s) => ({ key: s.id, label: s.name, icon: s.icon }))}
+                      ctaLabel="Choisir"
+                      hint="Glissez pour naviguer ou touchez une carte"
+                      onSelect={(opt) => {
+                        const sub = branch.subcategories.find((x) => x.id === opt.key);
+                        if (sub) nav(sub.target);
+                      }}
+                    />
+                  </div>
+                )}
               </motion.div>
             ) : (
               <motion.div key="branches" variants={container} initial="hidden" animate="show" exit={{ opacity: 0 }} className="pb-4">

@@ -1,7 +1,7 @@
 export type MarketplaceVertical = "pro_supply" | "shopping" | "second_hand" | "real_estate" | "automobile"
 
 export const VERTICAL_LABELS: Record<MarketplaceVertical, string> = {
-  pro_supply: "Construction",
+  pro_supply: "Quincailleries",
   shopping: "Shopping",
   second_hand: "Seconde main",
   real_estate: "Immobilier",
@@ -266,6 +266,31 @@ export interface CartItem {
   vertical: MarketplaceVertical
 }
 
+export interface OrderDelivery {
+  carrier: string
+  trackingCode: string
+  contact: string
+  estimatedAt: string
+  shippedAt?: string
+  deliveredAt?: string
+}
+
+export interface OrderEvent {
+  id: string
+  status: MarketplaceOrderStatus
+  label: string
+  description: string
+  at: string
+}
+
+export interface MarketplaceDispute {
+  reference: string
+  reason: string
+  description: string
+  evidence: string[]
+  openedAt: string
+}
+
 export interface MarketplaceOrder {
   id: string
   items: CartItem[]
@@ -279,6 +304,21 @@ export interface MarketplaceOrder {
   deliveryCity: string
   deliveryAddress: string
   paymentMethod: string
+  delivery: OrderDelivery
+  events: OrderEvent[]
+  dispute?: MarketplaceDispute
   createdAt: string
   updatedAt: string
+}
+
+// ── Marketplace chat (per order) ──
+
+export type ChatSender = "buyer" | "seller"
+
+export interface ChatMessage {
+  id: string
+  orderId: string
+  sender: ChatSender
+  text: string
+  at: string
 }

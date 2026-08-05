@@ -1,12 +1,11 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "motion/react"
 import { ShoppingCart, Trash2, Minus, Plus, Package } from "lucide-react"
-import PageHeader from "../../components/ui/PageHeader"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore, useCartHydrated } from "../../stores/marketplaceCartStore"
 
 export default function CartPage() {
-  const nav = useNavigate()
+  const { navigate: nav } = useAppNavigation()
   const hydrated = useCartHydrated()
   const { items, removeItem, updateQuantity, clearCart, itemCount, subtotal } =
     useMarketplaceCartStore()
@@ -20,7 +19,9 @@ export default function CartPage() {
   if (!hydrated) {
     return (
       <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
-        <PageHeader title="Mon panier" fallbackRoute="/marketplace" />
+        <div className="px-4 pt-4 pb-1">
+          <h1 className="h1-cm text-cm-text">Mon panier</h1>
+        </div>
         <div className="flex-1 px-4 pt-2 space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="bg-cm-elevated rounded-[var(--radius-cm)] p-4 border border-cm-border flex gap-3">
@@ -40,7 +41,9 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
-        <PageHeader title="Mon panier" fallbackRoute="/marketplace" />
+        <div className="px-4 pt-4 pb-1">
+          <h1 className="h1-cm text-cm-text">Mon panier</h1>
+        </div>
         <div className="flex-1 flex flex-col items-center justify-center px-5 text-center">
           <div className="w-16 h-16 rounded-2xl bg-cm-elevated border border-cm-border flex items-center justify-center mb-4">
             <ShoppingCart className="w-8 h-8 text-cm-text-muted" />
@@ -58,41 +61,43 @@ export default function CartPage() {
 
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
-      <PageHeader
-        title="Mon panier"
-        fallbackRoute="/marketplace"
-        subtitle={`${itemCount()} article${itemCount() > 1 ? "s" : ""}`}
-        rightAction={
-          <div className="relative">
-            <button onClick={() => setConfirmClear(true)}
-              className="text-[12px] font-bold text-cm-error px-3 py-1.5 rounded-lg hover:bg-red-50 cursor-pointer active:scale-95 transition-all touch-min">
-              Vider
-            </button>
-            <AnimatePresence>
-              {confirmClear && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="absolute top-full right-0 mt-1 z-10 bg-cm-elevated rounded-xl shadow-lg border border-cm-border p-3 w-48"
-                >
-                  <p className="text-[11px] font-semibold text-cm-text mb-2">Vider le panier ?</p>
-                  <div className="flex gap-2">
-                    <button onClick={() => { clearCart(); setConfirmClear(false) }}
-                      className="flex-1 h-10 rounded-lg bg-cm-error text-white text-[10px] font-bold cursor-pointer active:scale-95 transition-transform">
-                      Vider
-                    </button>
-                    <button onClick={() => setConfirmClear(false)}
-                      className="flex-1 h-10 rounded-lg bg-cm-surface text-cm-text text-[10px] font-bold cursor-pointer active:scale-95 transition-transform">
-                      Annuler
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        }
-      />
+      <div className="px-4 pt-4 pb-1 flex items-center justify-between">
+        <div>
+          <h1 className="h1-cm text-cm-text">Mon panier</h1>
+          <p className="text-[11px] text-cm-text-soft mt-0.5">{itemCount()} article{itemCount() > 1 ? "s" : ""}</p>
+        </div>
+        <div className="relative">
+          <button onClick={() => setConfirmClear(true)}
+            className="text-[12px] font-bold text-cm-error px-3 py-1.5 rounded-lg hover:bg-red-50 cursor-pointer active:scale-95 transition-all touch-min">
+            Vider
+          </button>
+          <AnimatePresence>
+            {confirmClear && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="absolute top-full right-0 mt-1 z-10 bg-cm-elevated rounded-xl shadow-lg border border-cm-border p-3 w-48"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Vider le panier"
+              >
+                <p className="text-[11px] font-semibold text-cm-text mb-2">Vider le panier ?</p>
+                <div className="flex gap-2">
+                  <button onClick={() => { clearCart(); setConfirmClear(false) }}
+                    className="flex-1 h-10 rounded-lg bg-cm-error text-white text-[10px] font-bold cursor-pointer active:scale-95 transition-transform">
+                    Vider
+                  </button>
+                  <button onClick={() => setConfirmClear(false)}
+                    className="flex-1 h-10 rounded-lg bg-cm-surface text-cm-text text-[10px] font-bold cursor-pointer active:scale-95 transition-transform">
+                    Annuler
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
 
       <div className="flex-1 px-4 pb-4 space-y-3 overflow-y-auto">
         {items.map((item) => (

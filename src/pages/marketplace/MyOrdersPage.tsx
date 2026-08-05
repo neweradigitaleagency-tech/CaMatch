@@ -1,9 +1,10 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
 import { motion } from "motion/react"
-import { Package, MapPin, CreditCard, Clock, CheckCircle, XCircle, Truck } from "lucide-react"
-import PageHeader from "../../components/ui/PageHeader"
+import { Package, MapPin, CreditCard, Clock, CheckCircle, XCircle, Truck, User } from "lucide-react"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
+import { getEstimatedWindow } from "../../data/delivery"
+import EmptyState from "../../components/ui/EmptyState"
 import type { MarketplaceOrderStatus } from "../../types/marketplace"
 
 const STATUS_LABELS: Record<MarketplaceOrderStatus, string> = {
@@ -27,7 +28,7 @@ const STATUS_COLORS: Record<MarketplaceOrderStatus, string> = {
 }
 
 export default function MyOrdersPage() {
-  const nav = useNavigate()
+  const { navigate: nav } = useAppNavigation()
   const orders = useMarketplaceCartStore((s) => s.orders)
   const [filter, setFilter] = useState<"all" | MarketplaceOrderStatus>("all")
 
@@ -35,7 +36,16 @@ export default function MyOrdersPage() {
 
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
-      <PageHeader title="Mes commandes" fallbackRoute="/marketplace" />
+      <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-2">
+        <h1 className="h1-cm text-cm-text">Mes commandes</h1>
+        <button
+          onClick={() => nav("/marketplace/profile")}
+          className="flex items-center gap-1.5 h-8 px-3 rounded-lg bg-cm-elevated border border-cm-border text-[11px] font-bold text-cm-text cursor-pointer active:scale-95 transition-all"
+        >
+          <User className="w-3.5 h-3.5 text-cm-forest" />
+          Mon espace
+        </button>
+      </div>
 
       {/* Filters */}
       <div className="flex gap-2 px-4 pb-3 overflow-x-auto no-scrollbar">
@@ -54,15 +64,13 @@ export default function MyOrdersPage() {
 
       <div className="flex-1 px-4 pb-4 space-y-2 overflow-y-auto">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center pt-16 text-center">
-            <Package className="w-12 h-12 text-cm-text-muted mb-3" />
-            <p className="text-[14px] font-bold text-cm-text mb-1">Aucune commande</p>
-            <p className="text-[12px] text-cm-text-soft mb-4">Vous n'avez pas encore passé de commande</p>
-            <button onClick={() => nav("/marketplace")}
-              className="h-10 px-5 rounded-xl bg-cm-text text-cm-elevated text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform">
-              Découvrir le marketplace
-            </button>
-          </div>
+          <EmptyState
+            icon={Package}
+            title="Aucune commande"
+            description="Vous n'avez pas encore passé de commande"
+            action={{ label: "Découvrir le marketplace", onClick: () => nav("/marketplace") }}
+            compact
+          />
         ) : (
           filtered.map((order, i) => {
             const Icon = STATUS_ICONS[order.status]
@@ -72,7 +80,7 @@ export default function MyOrdersPage() {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                onClick={() => nav(`/marketplace/order/confirm/${order.id}`)}
+                onClick={() => nav(`/marketplace/orders/${order.id}`)}
                 className="w-full bg-cm-elevated rounded-xl p-3.5 border border-cm-border text-left cursor-pointer active:scale-[0.99] transition-transform"
               >
                 <div className="flex items-start justify-between mb-2">
@@ -96,6 +104,11 @@ export default function MyOrdersPage() {
                   <span className="flex items-center gap-1">
                     <CreditCard className="w-3 h-3" /> {order.total.toLocaleString("fr-FR")} F
                   </span>
+                  {order.status !== "delivered" && order.status !== "cancelled" && order.delivery?.estimatedAt && (
+                    <span className="flex items-center gap-1 text-cm-forest font-semibold">
+                      <Truck className="w-3 h-3" /> Est. {getEstimatedWindow(order.delivery.estimatedAt).to}
+                    </span>
+                  )}
                 </div>
               </motion.button>
             )

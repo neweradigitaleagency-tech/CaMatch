@@ -9,7 +9,7 @@ const SELLER_TYPES: { value: SellerType; label: string; desc: string; icon: stri
 ]
 
 const VERTICALS: { value: MarketplaceVertical; label: string; desc: string }[] = [
-  { value: "pro_supply", label: "Pro Supply", desc: "Matériaux & fournitures BTP" },
+  { value: "pro_supply", label: "Quincailleries", desc: "Matériaux & fournitures BTP" },
   { value: "shopping", label: "Shopping", desc: "Produits neufs" },
   { value: "second_hand", label: "Seconde main", desc: "Articles d'occasion" },
   { value: "real_estate", label: "Immobilier", desc: "Location, vente, Airbnb" },

@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { Search, MapPin, Menu, ClipboardPlus, Store, UserPlus, X, Star, ChevronRight } from "lucide-react";
+import { Search, MapPin, Menu, ClipboardPlus, Store, UserPlus, X, Star, ChevronRight, Heart } from "lucide-react";
 import SponsoredCard from "./SponsoredCard";
 import type { SponsoredItem } from "./SponsoredCard";
 import HamburgerDrawer from "./HamburgerDrawer";
@@ -10,12 +9,15 @@ import NotificationPanel from "./ui/NotificationPanel";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useLocationStore, LOCATIONS } from "../stores/locationStore";
 import { useAuthStore } from "../stores/authStore";
-import { SERVICE_CATEGORIES } from "../data/serviceCategories";
+import { useFavoritesStore, type FavoriteItem } from "../stores/favoritesStore";
+import { categoriesWithPros } from "../data/serviceTrades";
 import { getAllFreelancers } from "../data/freelanceCategories";
+import { formatPriceLabel } from "../data/pricing";
 import { SEARCH_BRANCHES } from "../data/searchMenu";
 import { getBoutiques } from "../data/marketplaceSuppliers";
 import { MARKETPLACE_PRODUCTS } from "../data/marketplaceProducts";
 import { cardAppear } from "../animations/variants";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 
 const HERO_CARDS = [
   {
@@ -37,6 +39,8 @@ const HERO_CARDS = [
 ] as const;
 
 const POPULAR_PRODUCT_IDS = ["mp-25", "mp-27", "mp-26", "mp-32", "mp-31", "mp-28"];
+
+const TYPE_LABEL: Record<FavoriteItem["type"], string> = { pro: "Pro", product: "Produit", boutique: "Boutique" };
 
 const SPONSORED_ITEMS: SponsoredItem[] = [
   {
@@ -67,6 +71,15 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     size: "small",
   },
   {
+    id: "sp-6",
+    name: "Propre+ Ménage",
+    category: "Nettoyage",
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop",
+    tagline: "Nettoyage professionnel rapide",
+    link: "/marketplace/shop/seller-pro-3",
+    size: "small",
+  },
+  {
     id: "sp-4",
     name: "Clinique Dentaire Deux Plateaux",
     category: "Santé",
@@ -83,15 +96,6 @@ const SPONSORED_ITEMS: SponsoredItem[] = [
     tagline: "Le meilleur rapport qualité-prix",
     link: "/marketplace/shop/seller-pro-1",
     size: "large",
-  },
-  {
-    id: "sp-6",
-    name: "Propre+ Ménage",
-    category: "Nettoyage",
-    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=300&fit=crop",
-    tagline: "Nettoyage professionnel rapide",
-    link: "/marketplace/shop/seller-pro-3",
-    size: "small",
   },
   {
     id: "sp-7",
@@ -132,7 +136,7 @@ function SectionHeader({ label, onViewAll, badge }: { label: string; onViewAll?:
 }
 
 export default function ModernHomeScreen() {
-  const nav = useNavigate();
+  const { navigate: nav } = useAppNavigation();
   const [showDrawer, setShowDrawer] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -145,13 +149,17 @@ export default function ModernHomeScreen() {
   const refreshLocation = useLocationStore((s) => s.refreshLocation);
   const setNeighborhood = useLocationStore((s) => s.setNeighborhood);
   const authUser = useAuthStore((s) => s.user);
-  const firstName = authUser?.user_metadata?.firstName || authUser?.email?.split("@")[0] || "";
+  const firstName = authUser?.user_metadata?.firstName || authUser?.email?.split("@")[0] || "Jessica";
 
   const featuredFreelancers = getAllFreelancers().sort((a, b) => b.rating - a.rating).slice(0, 6);
   const featuredBoutiques = getBoutiques().slice(0, 6);
   const popularProducts = POPULAR_PRODUCT_IDS
     .map((id) => MARKETPLACE_PRODUCTS.find((p) => p.id === id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
+
+  const favoriteItems = useFavoritesStore((s) => s.items)
+    .slice()
+    .sort((a, b) => b.addedAt.localeCompare(a.addedAt));
 
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg">
@@ -167,8 +175,20 @@ export default function ModernHomeScreen() {
           <div className="flex items-center gap-1">
             <NotificationBell unreadCount={unreadCount} onClick={() => setShowNotifications(true)} variant="client" />
             <button
+              onClick={() => nav("/favorites")}
+              className="relative w-8 h-8 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+              aria-label="Mes favoris"
+            >
+              <Heart className="w-5 h-5 text-cm-text" />
+              {favoriteItems.length > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 bg-cm-error rounded-full flex items-center justify-center text-[9px] font-bold text-white border-2 border-cm-bg px-0.5">
+                  {favoriteItems.length > 99 ? "99+" : favoriteItems.length}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setShowDrawer(true)}
-              className="w-8 h-8 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+              className="w-8 h-8 flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
               aria-label="Menu"
             >
               <Menu className="w-4 h-4 text-cm-text" />
@@ -238,6 +258,47 @@ export default function ModernHomeScreen() {
         </button>
       </section>
 
+      {/* ── Vos favoris ── */}
+      {favoriteItems.length > 0 && (
+        <section className="pt-6">
+          <div className="px-3">
+            <SectionHeader label="Vos favoris" badge={`${favoriteItems.length}`} onViewAll={() => nav("/favorites")} />
+          </div>
+          <div className="flex gap-3 overflow-x-auto no-scrollbar px-3 pb-1">
+            {favoriteItems.slice(0, 6).map((item) => (
+              <button
+                key={`${item.type}-${item.id}`}
+                onClick={() => nav(item.route)}
+                className="shrink-0 w-44 bg-cm-elevated border border-cm-border rounded-2xl p-3 text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
+              >
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 border-2 border-cm-border bg-cm-surface flex items-center justify-center">
+                    {item.image ? (
+                      <img src={item.image} alt="" className="w-full h-full object-cover" loading="lazy" />
+                    ) : (
+                      <Heart className="w-4 h-4 text-cm-text-muted" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[12px] font-bold text-cm-text truncate">{item.name}</h3>
+                    <p className="text-[10px] text-cm-text-soft truncate">{item.subtitle}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t border-cm-border/50">
+                  <span className="flex items-center gap-1 text-[10px] font-semibold text-cm-amber">
+                    <Star className="w-2.5 h-2.5 fill-cm-amber text-cm-amber" />
+                    {item.rating != null ? item.rating.toFixed(1) : "★"}
+                  </span>
+                  <span className="text-[10px] font-bold text-cm-forest truncate max-w-[80px]">
+                    {item.priceLabel ?? TYPE_LABEL[item.type]}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ── Hero 2-col : Freelance | Marketplace ── */}
       <section className="px-3 pt-4">
         <div className="grid grid-cols-2 gap-3">
@@ -277,7 +338,7 @@ export default function ModernHomeScreen() {
       <section className="px-3 pt-6">
         <SectionHeader label="Services à domicile" badge="Abidjan" onViewAll={() => nav("/professionals")} />
         <div className="grid grid-cols-4 gap-2.5">
-          {SERVICE_CATEGORIES.slice(0, 7).map((cat) => (
+          {categoriesWithPros().map((cat) => (
             <button
               key={cat.id}
               onClick={() => nav(`/professionals?category=${cat.id}`)}
@@ -329,7 +390,7 @@ export default function ModernHomeScreen() {
                 <span className="flex items-center gap-1 text-[10px] font-semibold text-cm-amber">
                   <Star className="w-2.5 h-2.5 fill-cm-amber text-cm-amber" />{pro.rating}
                 </span>
-                <span className="text-[11px] font-bold text-cm-forest">{pro.hourlyRate.toLocaleString()} F/h</span>
+                <span className="text-[10px] font-bold text-cm-forest truncate max-w-[60%]">{formatPriceLabel(pro.hourlyRate)}</span>
               </div>
             </button>
           ))}
@@ -385,7 +446,7 @@ export default function ModernHomeScreen() {
           {popularProducts.map((prod) => (
             <button
               key={prod.id}
-              onClick={() => nav(`/catalog?product=${prod.id}`)}
+              onClick={() => nav(`/marketplace/item/${prod.id}`)}
               className="shrink-0 w-36 bg-cm-elevated border border-cm-border rounded-2xl overflow-hidden text-left cursor-pointer active:scale-[0.97] transition-transform hover:border-cm-accent/40"
             >
               <div className="h-20 overflow-hidden bg-cm-surface">

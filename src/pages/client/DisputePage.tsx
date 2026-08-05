@@ -52,7 +52,7 @@ export default function DisputePage() {
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-elevated border-b border-cm-border">
-        <button onClick={goBack} className="w-11 h-11 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95">
+        <button onClick={() => goBack()} className="w-11 h-11 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95">
           <ArrowLeft className="w-5 h-5 text-[#2B2B2B]" />
         </button>
         <h1 className="text-[15px] font-bold text-cm-text">Signaler un problème</h1>

@@ -59,11 +59,12 @@ export function useAppNavigation() {
     [navigate]
   );
 
-  const goBack = useCallback(() => {
+  const goBack = useCallback((overrideFallback?: string) => {
     const action = resolveBackAction(
       location.pathname,
       stack,
-      window.history.length
+      window.history.length,
+      overrideFallback
     );
     if (action.kind === "back") {
       pop();

@@ -86,7 +86,7 @@ export default function QuoteCreatePage() {
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="px-4 pt-3 pb-3">
           <div className="flex items-center gap-2 mb-2">
-            <button onClick={goBack}
+            <button onClick={() => goBack()}
               className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer shrink-0">
               <ArrowLeft className="w-4 h-4 text-cm-text" />
             </button>

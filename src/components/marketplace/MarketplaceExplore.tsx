@@ -1,19 +1,19 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useSearchParams } from "react-router-dom"
-import { Search, Filter, Store, Package, SlidersHorizontal, X, ChevronDown, MapPin, ShoppingCart, Sparkles, Award, Plus, ArrowRight, TrendingUp, LayoutGrid, KeyRound } from "lucide-react"
+import { Search, Filter, Package, SlidersHorizontal, X, ChevronDown, MapPin, Sparkles, Award, ArrowRight, TrendingUp, LayoutGrid, KeyRound, Navigation } from "lucide-react"
 import { motion } from "motion/react"
-import { useAppNavigation } from "../navigation/useAppNavigation"
-import PageHeader from "../components/ui/PageHeader"
-import { useMarketplaceCartStore } from "../stores/marketplaceCartStore"
-import type { MarketplaceVertical, Product } from "../types/marketplace"
-import { PROFESSIONAL_SELLERS } from "../data/marketplaceSuppliers"
-import { MARKETPLACE_PRODUCTS, searchProducts } from "../data/marketplaceProducts"
-import { MARKETPLACE_CATEGORIES, getSubcategoryById } from "../data/marketplaceCategories"
-import CatalogSupplierCard from "../components/marketplace/CatalogSupplierCard"
-import CatalogProductCard from "../components/marketplace/CatalogProductCard"
-import BottomSheet from "../components/BottomSheet"
-import { logSearch } from "../services/searchAnalytics"
-import { useTrendingSearches } from "../hooks/useTrendingSearches"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
+import { useLocationStore } from "../../stores/locationStore"
+import type { MarketplaceVertical, Product } from "../../types/marketplace"
+import { PROFESSIONAL_SELLERS } from "../../data/marketplaceSuppliers"
+import { MARKETPLACE_PRODUCTS, searchProducts } from "../../data/marketplaceProducts"
+import { MARKETPLACE_CATEGORIES, getSubcategoryById } from "../../data/marketplaceCategories"
+import CatalogSupplierCard from "./CatalogSupplierCard"
+import CatalogProductCard from "./CatalogProductCard"
+import BottomSheet from "../BottomSheet"
+import { logSearch } from "../../services/searchAnalytics"
+import { useTrendingSearches } from "../../hooks/useTrendingSearches"
+import EmptyState from "../ui/EmptyState"
 
 const ITEMS_PER_PAGE = 10
 
@@ -43,7 +43,7 @@ type VerticalFilter = MarketplaceVertical | "all"
 
 const VERTICAL_TABS: { value: VerticalFilter; label: string }[] = [
   { value: "all", label: "Tous" },
-  { value: "pro_supply", label: "Construction" },
+  { value: "pro_supply", label: "Quincailleries" },
   { value: "shopping", label: "Shopping" },
   { value: "second_hand", label: "Seconde main" },
   { value: "real_estate", label: "Immobilier" },
@@ -134,9 +134,9 @@ function ProductCardSkeleton() {
   )
 }
 
-export default function CatalogPage() {
+export default function MarketplaceExplore() {
   const { navigate: nav } = useAppNavigation()
-  const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
+  const neighborhood = useLocationStore((s) => s.neighborhood)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const params = useMemo(() => parseSearchParams(searchParams), [searchParams])
@@ -167,6 +167,17 @@ export default function CatalogPage() {
     return () => clearTimeout(t)
   }, [])
 
+  // Legacy deep links ?product= & ?supplier= → rediriger vers la fiche / la boutique
+  useEffect(() => {
+    const product = searchParams.get("product")
+    const supplier = searchParams.get("supplier")
+    if (product) {
+      nav(`/marketplace/item/${product}`, { replace: true })
+    } else if (supplier) {
+      nav(`/marketplace/shop/${supplier}`, { replace: true })
+    }
+  }, [searchParams, nav])
+
   const updateParam = useCallback((key: string, value: string) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
@@ -174,7 +185,7 @@ export default function CatalogPage() {
       else next.delete(key)
       if (key === "vert") next.delete("sub")
       return next
-    })
+    }, { replace: true })
     setVisibleCount(ITEMS_PER_PAGE)
     if (key === "vert") {
       setShowAllBoutiques(false)
@@ -211,7 +222,7 @@ export default function CatalogPage() {
 
   const clearFilters = () => {
     const vert = params.vert
-    setSearchParams(new URLSearchParams(vert && vert !== "all" ? { vert } : {}))
+    setSearchParams(new URLSearchParams(vert && vert !== "all" ? { vert } : {}), { replace: true })
     setQuery("")
     setDebouncedQuery("")
   }
@@ -297,35 +308,32 @@ export default function CatalogPage() {
 
   const showCondition = params.vert === "all" || params.vert === "second_hand"
 
-  // ─── Buttons ───
-  const cartButton = (
-    <div className="relative shrink-0">
-      <button onClick={() => nav("/marketplace/cart")}
-        className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-cm-elevated cursor-pointer active:scale-90 transition-transform touch-min" aria-label="Panier">
-        <ShoppingCart className="w-5 h-5 text-cm-text" />
-      </button>
-      {cartCount > 0 && (
-        <span className="absolute top-0 right-0 min-w-[18px] h-[18px] flex items-center justify-center bg-cm-error text-white text-[9px] font-bold rounded-full px-1 pointer-events-none">
-          {cartCount > 9 ? "9+" : cartCount}
-        </span>
-      )}
-    </div>
-  )
+  // ─── Près de vous ───
+  const nearbyProducts = useMemo(() => {
+    if (!neighborhood) return []
+    const nbh = neighborhood.toLowerCase()
+    return MARKETPLACE_PRODUCTS
+      .filter((p) => p.status === "active" && p.location.toLowerCase().includes(nbh))
+      .slice(0, 8)
+  }, [neighborhood])
 
-  const vendreButton = (
-    <button onClick={() => nav("/marketplace/register")}
-      className="flex items-center gap-1.5 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-text/80 shrink-0">
-      <Plus className="w-3.5 h-3.5" />
-      Vendre
-    </button>
-  )
+  // ─── Buttons ───
 
   return (
-    <div className="min-h-dynamic bg-cm-bg pb-8">
-      <PageHeader title="Marketplace" fallbackRoute="/" rightAction={<div className="flex items-center gap-1.5">{cartButton}{vendreButton}</div>} />
+    <div className="flex-1 bg-cm-bg pb-10">
+      <div className="px-5 pt-4 pb-2 flex items-center justify-between gap-2">
+        <div>
+          <h1 className="h1-cm text-cm-text">Explorer</h1>
+          <button onClick={() => nav(`/marketplace/explore?loc=${encodeURIComponent(neighborhood)}`)}
+            className="flex items-center gap-1 text-[10px] text-cm-text-soft mt-0.5 active:opacity-60 cursor-pointer">
+            <Navigation className="w-2.5 h-2.5 text-cm-accent" />
+            Près de {neighborhood}
+          </button>
+        </div>
+      </div>
 
       {/* ── Search ── */}
-      <div className="px-5 pt-3 pb-2">
+      <div className="px-5 pt-1 pb-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cm-text-muted pointer-events-none" />
           <input type="text"
@@ -434,6 +442,23 @@ export default function CatalogPage() {
       </div>
 
       <div className="px-5">
+        {/* ── Près de vous ── */}
+        {isBrowsing && nearbyProducts.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-1.5 mb-3">
+              <Navigation className="w-4 h-4 text-cm-accent" />
+              <h2 className="text-sm font-bold text-cm-text">Près de {neighborhood}</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
+              {nearbyProducts.map((product, i) => (
+                <div key={product.id} className="shrink-0 w-36">
+                  <CatalogProductCard product={product} index={i} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* ── Boutiques recommandées ── */}
         {isBrowsing && recommendedSuppliers.length > 0 && (
           <div className="mb-6">
@@ -544,19 +569,19 @@ export default function CatalogPage() {
         </div>
 
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-14 h-14 rounded-xl bg-cm-elevated border border-cm-border flex items-center justify-center mx-auto mb-3">
-              <Package className="w-6 h-6 text-cm-text-muted" />
-            </div>
-            <p className="text-[14px] font-bold text-cm-text mb-1">Aucun produit trouvé</p>
-            <p className="text-[12px] text-cm-text-soft">Essayez de modifier vos filtres ou votre recherche</p>
-            {hasActiveFilters && (
-              <button onClick={clearFilters} className="mt-3 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer touch-min">
-                Réinitialiser les filtres
-              </button>
-            )}
+          <EmptyState
+            icon={Package}
+            title="Aucun produit trouvé"
+            description="Essayez de modifier vos filtres ou votre recherche"
+            compact
+            action={
+              hasActiveFilters
+                ? { label: "Réinitialiser les filtres", onClick: clearFilters }
+                : undefined
+            }
+          >
             {suggestions.length > 0 && (
-              <div className="mt-8 text-left">
+              <div className="mt-8 w-full max-w-lg px-2 text-left">
                 <p className="text-[13px] font-bold text-cm-text mb-3">Vous aimerez aussi</p>
                 <div className="grid grid-cols-2 gap-3">
                   {suggestions.map((product, i) => (
@@ -565,7 +590,7 @@ export default function CatalogPage() {
                 </div>
               </div>
             )}
-          </div>
+          </EmptyState>
         ) : (
           <>
             {loading ? (
@@ -589,28 +614,6 @@ export default function CatalogPage() {
               </div>
             )}
           </>
-        )}
-
-        {/* ── CTA Banners ── */}
-        {isBrowsing && (
-          <div className="mt-6 space-y-3">
-            <div className="rounded-2xl bg-gradient-to-br from-cm-forest to-[#3a5a2a] p-5">
-              <h3 className="text-base font-bold text-white">Vous avez des articles à vendre ?</h3>
-              <p className="text-xs text-white/70 mt-1">Créez votre boutique et vendez facilement sur Ça Match.</p>
-              <button onClick={() => nav("/marketplace/register")}
-                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-cm-forest text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface">
-                Commencer à vendre
-              </button>
-            </div>
-            <div className="rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 p-5">
-              <h3 className="text-base font-bold text-white">Vous êtes un fournisseur professionnel ?</h3>
-              <p className="text-xs text-white/70 mt-1">Proposez vos matériaux et équipements aux professionnels de Ça Match.</p>
-              <button onClick={() => nav("/supplier/register")}
-                className="mt-3 h-10 px-5 rounded-xl bg-cm-elevated text-amber-700 text-xs font-bold cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface">
-                Devenir fournisseur
-              </button>
-            </div>
-          </div>
         )}
       </div>
 

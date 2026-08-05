@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
-import { useNavigate } from "react-router-dom";
 import { cardAppear } from "../animations/variants";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 
 export type SponsoredItem = {
   id: string;
@@ -24,7 +24,7 @@ const sizeClasses: Record<SponsoredItem["size"], string> = {
 };
 
 export default function SponsoredCard({ item, index }: SponsoredCardProps) {
-  const nav = useNavigate();
+  const { navigate: nav } = useAppNavigation();
 
   return (
     <motion.div

@@ -66,7 +66,7 @@ export default function QuoteReviewPage() {
           <FileText className="w-12 h-12 text-cm-text-muted mx-auto mb-3" />
           <p className="text-[14px] font-semibold text-cm-text mb-1">Devis introuvable</p>
           <p className="text-[12px] text-cm-text-muted mb-4">Ce devis n'existe pas ou a été supprimé</p>
-          <button onClick={goBack}
+          <button onClick={() => goBack()}
             className="h-10 px-6 bg-cm-accent rounded-[12px] text-[13px] font-medium text-white cursor-pointer">
             Retour
           </button>
@@ -81,7 +81,7 @@ export default function QuoteReviewPage() {
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="px-4 pt-3 pb-3">
           <div className="flex items-center gap-2 mb-2">
-            <button onClick={goBack}
+            <button onClick={() => goBack()}
               className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer shrink-0">
               <ArrowLeft className="w-4 h-4 text-cm-text" />
             </button>

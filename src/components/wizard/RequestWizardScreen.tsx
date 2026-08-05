@@ -36,10 +36,6 @@ export default function RequestWizardScreen({ onBack, onSubmit, loading }: Reque
     setStep(step);
   };
 
-  const handleAutoNext = () => {
-    if (isStepValid(1)) goNext();
-  };
-
   return (
     <div className="flex flex-col w-full min-h-dynamic pb-safe bg-cm-bg">
       <header className="sticky top-0 z-30 bg-cm-bg border-b border-cm-border/30">
@@ -69,7 +65,7 @@ export default function RequestWizardScreen({ onBack, onSubmit, loading }: Reque
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            {draft.step === 1 && <Step1Service onAutoNext={handleAutoNext} />}
+            {draft.step === 1 && <Step1Service />}
             {draft.step === 2 && <Step2Diagnostic />}
             {draft.step === 3 && <Step3Location />}
             {draft.step === 4 && <Step4Availability />}

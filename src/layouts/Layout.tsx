@@ -3,7 +3,6 @@ import { Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import ErrorBoundary from "../components/ui/ErrorBoundary";
 import RoleSwitcher from "../components/ui/RoleSwitcher";
-import BottomTabBar from "../components/navigation/BottomTabBar";
 import { isImmersiveRoute } from "../navigation/navigationGraph";
 import { useAuthStore } from "../stores/authStore";
 import { useLocationStore } from "../stores/locationStore";
@@ -32,7 +31,6 @@ export default function Layout({ variant = "client" }: LayoutProps) {
   }, [isClient, locStatus, refreshLocation]);
 
   const immersive = isImmersiveRoute(location.pathname);
-  const showTabBar = isClient && !immersive;
 
   const availableModes = useAuthStore((s) => s.availableModes);
   const hasMultipleModes = availableModes.length > 1;
@@ -42,7 +40,7 @@ export default function Layout({ variant = "client" }: LayoutProps) {
   }, [location.pathname]);
 
   return (
-    <div className={`min-h-dynamic text-cm-text flex flex-col font-sans cm-viewport shadow-2xl border-x border-cm-border bg-cm-bg${isClient ? (showTabBar ? " pb-[72px]" : " pb-safe") : ""}`}>
+    <div className={`min-h-dynamic text-cm-text flex flex-col font-sans cm-viewport shadow-2xl border-x border-cm-border bg-cm-bg${isClient ? " pb-safe" : ""}`}>
       <div className="h-1 shrink-0 bg-gradient-to-r from-cm-accent to-cm-forest" />
       {hasMultipleModes && (
         <div className="flex items-center justify-end px-4 py-1.5 border-b border-cm-border/30 bg-cm-elevated/50">
@@ -68,7 +66,6 @@ export default function Layout({ variant = "client" }: LayoutProps) {
           )}
         </ErrorBoundary>
       </main>
-      {showTabBar && <BottomTabBar />}
     </div>
   );
 }

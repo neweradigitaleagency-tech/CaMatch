@@ -32,6 +32,7 @@
 
   --color-cm-bg: #EDE8DC;
   --color-cm-elevated: #FFFFFF;
+  --color-cm-surface: #F5F2EB;
   --color-cm-border: #D8D2C4;
   --color-cm-border-soft: #F0ECE4;
   --color-cm-text: #1A1A1A;
@@ -48,6 +49,10 @@
   --color-cm-overlay: rgba(0,0,0,0.4);
   --color-cm-charcoal: #2B2B2B;
   --color-cm-green: #7FD356;
+  --color-cm-glass-dark-bg: rgba(43,43,43,0.08);
+  --color-cm-glass-dark-border: rgba(43,43,43,0.12);
+  --color-cm-glass-light-bg: rgba(255,255,255,0.15);
+  --color-cm-glass-light-border: rgba(255,255,255,0.25);
 
   --radius-cm: 14px;
   --radius-cm-sm: 16px;

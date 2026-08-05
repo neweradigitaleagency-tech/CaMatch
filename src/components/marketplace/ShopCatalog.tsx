@@ -17,7 +17,7 @@ const SORT_LABELS: Record<SortKey, string> = {
 }
 
 const VERTICAL_LABEL: Record<string, string> = {
-  pro_supply: "Pro Supply",
+  pro_supply: "Quincailleries",
   shopping: "Shopping",
   second_hand: "Seconde main",
   real_estate: "Immobilier",

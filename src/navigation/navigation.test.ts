@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveBackAction, resolveCompleteDestination } from "./navigationService";
+import { getFallback } from "./navigationGraph";
 
 function memoryStorage(): Storage {
   const store = new Map<string, string>();
@@ -53,6 +54,28 @@ describe("resolveBackAction", () => {
       to: "/pro/dashboard",
       replace: true,
     });
+  });
+
+  it("l'override du fallback ne s'applique QUE si la pile est vide", () => {
+    expect(resolveBackAction("/professionals", [], 5, "/")).toEqual({
+      kind: "fallback",
+      to: "/",
+      replace: true,
+    });
+    expect(resolveBackAction("/professionals", [{ path: "/" }], 5, "/")).toEqual({
+      kind: "back",
+    });
+  });
+});
+
+describe("graph des services à domicile — retour aux menus", () => {
+  it("le retour d'un pro remonte vers la catégorie puis le menu des branches", () => {
+    expect(getFallback("/professionals")).toBe("/search");
+    expect(getFallback("/search")).toBe("/");
+  });
+
+  it("la catégorie services a une completion vers la recherche", () => {
+    expect(getFallback("/search")).toBe("/");
   });
 });
 

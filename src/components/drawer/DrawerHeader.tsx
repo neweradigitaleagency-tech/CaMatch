@@ -8,7 +8,7 @@ interface DrawerHeaderProps {
 
 export default function DrawerHeader({ name, email, avatarUrl }: DrawerHeaderProps) {
   return (
-    <div className="w-full flex items-center gap-3 px-4 pt-6 pb-4 text-left">
+    <div className="w-full flex items-center gap-3 px-4 pr-14 pt-6 pb-4 text-left">
       <div className="w-12 h-12 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border overflow-hidden shrink-0 flex items-center justify-center">
         {avatarUrl ? (
           <img src={avatarUrl} alt={name} className="w-full h-full object-cover" loading="lazy" />

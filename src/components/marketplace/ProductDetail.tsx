@@ -1,11 +1,13 @@
 import { useState, useMemo, useRef, useCallback } from "react"
 import { useParams, Link } from "react-router-dom"
 import { motion } from "motion/react"
-import { ArrowLeft, MapPin, Heart, MessageCircle, Phone, ChevronDown, Eye, Share2, Flag, BadgeCheck, Package, AlertTriangle, ShieldAlert, Star, ShoppingCart } from "lucide-react"
+import { ArrowLeft, MapPin, Heart, MessageCircle, ChevronDown, Eye, BadgeCheck, Package, AlertTriangle, ShieldAlert, Star, ShoppingCart, Sparkles } from "lucide-react"
 import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useBackNavigation } from "../../hooks/useBackNavigation"
-import { getProductById } from "../../data/marketplaceProducts"
+import { getProductById, getProductsByVertical } from "../../data/marketplaceProducts"
 import { getSellerById } from "../../data/marketplaceSuppliers"
+import { getReviewsBySeller } from "../../data/marketplaceReviews"
+import CatalogProductCard from "./CatalogProductCard"
 import { useAuthStore } from "../../stores/authStore"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
 import { useFavoritesStore } from "../../stores/favoritesStore"
@@ -41,6 +43,21 @@ export default function ProductDetail() {
   const [currentImg, setCurrentImg] = useState(0)
   const [showDesc, setShowDesc] = useState(false)
   const touchStartX = useRef(0)
+
+  const sellerReviews = useMemo(() => (seller ? getReviewsBySeller(seller.id) : []), [seller])
+  const similarProducts = useMemo(() => {
+    if (!product) return []
+    return getProductsByVertical(product.vertical)
+      .filter((p) => p.id !== product.id && p.status === "active")
+      .slice(0, 6)
+  }, [product])
+
+  const views = useMemo(() => {
+    const id = product?.id || "unknown"
+    let h = 0
+    for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) % 997
+    return 50 + h
+  }, [product])
 
   const addToCart = useMarketplaceCartStore((s) => s.addItem)
   const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
@@ -314,11 +331,11 @@ export default function ProductDetail() {
               }`}>{CONDITION_LABELS[condition]}</span>
             )}
             {isProSupply && (
-              <span className="px-2 py-0.5 rounded bg-cm-accent/20 text-cm-forest text-[10px] font-bold">Pro Supply</span>
+              <span className="px-2 py-0.5 rounded bg-cm-accent/20 text-cm-forest text-[10px] font-bold">Quincailleries</span>
             )}
             <span className="text-[11px] text-cm-text-soft">{formatDate(product.createdAt)}</span>
             <span className="text-[11px] text-cm-text-soft flex items-center gap-1 ml-auto">
-              <Eye className="w-3 h-3" /> {Math.floor(Math.random() * 200 + 50)} vues
+              <Eye className="w-3 h-3" /> {views} vues
             </span>
           </div>
 
@@ -331,7 +348,7 @@ export default function ProductDetail() {
 
         {/* Seller card */}
         <div className="mx-4 mt-3">
-          <Link to={isPro ? `/marketplace/supplier/${seller.id}` : "#"}
+          <Link to={isPro ? `/marketplace/supplier/${seller.id}` : `/marketplace/shop/${seller.id}`}
             className="block bg-cm-elevated rounded-[12px] p-3.5 border border-cm-border hover:border-cm-border transition-colors">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-cm-surface overflow-hidden shrink-0 flex items-center justify-center">
@@ -358,7 +375,7 @@ export default function ProductDetail() {
                   <span>{seller.totalSales} ventes</span>
                 </div>
               </div>
-              {isPro && <span className="text-[11px] text-cm-forest font-semibold shrink-0">Voir la boutique →</span>}
+              <span className="text-[11px] text-cm-forest font-semibold shrink-0">Voir la boutique →</span>
             </div>
             <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleContact(); }}
               className="mt-2.5 w-full h-8 rounded-lg bg-cm-surface border border-cm-border text-[11px] font-bold text-cm-text-soft flex items-center justify-center gap-1.5 cursor-pointer hover:bg-cm-surface active:scale-[0.98] transition-all">
@@ -405,6 +422,70 @@ export default function ProductDetail() {
             </span>
           )}
         </div>
+
+        {/* Produits similaires */}
+        {similarProducts.length > 0 && (
+          <div className="mt-5">
+            <div className="flex items-center gap-1.5 px-4 mb-2">
+              <Sparkles className="w-4 h-4 text-cm-accent" />
+              <h2 className="text-[14px] font-bold text-cm-text">Produits similaires</h2>
+            </div>
+            <div className="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-1">
+              {similarProducts.map((p, i) => (
+                <div key={p.id} className="shrink-0 w-36">
+                  <CatalogProductCard product={p} index={i} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Avis du vendeur */}
+        {sellerReviews.length > 0 && (
+          <div className="mx-4 mt-4 bg-cm-elevated rounded-[12px] p-3.5 border border-cm-border">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1.5">
+                <Star className="w-4 h-4 fill-cm-amber text-cm-amber" />
+                <h3 className="text-[14px] font-bold text-cm-text">Avis du vendeur</h3>
+              </div>
+              <Link to={isPro ? `/marketplace/supplier/${seller.id}` : `/marketplace/shop/${seller.id}`}
+                className="text-[11px] font-semibold text-cm-forest">
+                Tout voir
+              </Link>
+            </div>
+            <div className="flex flex-col gap-3">
+              {sellerReviews.slice(0, 3).map((rev) => (
+                <div key={rev.id} className="flex gap-2.5">
+                  <img src={rev.authorPhoto} alt="" className="w-7 h-7 rounded-full object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[12px] font-semibold text-cm-text">{rev.authorName}</span>
+                      <span className="text-[9px] text-cm-text-muted">{formatDate(rev.date)}</span>
+                    </div>
+                    <div className="flex items-center gap-0.5 mt-0.5">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star key={s} className={`w-2.5 h-2.5 ${s <= rev.rating ? "fill-cm-amber text-cm-amber" : "text-cm-border"}`} />
+                      ))}
+                      {rev.isVerifiedPurchase && (
+                        <span className="ml-1 text-[8px] text-cm-forest font-semibold">Achat vérifié</span>
+                      )}
+                    </div>
+                    {rev.productName && (
+                      <p className="text-[9px] text-cm-text-soft mt-0.5">Sur : {rev.productName}</p>
+                    )}
+                    <p className="text-[12px] text-cm-text mt-0.5 leading-relaxed">{rev.comment}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {sellerReviews.length > 3 && (
+              <Link to={isPro ? `/marketplace/supplier/${seller.id}` : `/marketplace/shop/${seller.id}`}
+                className="block text-center text-[11px] font-semibold text-cm-forest mt-3 pt-3 border-t border-cm-border/50">
+                Voir les {sellerReviews.length} avis
+              </Link>
+            )}
+          </div>
+        )}
 
         {/* Safety tips */}
         <div className="mx-4 mt-3 bg-amber-50 rounded-[10px] p-3 flex gap-2 border border-amber-100">

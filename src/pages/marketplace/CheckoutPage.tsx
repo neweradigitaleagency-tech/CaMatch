@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { CreditCard, Truck, ChevronRight } from "lucide-react"
+import { useState, useEffect } from "react"
+import { CreditCard, Truck, ChevronRight, Lock } from "lucide-react"
 import PageHeader from "../../components/ui/PageHeader"
 import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
@@ -26,6 +26,12 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash_on_delivery")
   const [submitting, setSubmitting] = useState(false)
 
+  useEffect(() => {
+    if (items.length === 0) {
+      replace("/marketplace/cart")
+    }
+  }, [items.length, replace])
+
   const COMMISSION_RATE = 0.10
   const commission = subtotal() * COMMISSION_RATE
   const sellerNet = subtotal() - commission
@@ -44,7 +50,6 @@ export default function CheckoutPage() {
   }
 
   if (items.length === 0) {
-    replace("/marketplace/cart")
     return null
   }
 
@@ -135,6 +140,15 @@ export default function CheckoutPage() {
               Le vendeur recevra <strong>{sellerNet.toLocaleString("fr-FR")} F</strong> après validation de la livraison
             </p>
           </div>
+        </div>
+
+        {/* Escrow trust */}
+        <div className="rounded-xl p-3.5 bg-cm-forest text-white flex items-start gap-2.5">
+          <Lock className="w-4 h-4 text-cm-accent shrink-0 mt-0.5" />
+          <p className="text-[11px] leading-relaxed text-white/90">
+            <strong className="text-cm-accent">Paiement sécurisé :</strong> votre argent est bloqué par Ça Match et
+            reversé au vendeur uniquement à la confirmation de la livraison.
+          </p>
         </div>
       </div>
 

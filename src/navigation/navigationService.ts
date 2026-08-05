@@ -34,7 +34,8 @@ export { resolveSpace };
 export function resolveBackAction(
   pathname: string,
   stack: StackEntry[],
-  historyLength: number
+  historyLength: number,
+  overrideFallback?: string
 ): BackAction {
   const hasInAppHistory = stack.length > 0;
   const canGoBack = hasInAppHistory && historyLength > 1;
@@ -44,7 +45,7 @@ export function resolveBackAction(
   }
 
   const info = getRouteInfo(pathname);
-  const to = info?.fallback ?? SPACE_FALLBACK[resolveSpace(pathname)];
+  const to = overrideFallback ?? info?.fallback ?? SPACE_FALLBACK[resolveSpace(pathname)];
   return { kind: "fallback", to, replace: true };
 }
 

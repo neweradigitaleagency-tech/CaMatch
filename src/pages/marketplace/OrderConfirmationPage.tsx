@@ -1,11 +1,12 @@
-import { useParams, useNavigate } from "react-router-dom"
-import { CheckCircle, Package, MapPin, CreditCard, ArrowRight } from "lucide-react"
+import { useParams } from "react-router-dom"
+import { CheckCircle, Package, MapPin, CreditCard, ArrowRight, Lock } from "lucide-react"
 import PageHeader from "../../components/ui/PageHeader"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
 
 export default function OrderConfirmationPage() {
   const { orderId } = useParams<{ orderId: string }>()
-  const nav = useNavigate()
+  const { navigate: nav } = useAppNavigation()
   const order = useMarketplaceCartStore((s) => s.getOrder(orderId || ""))
 
   if (!order) {
@@ -32,6 +33,15 @@ export default function OrderConfirmationPage() {
         <p className="text-[12px] text-cm-text-soft mb-6 max-w-[280px]">
           Votre commande a été transmise au vendeur. Vous serez informé de son traitement.
         </p>
+
+        <div className="w-full rounded-xl p-3.5 bg-cm-forest text-white flex items-start gap-2.5 text-left mb-6 max-w-sm">
+          <Lock className="w-4 h-4 text-cm-accent shrink-0 mt-0.5" />
+          <p className="text-[11px] leading-relaxed text-white/90">
+            <strong className="text-cm-accent">Paiement sécurisé :</strong> vos{" "}
+            {order.total.toLocaleString("fr-FR")} F sont bloqués en escrow par Ça Match et ne seront
+            reversés au vendeur qu'à la confirmation de la livraison.
+          </p>
+        </div>
 
         <div className="w-full bg-cm-elevated rounded-xl p-4 border border-cm-border text-left mb-6 max-w-sm">
           <div className="flex items-center gap-2 mb-3 pb-3 border-b border-cm-border">

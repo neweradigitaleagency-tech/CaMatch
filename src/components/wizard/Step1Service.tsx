@@ -12,7 +12,7 @@ const ICON_MAP: Record<string, typeof Sparkles> = {
   "assistance-services": Handshake,
 };
 
-export default function Step1Service({ onAutoNext }: { onAutoNext?: () => void }) {
+export default function Step1Service() {
   const { draft, setCategory, setSubCategory } = useRequestWizardStore();
   const [search, setSearch] = useState("");
   const selectedCategory = draft.category;
@@ -28,7 +28,6 @@ export default function Step1Service({ onAutoNext }: { onAutoNext?: () => void }
 
   const handleSubCategorySelect = (sub: string) => {
     setSubCategory(sub);
-    setTimeout(() => onAutoNext?.(), 300);
   };
 
   return (

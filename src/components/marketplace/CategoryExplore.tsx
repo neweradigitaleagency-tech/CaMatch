@@ -1,16 +1,14 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
 import { useParams, useSearchParams } from "react-router-dom"
 import { motion } from "motion/react"
-import { Search, Package, MapPin, SlidersHorizontal, X, ChevronRight, ChevronDown, ShoppingCart } from "lucide-react"
-import { useAppNavigation } from "../../navigation/useAppNavigation"
-import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
-import PageHeader from "../../components/ui/PageHeader"
+import { Search, Package, MapPin, SlidersHorizontal, X, ChevronRight, ChevronDown } from "lucide-react"
 import BottomSheet from "../BottomSheet"
 import { MARKETPLACE_PRODUCTS } from "../../data/marketplaceProducts"
 import { MARKETPLACE_CATEGORIES } from "../../data/marketplaceCategories"
 import { VERTICAL_LABELS } from "../../types/marketplace"
 import CatalogProductCard from "./CatalogProductCard"
 import type { MarketplaceVertical, Product } from "../../types/marketplace"
+import EmptyState from "../ui/EmptyState"
 
 const ITEMS_PER_PAGE = 8
 
@@ -62,8 +60,6 @@ function parseSearchParams(sp: URLSearchParams) {
 
 export default function CategoryExplore() {
   const { vertical } = useParams<{ vertical: string }>()
-  const { navigate: nav } = useAppNavigation()
-  const cartCount = useMarketplaceCartStore((s) => (s.items ?? []).reduce((sum, i) => sum + i.quantity, 0))
   const [searchParams, setSearchParams] = useSearchParams()
 
   const params = useMemo(() => parseSearchParams(searchParams), [searchParams])
@@ -88,7 +84,7 @@ export default function CategoryExplore() {
       if (value && value !== "all") next.set(key, value)
       else next.delete(key)
       return next
-    })
+    }, { replace: true })
     setVisibleCount(ITEMS_PER_PAGE)
   }, [setSearchParams])
 
@@ -162,7 +158,7 @@ export default function CategoryExplore() {
   const isSecondHand = currentVertical === "second_hand"
 
   const clearFilters = () => {
-    setSearchParams(new URLSearchParams())
+    setSearchParams(new URLSearchParams(), { replace: true })
     setSearchQuery("")
   }
 
@@ -175,22 +171,15 @@ export default function CategoryExplore() {
     updateParam("sub", id === "all" ? "" : id)
   }
 
-  const cartButton = (
-    <button onClick={() => nav("/marketplace/cart")}
-      className="relative w-9 h-9 flex items-center justify-center rounded-xl hover:bg-cm-surface cursor-pointer active:scale-90 transition-transform shrink-0">
-      <ShoppingCart className="w-4.5 h-4.5 text-cm-text" />
-      {cartCount > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-cm-error text-white text-[9px] font-bold rounded-full px-1">
-          {cartCount > 9 ? "9+" : cartCount}
-        </span>
-      )}
-    </button>
-  )
-
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-8">
       <div className="sticky top-0 z-20 bg-cm-elevated border-b border-cm-border">
-        <PageHeader title="Catégories" fallbackRoute="/marketplace" rightAction={cartButton} />
+        <div className="px-5 pt-4 pb-2 flex items-center justify-between">
+          <div>
+            <h1 className="h1-cm text-cm-text">{pageTitle}</h1>
+            <p className="text-[10px] text-cm-text-soft mt-0.5">Marché Ça Match</p>
+          </div>
+        </div>
 
         <div className="px-5 pb-3">
           <div className="relative">
@@ -293,17 +282,19 @@ export default function CategoryExplore() {
 
       <div className="px-5 pt-4">
         {filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <Package className="w-10 h-10 text-cm-border-soft mx-auto mb-3" />
-            <p className="text-[14px] font-bold text-cm-text mb-1">Aucune annonce trouvée</p>
-            <p className="text-[12px] text-cm-text-soft">Essayez de modifier votre recherche ou vos filtres</p>
-            {hasActiveFilters && (
-              <button onClick={clearFilters} className="mt-3 h-9 px-4 rounded-xl bg-cm-text text-white text-[11px] font-bold cursor-pointer">
-                Réinitialiser les filtres
-              </button>
-            )}
+          <EmptyState
+            icon={Package}
+            title="Aucune annonce trouvée"
+            description="Essayez de modifier votre recherche ou vos filtres"
+            compact
+            action={
+              hasActiveFilters
+                ? { label: "Réinitialiser les filtres", onClick: clearFilters }
+                : undefined
+            }
+          >
             {suggestions.length > 0 && (
-              <div className="mt-8 text-left">
+              <div className="mt-8 w-full max-w-lg px-2 text-left">
                 <p className="text-[13px] font-bold text-cm-text mb-3">Vous aimerez aussi</p>
                 <div className="grid grid-cols-2 gap-3">
                   {suggestions.map((product, i) => (
@@ -312,7 +303,7 @@ export default function CategoryExplore() {
                 </div>
               </div>
             )}
-          </div>
+          </EmptyState>
         ) : (
           <>
             <div className="grid grid-cols-2 gap-3">

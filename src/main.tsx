@@ -6,6 +6,8 @@ import AppLayout from "./layouts/AppLayout";
 import ProLayout from "./layouts/ProLayout";
 import AdminLayout from "./components/admin/AdminLayout";
 import SupplierLayout from "./components/supplier/SupplierLayout";
+import MarketplaceLayout from "./components/marketplace/MarketplaceLayout";
+import MarketplacePlaceholder from "./components/marketplace/MarketplacePlaceholder";
 import { useAuthStore } from "./stores/authStore";
 import { useAdminAuthStore } from "./stores/adminAuthStore";
 import RequireMode from "./components/auth/RequireMode";
@@ -17,7 +19,6 @@ const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 2, sta
 const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
-const CatalogPage = lazy(() => import("./pages/CatalogPage"));
 const UnifiedProfilePage = lazy(() => import("./pages/UnifiedProfilePage"));
 const OrdersPage = lazy(() => import("./pages/OrdersPage"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
@@ -56,6 +57,7 @@ const ProNotificationsPage = lazy(() => import("./pages/profile/ProNotifications
 const ProHelpPage = lazy(() => import("./pages/profile/ProHelpPage"));
 const ProOnboardingPage = lazy(() => import("./pages/ProOnboardingPage"));
 const MarketplaceHome = lazy(() => import("./components/marketplace/MarketplaceHome"));
+const MarketplaceExplore = lazy(() => import("./components/marketplace/MarketplaceExplore"));
 const BoutiquesPage = lazy(() => import("./pages/marketplace/BoutiquesPage"));
 const SellerRegistrationPage = lazy(() => import("./pages/marketplace/SellerRegistrationPage"));
 const ShopPage = lazy(() => import("./pages/marketplace/ShopPage"));
@@ -63,6 +65,10 @@ const CartPage = lazy(() => import("./pages/marketplace/CartPage"));
 const CheckoutPage = lazy(() => import("./pages/marketplace/CheckoutPage"));
 const OrderConfirmationPage = lazy(() => import("./pages/marketplace/OrderConfirmationPage"));
 const MyOrdersPage = lazy(() => import("./pages/marketplace/MyOrdersPage"));
+const OrderDetailPage = lazy(() => import("./pages/marketplace/OrderDetailPage"));
+const PublishListingPage = lazy(() => import("./pages/marketplace/PublishListingPage"));
+const SellerProfilePage = lazy(() => import("./pages/marketplace/SellerProfilePage"));
+const MarketplaceDisputePage = lazy(() => import("./pages/marketplace/DisputePage"));
 const BrowseProducts = lazy(() => import("./components/marketplace/BrowseProducts"));
 const CategoryExplore = lazy(() => import("./components/marketplace/CategoryExplore"));
 const ProductDetail = lazy(() => import("./components/marketplace/ProductDetail"));
@@ -429,7 +435,6 @@ function App() {
           <Route element={<AppLayout />}>
         <Route index element={<Suspense fallback={<PageLoader />}><HomePage /></Suspense>} />
         <Route path="search" element={<Suspense fallback={<PageLoader />}><SearchPage /></Suspense>} />
-        <Route path="catalog" element={<Suspense fallback={<PageLoader />}><CatalogPage /></Suspense>} />
         <Route path="messages" element={<Suspense fallback={<PageLoader />}><MessagingListPage /></Suspense>} />
         <Route path="messages/new" element={<Suspense fallback={<PageLoader />}><NewConversationPage /></Suspense>} />
         <Route path="messages/:conversationId" element={<Suspense fallback={<PageLoader />}><ChatPage /></Suspense>} />
@@ -486,18 +491,6 @@ function App() {
         <Route path="settings/subscription/payment" element={<Suspense fallback={<PageLoader />}><SubscriptionPaymentPage /></Suspense>} />
         <Route path="settings/subscription/history" element={<Suspense fallback={<PageLoader />}><SubscriptionHistoryPage /></Suspense>} />
         <Route path="settings/subscription/invoices" element={<Suspense fallback={<PageLoader />}><SubscriptionInvoicesPage /></Suspense>} />
-        <Route path="marketplace" element={<Suspense fallback={<PageLoader />}><MarketplaceHome /></Suspense>} />
-        <Route path="marketplace/boutiques" element={<Suspense fallback={<PageLoader />}><BoutiquesPage /></Suspense>} />
-        <Route path="marketplace/register" element={<Suspense fallback={<PageLoader />}><SellerRegistrationPage /></Suspense>} />
-        <Route path="marketplace/shop/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
-        <Route path="marketplace/supplier/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
-        <Route path="marketplace/browse/:vertical" element={<Suspense fallback={<PageLoader />}><CategoryExplore /></Suspense>} />
-        <Route path="marketplace/item/:productId" element={<Suspense fallback={<PageLoader />}><ProductDetail /></Suspense>} />
-        <Route path="marketplace/cart" element={<Suspense fallback={<PageLoader />}><CartPage /></Suspense>} />
-        <Route path="marketplace/checkout" element={<Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense>} />
-        <Route path="marketplace/order/confirm/:orderId" element={<Suspense fallback={<PageLoader />}><OrderConfirmationPage /></Suspense>} />
-        <Route path="marketplace/orders" element={<Suspense fallback={<PageLoader />}><MyOrdersPage /></Suspense>} />
-        <Route path="marketplace/:categoryId" element={<Suspense fallback={<PageLoader />}><BrowseProducts /></Suspense>} />
         <Route path="professionals" element={<Suspense fallback={<PageLoader />}><ProfessionalListingScreen /></Suspense>} />
         <Route path="freelance" element={<Suspense fallback={<PageLoader />}><FreelanceListingScreen /></Suspense>} />
         <Route path="favorites" element={<Suspense fallback={<PageLoader />}><FavoritesPage /></Suspense>} />
@@ -517,6 +510,29 @@ function App() {
         <Route path="explorer/design-provider/:id" element={<Suspense fallback={<PageLoader />}><ProviderProfileScreen /></Suspense>} />
 
         <Route path="profile/pro-preview" element={<Suspense fallback={<PageLoader />}><ProPreviewPage /></Suspense>} />
+      </Route>
+
+      {/* Marketplace — univers dédié */}
+      <Route element={<MarketplaceLayout />}>
+        <Route path="marketplace" element={<Suspense fallback={<PageLoader />}><MarketplaceHome /></Suspense>} />
+        <Route path="marketplace/explore" element={<Suspense fallback={<PageLoader />}><MarketplaceExplore /></Suspense>} />
+        <Route path="catalog" element={<Suspense fallback={<PageLoader />}><MarketplaceExplore /></Suspense>} />
+        <Route path="marketplace/publish" element={<Suspense fallback={<PageLoader />}><PublishListingPage /></Suspense>} />
+        <Route path="marketplace/profile" element={<Suspense fallback={<PageLoader />}><SellerProfilePage /></Suspense>} />
+        <Route path="marketplace/boutiques" element={<Suspense fallback={<PageLoader />}><BoutiquesPage /></Suspense>} />
+        <Route path="marketplace/register" element={<Suspense fallback={<PageLoader />}><SellerRegistrationPage /></Suspense>} />
+        <Route path="marketplace/shop/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
+        <Route path="marketplace/supplier/:sellerId" element={<Suspense fallback={<PageLoader />}><ShopPage /></Suspense>} />
+        <Route path="marketplace/browse/:vertical" element={<Suspense fallback={<PageLoader />}><CategoryExplore /></Suspense>} />
+        <Route path="marketplace/item/:productId" element={<Suspense fallback={<PageLoader />}><ProductDetail /></Suspense>} />
+        <Route path="marketplace/cart" element={<Suspense fallback={<PageLoader />}><CartPage /></Suspense>} />
+        <Route path="marketplace/checkout" element={<Suspense fallback={<PageLoader />}><CheckoutPage /></Suspense>} />
+        <Route path="marketplace/order/confirm/:orderId" element={<Suspense fallback={<PageLoader />}><OrderConfirmationPage /></Suspense>} />
+        <Route path="marketplace/orders" element={<Suspense fallback={<PageLoader />}><MyOrdersPage /></Suspense>} />
+        <Route path="marketplace/seller" element={<Suspense fallback={<PageLoader />}><MarketplacePlaceholder title="Espace vendeur" description="Gérez vos annonces et vos ventes en un seul endroit — bientôt disponible." badge="À venir" backTo="/marketplace/orders" /></Suspense>} />
+        <Route path="marketplace/orders/:orderId" element={<Suspense fallback={<PageLoader />}><OrderDetailPage /></Suspense>} />
+        <Route path="marketplace/dispute/:orderId" element={<Suspense fallback={<PageLoader />}><MarketplaceDisputePage /></Suspense>} />
+        <Route path="marketplace/:categoryId" element={<Suspense fallback={<PageLoader />}><BrowseProducts /></Suspense>} />
       </Route>
       </Route>
     </Routes>

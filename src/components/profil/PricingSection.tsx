@@ -1,15 +1,22 @@
 import ProfileSection from "./ProfileSection";
 import EditableField from "./EditableField";
+import { isHourlyCategory, roundPriceFCFA } from "../../data/pricing";
 import type { SectionBaseProps } from "./types";
 
 export default function PricingSection({ mode, editing, pro, onUpdate }: SectionBaseProps) {
-  const rows = [
-    { label: "Taux horaire", price: pro.hourlyRateXOF, key: "hourlyRateXOF", highlighted: false },
-    { label: "Déplacement", price: 5000, key: "travelFeeXOF", highlighted: false },
-    { label: "Forfait 2h", price: pro.hourlyRateXOF * 2 + 5000, key: null, highlighted: true },
-    { label: "Forfait 4h", price: pro.hourlyRateXOF * 4 + 5000, key: null, highlighted: false },
-    { label: "Journée (8h)", price: pro.hourlyRateXOF * 8 + 5000, key: null, highlighted: false },
-  ];
+  const hourly = isHourlyCategory(pro.category);
+  const rows = hourly
+    ? [
+        { label: "Taux horaire", price: pro.hourlyRateXOF, key: "hourlyRateXOF", highlighted: false },
+        { label: "Déplacement", price: 5000, key: "travelFeeXOF", highlighted: false },
+        { label: "Forfait 2h", price: pro.hourlyRateXOF * 2 + 5000, key: null, highlighted: true },
+        { label: "Forfait 4h", price: pro.hourlyRateXOF * 4 + 5000, key: null, highlighted: false },
+        { label: "Journée (8h)", price: pro.hourlyRateXOF * 8 + 5000, key: null, highlighted: false },
+      ]
+    : [
+        { label: "À partir de", price: roundPriceFCFA(pro.hourlyRateXOF), key: "hourlyRateXOF", highlighted: true },
+        { label: "Déplacement", price: 5000, key: "travelFeeXOF", highlighted: false },
+      ];
 
   return (
     <ProfileSection title="Tarifs">
@@ -34,6 +41,11 @@ export default function PricingSection({ mode, editing, pro, onUpdate }: Section
           </div>
         ))}
       </div>
+      {!hourly && (
+        <p className="text-[11px] text-cm-text-muted mt-2">
+          Tarif détaillé après devis gratuit selon votre besoin.
+        </p>
+      )}
     </ProfileSection>
   );
 }

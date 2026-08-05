@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Star, Heart, Loader2, Check } from "lucide-react";
 import { motion } from "motion/react";
 import type { ProfessionalDetails, ProCategory } from "../../types";
+import { formatPriceLabel, roundPriceFCFA, isHourlyCategory } from "../../data/pricing";
 import TouchFeedback from "../TouchFeedback";
 
 interface ProCardProps {
@@ -110,7 +111,7 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
               <Star className="w-3 h-3 text-amber-500 fill-amber-500" />{rating.toFixed(1)}
             </span>
             <span className="text-[10px] font-black text-cm-text-soft">·</span>
-            <span className="text-[10px] font-black text-cm-text">{pro.hourlyRateXOF.toLocaleString("fr-FR")} F/h</span>
+            <span className="text-[10px] font-black text-cm-text">{formatPriceLabel(pro.hourlyRateXOF, { hourly: isHourlyCategory(pro.category) })}</span>
             <span className="text-[10px] font-black text-cm-text-soft">·</span>
             <span className="text-[10px] font-black text-cm-text">{pro.reviewCount}+</span>
           </div>
@@ -193,9 +194,11 @@ export default function ProCard({ pro, variant = "light", onClick }: ProCardProp
           </div>
           <div className={`flex flex-col items-center border-x w-full ${isDark ? "border-zinc-800" : "border-cm-border/50"}`}>
             <span className={`text-[11px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>
-              {pro.hourlyRateXOF.toLocaleString("fr-FR")} F
+              {roundPriceFCFA(pro.hourlyRateXOF).toLocaleString("fr-FR")} F
             </span>
-            <span className={`text-[9px] font-black uppercase tracking-wider mt-1 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>Tarif/h</span>
+            <span className={`text-[9px] font-black uppercase tracking-wider mt-1 ${isDark ? "text-zinc-500" : "text-cm-text-muted"}`}>
+              {isHourlyCategory(pro.category) ? "Tarif/h" : "À partir de"}
+            </span>
           </div>
           <div className="flex flex-col items-center">
             <span className={`text-[11px] font-black ${isDark ? "text-zinc-200" : "text-cm-text"}`}>

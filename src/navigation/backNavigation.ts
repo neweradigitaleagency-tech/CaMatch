@@ -4,20 +4,19 @@ import { useAppNavigation } from "./useAppNavigation";
 /**
  * Wrapper rétro-compatible pour `useBackNavigation`.
  *
- * Les ~66 sites existants continuent de fonctionner sans modification :
- * le fallback passé en argument reste un OVERRIDE — sinon c'est le graph
- * qui décide. Aucun `navigate(-1)` direct : tout passe par `goBack()`.
+ * Retour arrière intelligent : `navigate(-1)` si la pile in-app est non vide,
+ * sinon fallback en `replace`. Le fallback passé en argument est un OVERRIDE
+ * qui ne s'applique QUE lorsque la pile est vide — il ne détruit pas une
+ * pile existante (retour pas-à-pas préservé). Aucun `navigate(-1)` direct :
+ * tout passe par `goBack()`.
  *
- * @param overrideFallback destination forcée (optionnel — préférer le graph).
+ * @param overrideFallback destination forcée quand la pile est vide
+ *   (optionnel — préférer le graph).
  */
 export function useBackNavigation(overrideFallback?: string) {
-  const { goBack, goBackTo } = useAppNavigation();
+  const { goBack } = useAppNavigation();
 
   return useCallback(() => {
-    if (overrideFallback) {
-      goBackTo(overrideFallback);
-    } else {
-      goBack();
-    }
-  }, [goBack, goBackTo, overrideFallback]);
+    goBack(overrideFallback);
+  }, [goBack, overrideFallback]);
 }

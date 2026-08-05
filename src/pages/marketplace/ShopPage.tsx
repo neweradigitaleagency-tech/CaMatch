@@ -1,13 +1,12 @@
 import { useEffect } from "react"
-import { useParams, useSearchParams } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { XCircle } from "lucide-react"
 import { getSellerById, PROFESSIONAL_SELLERS, INDIVIDUAL_SELLERS, CA_MATCH_PRO_SELLERS } from "../../data/marketplaceSuppliers"
-import ShopScreen, { ShopNotFound } from "../../components/marketplace/ShopScreen"
 import ShopScreenV2 from "../../components/marketplace/ShopScreenV2"
+import { useAppNavigation } from "../../navigation/useAppNavigation"
 
 export default function ShopPage() {
   const { sellerId } = useParams<{ sellerId: string }>()
-  const [searchParams] = useSearchParams()
-  const variant = searchParams.get("v")
 
   let seller = sellerId ? getSellerById(sellerId) : undefined
 
@@ -22,6 +21,22 @@ export default function ShopPage() {
   }, [sellerId, seller])
 
   if (!seller) return <ShopNotFound />
-  if (variant === "2") return <ShopScreenV2 seller={seller} />
-  return <ShopScreen seller={seller} />
+  return <ShopScreenV2 seller={seller} />
+}
+
+function ShopNotFound() {
+  const { navigate } = useAppNavigation()
+  return (
+    <div className="flex flex-col items-center justify-center min-h-dynamic bg-cm-bg px-5">
+      <XCircle className="w-12 h-12 text-cm-text-muted mb-3" />
+      <h2 className="text-lg font-bold text-cm-text">Boutique introuvable</h2>
+      <p className="text-sm text-cm-text-soft mt-1 text-center">Cette boutique n'existe pas ou a été supprimée.</p>
+      <button
+        onClick={() => navigate("/marketplace")}
+        className="mt-4 h-12 px-6 rounded-xl bg-cm-text text-white text-sm font-bold cursor-pointer active:scale-[0.98] transition-transform"
+      >
+        Retour au marketplace
+      </button>
+    </div>
+  )
 }
