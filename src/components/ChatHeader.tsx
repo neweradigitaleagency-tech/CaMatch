@@ -24,7 +24,7 @@ const STATE_LABEL: Record<string, string> = {
   locked: "Verrouillée",
 };
 
-export default function ChatHeader({ conversation, onBack }: ChatHeaderProps) {
+export default function ChatHeader({ conversation, onBack, onAudioCall, onVideoCall }: ChatHeaderProps) {
   return (
     <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
       <div className="flex items-center h-14 px-4 gap-3">
@@ -52,14 +52,14 @@ export default function ChatHeader({ conversation, onBack }: ChatHeaderProps) {
         </div>
         <div className="flex items-center gap-1">
           <button
-            onClick={() => {}}
+            onClick={onAudioCall}
             className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer transition-colors"
             title="Appel audio"
           >
             <Phone className="w-4 h-4 text-cm-text" />
           </button>
           <button
-            onClick={() => {}}
+            onClick={onVideoCall}
             className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer transition-colors"
             title="Appel vidéo"
           >

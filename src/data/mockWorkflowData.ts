@@ -578,17 +578,13 @@ export function seedWorkflowData(requestId?: string): void {
   }
 
   const proposals = generateMockProposals(rid);
-  matchingStore.proposals = { ...matchingStore.proposals, [rid]: proposals };
-  matchingStore.isSearching = false;
-  matchingStore.searchRequestId = null;
+  matchingStore.setProposals({ ...matchingStore.proposals, [rid]: proposals });
+  matchingStore.setSearching(null);
 
   const existingConv = chatStore.conversations.find((c) => c.id === "demo_conv_1");
   if (!existingConv) {
-    chatStore.conversations = [...chatStore.conversations, MOCK_WORKFLOW_CONVERSATION];
-    chatStore.messages = {
-      ...chatStore.messages,
-      "demo_conv_1": MOCK_WORKFLOW_MESSAGES,
-    };
+    chatStore.upsertConversation(MOCK_WORKFLOW_CONVERSATION);
+    chatStore.appendMessages("demo_conv_1", MOCK_WORKFLOW_MESSAGES);
   }
 
   const existingMission = requestStore.missions.find((m) => m.id === "demo_mission_1");
@@ -598,12 +594,12 @@ export function seedWorkflowData(requestId?: string): void {
 
   const existingEscrow = escrowStore.entries.find((e) => e.missionId === "demo_mission_1");
   if (!existingEscrow) {
-    escrowStore.entries = [...escrowStore.entries, MOCK_WORKFLOW_ESCROW];
+    escrowStore.addEntry(MOCK_WORKFLOW_ESCROW);
   }
 
   const existingProJob = proStore.jobs.find((j) => j.id === "demo_mission_1");
   if (!existingProJob) {
-    proStore.jobs = [...proStore.jobs, {
+    proStore.addJob({
       id: "demo_mission_1",
       clientId: "client_marie",
       clientName: "Marie K.",
@@ -623,7 +619,7 @@ export function seedWorkflowData(requestId?: string): void {
       pricingModel: "fixed",
       beforePhoto: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?w=400&h=300&fit=crop",
       afterPhoto: "https://images.unsplash.com/photo-1616627547584-bf28cee262db?w=400&h=300&fit=crop",
-    }];
+    });
   }
 }
 

@@ -27,7 +27,7 @@ export default function CategorySelectScreen() {
     >
       {/* Top bar */}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={goBack} className="w-10 h-10 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer">
+        <button onClick={goBack} className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
           <ArrowLeft className="w-5 h-5 text-[#2B2B2B]" />
         </button>
         <h1 className="text-[18px] font-bold text-cm-text">Catégories</h1>

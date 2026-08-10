@@ -1,6 +1,6 @@
 import { StrictMode, lazy, Suspense, Component, useState, useEffect, useRef, type ReactNode, type ErrorInfo } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AppLayout from "./layouts/AppLayout";
 import ProLayout from "./layouts/ProLayout";
@@ -11,6 +11,9 @@ import MarketplacePlaceholder from "./components/marketplace/MarketplacePlacehol
 import { useAuthStore } from "./stores/authStore";
 import { useAdminAuthStore } from "./stores/adminAuthStore";
 import RequireMode from "./components/auth/RequireMode";
+import { ensureSandboxSeed } from "./sandbox/bootstrap";
+import SandboxPanel from "./sandbox/SandboxPanel";
+import { resolveSpace, SPACE_FALLBACK } from "./navigation/navigationGraph";
 import "./index.css";
 import "./styles/admin.css";
 
@@ -286,6 +289,12 @@ function AdminInitGate({ children }: { children?: React.ReactNode }) {
   return children ? <>{children}</> : <Outlet />;
 }
 
+/** Redirige toute route inconnue vers le fallback de son espace (jamais vers "/" sauvage). */
+function SpaceRedirect() {
+  const { pathname } = useLocation();
+  return <Navigate to={SPACE_FALLBACK[resolveSpace(pathname)]} replace />;
+}
+
 function App() {
   const initialize = useAuthStore((s) => s.initialize);
   const initialized = useAuthStore((s) => s.initialized);
@@ -295,6 +304,7 @@ function App() {
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
+    ensureSandboxSeed();
     initialize().finally(() => setBooted(true));
   }, []);
 
@@ -307,7 +317,8 @@ function App() {
   if (!booted) return <PageLoader />;
 
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path="/onboarding" element={<Suspense fallback={<PageLoader />}><OnboardingPage /></Suspense>} />
 
       {/* Admin routes — separate auth from regular users */}
@@ -535,10 +546,14 @@ function App() {
         <Route path="marketplace/:categoryId" element={<Suspense fallback={<PageLoader />}><BrowseProducts /></Suspense>} />
       </Route>
       </Route>
+
+      {/* Catch-all — route inconnue → fallback de son espace */}
+      <Route path="*" element={<SpaceRedirect />} />
     </Routes>
+      <SandboxPanel />
+    </>
   );
 }
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorFallback>

@@ -12,7 +12,9 @@ import {
   subscribeToConversation,
   subscribeToConversationList,
   uploadMedia,
+  createConversation as createConversationService,
 } from "../services/chatService";
+import { MOCK_PROS } from "../services/mockData";
 
 interface ChatState {
   conversations: Conversation[];
@@ -37,7 +39,22 @@ interface ChatState {
   setActiveConversation: (id: string | null) => void;
   updateState: (convId: string, state: ConversationState) => void;
   getConversationByMission: (missionId: string) => Conversation | undefined;
+  upsertConversation: (conv: Conversation) => void;
+  appendMessages: (conversationId: string, msgs: Message[]) => void;
+  createConversation: (params: {
+    participant1: string;
+    participant2: string;
+    jobId?: string;
+    metadata?: Partial<Conversation["metadata"]>;
+  }) => Promise<Conversation>;
   cleanup: () => void;
+}
+
+function mergeConversations(fetched: Conversation[], existing: Conversation[]): Conversation[] {
+  const map = new Map<string, Conversation>();
+  for (const c of fetched) map.set(c.id, c);
+  for (const c of existing) if (!map.has(c.id)) map.set(c.id, c);
+  return [...map.values()];
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
@@ -52,7 +69,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
     set({ loading: true, error: null });
     try {
       const convs = await fetchConversations(userId);
-      set({ conversations: convs, loading: false });
+      set((state) => ({
+        conversations: mergeConversations(convs, state.conversations),
+        loading: false,
+      }));
     } catch (err) {
       set({ error: "Erreur de chargement", loading: false });
     }
@@ -60,7 +80,9 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   loadConversations: async (userId: string) => {
     const convs = await fetchConversations(userId);
-    set({ conversations: convs });
+    set((state) => ({
+      conversations: mergeConversations(convs, state.conversations),
+    }));
   },
 
   loadMessages: async (conversationId: string, userId: string) => {
@@ -216,6 +238,77 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   getConversationByMission: (missionId: string) => {
     return get().conversations.find((c) => c.missionId === missionId);
+  },
+
+  upsertConversation: (conv) =>
+    set((state) => {
+      const exists = state.conversations.some((c) => c.id === conv.id);
+      return {
+        conversations: exists
+          ? state.conversations.map((c) => (c.id === conv.id ? conv : c))
+          : [conv, ...state.conversations],
+      };
+    }),
+
+  appendMessages: (conversationId, msgs) =>
+    set((state) => ({
+      messages: { ...state.messages, [conversationId]: msgs },
+    })),
+
+  createConversation: async ({ participant1, participant2, jobId, metadata }) => {
+    const existing = get().conversations.find(
+      (c) =>
+        c.missionId === (jobId || "") &&
+        c.participants.includes(participant1) &&
+        c.participants.includes(participant2)
+    );
+    if (existing) {
+      set({ activeConversationId: existing.id });
+      return existing;
+    }
+
+    const id = await createConversationService({
+      participant1,
+      participant2,
+      jobId: jobId || "",
+      metadata,
+    });
+
+    const pro = MOCK_PROS.find((p) => p.id === participant2);
+    const conv: Conversation = {
+      id: id || `conv_mock_${Date.now()}`,
+      participants: [participant1, participant2],
+      missionId: jobId || "",
+      state: "waiting",
+      metadata: {
+        mission_phase: undefined,
+        flags: { dispute: false, support_joined: false, pinned: false },
+        job_snapshot: {
+          category: "",
+          location: "",
+          price_estimate: 0,
+          currency: "XOF",
+          service_type: "on_demand",
+        },
+        created_from: "manual",
+        ...metadata,
+      },
+      lastMessage: "",
+      lastMessageAt: new Date().toISOString(),
+      unreadCount: 0,
+      otherUserName: pro?.name || participant2.slice(0, 8),
+      otherUserAvatar: pro?.avatarUrl || "",
+    };
+
+    get().upsertConversation(conv);
+    set({ activeConversationId: conv.id });
+    useNotificationStore.getState().addNotification({
+      type: "message",
+      title: "Nouvelle conversation",
+      body: `Conversation avec ${conv.otherUserName}`,
+      actionUrl: `/messages/${conv.id}`,
+    });
+    return conv;
   },
 
   cleanup: () => {

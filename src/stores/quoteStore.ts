@@ -21,6 +21,7 @@ interface QuoteState {
     validUntil: string;
     notes: string;
     attachments: string[];
+    commissionPercent?: number;
   }) => string;
   addVersion: (quoteId: string, lineItems: QuoteLineItem[], changes: Partial<Omit<QuoteVersion, "id" | "version" | "lineItems" | "totalXOF" | "createdAt">>) => void;
   acceptQuote: (requestId: string) => void;
@@ -66,6 +67,7 @@ export const useQuoteStore = create<QuoteState>((set, get) => ({
       status: "sent",
       versions: [version],
       currentVersion: 1,
+      commissionPercent: params.commissionPercent,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };

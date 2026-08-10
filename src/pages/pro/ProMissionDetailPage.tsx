@@ -1,12 +1,19 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion, AnimatePresence } from "motion/react";
 import { ArrowLeft, MapPin, Calendar, Clock, Phone, CheckCircle, XCircle, MessageSquare, X, Package, Plus, Minus, ShoppingCart, Loader2, Check } from "lucide-react";
-import { MOCK_PRO_JOBS } from "../../services/mockData";
 import { MOCK_PRODUCTS, MOCK_DELIVERY_ZONES } from "../../data/supplier-mocks";
 import { createMaterialOrder } from "../../services/supplier/orders.service";
 import CrossLinkSuggestions from "../../components/ui/CrossLinkSuggestions";
+import CommissionBreakdown from "../../components/pro/CommissionBreakdown";
+import { getProCommissionPercent } from "../../data/proCommission";
+import { useSubscriptionStore } from "../../stores/subscriptionStore";
+import { useAuthStore } from "../../stores/authStore";
+import { useProStore } from "../../stores/proStore";
+import { useChatStore } from "../../stores/chatStore";
+import { useNotificationStore } from "../../stores/notificationStore";
+import { syncMissionAccept, syncMissionStatus, getSandboxPro } from "../../services/missionSync";
 import { formatXOF } from "../../utils/format";
 import type { ProJobStatus } from "../../types";
 
@@ -43,8 +50,16 @@ export default function ProMissionDetailPage() {
   const { id } = useParams<{ id: string }>();
   const nav = useNavigate();
   const goBack = useBackNavigation("/pro/dashboard");
-  const job = MOCK_PRO_JOBS.find((j) => j.id === id);
-  const [localStatus, setLocalStatus] = useState<ProJobStatus | null>(null);
+  const storeJobs = useProStore((s) => s.jobs);
+  const job = storeJobs.find((j) => j.id === id);
+  const currentSubscription = useSubscriptionStore((s) => s.currentSubscription);
+  const fetchCurrent = useSubscriptionStore((s) => s.fetchCurrent);
+  const commissionPercent = getProCommissionPercent(currentSubscription?.plan_id);
+
+  useEffect(() => {
+    const userId = useAuthStore.getState().userId;
+    if (userId) fetchCurrent(userId);
+  }, [fetchCurrent]);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [showRejectConfirm, setShowRejectConfirm] = useState(false);
   const [showMaterialSelector, setShowMaterialSelector] = useState(false);
@@ -128,18 +143,72 @@ export default function ProMissionDetailPage() {
     );
   }
 
-  const effectiveStatus = localStatus ?? (job.status as ProJobStatus);
+  const effectiveStatus = job.status as ProJobStatus;
   const currentStepIndex = STEP_ORDER.indexOf(effectiveStatus);
   const isCancelled = effectiveStatus === "cancelled";
 
   const handleAccept = (type: "fixed" | "quote") => {
-    setLocalStatus(type === "fixed" ? "accepted" : "quote_required");
+    if (!job) return;
+    const pro = getSandboxPro();
+    const requestId = job.id.replace(/^mission_/, "") || job.id;
+    syncMissionAccept({
+      requestId,
+      proId: pro?.id ?? "pro6",
+      proName: pro?.name ?? "Vous",
+      proAvatar: pro?.avatarUrl ?? "",
+      proPhone: pro?.phoneNumber ?? "",
+      clientId: job.clientId,
+      clientName: job.clientName,
+      clientPhone: job.clientPhone,
+      clientLocation: job.clientLocation,
+      title: job.serviceName,
+      description: job.description,
+      category: job.category,
+      address: job.clientLocation,
+      budgetXOF: job.totalFeeXOF,
+      laborFeeXOF: job.totalFeeXOF,
+      totalFeeXOF: job.totalFeeXOF,
+      missionStatus: type === "fixed" ? "accepted" : "quote_requested",
+      jobStatus: type === "fixed" ? "accepted" : "quote_required",
+      pricingModel: type,
+    });
     setShowAcceptModal(false);
   };
 
   const handleReject = () => {
-    setLocalStatus("cancelled");
+    if (job) {
+      useProStore.getState().upsertJob({ ...job, status: "cancelled" });
+      syncMissionStatus(job.id, "cancelled");
+      useNotificationStore.getState().addNotification({
+        type: "info",
+        title: "Mission refusée",
+        body: `Vous avez refusé la mission de ${job.clientName}`,
+      });
+    }
     setShowRejectConfirm(false);
+  };
+
+  const handleComplete = () => {
+    if (!job) return;
+    useProStore.getState().upsertJob({ ...job, status: "completed" });
+    syncMissionStatus(job.id, "completed");
+    useNotificationStore.getState().addNotification({
+      type: "mission",
+      title: "Mission terminée",
+      body: `La mission ${job.serviceName} est terminée`,
+      actionUrl: `/orders/tracker/${job.id}`,
+    });
+  };
+
+  const openChat = async () => {
+    if (!job) return;
+    const pro = getSandboxPro();
+    const conv = await useChatStore.getState().createConversation({
+      participant1: pro?.id ?? "pro6",
+      participant2: job.clientId,
+      jobId: job.id,
+    });
+    if (conv) nav(`/pro/messages/${conv.id}`);
   };
 
   return (
@@ -188,6 +257,10 @@ export default function ProMissionDetailPage() {
             <div className="text-right">
               <p className="text-[12px] font-medium text-cm-text">{job.clientName}</p>
             </div>
+          </div>
+
+          <div className="mt-4">
+            <CommissionBreakdown subtotalXOF={job.totalFeeXOF} percent={commissionPercent} />
           </div>
         </motion.div>
 
@@ -245,18 +318,18 @@ export default function ProMissionDetailPage() {
             </button>
           )}
           {effectiveStatus !== "pending" && effectiveStatus !== "completed" && effectiveStatus !== "client_validation" && effectiveStatus !== "closed" && effectiveStatus !== "cancelled" && (
-            <button className="flex-1 px-4 py-2.5 bg-cm-accent text-cm-text-onAccent text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
+            <button onClick={effectiveStatus === "in_progress" ? handleComplete : openChat} className="flex-1 px-4 py-2.5 bg-cm-accent text-cm-text-onAccent text-[12px] font-semibold rounded-full cursor-pointer active:scale-[0.97]">
               {effectiveStatus === "in_progress" ? "Terminer" : "Contacter"}
             </button>
           )}
-          <button className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-cm-elevated border border-cm-border text-cm-text text-[12px] font-medium rounded-full cursor-pointer active:scale-[0.97]">
+          <button onClick={openChat} className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-cm-elevated border border-cm-border text-cm-text text-[12px] font-medium rounded-full cursor-pointer active:scale-[0.97]">
             <MessageSquare className="w-3.5 h-3.5" />
             Message
           </button>
-          <button className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-cm-elevated border border-cm-border text-cm-text text-[12px] font-medium rounded-full cursor-pointer active:scale-[0.97]">
+          <a href={`tel:${job.clientPhone}`} className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-cm-elevated border border-cm-border text-cm-text text-[12px] font-medium rounded-full cursor-pointer active:scale-[0.97]">
             <Phone className="w-3.5 h-3.5" />
             Appeler
-          </button>
+          </a>
         </div>
       </div>
 

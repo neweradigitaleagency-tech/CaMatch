@@ -11,7 +11,7 @@ import CatalogProductCard from "./CatalogProductCard"
 import { useAuthStore } from "../../stores/authStore"
 import { useMarketplaceCartStore } from "../../stores/marketplaceCartStore"
 import { useFavoritesStore } from "../../stores/favoritesStore"
-import { findConversation, createConversation } from "../../services/chatService"
+import { useChatStore } from "../../stores/chatStore"
 import type { Product, MaterialProduct, ShoppingProduct, SecondHandProduct, RealEstateProduct, AutomobileProduct, ProfessionalSeller, MarketplaceVertical } from "../../types/marketplace"
 
 function formatPrice(p: number) { return p.toLocaleString("fr-FR") + " F" }
@@ -86,18 +86,13 @@ export default function ProductDetail() {
   const handleContact = useCallback(async () => {
     if (!currentUserId || !seller) return
     const sellerUserId = seller.userId || `seller_${seller.id}`
-    const existing = await findConversation(currentUserId, sellerUserId, productId!)
-    if (existing) {
-      nav(`/messages/${existing}`)
-      return
-    }
-    const convId = await createConversation({
+    const conv = await useChatStore.getState().createConversation({
       participant1: currentUserId,
       participant2: sellerUserId,
       jobId: productId!,
       metadata: { productId: productId!, productName: product?.name },
     })
-    if (convId) nav(`/messages/${convId}`)
+    if (conv) nav(`/messages/${conv.id}`)
   }, [currentUserId, seller, productId, product?.name, nav])
 
   const handleAddToCart = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {

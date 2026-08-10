@@ -9,6 +9,7 @@ export default function AppSettingsPage() {
 
   const handleBack = () => {
     if (fromHamburger) {
+      setFlag("reopen-menu", true);
       navigate("/");
     } else {
       goBack();

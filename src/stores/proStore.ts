@@ -13,6 +13,7 @@ interface ProState {
   setActiveAlert: (alert: ProAlert | null) => void;
   setJobs: (jobs: ProJob[]) => void;
   addJob: (job: ProJob) => void;
+  upsertJob: (job: ProJob) => void;
   setAlerts: (alerts: ProAlert[]) => void;
   removeAlert: (id: string) => void;
   setCurrentJob: (job: ProJob | null) => void;
@@ -47,6 +48,17 @@ export const useProStore = create<ProState>((set) => ({
   addJob: (job) => {
     useProjectStore.getState().addProject(fromProJob(job));
     set((state) => ({ jobs: [job, ...state.jobs] }));
+  },
+  upsertJob: (job) => {
+    useProjectStore.getState().upsertProject(fromProJob(job));
+    set((state) => {
+      const exists = state.jobs.some((j) => j.id === job.id);
+      return {
+        jobs: exists
+          ? state.jobs.map((j) => (j.id === job.id ? job : j))
+          : [job, ...state.jobs],
+      };
+    });
   },
   setAlerts: (alerts) => {
     useProjectStore.getState().setAlerts(alerts);

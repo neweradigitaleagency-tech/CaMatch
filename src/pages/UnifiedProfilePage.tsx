@@ -157,7 +157,7 @@ export default function UnifiedProfilePage() {
         <div className="px-4 pt-3 pb-3">
           <div className="flex items-center gap-2 mb-2">
             <button onClick={goBack}
-              className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer shrink-0">
+              className="cm-scale-btn p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min shrink-0">
               <ArrowLeft className="w-4 h-4 text-cm-text" />
             </button>
             <h1 className="text-[15px] font-display font-bold text-cm-text">Mon profil</h1>

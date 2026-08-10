@@ -121,7 +121,7 @@ export default function SubscriptionHistoryPage() {
 function Header({ onBack, title }: { onBack: () => void; title: string }) {
   return (
     <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-      <button onClick={onBack} className="w-8 h-8 flex items-center justify-center rounded-xl bg-cm-elevated border border-cm-border cursor-pointer active:scale-[0.94] transition-transform">
+      <button onClick={onBack} className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
         <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
       </button>
       <h1 className="text-lg font-extrabold text-cm-text">{title}</h1>

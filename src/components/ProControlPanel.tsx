@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { CheckCircle, Navigation, Home, Loader, MapPin, Phone, UserIcon, Camera, X, Image, Clock, Plus, ClipboardList } from "lucide-react";
 import type { ProJob, ProJobStatus } from "../types";
 import { useAuthStore } from "../stores/authStore";
-import { createConversation, findConversation } from "../services/chatService";
+import { useChatStore } from "../stores/chatStore";
 import MapView from "./ui/MapView";
 import { useRequestStore } from "../stores/requestStore";
 
@@ -164,14 +164,11 @@ export default function ProControlPanel({
 
     const currentUserId = useAuthStore.getState().userId;
     if (currentUserId && job.clientId) {
-      const existing = await findConversation(currentUserId, job.clientId, job.id);
-      if (!existing) {
-        await createConversation({
-          participant1: currentUserId,
-          participant2: job.clientId,
-          jobId: job.id,
-        });
-      }
+      await useChatStore.getState().createConversation({
+        participant1: currentUserId,
+        participant2: job.clientId,
+        jobId: job.id,
+      });
     }
   };
 

@@ -4,11 +4,20 @@ import type { Database } from "../types/supabase";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-const missingEnv = !supabaseUrl || !supabaseAnonKey;
+/**
+ * SANDBOX MODE — VITE_DEMO_MODE=true force le mode démo (aucun appel BDD),
+ * même si les clés Supabase sont présentes dans l'environnement.
+ * C'est le mode par défaut pour le prototype : réversible à tout moment.
+ */
+export function isDemoMode(): boolean {
+  return import.meta.env.VITE_DEMO_MODE === "true";
+}
+
+const missingEnv = !supabaseUrl || !supabaseAnonKey || isDemoMode();
 
 if (missingEnv) {
   console.warn(
-    "⚠️ VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY not set — running in demo mode."
+    `[sandbox] ${isDemoMode() ? "VITE_DEMO_MODE=true" : "clés Supabase absentes"} — mode démo sans base de données.`
   );
 }
 

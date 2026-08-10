@@ -6,6 +6,7 @@ import { useClientRequests, useClientMissions } from "../hooks/useDatabase";
 import { useAuthStore } from "../stores/authStore";
 import { useRequestStore } from "../stores/requestStore";
 import { useProStore } from "../stores/proStore";
+import { acceptAlertAsPro } from "../services/missionSync";
 import { MOCK_REQUESTS, MOCK_MISSIONS, MOCK_PRO_JOBS, MOCK_PROS } from "../services/mockData";
 import StatusBadge from "../components/ui/StatusBadge";
 import type { Mission, ProAlert, ProDashboardStats, ClientRequest, MissionStatus } from "../types";
@@ -102,7 +103,7 @@ export default function OrdersPage() {
         <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
           <div className="flex items-center gap-3 h-14 px-5">
             <button onClick={goBack}
-              className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-95 shrink-0">
+              className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min shrink-0">
               <ArrowLeft className="w-4 h-4 text-[#2B2B2B]" />
             </button>
             <h1 className="text-[18px] font-bold text-cm-text">Mes commandes</h1>
@@ -201,7 +202,7 @@ export default function OrdersPage() {
                       className="flex-1 h-9 text-[11px] font-bold text-cm-accent bg-cm-accent-soft rounded-[10px] flex items-center justify-center gap-1 cursor-pointer">
                       <FileText className="w-3.5 h-3.5" /> Devis
                     </button>
-                    <button type="button" onClick={() => { const newMission: Mission = { id: "mission_" + Date.now(), requestId: alert.requestId, clientId: "client_marie", proId: userId || "pro_mock", status: "accepted", title: alert.description.slice(0, 60), description: alert.description, category: alert.category, address: alert.location, budgetXOF: alert.estimatedPriceMinXOF, photos: [], proName: currentPro?.name || "Vous", proAvatar: currentPro?.avatarUrl || "", proPhone: currentPro?.phoneNumber || "", clientName: alert.clientName, clientPhone: alert.clientPhone, createdAt: new Date().toISOString() }; useRequestStore.getState().addMission(newMission); removeAlert(alert.id); }} className="h-9 text-[11px] font-bold text-white bg-green-600 rounded-[10px] px-3 cursor-pointer">Accepter</button>
+                    <button type="button" onClick={() => { acceptAlertAsPro(alert, "fixed"); removeAlert(alert.id); }} className="h-9 text-[11px] font-bold text-white bg-green-600 rounded-[10px] px-3 cursor-pointer">Accepter</button>
                     <button type="button" onClick={() => removeAlert(alert.id)} className="h-9 text-[11px] font-bold text-cm-text bg-cm-border-soft rounded-[10px] px-3 cursor-pointer">Refuser</button>
                   </div>
                 </div>

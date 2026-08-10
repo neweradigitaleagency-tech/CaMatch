@@ -38,7 +38,7 @@ export default function ProSubscriptionPage() {
   return (
     <div className="flex flex-col min-h-dynamic bg-cm-bg pb-32">
       <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <button onClick={() => nav("/profile")} className="w-8 h-8 flex items-center justify-center rounded-xl bg-cm-elevated border border-cm-border cursor-pointer">
+        <button onClick={() => nav("/profile")} className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
           <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <h1 className="text-lg font-extrabold">Abonnement</h1>
@@ -75,7 +75,7 @@ export default function ProSubscriptionPage() {
                 ))}
               </ul>
               <button
-                onClick={() => {}}
+                onClick={() => { if (plan.price > 0) nav("/pro/subscription/plans"); }}
                 className={`w-full mt-3 h-10 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
                   plan.price === 0
                     ? "bg-cm-accent-soft/40 text-cm-text-muted border border-cm-border"

@@ -4,6 +4,7 @@ import { MOCK_ORDERS, getMockSupplierOrders } from "../../data/supplier-mocks"
 
 export interface CreateOrderInput {
   jobId: string
+  quoteId?: string
   supplierId: string
   clientId: string
   professionalId: string
@@ -122,6 +123,7 @@ export async function createMaterialOrder(input: CreateOrderInput): Promise<Mate
     .from("material_orders" as never)
     .insert({
       job_id: input.jobId,
+      quote_id: input.quoteId ?? null,
       supplier_id: input.supplierId,
       client_id: input.clientId,
       professional_id: input.professionalId,
@@ -159,6 +161,7 @@ function mockCreateOrder(
   const order: MaterialOrder = {
     id: `mock-${Date.now()}`,
     jobId: input.jobId,
+    quoteId: input.quoteId,
     supplierId: input.supplierId,
     clientId: input.clientId,
     professionalId: input.professionalId,

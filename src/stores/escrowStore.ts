@@ -6,6 +6,7 @@ const COMMISSION_PERCENT = 15;
 
 interface EscrowState {
   entries: EscrowEntry[];
+  addEntry: (entry: EscrowEntry) => void;
   holdPayment: (missionId: string, clientId: string, proId: string, amountXOF: number, paymentMethod: UnifiedPaymentMethod) => EscrowEntry;
   releasePayment: (missionId: string) => void;
   refundPayment: (missionId: string) => void;
@@ -16,6 +17,8 @@ let escrowCounter = 0;
 
 export const useEscrowStore = create<EscrowState>((set, get) => ({
   entries: [],
+
+  addEntry: (entry) => set((state) => ({ entries: [...state.entries, entry] })),
 
   holdPayment: (missionId, clientId, proId, amountXOF, method) => {
     escrowCounter += 1;

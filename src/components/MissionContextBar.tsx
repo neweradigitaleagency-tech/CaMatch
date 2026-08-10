@@ -1,5 +1,6 @@
 import { ChevronRight, MapPin } from "lucide-react";
 import type { Conversation } from "../types";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 
 interface MissionContextBarProps {
   conversation: Conversation;
@@ -13,6 +14,7 @@ const PHASE_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export default function MissionContextBar({ conversation }: MissionContextBarProps) {
+  const { navigate } = useAppNavigation();
   const meta = conversation.metadata;
   const phase = meta.mission_phase;
   const phaseInfo = phase ? PHASE_LABELS[phase] : null;
@@ -38,7 +40,9 @@ export default function MissionContextBar({ conversation }: MissionContextBarPro
           </div>
         )}
         <button
-          onClick={() => {}}
+          onClick={() => {
+            if (conversation.missionId) navigate(`/orders/tracker/${conversation.missionId}`);
+          }}
           className="mt-2 w-full flex items-center justify-between px-2 py-1.5 rounded-[8px] hover:bg-cm-accent-soft transition-colors text-[12px] text-cm-accent font-medium"
         >
           Voir les détails de la mission

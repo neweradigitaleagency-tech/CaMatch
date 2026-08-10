@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { useAuthStore } from "../../stores/authStore"
-import { findConversation, createConversation } from "../../services/chatService"
+import { useChatStore } from "../../stores/chatStore"
 import { getSellerById, PROFESSIONAL_SELLERS, INDIVIDUAL_SELLERS, CA_MATCH_PRO_SELLERS } from "../../data/marketplaceSuppliers"
 
 export default function NewConversationPage() {
@@ -33,19 +33,14 @@ export default function NewConversationPage() {
     const jobId = `marketplace_contact_${sellerId}_${Date.now()}`
 
     const init = async () => {
-      const existing = await findConversation(userId, sellerUserId, jobId)
-      if (existing) {
-        nav(`/messages/${existing}`, { replace: true })
-        return
-      }
-      const convId = await createConversation({
+      const conv = await useChatStore.getState().createConversation({
         participant1: userId,
         participant2: sellerUserId,
         jobId,
         metadata: { sellerId: seller.id },
       })
-      if (convId) {
-        nav(`/messages/${convId}`, { replace: true })
+      if (conv) {
+        nav(`/messages/${conv.id}`, { replace: true })
       } else {
         setStatus("Erreur lors de la création de la conversation")
       }

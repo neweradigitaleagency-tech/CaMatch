@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { Heart, MapPin, Star, Briefcase, Package, Store } from "lucide-react";
 import PageHeader from "../components/ui/PageHeader";
 import { useFavoritesStore, type FavoriteItem, type FavoriteType } from "../stores/favoritesStore";
+import { useAppNavigation } from "../navigation/useAppNavigation";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 12 },
@@ -69,8 +69,17 @@ function FavoriteRow({ item, onOpen }: { item: FavoriteItem; onOpen: () => void 
 }
 
 export default function FavoritesPage() {
-  const nav = useNavigate();
+  const { navigate: nav, goBack, getFlag, setFlag } = useAppNavigation();
   const items = useFavoritesStore((s) => s.items);
+
+  const handleBack = () => {
+    if (getFlag("from-hamburger")) {
+      setFlag("reopen-menu", true);
+      nav("/");
+    } else {
+      goBack();
+    }
+  };
 
   const groups = useMemo(() => {
     const order: FavoriteType[] = ["pro", "product", "boutique"];
@@ -86,7 +95,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="min-h-dynamic bg-cm-bg pb-10">
-      <PageHeader title="Mes favoris" fallbackRoute="/" subtitle={total > 0 ? `${total} favori(s)` : undefined} />
+      <PageHeader title="Mes favoris" fallbackRoute="/" subtitle={total > 0 ? `${total} favori(s)` : undefined} onBack={handleBack} />
 
       {total === 0 ? (
         <div className="flex flex-col items-center justify-center pt-16 px-8">

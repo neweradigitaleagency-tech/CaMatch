@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Search, MapPin, Menu, ClipboardPlus, Store, UserPlus, X, Star, ChevronRight, Heart } from "lucide-react";
 import SponsoredCard from "./SponsoredCard";
@@ -18,6 +18,7 @@ import { getBoutiques } from "../data/marketplaceSuppliers";
 import { MARKETPLACE_PRODUCTS } from "../data/marketplaceProducts";
 import { cardAppear } from "../animations/variants";
 import { useAppNavigation } from "../navigation/useAppNavigation";
+import { useNavigationStore } from "../navigation/navigationStore";
 
 const HERO_CARDS = [
   {
@@ -140,6 +141,15 @@ export default function ModernHomeScreen() {
   const [showDrawer, setShowDrawer] = useState(false);
   const [showLocationPicker, setShowLocationPicker] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+
+  const reopenMenu = useNavigationStore((s) => s.flags["reopen-menu"] === true);
+  const clearFlag = useNavigationStore((s) => s.clearFlag);
+  useEffect(() => {
+    if (reopenMenu) {
+      setShowDrawer(true);
+      clearFlag("reopen-menu");
+    }
+  }, [reopenMenu, clearFlag]);
 
   const unreadCount = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
   const neighborhood = useLocationStore((s) => s.neighborhood);
@@ -505,7 +515,7 @@ export default function ModernHomeScreen() {
                 <h3 className="text-[15px] font-semibold text-cm-text">Changer de localisation</h3>
                 <button
                   onClick={() => setShowLocationPicker(false)}
-                  className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer"
+                  className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min"
                 >
                   <X className="w-4 h-4 text-cm-text" />
                 </button>

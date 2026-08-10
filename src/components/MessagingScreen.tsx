@@ -146,6 +146,7 @@ export function ChatScreen({
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const [showRiskWarning, setShowRiskWarning] = useState<string | null>(null);
+  const [callNotice, setCallNotice] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -257,9 +258,19 @@ export function ChatScreen({
       <ChatHeader
         conversation={conversation}
         onBack={onBack}
-        onAudioCall={() => {}}
-        onVideoCall={() => {}}
+        onAudioCall={() => setCallNotice("Appel audio non disponible en version démo.")}
+        onVideoCall={() => setCallNotice("Appel vidéo non disponible en version démo.")}
       />
+
+      {callNotice && (
+        <div className="mx-4 mt-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-[10px] flex items-start gap-2">
+          <Phone className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
+          <p className="text-[11px] text-blue-700">{callNotice}</p>
+          <button onClick={() => setCallNotice(null)} className="p-0.5 shrink-0">
+            <X className="w-3 h-3 text-blue-400" />
+          </button>
+        </div>
+      )}
 
       <MissionContextBar conversation={conversation} />
 

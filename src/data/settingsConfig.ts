@@ -6,6 +6,7 @@ import {
   Globe, Flag, Clock, DollarSign,
   Download, Upload, Trash2, HardDrive,
   AlertTriangle, Skull, Image,
+  FileText, Info,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { VerificationStatus } from "../components/settings/VerificationBadge";
@@ -121,6 +122,14 @@ export const SETTINGS_SECTIONS: SettingsSectionConfig[] = [
       { id: "export-activity", icon: Upload, label: "Exporter mon activité", kind: "action" },
       { id: "clear-cache", icon: Trash2, label: "Vider le cache", kind: "action", requiresConfirmation: true, confirmationTitle: "Vider le cache", confirmationMessage: "Les données temporaires seront supprimées. Cette action est irréversible." },
       { id: "storage-usage", icon: HardDrive, label: "Utilisation du stockage", subtitle: "Calcul…", kind: "info" },
+    ],
+  },
+  {
+    id: "legal",
+    label: "Légal",
+    items: [
+      { id: "terms", icon: FileText, label: "Conditions d'utilisation", kind: "navigation", route: "/profile/terms" },
+      { id: "version", icon: Info, label: "Version", subtitle: "1.0.0 (Build 25)", kind: "info" },
     ],
   },
   {

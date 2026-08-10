@@ -63,6 +63,7 @@ interface ProjectState {
   setPerspective: (p: ProjectPerspective) => void;
   setProjects: (projects: Project[]) => void;
   addProject: (project: Project) => void;
+  upsertProject: (project: Project) => void;
   removeProject: (id: string) => void;
   selectProject: (project: Project | null) => void;
   updateProjectStatus: (id: string, status: string) => void;
@@ -171,6 +172,16 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
 
   addProject: (project) =>
     set((state) => ({ projects: [project, ...state.projects] })),
+
+  upsertProject: (project) =>
+    set((state) => {
+      const exists = state.projects.some((p) => p.id === project.id);
+      return {
+        projects: exists
+          ? state.projects.map((p) => (p.id === project.id ? project : p))
+          : [project, ...state.projects],
+      };
+    }),
 
   removeProject: (id) =>
     set((state) => ({

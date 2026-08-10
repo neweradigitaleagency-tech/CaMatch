@@ -64,7 +64,7 @@ export default function CategoryDetailScreen() {
       <div className="sticky top-0 z-10 bg-cm-bg/80 backdrop-blur-xl border-b border-cm-border/40">
         <div className="flex items-center gap-3 px-4 h-14">
           <button onClick={goBack}
-            className="cm-scale-btn w-8 h-8 flex items-center justify-center rounded-[12px] bg-cm-elevated hover:bg-cm-border/50 cursor-pointer">
+            className="cm-scale-btn p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
             <ArrowLeft className="w-4 h-4 text-cm-text" />
           </button>
           <div className="flex items-center gap-2">

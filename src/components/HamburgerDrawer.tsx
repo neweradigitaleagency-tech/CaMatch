@@ -10,9 +10,6 @@ import {
   PRO_SECTION,
   ACCOUNT_SECTION,
   SUPPORT_SECTION,
-  PREFERENCES_SECTION,
-  LEGAL_SECTION,
-  LEGAL_STATIC_INFO,
   LOGOUT_ITEM,
 } from "../data/menuConfig";
 
@@ -124,21 +121,6 @@ export default function HamburgerDrawer({ open, onClose }: Props) {
           {SUPPORT_SECTION.items.map((item) => (
             <DrawerItem key={item.id} {...item} onClick={makeHandler(item.route, item.onClick)} />
           ))}
-        </DrawerSection>
-
-        <DrawerSection label={PREFERENCES_SECTION.label}>
-          {PREFERENCES_SECTION.items.map((item) => (
-            <DrawerItem key={item.id} {...item} onClick={makeHandler(item.route, item.onClick)} />
-          ))}
-        </DrawerSection>
-
-        <DrawerSection label={LEGAL_SECTION.label}>
-          {LEGAL_SECTION.items.map((item) => (
-            <DrawerItem key={item.id} {...item} onClick={makeHandler(item.route, item.onClick)} />
-          ))}
-          <div className="px-4 py-3">
-            <span className="text-[11px] text-cm-text-muted">{LEGAL_STATIC_INFO.label} {LEGAL_STATIC_INFO.value}</span>
-          </div>
         </DrawerSection>
       </Drawer>
 

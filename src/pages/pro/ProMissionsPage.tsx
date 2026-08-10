@@ -3,8 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useBackNavigation } from "../../hooks/useBackNavigation";
 import { motion } from "motion/react";
 import { ArrowLeft, CalendarDays, MapPin, Coins, UserIcon, Clock, XCircle, Navigation, MessageCircle, Phone } from "lucide-react";
-import { MOCK_PRO_JOBS, MOCK_PRO_ALERTS } from "../../services/mockData";
-import type { MissionStatus } from "../../types";
+import { useProStore } from "../../stores/proStore";
+import { useChatStore } from "../../stores/chatStore";
+import { useNotificationStore } from "../../stores/notificationStore";
+import { acceptAlertAsPro, getSandboxPro } from "../../services/missionSync";
+import type { ProAlert } from "../../types";
 
 const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string }> = {
   pending:        { border: "border-l-amber-400",  dot: "bg-amber-400",  badge: "bg-amber-50 text-amber-700" },
@@ -46,11 +49,43 @@ export default function ProMissionsPage() {
   const [tab, setTab] = useState<TabFilter>("active");
   const [showDetail, setShowDetail] = useState<string | null>(null);
 
-  const activeJobs = MOCK_PRO_JOBS.filter((j) => j.status === "accepted" || j.status === "quote_required" || j.status === "en_route" || j.status === "in_progress");
-  const pendingJobs = MOCK_PRO_JOBS.filter((j) => j.status === "pending");
-  const completedJobs = MOCK_PRO_JOBS.filter((j) => j.status === "completed");
+  const storeJobs = useProStore((s) => s.jobs);
+  const storeAlerts = useProStore((s) => s.alerts);
+  const addNotification = useNotificationStore((s) => s.addNotification);
+
+  const activeJobs = storeJobs.filter((j) => j.status === "accepted" || j.status === "quote_required" || j.status === "en_route" || j.status === "in_progress");
+  const pendingJobs = storeJobs.filter((j) => j.status === "pending");
+  const completedJobs = storeJobs.filter((j) => j.status === "completed" || j.status === "closed" || j.status === "client_validation" || j.status === "cancelled");
 
   const filtered = tab === "active" ? activeJobs : tab === "upcoming" ? pendingJobs : completedJobs;
+
+  const handleAcceptAlert = (alert: ProAlert) => {
+    acceptAlertAsPro(alert, "fixed");
+    addNotification({
+      type: "mission",
+      title: "Mission acceptée",
+      body: `Vous avez accepté la mission de ${alert.clientName}`,
+      actionUrl: "/pro/missions",
+    });
+  };
+
+  const handleRefuseAlert = (alert: ProAlert) => {
+    useProStore.getState().removeAlert(alert.id);
+    addNotification({
+      type: "info",
+      title: "Mission refusée",
+      body: `Vous avez refusé la mission de ${alert.clientName}`,
+    });
+  };
+
+  const openChat = async (clientId: string, jobId: string) => {
+    const conv = await useChatStore.getState().createConversation({
+      participant1: getSandboxPro()?.id ?? "pro6",
+      participant2: clientId,
+      jobId,
+    });
+    if (conv) nav(`/pro/messages/${conv.id}`);
+  };
 
   return (
     <div className="min-h-dynamic bg-[#F5F5F0]">
@@ -79,10 +114,10 @@ export default function ProMissionsPage() {
         </div>
 
         {/* Nouvelles alertes (pending) */}
-        {tab === "upcoming" && MOCK_PRO_ALERTS.length > 0 && (
+        {tab === "upcoming" && storeAlerts.length > 0 && (
           <div className="mb-4">
             <h3 className="text-[11px] font-bold text-cm-text-muted uppercase tracking-wider mb-2">Nouvelles demandes</h3>
-            {MOCK_PRO_ALERTS.map((alert) => (
+            {storeAlerts.map((alert) => (
               <motion.div key={alert.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
                 className="bg-white border border-cm-border/40 rounded-[16px] p-3.5 mb-2 shadow-sm">
                 <div className="flex items-start justify-between mb-2">
@@ -107,10 +142,10 @@ export default function ProMissionsPage() {
                   <span className="font-bold text-cm-accent ml-auto">{alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} - {alert.estimatedPriceMaxXOF.toLocaleString("fr-FR")} F</span>
                 </div>
                 <div className="flex gap-2">
-                  <button className="flex-1 h-9 rounded-[10px] border-2 border-red-100 text-red-500 text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-red-50 flex items-center justify-center gap-1">
+                  <button onClick={() => handleRefuseAlert(alert)} className="flex-1 h-9 rounded-[10px] border-2 border-red-100 text-red-500 text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-red-50 flex items-center justify-center gap-1">
                     <XCircle className="w-3 h-3" /> Refuser
                   </button>
-                  <button className="flex-1 h-9 rounded-[10px] bg-cm-accent text-cm-text-onAccent text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-accent/90 flex items-center justify-center gap-1 shadow-sm">
+                  <button onClick={() => handleAcceptAlert(alert)} className="flex-1 h-9 rounded-[10px] bg-cm-accent text-cm-text-onAccent text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-accent/90 flex items-center justify-center gap-1 shadow-sm">
                     <Check className="w-3 h-3" /> Accepter
                   </button>
                 </div>
@@ -203,15 +238,15 @@ export default function ProMissionsPage() {
                   {isDetailOpen && (tab === "active") && (
                     <div className="mt-3 pt-3 border-t border-cm-border/40">
                       <div className="flex gap-2 mb-2">
-                        <button className="flex-1 h-9 rounded-[10px] bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
+                        <button onClick={() => nav(`/pro/map?job=${job.id}`)} className="flex-1 h-9 rounded-[10px] bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
                            <Navigation className="w-3 h-3" /> Naviguer
                          </button>
-                         <button className="flex-1 h-9 rounded-[10px] border border-cm-border/40 text-cm-text-soft text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
+                         <button onClick={() => openChat(job.clientId, job.id)} className="flex-1 h-9 rounded-[10px] border border-cm-border/40 text-cm-text-soft text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
                            <MessageCircle className="w-3 h-3" /> Chat
                          </button>
-                         <button className="w-9 h-9 rounded-[10px] border border-cm-border/40 text-cm-text-soft flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
+                         <a href={`tel:${job.clientPhone}`} className="w-9 h-9 rounded-[10px] border border-cm-border/40 text-cm-text-soft flex items-center justify-center active:scale-90 transition-transform">
                           <Phone className="w-4 h-4" />
-                        </button>
+                        </a>
                       </div>
                       <div className="flex items-center gap-2 bg-cm-surface rounded-[10px] p-2.5">
                         <div className={`w-2 h-2 rounded-full ${job.status === "accepted" ? "bg-blue-500 animate-pulse" : job.status === "en_route" ? "bg-amber-500 animate-pulse" : "bg-cm-accent"}`} />

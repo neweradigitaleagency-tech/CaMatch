@@ -7,7 +7,6 @@ import { useRequestStore } from "../../stores/requestStore";
 import { useProStore } from "../../stores/proStore";
 import { useChatStore } from "../../stores/chatStore";
 import { useAuthStore } from "../../stores/authStore";
-import { findConversation, createConversation } from "../../services/chatService";
 import { useNotifications } from "../../hooks/useNotifications";
 import { MOCK_PRO_JOBS, MOCK_PRO_ALERTS } from "../../services/mockData";
 import type { MissionStatus } from "../../types";
@@ -21,7 +20,6 @@ export default function MissionTrackerPage() {
   const proJobs = useProStore((s) => s.jobs);
   const setProJobs = useProStore((s) => s.setJobs);
   const updateProJobStatus = useProStore((s) => s.updateJobStatus);
-  const conversations = useChatStore((s) => s.conversations);
 
   const { sendLocalNotification } = useNotifications();
 
@@ -75,27 +73,14 @@ export default function MissionTrackerPage() {
       onBack={goBack}
       onOpenChat={async () => {
         if (!mission) return;
-        const conv = conversations.find((c) => c.missionId === mission.id);
-        if (conv) {
-          navigate(`/messages/${conv.id}`);
-          return;
-        }
         const userId = useAuthStore.getState().userId;
-        if (userId && mission.proId) {
-          const existing = await findConversation(userId, mission.proId, mission.id);
-          if (existing) {
-            navigate(`/messages/${existing}`);
-          } else {
-            const created = await createConversation({
-              participant1: userId,
-              participant2: mission.proId,
-              jobId: mission.id,
-            });
-            if (created) {
-              navigate(`/messages/${created}`);
-            }
-          }
-        }
+        if (!userId || !mission.proId) return;
+        const conv = await useChatStore.getState().createConversation({
+          participant1: userId,
+          participant2: mission.proId,
+          jobId: mission.id,
+        });
+        if (conv) navigate(`/messages/${conv.id}`);
       }}
       onOpenInvoice={() => openFlow("/orders/invoice")}
       onQRPayment={() => openFlow("/orders/qr-payment")}

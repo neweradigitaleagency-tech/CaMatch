@@ -1,103 +1,70 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
-  Star, Users, CalendarDays, TrendingUp, Clock, MapPin, Wallet,
-  CheckCircle, Phone, BarChart3, Target,
-  UserIcon, Coins, Award, Bell, Settings,
-  MessageCircle, Navigation, XCircle, Check,
-  FileText, Camera, Lock,
+  Bell, XCircle, Check, CheckCircle, Clock, Coins,
+  Phone, MessageCircle, Navigation, UserIcon, Settings, Award,
+  CalendarDays, Wallet, FileText, ChevronRight,
 } from "lucide-react";
 import { useAuthStore } from "../stores/authStore";
 import { useProStore } from "../stores/proStore";
 import { useNotificationStore } from "../stores/notificationStore";
 import { useChatStore } from "../stores/chatStore";
 import { useSubscriptionStore } from "../stores/subscriptionStore";
-import { findConversation, createConversation } from "../services/chatService";
+import { acceptAlertAsPro, syncMissionStatus } from "../services/missionSync";
 import NotificationPanel from "./NotificationPanel";
 import PhotoCaptureModal from "./PhotoCaptureModal";
 import {
-  MOCK_PRO_STATS, MOCK_PRO_JOBS, MOCK_PRO_ALERTS,
-  MOCK_FINANCE_SUMMARY, MOCK_CONVERSATIONS,
-  MOCK_DASH_DATA, MOCK_REVENUE_HISTORY, MOCK_MISSION_HISTORY,
-  MOCK_RATING_HISTORY, MOCK_PORTFOLIO_PRO, MOCK_PROS
+  MOCK_FINANCE_SUMMARY,
+  MOCK_DASH_DATA, MOCK_REVIEWS, MOCK_PROS,
+  MOCK_VERIFICATION,
 } from "../services/mockData";
+import type { ProAlert, ProJob } from "../types";
 import { getProLevel, PRO_LEVELS } from "../types";
 import HamburgerDrawer from "./HamburgerDrawer";
 import RouteMapModal from "./RouteMapModal";
+import { useNavigationStore } from "../navigation/navigationStore";
+import { useAppNavigation } from "../navigation/useAppNavigation";
+import { ACTIVE_JOB_STATUSES, nextStatus } from "./pro/dashboard";
+import MissionSummary from "./pro/MissionSummary";
+import type { MissionSummaryData } from "./pro/MissionSummary";
+import { getProCommissionPercent } from "../data/proCommission";
+import AvailabilityCard from "./pro/AvailabilityCard";
+import ActiveMissionControl from "./pro/ActiveMissionControl";
+import NewRequestsList from "./pro/NewRequestsList";
+import TodayMissions from "./pro/TodayMissions";
+import EarningsCard from "./pro/EarningsCard";
+import PerformanceCard from "./pro/PerformanceCard";
+import ProfileProgressCard from "./pro/ProfileProgressCard";
+import ReviewsPreview from "./pro/ReviewsPreview";
+import MessagesPreview from "./pro/MessagesPreview";
+import QuickActions from "./pro/QuickActions";
+import type { QuickAction } from "./pro/QuickActions";
 
 function SkeletonBlock({ className = "" }: { className?: string }) {
   return <div className={`bg-cm-border-soft/50 animate-pulse rounded-[14px] ${className}`} />;
 }
 
-function formatXOF(amount: number): string {
-  return amount.toLocaleString("fr-FR") + " F";
-}
-
-const STATUS_FLOW = ["accepted", "en_route", "arrived", "photos_taken", "in_progress", "completed", "client_validation"] as const;
-
-function nextStatus(current: string): typeof STATUS_FLOW[number] | null {
-  const idx = STATUS_FLOW.indexOf(current as typeof STATUS_FLOW[number]);
-  if (idx < 0 || idx >= STATUS_FLOW.length - 1) return null;
-  return STATUS_FLOW[idx + 1] ?? null;
-}
-
-const FLOW_BUTTON_LABELS: Record<string, string> = {
-  quote_required: "📄 Créer un devis",
-  accepted: "🚗 Je suis en route",
-  en_route: "📍 Je suis arrivé",
-  arrived: "📸 Photo avant intervention",
-  photos_taken: "🔨 Commencer le travail",
-  in_progress: "✅ Travail terminé",
-  completed: "📋 En attente validation client",
-  client_validation: "⏳ En attente du client",
-};
-
-const FLOW_BUTTON_ICONS: Record<string, string> = {
-  quote_required: "📄",
-  accepted: "🚗",
-  en_route: "📍",
-  arrived: "📸",
-  photos_taken: "🔨",
-  in_progress: "✅",
-  completed: "📋",
-  client_validation: "⏳",
-};
-
-const STATUS_CONFIG: Record<string, { border: string; dot: string; badge: string }> = {
-  pending:        { border: "border-l-amber-400",  dot: "bg-amber-400",  badge: "bg-amber-50 text-amber-700" },
-  accepted:       { border: "border-l-emerald-500", dot: "bg-emerald-500",badge: "bg-emerald-50 text-emerald-700" },
-  quote_required: { border: "border-l-violet-500",  dot: "bg-violet-500", badge: "bg-violet-50 text-violet-700" },
-  en_route:       { border: "border-l-blue-500",    dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700" },
-  arrived:        { border: "border-l-sky-500",     dot: "bg-sky-500",    badge: "bg-sky-50 text-sky-700" },
-  in_progress:    { border: "border-l-orange-500",  dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700" },
-  completed:      { border: "border-l-cm-text-muted",    dot: "bg-cm-text-muted",   badge: "bg-cm-surface text-cm-text-soft" },
-  client_validation: { border: "border-l-teal-500", dot: "bg-teal-500",  badge: "bg-teal-50 text-teal-700" },
-  closed:         { border: "border-l-cm-text",    dot: "bg-cm-text",   badge: "bg-cm-surface text-cm-text" },
-  cancelled:      { border: "border-l-red-500",     dot: "bg-red-500",    badge: "bg-red-50 text-red-700" },
-};
-
-const STATUS_LABEL: Record<string, string> = {
-  pending: "Nouvelle",
-  accepted: "Acceptée",
-  quote_required: "Devis requis",
-  en_route: "En route",
-  arrived: "Arrivé",
-  in_progress: "En cours",
-  completed: "Terminée",
-  client_validation: "Validation",
-  closed: "Clôturée",
-  cancelled: "Annulée",
-};
-
-function MissionDetailSheet({ open, onClose, alert, onAccept, onRefuse }: {
+function MissionDetailSheet({ open, onClose, alert, commissionPercent, onAccept, onRefuse }: {
   open: boolean;
   onClose: () => void;
-  alert: typeof MOCK_PRO_ALERTS[0] | null;
+  alert: ProAlert | null;
+  commissionPercent: number;
   onAccept: () => void;
   onRefuse: () => void;
 }) {
   if (!alert) return null;
+  const mission: MissionSummaryData = {
+    clientName: alert.clientName,
+    clientAvatarUrl: alert.clientAvatarUrl,
+    serviceName: alert.description,
+    description: alert.description,
+    address: alert.location,
+    budgetMinXOF: alert.estimatedPriceMinXOF,
+    budgetMaxXOF: alert.estimatedPriceMaxXOF,
+    urgency: alert.urgency,
+    distanceKm: "2,3 km",
+    travelMinutes: "~7 min",
+  };
   return (
     <AnimatePresence>
       {open && (
@@ -118,41 +85,9 @@ function MissionDetailSheet({ open, onClose, alert, onAccept, onRefuse }: {
           >
             <div className="w-10 h-1 bg-cm-border rounded-full mx-auto mt-3 mb-4" />
             <div className="px-5 pb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-cm-surface flex items-center justify-center text-[20px]">👤</div>
-                <div>
-                  <p className="text-[15px] font-bold text-cm-text">{alert.clientName}</p>
-                </div>
-              </div>
+              <MissionSummary mission={mission} commissionPercent={commissionPercent} />
 
-              <p className="text-[13px] font-bold text-cm-text mb-1">{alert.description}</p>
-              <div className="flex items-center gap-2 text-[12px] text-cm-text-soft mb-4">
-                <MapPin className="w-3 h-3" />
-                <span>{alert.location}</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 mb-4">
-                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
-                  <p className="text-[10px] text-cm-text-soft">Distance</p>
-                  <p className="text-[14px] font-bold text-cm-text">2,3 km</p>
-                </div>
-                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
-                  <p className="text-[10px] text-cm-text-soft">Temps estimé</p>
-                  <p className="text-[14px] font-bold text-cm-text">~7 min</p>
-                </div>
-                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
-                  <p className="text-[10px] text-cm-text-soft">Budget</p>
-                  <p className="text-[14px] font-bold text-cm-text">{alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} - {alert.estimatedPriceMaxXOF.toLocaleString("fr-FR")} F</p>
-                </div>
-                <div className="bg-cm-surface rounded-[var(--radius-cm-lg)] p-3 text-center">
-                  <p className="text-[10px] text-cm-text-soft">Urgence</p>
-                  <p className={`text-[14px] font-bold ${alert.urgency === "high" ? "text-cm-error" : "text-cm-amber"}`}>
-                    {alert.urgency === "high" ? "Urgent" : "Normal"}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-4">
+              <div className="flex gap-3 mt-5">
                 <button onClick={() => { onRefuse(); onClose(); }}
                   className="flex-1 h-12 rounded-[var(--radius-cm-lg)] border-2 border-cm-error/20 text-cm-error text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-error/5 flex items-center justify-center gap-2">
                   <XCircle className="w-4 h-4" /> Refuser
@@ -170,46 +105,115 @@ function MissionDetailSheet({ open, onClose, alert, onAccept, onRefuse }: {
   );
 }
 
-function ShieldCheck({ className }: { className?: string }) {
+function JobDetailSheet({ open, onClose, job, commissionPercent, onChat, onNavigate, onAdvance }: {
+  open: boolean;
+  onClose: () => void;
+  job: ProJob | null;
+  commissionPercent: number;
+  onChat: (job: ProJob) => void;
+  onNavigate: (job: ProJob) => void;
+  onAdvance: (job: ProJob) => void;
+}) {
+  if (!job) return null;
+  const mission: MissionSummaryData = {
+    clientName: job.clientName,
+    clientAvatarUrl: job.clientAvatarUrl,
+    serviceName: job.serviceName,
+    description: job.description,
+    address: job.clientLocation,
+    scheduledDate: job.scheduledDate,
+    scheduledTime: job.scheduledTime,
+    amountXOF: job.totalFeeXOF,
+  };
+  const canNavigate = ACTIVE_JOB_STATUSES.includes(job.status) && job.status !== "quote_required";
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-      <polyline points="9 12 11 14 15 10" />
-    </svg>
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 bg-black/40"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[448px] bg-cm-elevated rounded-t-[var(--radius-cm-xl)] max-h-[85vh] overflow-y-auto shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-10 h-1 bg-cm-border rounded-full mx-auto mt-3 mb-4" />
+            <div className="px-5 pb-8">
+              <MissionSummary mission={mission} commissionPercent={commissionPercent} />
+
+              <div className="flex gap-3 mt-5">
+                {job.status === "quote_required" ? (
+                  <button onClick={() => { onAdvance(job); onClose(); }}
+                    className="flex-1 h-12 rounded-[var(--radius-cm-lg)] bg-cm-accent text-cm-text-onAccent text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-accent-hover flex items-center justify-center gap-2 shadow-cm-btn">
+                    <FileText className="w-4 h-4" /> Créer un devis
+                  </button>
+                ) : (
+                  <button onClick={() => { onAdvance(job); onClose(); }}
+                    className="flex-1 h-12 rounded-[var(--radius-cm-lg)] bg-cm-accent text-cm-text-onAccent text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-accent-hover flex items-center justify-center gap-2 shadow-cm-btn">
+                    <ChevronRight className="w-4 h-4" /> Faire avancer
+                  </button>
+                )}
+                {canNavigate && (
+                  <button onClick={() => { onNavigate(job); onClose(); }}
+                    className="flex-1 h-12 rounded-[var(--radius-cm-lg)] border-2 border-cm-accent/20 text-cm-accent text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-accent/5 flex items-center justify-center gap-2">
+                    <Navigation className="w-4 h-4" /> Itinéraire
+                  </button>
+                )}
+              </div>
+              <button onClick={() => { onChat(job); onClose(); }}
+                className="w-full mt-3 h-12 rounded-[var(--radius-cm-lg)] border-2 border-cm-border text-cm-text text-[13px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-surface flex items-center justify-center gap-2">
+                <MessageCircle className="w-4 h-4" /> Message
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
 export default function ProDashboardScreen() {
-  const nav = useNavigate();
+  const { navigate: nav } = useAppNavigation();
   const isAvailable = useProStore((s) => s.isAvailable);
   const toggleAvailability = useProStore((s) => s.toggleAvailability);
-  const user = useAuthStore((s) => s.user);
+  const storeAlerts = useProStore((s) => s.alerts);
+  const storeJobs = useProStore((s) => s.jobs);
+  const storeConversations = useChatStore((s) => s.conversations);
   const addNotification = useNotificationStore((s) => s.addNotification);
   const unreadNotifs = useNotificationStore((s) => s.notifications.filter((n) => !n.read).length);
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [missionFilter, setMissionFilter] = useState<"all" | "upcoming" | "completed">("all");
+
+  const reopenMenu = useNavigationStore((s) => s.flags["reopen-menu"] === true);
+  const clearFlag = useNavigationStore((s) => s.clearFlag);
+  useEffect(() => {
+    if (reopenMenu) {
+      setMenuOpen(true);
+      clearFlag("reopen-menu");
+    }
+  }, [reopenMenu, clearFlag]);
+
   const [loading, setLoading] = useState(true);
-  const [selectedAlert, setSelectedAlert] = useState<typeof MOCK_PRO_ALERTS[0] | null>(null);
+  const [selectedAlert, setSelectedAlert] = useState<ProAlert | null>(null);
   const [showMissionDetail, setShowMissionDetail] = useState(false);
-  const [activeMissions, setActiveMissions] = useState<typeof MOCK_PRO_ALERTS>([]);
-  const [acceptedJobs, setAcceptedJobs] = useState<typeof MOCK_PRO_JOBS>([]);
   const [showMap, setShowMap] = useState(false);
-  const [mapJob, setMapJob] = useState<typeof MOCK_PRO_JOBS[0] | null>(null);
+  const [mapJob, setMapJob] = useState<ProJob | null>(null);
   const [photoModalMode, setPhotoModalMode] = useState<"before" | "after" | null>(null);
   const [photoJobId, setPhotoJobId] = useState<string | null>(null);
   const [showPricingChoice, setShowPricingChoice] = useState(false);
-  const [pricingAlert, setPricingAlert] = useState<typeof MOCK_PRO_ALERTS[0] | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [pricingAlert, setPricingAlert] = useState<ProAlert | null>(null);
+  const [selectedJob, setSelectedJob] = useState<ProJob | null>(null);
+  const [showJobDetail, setShowJobDetail] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 600);
-    setActiveMissions(MOCK_PRO_ALERTS);
-    setAcceptedJobs(MOCK_PRO_JOBS);
-    if (useProStore.getState().jobs.length === 0) {
-      useProStore.getState().setJobs(MOCK_PRO_JOBS);
-      useProStore.getState().setAlerts(MOCK_PRO_ALERTS);
-    }
     return () => clearTimeout(t);
   }, []);
 
@@ -230,7 +234,7 @@ export default function ProDashboardScreen() {
 
   const currentPlan = availablePlans.find((p) => p.id === currentSubscription?.plan_id);
   const isFree = !currentSubscription || !currentPlan || currentPlan.price_monthly === 0;
-  const proProfileViews = 230; // would come from analytics
+  const commissionPercent = getProCommissionPercent(currentSubscription?.plan_id);
   const rating = (pro.rating / 10).toFixed(1);
   const level = getProLevel(pro.completedInterventions * 100);
   const nextLevel = PRO_LEVELS[PRO_LEVELS.indexOf(level) + 1];
@@ -243,12 +247,15 @@ export default function ProDashboardScreen() {
     week: MOCK_FINANCE_SUMMARY.weekEarningsXOF,
     month: MOCK_FINANCE_SUMMARY.monthEarningsXOF,
     available: MOCK_FINANCE_SUMMARY.availableBalanceXOF,
+    pending: MOCK_FINANCE_SUMMARY.pendingBalanceXOF,
   };
 
-  const chartMax = Math.max(...MOCK_REVENUE_HISTORY);
+  const reviews = MOCK_REVIEWS
+    .filter((r) => r.proId === pro.id)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   const handleAcceptAlert = (alertId: string) => {
-    const alert = MOCK_PRO_ALERTS.find((a) => a.id === alertId);
+    const alert = storeAlerts.find((a) => a.id === alertId);
     if (!alert) return;
     setPricingAlert(alert);
     setShowPricingChoice(true);
@@ -260,25 +267,7 @@ export default function ProDashboardScreen() {
     setShowPricingChoice(false);
     setPricingAlert(null);
 
-    setActiveMissions((prev) => prev.filter((a) => a.id !== alert.id));
-    setAcceptedJobs((prev) => [...prev, {
-      id: "job-" + alert.id,
-      clientId: "client_" + alert.id,
-      clientName: alert.clientName,
-      clientPhone: alert.clientPhone,
-      clientLocation: alert.location,
-      category: alert.category,
-      serviceName: "Intervention",
-      description: alert.description,
-      status: model === "quote" ? "quote_required" : "accepted",
-      pricingModel: model,
-      travelFeeXOF: 0,
-      laborFeeXOF: alert.estimatedPriceMinXOF,
-      totalFeeXOF: alert.estimatedPriceMinXOF,
-      createdAt: new Date().toISOString(),
-      scheduledDate: new Date().toISOString(),
-      scheduledTime: "maintenant",
-    }]);
+    const { job } = acceptAlertAsPro(alert, model);
 
     if (model === "quote") {
       addNotification({
@@ -291,59 +280,50 @@ export default function ProDashboardScreen() {
         type: "mission",
         title: "Mission acceptée",
         body: `Vous avez accepté la mission de ${alert.clientName} — ${alert.description}`,
+        actionUrl: `/pro/mission/${job.id}`,
       });
     }
   };
 
   const handleRefuseAlert = (alertId: string) => {
-    const alert = MOCK_PRO_ALERTS.find((a) => a.id === alertId);
-    setActiveMissions((prev) => prev.filter((a) => a.id !== alertId));
+    const alert = storeAlerts.find((a) => a.id === alertId);
+    if (!alert) return;
+    useProStore.getState().removeAlert(alertId);
 
-    if (alert) {
-      addNotification({
-        type: "info",
-        title: "Mission refusée",
-        body: `Vous avez refusé la mission de ${alert.clientName}`,
-      });
-    }
+    addNotification({
+      type: "info",
+      title: "Mission refusée",
+      body: `Vous avez refusé la mission de ${alert.clientName}`,
+    });
   };
 
-  const advanceJobStatus = (jobId: string, extraFields?: Partial<typeof MOCK_PRO_JOBS[0]>) => {
-    let newStatus: string | null = null;
-    setAcceptedJobs((prev) => {
-      const job = prev.find((j) => j.id === jobId);
-      if (!job) return prev;
-      const next = nextStatus(job.status);
-      if (!next) return prev;
-      newStatus = next;
+  const advanceJobStatus = (jobId: string, extraFields?: Partial<ProJob>) => {
+    const state = useProStore.getState();
+    const job = state.jobs.find((j) => j.id === jobId);
+    if (!job) return;
 
-      const updated = prev.map((j) =>
-        j.id === jobId ? { ...j, ...extraFields, status: next as typeof j.status } : j
-      );
+    const next = nextStatus(job.status);
+    if (!next) return;
 
-      const statusLabels: Record<string, string> = {
-        en_route: "En route vers le client",
-        arrived: "Arrivé sur place",
-        photos_taken: "Photos prises",
-        in_progress: "Travail en cours",
-        completed: "Mission terminée",
-        client_validation: "En attente de validation client",
-      };
+    const merged: ProJob = { ...job, ...extraFields, status: next };
+    state.upsertJob(merged);
+    syncMissionStatus(jobId, next);
 
-      addNotification({
-        type: "mission",
-        title: `Statut mis à jour`,
-        body: statusLabels[next] || next,
-      });
+    const statusLabels: Record<string, string> = {
+      en_route: "En route vers le client",
+      arrived: "Arrivé sur place",
+      photos_taken: "Photos prises",
+      in_progress: "Travail en cours",
+      completed: "Mission terminée",
+      client_validation: "En attente de validation client",
+    };
 
-      return updated;
+    addNotification({
+      type: "mission",
+      title: "Statut mis à jour",
+      body: statusLabels[next] || next,
+      actionUrl: `/orders/tracker/${jobId}`,
     });
-
-    setTimeout(() => {
-      if (newStatus) {
-        useProStore.getState().updateJobStatus(jobId, newStatus);
-      }
-    }, 0);
   };
 
   const handleAdvanceClick = (jobId: string, currentStatus: string) => {
@@ -382,26 +362,21 @@ export default function ProDashboardScreen() {
     setPhotoJobId(null);
   };
 
-  const openMapForJob = (job: typeof MOCK_PRO_JOBS[0]) => {
+  const openMapForJob = (job: ProJob) => {
     setMapJob(job);
     setShowMap(true);
   };
 
-  const openChatForJob = async (job: typeof MOCK_PRO_JOBS[0]) => {
+  const openChatForJob = async (job: ProJob) => {
     const currentUserId = useAuthStore.getState().userId;
     if (!currentUserId || !job.clientId) return;
-    const existing = await findConversation(currentUserId, job.clientId, job.id);
-    if (existing) {
-      nav(`/pro/messages/${existing}`);
-    } else {
-      const created = await createConversation({
-        participant1: currentUserId,
-        participant2: job.clientId,
-        jobId: job.id,
-      });
-      if (created) {
-        nav(`/pro/messages/${created}`);
-      }
+    const conv = await useChatStore.getState().createConversation({
+      participant1: currentUserId,
+      participant2: job.clientId,
+      jobId: job.id,
+    });
+    if (conv) {
+      nav(`/pro/messages/${conv.id}`);
     }
   };
 
@@ -417,9 +392,14 @@ export default function ProDashboardScreen() {
     );
   }
 
-  const activeJob = acceptedJobs.filter(
-    (j) => j.status === "accepted" || j.status === "quote_required" || j.status === "en_route" || j.status === "arrived" || j.status === "photos_taken" || j.status === "in_progress" || j.status === "client_validation"
-  )[0];
+  const activeJob = storeJobs.find((j) => ACTIVE_JOB_STATUSES.includes(j.status));
+
+  const quickActions: QuickAction[] = [
+    { icon: <Settings className="w-4 h-4" />, label: "Gérer mes services", hint: "Tarifs, catégories", onClick: () => nav("/pro/services") },
+    { icon: <CalendarDays className="w-4 h-4" />, label: "Mes horaires", hint: "Disponibilités", onClick: () => nav("/pro/planning") },
+    { icon: <Wallet className="w-4 h-4" />, label: "Mon portefeuille", hint: "Soldes, retraits", onClick: () => nav("/pro/wallet") },
+    { icon: <Award className="w-4 h-4" />, label: "Aperçu profil", hint: "Vu par les clients", onClick: () => nav("/profile/pro-preview") },
+  ];
 
   return (
     <div className="min-h-dynamic bg-cm-bg">
@@ -443,12 +423,12 @@ export default function ProDashboardScreen() {
         title={photoModalMode === "before" ? "Photo avant intervention" : "Photo après intervention"}
       />
 
-      <div ref={containerRef} className="w-full max-w-[448px] mx-auto px-4 pb-28">
+      <div className="w-full max-w-[448px] mx-auto px-4 pb-28">
         {/* ─── Sticky Header ─── */}
         <header className="sticky top-0 z-20 bg-cm-bg/90 backdrop-blur-xl pt-3 pb-2">
           <div className="flex items-center justify-between h-14">
-            <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-full overflow-hidden bg-cm-surface border-2 border-cm-bg shadow-sm">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-9 h-9 rounded-full overflow-hidden bg-cm-surface border-2 border-cm-bg shadow-sm shrink-0">
                 {pro.avatarUrl ? (
                   <img src={pro.avatarUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -457,24 +437,32 @@ export default function ProDashboardScreen() {
                   </div>
                 )}
               </div>
-              <div>
-                <p className="text-[13px] font-bold text-cm-text leading-tight">{firstName}</p>
-                <div className="flex items-center gap-1">
+              <div className="min-w-0">
+                <p className="text-[13px] font-bold text-cm-text leading-tight truncate">{firstName}</p>
+                <div className="flex items-center gap-1.5">
                   <div className={`w-1.5 h-1.5 rounded-full ${isAvailable ? "bg-green-500" : "bg-cm-text-muted"}`} />
                   <span className={`text-[9px] font-medium ${isAvailable ? "text-green-600" : "text-cm-text-muted"}`}>
                     {isAvailable ? "En ligne" : "Hors ligne"}
                   </span>
+                  {pro.isVerified && (
+                    <>
+                      <span className="text-[9px] text-cm-text-muted">·</span>
+                      <span className="flex items-center gap-0.5 text-[9px] font-medium text-cm-text-soft">
+                        <CheckCircle className="w-2.5 h-2.5" /> Vérifié
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <div className="flex items-center gap-1 px-2 py-1 bg-cm-surface rounded-full">
                 <span className="text-[11px]">{level.emoji}</span>
                 <span className={`text-[10px] font-bold ${level.color}`}>{level.label}</span>
               </div>
               <button onClick={() => setShowNotifications(true)}
-                className="relative w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform shadow-sm">
+                className="relative w-8 h-8 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
                 <Bell className="w-4 h-4 text-cm-text-soft" />
                 {unreadNotifs > 0 && (
                   <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center px-1">
@@ -483,7 +471,7 @@ export default function ProDashboardScreen() {
                 )}
               </button>
               <button onClick={() => setMenuOpen(true)}
-                className="w-9 h-9 rounded-full bg-cm-elevated border border-cm-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform shadow-sm">
+                className="w-8 h-8 flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
                 <div className="w-4 h-3 flex flex-col justify-between">
                   <span className="block h-0.5 w-full bg-cm-text-soft rounded-full" />
                   <span className="block h-0.5 w-3/4 bg-cm-text-soft rounded-full" />
@@ -494,454 +482,85 @@ export default function ProDashboardScreen() {
           </div>
         </header>
 
+        {/* ─── Availability Hero ─── */}
+        <AvailabilityCard
+          isAvailable={isAvailable}
+          todayJobsCount={storeJobs.length}
+          pendingRequestsCount={storeAlerts.length}
+          onToggle={toggleAvailability}
+        />
+
         {/* ─── Active Mission Control ─── */}
         {activeJob && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-4">
-            <div className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm">
-              <div className="flex items-center gap-1 mb-3">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-[11px] font-bold text-green-600 uppercase tracking-wider">
-                  {activeJob.status === "quote_required" ? "Devis requis" :
-                   activeJob.status === "en_route" ? "En route" :
-                   activeJob.status === "arrived" ? "Arrivé sur place" :
-                   activeJob.status === "photos_taken" ? "Photos prises" :
-                   activeJob.status === "in_progress" ? "En cours" :
-                   activeJob.status === "completed" ? "Terminée" :
-                   activeJob.status === "client_validation" ? "En validation" :
-                   "Mission acceptée"}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-full bg-cm-surface flex items-center justify-center text-[16px]">👤</div>
-                <div>
-                  <p className="text-[14px] font-bold text-cm-text">{activeJob.clientName}</p>
-                  <p className="text-[11px] text-cm-text-muted">{activeJob.clientLocation}</p>
-                </div>
-                <div className="ml-auto"></div>
-              </div>
-
-              <div className="flex gap-2 mb-3">
-                <button onClick={() => openMapForJob(activeJob)}
-                  className="flex-1 h-10 rounded-[12px] bg-cm-text text-white text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5 shadow-sm">
-                  <Navigation className="w-3.5 h-3.5" /> Naviguer
-                </button>
-                <button onClick={() => openChatForJob(activeJob)}
-                  className="flex-1 h-10 rounded-[12px] border border-cm-border text-cm-text-soft text-[11px] font-bold cursor-pointer active:scale-[0.97] transition-transform flex items-center justify-center gap-1.5">
-                  <MessageCircle className="w-3.5 h-3.5" /> Chat
-                </button>
-                <a href={`tel:${activeJob.clientPhone}`}
-                  className="w-10 h-10 rounded-[12px] border border-cm-border text-cm-text-soft flex items-center justify-center cursor-pointer active:scale-90 transition-transform">
-                  <Phone className="w-4 h-4" />
-                </a>
-              </div>
-
-              {/* Status progression */}
-              <div className="flex items-center justify-between bg-cm-surface rounded-[12px] p-2">
-                {STATUS_FLOW.map((s, i) => {
-                  const flowIdx = STATUS_FLOW.indexOf(activeJob.status as typeof STATUS_FLOW[number]);
-                  const done = i < flowIdx;
-                  const active = i === flowIdx;
-                  const labels: Record<string, string> = {
-                    accepted: "En route",
-                    en_route: "Arrivé",
-                    arrived: "Photo",
-                    photos_taken: "Commencer",
-                    in_progress: "Terminer",
-                    completed: "Validé",
-                    client_validation: "Clôturé",
-                  };
-                  return (
-                    <div key={s} className="flex flex-col items-center flex-1">
-                      <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                        done ? "bg-cm-text text-white" : active ? "bg-cm-text text-white shadow-md" : "bg-cm-border-soft text-cm-text-muted"
-                      }`}>
-                        {done ? <Check className="w-3 h-3" /> : active ? <div className="w-2 h-2 rounded-full bg-white" /> : <span className="text-[9px] font-bold">{i + 1}</span>}
-                      </div>
-                      <span className={`text-[7px] mt-1 font-bold text-center leading-tight uppercase tracking-wider ${
-                        active ? "text-cm-text" : done ? "text-cm-text-muted" : "text-cm-border-soft"
-                      }`}>{labels[s]}</span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Progression button */}
-              {activeJob.status === "quote_required" ? (
-                <button onClick={() => nav("/orders/quote/create/" + activeJob.id.replace("job-", ""))}
-                  className="w-full mt-3 h-11 rounded-[12px] bg-violet-600 text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-violet-700 shadow-sm">
-                  📄 Créer un devis
-                </button>
-              ) : activeJob.status === "client_validation" ? (
-                <div className="w-full mt-3 h-11 rounded-[12px] bg-cm-surface text-cm-text-muted text-[12px] font-bold flex items-center justify-center gap-2">
-                  <Clock className="w-3.5 h-3.5" /> En attente de validation du client
-                </div>
-              ) : nextStatus(activeJob.status) && (
-                <button onClick={() => handleAdvanceClick(activeJob.id, activeJob.status)}
-                  className="w-full mt-3 h-11 rounded-[12px] bg-cm-text text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-text/90 shadow-sm">
-                  {FLOW_BUTTON_LABELS[activeJob.status] || "Continuer"}
-                </button>
-              )}
-            </div>
-          </motion.div>
+          <ActiveMissionControl
+            job={activeJob}
+            onNavigate={() => openMapForJob(activeJob)}
+            onChat={() => openChatForJob(activeJob)}
+            onAdvance={() => handleAdvanceClick(activeJob.id, activeJob.status)}
+          />
         )}
 
-        {/* ─── Nouvelle Mission Alert Cards ─── */}
-        {activeMissions.length > 0 && (
-          <div className="space-y-3 mb-4">
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-              <h2 className="text-[13px] font-bold text-cm-text-soft uppercase tracking-wider">Nouvelles missions</h2>
-            </div>
-            {activeMissions.map((alert) => (
-              <motion.div key={alert.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm cursor-pointer active:scale-[0.99] transition-transform"
-                onClick={() => { setSelectedAlert(alert); setShowMissionDetail(true); }}>
-                <div className="flex items-center gap-1.5 mb-2">
-                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
-                    <span className="text-[10px] text-white font-bold">N</span>
-                  </div>
-                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-wider">Nouvelle mission</span>
-                  <span className="text-[9px] text-cm-text-muted ml-auto">Il y a 10 s</span>
-                </div>
+        {/* ─── Nouvelle Missions ─── */}
+        <NewRequestsList
+          alerts={storeAlerts}
+          onAccept={handleAcceptAlert}
+          onRefuse={handleRefuseAlert}
+          onOpenDetail={(alert) => { setSelectedAlert(alert); setShowMissionDetail(true); }}
+        />
 
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-cm-surface flex items-center justify-center text-[16px]">👤</div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-1.5">
-                      <p className="text-[14px] font-bold text-cm-text">{alert.clientName}</p>
-                    </div>
-                  </div>
-                </div>
+        {/* ─── Aujourd'hui ─── */}
+        <TodayMissions
+          jobs={storeJobs}
+          onOpenJob={(job) => { setSelectedJob(job); setShowJobDetail(true); }}
+          onViewAll={() => nav("/pro/missions")}
+        />
 
-                <p className="text-[12px] font-semibold text-cm-text mb-2 line-clamp-1">{alert.description}</p>
+        {/* ─── Revenus ─── */}
+        <EarningsCard
+          finance={displayFinance}
+          onWithdraw={() => nav("/pro/wallet")}
+          onViewAll={() => nav("/pro/revenues")}
+        />
 
-                <div className="flex items-center gap-3 text-[11px] text-cm-text-soft mb-3">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-cm-text-muted" /> {alert.location}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-3 h-3 text-cm-text-muted" /> 7 min
-                  </span>
-                  <span className="flex items-center gap-1 font-bold text-cm-text ml-auto">
-                    <Coins className="w-3 h-3" /> {alert.estimatedPriceMinXOF.toLocaleString("fr-FR")} F
-                  </span>
-                </div>
+        {/* ─── Performance ─── */}
+        <PerformanceCard
+          isFree={isFree}
+          missionsTrend={MOCK_DASH_DATA.missionsTrend}
+          ratingTrend={MOCK_DASH_DATA.ratingTrend}
+          responseMinutes={pro.avgResponseTimeMinutes ?? 5}
+          completionRate={pro.completionRate ?? 95}
+          reviewsToBadge={3 - (pro.reviewCount % 3)}
+          reviewProgressPercent={((pro.reviewCount % 3) / 3) * 100}
+          onUpgrade={() => nav("/pro/subscription/plans")}
+        />
 
-                <div className="flex gap-2">
-                  <button onClick={(e) => { e.stopPropagation(); handleRefuseAlert(alert.id); }}
-                    className="flex-1 h-11 rounded-[12px] border-2 border-red-100 text-red-500 text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-red-50 flex items-center justify-center gap-1.5">
-                    <XCircle className="w-4 h-4" /> Refuser
-                  </button>
-                  <button onClick={(e) => { e.stopPropagation(); handleAcceptAlert(alert.id); }}
-                    className="flex-1 h-11 rounded-[12px] bg-cm-text text-white text-[12px] font-bold cursor-pointer active:scale-[0.97] transition-transform hover:bg-cm-text/90 flex items-center justify-center gap-1.5 shadow-sm">
-                    <Check className="w-4 h-4" /> Accepter
-                  </button>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+        {/* ─── Profil & vérifications ─── */}
+        <ProfileProgressCard
+          verification={MOCK_VERIFICATION}
+          level={{ emoji: level.emoji, label: level.label, color: level.color }}
+          xpPercent={xpPercent}
+          nextLevelLabel={nextLevel?.label ?? null}
+          nextLevelXp={nextLevelXp}
+          onOpen={() => nav("/profile/pro-verification")}
+        />
 
-        {/* ─── Stats Card ─── */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                <span className="text-[18px] font-extrabold text-cm-text">{rating}</span>
-              </div>
-              <span className="text-[12px] text-cm-text-muted">({pro.reviewCount} avis)</span>
-            </div>
-            {pro.isVerified && (
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-cm-surface rounded-full">
-                <CheckCircle className="w-3 h-3 text-cm-text-soft" />
-                <span className="text-[10px] font-medium text-cm-text-soft">Vérifié</span>
-              </div>
-            )}
-          </div>
+        {/* ─── Avis ─── */}
+        <ReviewsPreview
+          reviews={reviews}
+          rating={Number(rating)}
+          reviewCount={pro.reviewCount}
+          onViewAll={() => nav("/pro/stats")}
+        />
 
-          <div className="grid grid-cols-4 gap-2 mb-3">
-            {[
-              { label: "Réponse", value: `${pro.avgResponseTimeMinutes ?? 5} min`, icon: Clock, color: "text-blue-600", bg: "bg-blue-50" },
-              { label: "Complétion", value: `${pro.completionRate ?? 95}%`, icon: CheckCircle, color: "text-green-600", bg: "bg-green-50" },
-              { label: "Clients", value: `${pro.clientCount ?? 98}`, icon: Users, color: "text-purple-600", bg: "bg-purple-50" },
-              { label: "Missions", value: `${pro.completedInterventions}`, icon: CalendarDays, color: "text-amber-600", bg: "bg-amber-50" },
-            ].map((s) => {
-              const Icon = s.icon;
-              return (
-                <div key={s.label} className={`${s.bg} rounded-[12px] p-2.5 text-center`}>
-                  <Icon className={`w-4 h-4 ${s.color} mx-auto mb-0.5`} />
-                  <p className="text-[13px] font-extrabold text-cm-text">{s.value}</p>
-                  <p className="text-[8px] text-cm-text-muted uppercase tracking-wide">{s.label}</p>
-                </div>
-              );
-            })}
-          </div>
+        {/* ─── Messages ─── */}
+        <MessagesPreview
+          conversations={storeConversations}
+          onOpen={(id) => nav(`/pro/messages/${id}`)}
+          onViewAll={() => nav("/pro/messages")}
+        />
 
-          <div className="bg-cm-surface rounded-[12px] p-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[13px]">{level.emoji}</span>
-                <span className="text-[11px] font-medium text-cm-text-soft">Niveau {level.label}</span>
-              </div>
-              <span className="text-[10px] font-bold text-cm-text">
-                {nextLevel ? `${nextLevelXp} XP → ${nextLevel.label}` : "Niveau max"}
-              </span>
-            </div>
-            <div className="w-full h-2.5 bg-cm-border-soft rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${xpPercent}%` }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-                className={`h-full rounded-full ${nextLevel ? "bg-cm-text" : "bg-amber-500"}`}
-              />
-            </div>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-[9px] text-cm-text-muted">{xpProgress.toLocaleString("fr-FR")} XP</span>
-              <span className="text-[9px] text-cm-text-muted">{nextLevel ? `${nextLevel.minXP.toLocaleString("fr-FR")} XP` : "MAX"}</span>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* ─── Premium upsell card ─── */}
-        {isFree && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.03 }}
-            className="bg-gradient-to-br from-amber-50 to-amber-100/60 border border-amber-200 rounded-[20px] p-4 shadow-sm mb-4">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1">
-                <p className="text-[14px] font-bold text-cm-text">Augmentez votre visibilité</p>
-                <p className="text-[11px] text-cm-text-muted">Votre profil a été vu {proProfileViews} fois.</p>
-              </div>
-            </div>
-            <p className="text-[12px] text-cm-text-soft mb-3">
-              Passez à une formule Premium pour apparaître plus haut dans les recherches et recevoir plus de demandes.
-            </p>
-            <button onClick={() => nav("/pro/subscription/plans")}
-              className="flex items-center gap-1.5 h-10 px-4 bg-amber-500 text-white text-[12px] font-bold rounded-xl cursor-pointer active:scale-[0.97] transition-transform hover:brightness-105 shadow-sm">
-              <Star className="w-3.5 h-3.5" /> Booster mon profil
-            </button>
-          </motion.div>
-        )}
-
-        {/* ─── Revenue Section ─── */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
-          className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Wallet className="w-4 h-4 text-cm-text" />
-              <span className="text-[14px] font-bold text-cm-text">Revenus</span>
-            </div>
-            <button onClick={() => nav("/pro/revenues")}
-              className="text-[11px] font-medium text-cm-text-soft cursor-pointer hover:underline">
-              Voir tout
-            </button>
-          </div>
-
-          <div className="flex items-end gap-1 mb-4">
-            <span className="text-[28px] font-extrabold text-cm-text font-mono">
-              {displayFinance.available.toLocaleString("fr-FR")}
-            </span>
-            <span className="text-[12px] font-medium text-cm-text-muted mb-1">F</span>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {[
-              { label: "Aujourd'hui", value: displayFinance.today },
-              { label: "Cette semaine", value: displayFinance.week },
-              { label: "Ce mois", value: displayFinance.month },
-            ].map((r) => (
-              <div key={r.label} className="bg-cm-surface rounded-[10px] p-2.5 text-center">
-                <p className="text-[10px] text-cm-text-muted">{r.label}</p>
-                <p className="text-[13px] font-extrabold text-cm-text font-mono">{r.value.toLocaleString("fr-FR")}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-end gap-1 h-12">
-            {MOCK_REVENUE_HISTORY.map((v, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
-                <motion.div
-                  initial={{ height: 0 }}
-                  animate={{ height: `${(v / chartMax) * 100}%` }}
-                  transition={{ duration: 0.4, delay: i * 0.05 }}
-                  className="w-full bg-cm-text rounded-t-sm opacity-80 hover:opacity-100 transition-opacity"
-                />
-              </div>
-            ))}
-          </div>
-        </motion.div>
-
-        {/* ─── Missions Section ─── */}
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[14px] font-bold text-cm-text">Missions</h2>
-            <button onClick={() => nav("/pro/missions")}
-              className="text-[11px] font-medium text-cm-text-soft cursor-pointer hover:underline">
-              Voir tout
-            </button>
-          </div>
-
-          <div className="relative">
-            {(() => {
-              const jobs = MOCK_PRO_JOBS.filter((j) => missionFilter === "all" || j.status === missionFilter || (missionFilter === "upcoming" && j.status === "pending")).slice(0, 3);
-              return jobs.map((job, i) => {
-                const cfg = STATUS_CONFIG[job.status]!;
-                const label = STATUS_LABEL[job.status] || job.status;
-                return (
-                  <div key={job.id} className="relative flex gap-3 mb-2">
-                    {/* Timeline column */}
-                    <div className="flex flex-col items-center w-5 shrink-0">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ type: "spring", stiffness: 400, damping: 15, delay: i * 0.08 }}
-                        className={`w-3 h-3 rounded-full border-2 border-white shadow-sm z-10 ${cfg.dot}`}
-                      />
-                      {i < jobs.length - 1 && (
-                        <motion.div
-                          initial={{ scaleY: 0 }}
-                          animate={{ scaleY: 1 }}
-                          transition={{ duration: 0.3, delay: i * 0.08 + 0.1 }}
-                          className="w-0.5 flex-1 min-h-[16px] bg-cm-border-soft origin-top"
-                        />
-                      )}
-                    </div>
-
-                    {/* Card */}
-                    <motion.div
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.08, type: "spring", damping: 20, stiffness: 200 }}
-                      onClick={() => nav(`/pro/missions`)}
-                      className={`flex-1 bg-cm-elevated rounded-[16px] p-3.5 cursor-pointer shadow-sm ${cfg.border} hover:shadow-md active:scale-[0.99] transition-all`}
-                    >
-                      <div className="flex items-start justify-between mb-1.5">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center">
-                            <UserIcon className="w-4 h-4 text-cm-text-soft" />
-                          </div>
-                          <div>
-                            <p className="text-[13px] font-bold text-cm-text">{job.clientName}</p>
-                            <p className="text-[10px] text-cm-text-muted">{job.clientLocation.split(",")[0]}</p>
-                          </div>
-                        </div>
-                        <span className="text-[13px] font-extrabold text-cm-text font-mono">{job.totalFeeXOF.toLocaleString("fr-FR")} F</span>
-                      </div>
-                      <p className="text-[11px] text-cm-text-soft line-clamp-1 ml-10.5">{job.serviceName}</p>
-                      <div className="flex items-center gap-2 text-[10px] text-cm-text-muted mt-2 ml-10.5">
-                        {job.scheduledDate && (
-                          <span>{new Date(job.scheduledDate).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}</span>
-                        )}
-                        {job.scheduledTime && <span>· {job.scheduledTime}</span>}
-                        <motion.span
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 15, delay: i * 0.08 + 0.15 }}
-                          className={`ml-auto px-2 py-0.5 rounded-full text-[10px] font-medium ${cfg.badge}`}
-                        >
-                          {label}
-                        </motion.span>
-                      </div>
-                    </motion.div>
-                  </div>
-                );
-              });
-            })()}
-          </div>
-        </motion.div>
-
-        {/* ─── Performance (Premium feature) ─── */}
-        {isFree ? (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="bg-cm-elevated border border-amber-200 rounded-[20px] p-4 shadow-sm mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-amber-500" />
-              <span className="text-[14px] font-bold text-cm-text">Analytics</span>
-            </div>
-            <div className="bg-amber-50 rounded-[14px] p-4 text-center mb-3">
-              <Lock className="w-8 h-8 text-amber-400 mx-auto mb-2" />
-              <p className="text-[13px] font-semibold text-cm-text mb-1">Statistiques Premium</p>
-              <p className="text-[11px] text-cm-text-soft mb-3">
-                Passez à une formule supérieure pour accéder à vos analytics, suivi de revenus et indicateurs de performance.
-              </p>
-              <button onClick={() => nav("/pro/subscription/plans")}
-                className="h-9 px-4 bg-amber-500 text-white text-[11px] font-bold rounded-xl cursor-pointer active:scale-[0.97] transition-transform hover:brightness-105 shadow-sm">
-                Passer Premium
-              </button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="bg-cm-elevated border border-cm-border rounded-[20px] p-4 shadow-sm mb-4">
-            <div className="flex items-center gap-2 mb-3">
-              <BarChart3 className="w-4 h-4 text-cm-text" />
-              <span className="text-[14px] font-bold text-cm-text">Performance</span>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              {[
-                { label: "Cette semaine", value: "+620 XP", icon: TrendingUp, color: "text-cm-text", bg: "bg-cm-surface" },
-                { label: "Missions", value: `${MOCK_DASH_DATA.missionsTrend}%`, icon: CalendarDays, color: "text-blue-600", bg: "bg-blue-50" },
-                { label: "Avis", value: `${MOCK_DASH_DATA.ratingTrend}%`, icon: Star, color: "text-amber-600", bg: "bg-amber-50" },
-              ].map((m) => {
-                const Icon = m.icon;
-                return (
-                  <div key={m.label} className={`${m.bg} rounded-[12px] p-3 text-center`}>
-                    <Icon className={`w-4 h-4 ${m.color} mx-auto mb-1`} />
-                    <p className="text-[14px] font-extrabold text-cm-text">{m.value}</p>
-                    <p className="text-[8px] text-cm-text-muted uppercase tracking-wider">{m.label}</p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="space-y-2">
-              <div className="bg-cm-surface rounded-[12px] p-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-amber-50 flex items-center justify-center">
-                  <Target className="w-4 h-4 text-amber-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[11px] font-medium text-cm-text-soft">Encore <span className="font-bold text-cm-text">{nextLevel ? nextLevelXp : 0} XP</span> pour {nextLevel?.label ?? "le max"}</p>
-                  <div className="w-full h-1.5 bg-cm-border-soft rounded-full mt-1.5 overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full" style={{ width: `${xpPercent}%` }} />
-                  </div>
-                </div>
-              </div>
-              <div className="bg-cm-surface rounded-[12px] p-3 flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
-                  <Star className="w-4 h-4 text-green-500" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[11px] font-medium text-cm-text-soft">Encore <span className="font-bold text-cm-text">{3 - (pro.reviewCount % 3)} avis 5★</span> pour le badge Premium</p>
-                  <div className="w-full h-1.5 bg-cm-border-soft rounded-full mt-1.5 overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full" style={{ width: `${(pro.reviewCount % 3) / 3 * 100}%` }} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
-        {/* ─── Quick Actions ─── */}
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <button onClick={() => nav("/pro/services")}
-            className="bg-cm-elevated border border-cm-border rounded-[16px] p-3.5 text-left cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface shadow-sm">
-            <Settings className="w-4 h-4 text-cm-text mb-1.5" />
-            <p className="text-[12px] font-bold text-cm-text">Gérer mes services</p>
-            <p className="text-[9px] text-cm-text-muted">Tarifs, catégories</p>
-          </button>
-          <button onClick={() => nav("/profile/pro-preview")}
-            className="bg-cm-elevated border border-cm-border rounded-[16px] p-3.5 text-left cursor-pointer active:scale-[0.98] transition-transform hover:bg-cm-surface shadow-sm">
-            <Award className="w-4 h-4 text-cm-text mb-1.5" />
-            <p className="text-[12px] font-bold text-cm-text">Voir mon profil</p>
-            <p className="text-[9px] text-cm-text-muted">Aperçu client</p>
-          </button>
-        </div>
+        {/* ─── Raccourcis ─── */}
+        <QuickActions actions={quickActions} />
 
         <div className="text-center py-4">
           <p className="text-[10px] text-cm-text-muted">ÇaMatch Prestataire v2.0</p>
@@ -997,8 +616,19 @@ export default function ProDashboardScreen() {
         open={showMissionDetail}
         onClose={() => setShowMissionDetail(false)}
         alert={selectedAlert}
+        commissionPercent={commissionPercent}
         onAccept={() => selectedAlert && handleAcceptAlert(selectedAlert.id)}
         onRefuse={() => selectedAlert && handleRefuseAlert(selectedAlert.id)}
+      />
+
+      <JobDetailSheet
+        open={showJobDetail}
+        onClose={() => setShowJobDetail(false)}
+        job={selectedJob}
+        commissionPercent={commissionPercent}
+        onChat={openChatForJob}
+        onNavigate={openMapForJob}
+        onAdvance={(job) => handleAdvanceClick(job.id, job.status)}
       />
     </div>
   );

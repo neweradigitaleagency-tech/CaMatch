@@ -28,7 +28,7 @@ export default function ImageViewer({ images, initialIndex = 0, open, onClose }:
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center"
         >
-          <button onClick={onClose} className="absolute top-4 right-4 w-12 h-12 rounded-full bg-white/10 flex items-center justify-center text-white z-10 cursor-pointer hover:bg-white/20 active:scale-90 transition-all">
+          <button onClick={onClose} className="absolute top-4 right-4 p-1 cursor-pointer active:scale-[0.97] transition-transform z-10 text-white">
             <X className="w-5 h-5" />
           </button>
 

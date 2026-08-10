@@ -238,8 +238,8 @@ export default function AppSettingsScreen({ onBack, onNavigate, onSignOutAllDevi
   return (
     <div className="flex flex-col w-full min-h-dynamic bg-cm-bg pb-12">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-bg">
-        <button onClick={onBack} className="w-9 h-9 rounded-full bg-[rgba(43,43,43,0.08)] backdrop-blur-sm border border-[rgba(43,43,43,0.10)] flex items-center justify-center cursor-pointer active:scale-90 transition-all">
-          <ArrowLeft className="w-4 h-4 text-cm-text" />
+        <button onClick={onBack} className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
+          <ArrowLeft className="w-5 h-5 text-cm-text" />
         </button>
         <h1 className="text-[15px] font-bold text-cm-text">Paramètres du compte</h1>
         <div className="w-9 h-9" />

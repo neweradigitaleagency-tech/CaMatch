@@ -44,7 +44,7 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
         <div className="flex items-center gap-3 px-5 h-12">
           <button
             onClick={onBack}
-            className="w-9 h-9 flex items-center justify-center rounded-full bg-cm-elevated border border-cm-border cursor-pointer active:scale-95 shrink-0"
+            className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min shrink-0"
           >
             <ArrowLeft className="w-4 h-4 text-cm-text" />
           </button>

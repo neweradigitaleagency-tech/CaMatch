@@ -6,8 +6,8 @@ export default function VerifyPhonePage() {
   return (
     <div className="flex flex-col min-h-dynamic bg-cm-bg">
       <header className="flex items-center gap-3 px-4 pt-4 pb-2">
-        <button onClick={() => { setFlag("reopen-menu", true); navigate("/") }} className="w-8 h-8 flex items-center justify-center rounded-xl bg-cm-elevated border border-cm-border cursor-pointer active:scale-[0.94] transition-transform shadow-sm">
-          <ArrowLeft className="w-4 h-4 text-cm-text" />
+        <button onClick={() => { setFlag("reopen-menu", true); navigate("/") }} className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
+          <ArrowLeft className="w-5 h-5 text-cm-text" />
         </button>
         <h1 className="text-[17px] font-extrabold text-cm-text">Vérification téléphone</h1>
       </header>

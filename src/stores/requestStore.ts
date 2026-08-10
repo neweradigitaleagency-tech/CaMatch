@@ -9,8 +9,10 @@ interface RequestState {
   setRequests: (requests: ClientRequest[]) => void;
   addRequest: (request: ClientRequest) => void;
   removeRequest: (id: string) => void;
+  setRequestField: (id: string, field: string, value: unknown) => void;
   setMissions: (missions: Mission[]) => void;
   addMission: (mission: Mission) => void;
+  upsertMission: (mission: Mission) => void;
   selectMission: (mission: Mission | null) => void;
   updateMissionStatus: (id: string, status: string) => void;
   setMissionField: (id: string, field: string, value: unknown) => void;
@@ -27,6 +29,12 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     set((state) => ({
       requests: state.requests.filter((r) => r.id !== id),
     })),
+  setRequestField: (id, field, value) =>
+    set((state) => ({
+      requests: state.requests.map((r) =>
+        r.id === id ? { ...r, [field]: value } as ClientRequest : r
+      ),
+    })),
   setMissions: (missions) => {
     const projectStore = useProjectStore.getState();
     const projects = missions.map(fromMission);
@@ -40,6 +48,19 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     const projectStore = useProjectStore.getState();
     projectStore.addProject(fromMission(mission));
     set((state) => ({ missions: [mission, ...state.missions] }));
+  },
+  upsertMission: (mission) => {
+    useProjectStore.getState().upsertProject(fromMission(mission));
+    set((state) => {
+      const exists = state.missions.some((m) => m.id === mission.id);
+      return {
+        missions: exists
+          ? state.missions.map((m) => (m.id === mission.id ? mission : m))
+          : [mission, ...state.missions],
+        selectedMission:
+          state.selectedMission?.id === mission.id ? mission : state.selectedMission,
+      };
+    });
   },
   selectMission: (mission) => {
     if (mission) {

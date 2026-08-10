@@ -175,6 +175,9 @@ export interface QuoteLineItem {
   unitPriceXOF: number;
   totalXOF: number;
   type: "labor" | "material" | "travel" | "other";
+  productId?: string;
+  supplierId?: string;
+  source?: "marketplace" | "manual";
 }
 
 export interface QuoteVersion {
@@ -205,6 +208,7 @@ export interface Quote {
   status: QuoteStatus;
   versions: QuoteVersion[];
   currentVersion: number;
+  commissionPercent?: number;
   clientComment?: string;
   createdAt: string;
   updatedAt: string;

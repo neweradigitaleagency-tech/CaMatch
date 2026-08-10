@@ -103,7 +103,7 @@ export default function ClientAddressesScreen({ onBack }: ClientAddressesScreenP
     <div className="flex flex-col w-full min-h-dynamic bg-cm-surface pb-32">
       <header className="flex items-center justify-between px-4 py-3 sticky top-0 z-10 bg-cm-bg border-b border-cm-border/40">
         <button onClick={onBack}
-          className="w-9 h-9 flex items-center justify-center rounded-xl border border-cm-border bg-cm-elevated cursor-pointer active:scale-90 transition-all">
+          className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
           <ArrowLeft className="w-4 h-4 text-cm-text-soft" />
         </button>
         <h1 className="text-[15px] font-bold text-cm-text">Mes adresses</h1>

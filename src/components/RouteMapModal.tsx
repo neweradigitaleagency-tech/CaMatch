@@ -117,7 +117,7 @@ export default function RouteMapModal({
                 {job && <p className="text-[11px] text-cm-text-muted">{job.clientLocation}</p>}
               </div>
               <button onClick={onClose}
-                className="w-8 h-8 rounded-full bg-cm-surface flex items-center justify-center cursor-pointer active:scale-90">
+                className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
                 <X className="w-4 h-4 text-cm-text-soft" />
               </button>
             </div>

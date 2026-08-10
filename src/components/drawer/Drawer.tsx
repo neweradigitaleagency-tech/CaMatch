@@ -52,9 +52,9 @@ export default function Drawer({ open, onClose, header, children, footer }: Draw
             <button
               onClick={onClose}
               aria-label="Fermer le menu"
-              className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer active:scale-90 transition-transform"
+              className="absolute top-3 right-3 z-30 p-1 cursor-pointer active:scale-[0.97] transition-transform"
             >
-              <X className="w-4 h-4 text-cm-text" />
+              <X className="w-5 h-5 text-cm-text" />
             </button>
 
             {/* Scrollable content */}

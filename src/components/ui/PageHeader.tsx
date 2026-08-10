@@ -6,17 +6,19 @@ interface PageHeaderProps {
   fallbackRoute?: string
   rightAction?: React.ReactNode
   subtitle?: string
+  onBack?: () => void
 }
 
-export default function PageHeader({ title, fallbackRoute, rightAction, subtitle }: PageHeaderProps) {
+export default function PageHeader({ title, fallbackRoute, rightAction, subtitle, onBack }: PageHeaderProps) {
   const goBack = useBackNavigation(fallbackRoute)
+  const handleBack = onBack ?? goBack
 
   return (
     <div className="sticky top-0 z-10 bg-cm-elevated/80 backdrop-blur-lg border-b border-cm-border">
       <div className="flex items-center h-14 px-5 gap-3">
         <button
           type="button"
-          onClick={goBack}
+          onClick={handleBack}
           className="p-1 -ml-1 cursor-pointer active:scale-[0.97] transition-transform touch-min"
           aria-label="Retour"
         >

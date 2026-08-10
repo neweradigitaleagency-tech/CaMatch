@@ -11,6 +11,7 @@ interface MatchingState {
   isSearching: boolean;
   searchRequestId: string | null;
   setSearching: (requestId: string | null) => void;
+  setProposals: (proposals: Record<string, Proposal[]>) => void;
   rankProfessionals: (requestId: string, draft: RequestDraft, pros: ProfessionalDetails[]) => void;
   acceptProposal: (requestId: string, proposalId: string) => void;
   refuseProposal: (requestId: string, proposalId: string) => void;
@@ -54,6 +55,8 @@ export const useMatchingStore = create<MatchingState>((set, get) => ({
   searchRequestId: null,
 
   setSearching: (requestId) => set({ isSearching: !!requestId, searchRequestId: requestId }),
+
+  setProposals: (proposals) => set({ proposals }),
 
   rankProfessionals: (requestId, draft, pros) => {
     const clientLat = draft.lat || 5.35;

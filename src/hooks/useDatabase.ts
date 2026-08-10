@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../services/supabase";
+import { supabase, isDemoMode } from "../services/supabase";
 import { useAuthStore } from "../stores/authStore";
+import {
+  MOCK_PROS, MOCK_REQUESTS, MOCK_MISSIONS, MOCK_PRO_JOBS, MOCK_PRO_ALERTS,
+  MOCK_PRO_STATS, MOCK_CONVERSATIONS,
+} from "../services/mockData";
 import type { ProfessionalDetails, ClientRequest, Mission, Conversation, ProJob, ProAlert, ProDashboardStats } from "../types";
 
 function getUserId(): string {
@@ -42,6 +46,7 @@ export function usePros() {
   return useQuery({
     queryKey: ["pros"],
     queryFn: async () => {
+      if (isDemoMode()) return MOCK_PROS;
       const { data } = await supabase
         .from("professional_profiles")
         .select("*, users( email, phone_number )")
@@ -57,6 +62,7 @@ export function usePro(id?: string) {
     queryKey: ["pro", id],
     enabled: !!id,
     queryFn: async () => {
+      if (isDemoMode()) return MOCK_PROS.find((p) => p.id === id) ?? null;
       const { data } = await supabase
         .from("professional_profiles")
         .select("*, users( email, phone_number )")
@@ -103,6 +109,7 @@ export function useClientRequests() {
   return useQuery({
     queryKey: ["clientRequests", userId],
     queryFn: async () => {
+      if (isDemoMode()) return MOCK_REQUESTS;
       const { data } = await supabase
         .from("service_requests")
         .select("*")
@@ -155,6 +162,7 @@ export function useClientMissions() {
   return useQuery({
     queryKey: ["clientMissions", userId],
     queryFn: async () => {
+      if (isDemoMode()) return MOCK_MISSIONS;
       const { data } = await supabase
         .from("service_requests")
         .select("*, professional_profiles( first_name, last_name, users( phone_number ) )")
@@ -171,6 +179,7 @@ export function useProMissions() {
   return useQuery({
     queryKey: ["proMissions", userId],
     queryFn: async () => {
+      if (isDemoMode()) return MOCK_MISSIONS.filter((m) => m.proId === userId);
       const { data } = await supabase
         .from("service_requests")
         .select("*, professional_profiles( first_name, last_name, users( phone_number ) )")
@@ -186,6 +195,31 @@ export function useProDashboard() {
   return useQuery({
     queryKey: ["proDashboard", userId],
     queryFn: async () => {
+      if (isDemoMode()) {
+        const monthLabels: string[] = [];
+        const revenueHistory: number[] = [];
+        const missionHistory: number[] = [];
+        const ratingHistory: number[] = [];
+        const today = new Date();
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date();
+          d.setMonth(today.getMonth() - i);
+          monthLabels.push(d.toLocaleDateString("fr-FR", { month: "short" }));
+          revenueHistory.push(MOCK_PRO_STATS?.monthEarningsXOF ? Math.round((MOCK_PRO_STATS.monthEarningsXOF / 6) * (6 - i)) : 0);
+          missionHistory.push(Math.round((MOCK_PRO_STATS.totalJobsCompleted / 6) * (6 - i)));
+          ratingHistory.push(MOCK_PRO_STATS?.rating ?? 0);
+        }
+        return {
+          pro: MOCK_PROS[0] ?? null,
+          stats: MOCK_PRO_STATS,
+          todayJobs: MOCK_PRO_JOBS.filter((j) => j.status === "in_progress" || j.status === "accepted"),
+          alerts: MOCK_PRO_ALERTS,
+          revenueHistory,
+          missionHistory,
+          ratingHistory,
+          monthLabels,
+        };
+      }
       const [profileRes, requestsRes] = await Promise.all([
         supabase.from("professional_profiles").select("*").eq("user_id", userId).single(),
         supabase.from("service_requests")
@@ -295,6 +329,7 @@ export function useConversations() {
   return useQuery({
     queryKey: ["conversations", userId],
     queryFn: async () => {
+      if (isDemoMode()) return MOCK_CONVERSATIONS;
       const { data } = await supabase
         .from("conversations")
         .select("*")

@@ -60,7 +60,7 @@ export default function CancelSubscriptionModal({
               </div>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-cm-accent-soft flex items-center justify-center cursor-pointer active:scale-90"
+                className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min"
               >
                 <X className="w-4 h-4 text-cm-text" />
               </button>

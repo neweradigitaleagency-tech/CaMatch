@@ -257,7 +257,7 @@ export default function FreelanceListingScreen() {
           <div className="relative w-full max-w-md bg-cm-elevated rounded-t-[20px] p-5 pb-10 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[15px] font-semibold text-cm-text">Filtrer par zone</h3>
-              <button onClick={() => setShowLocationPicker(false)} className="w-9 h-9 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer">
+              <button onClick={() => setShowLocationPicker(false)} className="p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min">
                 <X className="w-4 h-4 text-cm-text" />
               </button>
             </div>

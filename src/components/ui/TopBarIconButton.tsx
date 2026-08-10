@@ -9,10 +9,9 @@ interface Props {
 export default function TopBarIconButton({ icon, onClick, className = "" }: Props) {
   return (
     <motion.button
-      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`w-10 h-10 rounded-full bg-cm-glass-dark-bg backdrop-blur-sm border border-cm-glass-dark-border flex items-center justify-center cursor-pointer ${className}`}
+      className={`p-1 cursor-pointer active:scale-[0.97] transition-transform touch-min ${className}`}
     >
       {icon}
     </motion.button>
