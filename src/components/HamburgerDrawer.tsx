@@ -60,7 +60,7 @@ export default function HamburgerDrawer({ open, onClose }: Props) {
 
   const [confirmLogout, setConfirmLogout] = useState(false);
 
-  const isPro = user?.user_metadata?.isPro || false;
+  const isPro = useAuthStore((s) => s.isPro);
   const firstName = user?.user_metadata?.firstName || user?.email?.split("@")[0] || "Utilisateur";
   const avatarUrl = user?.user_metadata?.avatarUrl || "";
   const email = user?.email || "";

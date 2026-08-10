@@ -72,11 +72,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           userId: session.user.id,
           user: session.user,
           role: "client",
-          isPro: !!session.user.user_metadata?.isPro,
           isAuthenticated: true,
           isLoading: false,
           initialized: true,
         });
+        void loadIsPro(session.user.id);
       } else {
         set({ isLoading: false, initialized: true });
       }
@@ -91,10 +91,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             userId: session.user.id,
             user: session.user,
             role: "client",
-            isPro: !!session.user.user_metadata?.isPro,
             isAuthenticated: true,
             isLoading: false,
           });
+          void loadIsPro(session.user.id);
         } else {
           set({
             userId: null,
@@ -258,3 +258,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return perms.every((p) => permissions.includes(p));
   },
 }));
+
+/**
+ * Source de vérité du statut pro : existence d'un profil professionnel en base.
+ * Jamais user_metadata (éditable par l'utilisateur). Lecture non-bloquante :
+ * l'init d'auth ne l'attend pas. Ignorée en mode démo (le sandbox gère isPro).
+ */
+async function loadIsPro(userId: string) {
+  if (!isSupabaseReady()) return;
+  try {
+    const { data } = await supabase
+      .from("professional_profiles")
+      .select("user_id")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const isPro = !!data;
+    if (useAuthStore.getState().isPro !== isPro) {
+      useAuthStore.setState({ isPro });
+    }
+  } catch {
+    // Non bloquant : on laisse isPro tel quel si la lecture échoue.
+  }
+}

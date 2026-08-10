@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAdminAuthStore } from "../../stores/adminAuthStore"
+import { isDemoMode } from "../../services/supabase"
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
+
+const SHOW_DEMO_LOGIN = import.meta.env.DEV || isDemoMode()
 
 export default function AdminLoginPage() {
   const navigate = useNavigate()
@@ -118,13 +121,15 @@ export default function AdminLoginPage() {
           Accès réservé au personnel autorisé
         </p>
 
-        <div className="mt-4 pt-4 border-t border-cm-border/40">
-          <p className="text-[10px] text-cm-text-muted text-center mb-2">Accès rapide — Mode démo</p>
-          <button onClick={demoLogin}
-            className="w-full h-10 text-xs font-semibold text-cm-text-soft bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-cm-text-muted" /> Mode démo Admin
-          </button>
-        </div>
+        {SHOW_DEMO_LOGIN && (
+          <div className="mt-4 pt-4 border-t border-cm-border/40">
+            <p className="text-[10px] text-cm-text-muted text-center mb-2">Accès rapide — Mode démo</p>
+            <button onClick={demoLogin}
+              className="w-full h-10 text-xs font-semibold text-cm-text-soft bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-cm-text-muted" /> Mode démo Admin
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

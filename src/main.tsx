@@ -12,12 +12,21 @@ import { useAuthStore } from "./stores/authStore";
 import { useAdminAuthStore } from "./stores/adminAuthStore";
 import RequireMode from "./components/auth/RequireMode";
 import { ensureSandboxSeed } from "./sandbox/bootstrap";
-import SandboxPanel from "./sandbox/SandboxPanel";
+import { isDemoMode } from "./services/supabase";
 import { resolveSpace, SPACE_FALLBACK } from "./navigation/navigationGraph";
 import "./index.css";
 import "./styles/admin.css";
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: 2, staleTime: 30_000 } } });
+
+/**
+ * Panneau sandbox — monté uniquement en dev ou en mode démo.
+ * En build de production (VITE_DEMO_MODE=false), il est remplacé par un composant vide :
+ * le seul point d'entrée UI vers adminDemoLogin disparaît du bundle rendu.
+ */
+const SandboxPanel = import.meta.env.PROD && !isDemoMode()
+  ? () => null
+  : lazy(() => import("./sandbox/SandboxPanel"));
 
 const OnboardingPage = lazy(() => import("./pages/OnboardingPage"));
 const HomePage = lazy(() => import("./pages/HomePage"));
