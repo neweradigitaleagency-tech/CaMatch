@@ -21,7 +21,6 @@ export default function MarketplaceLayout() {
 
   return (
     <div className="min-h-dynamic text-cm-text flex flex-col font-sans cm-viewport shadow-2xl border-x border-cm-border bg-cm-bg pb-safe">
-      <div className="h-1 shrink-0 bg-gradient-to-r from-cm-accent to-cm-forest" />
 
       {!immersive && (
         <header className="shrink-0 bg-cm-elevated/92 backdrop-blur-lg border-b border-cm-border">

@@ -227,7 +227,6 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
 
   return (
     <div className="min-h-dynamic bg-cm-bg text-cm-text font-sans cm-viewport border-x border-cm-border shadow-2xl flex flex-col">
-      <div className="h-1 shrink-0 bg-gradient-to-r from-cm-accent to-cm-forest" />
 
       <AnimatePresence mode="wait">
         {stage === "slides" ? (

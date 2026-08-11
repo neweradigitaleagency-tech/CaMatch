@@ -41,7 +41,6 @@ export default function Layout({ variant = "client" }: LayoutProps) {
 
   return (
     <div className={`min-h-dynamic text-cm-text flex flex-col font-sans cm-viewport shadow-2xl border-x border-cm-border bg-cm-bg${isClient ? " pb-safe" : ""}`}>
-      <div className="h-1 shrink-0 bg-gradient-to-r from-cm-accent to-cm-forest" />
       {hasMultipleModes && (
         <div className="flex items-center justify-end px-4 py-1.5 border-b border-cm-border/30 bg-cm-elevated/50">
           <RoleSwitcher />
