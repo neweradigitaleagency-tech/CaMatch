@@ -284,7 +284,7 @@ export default function DisputePage() {
         </div>
       </div>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-cm-elevated border-t border-cm-border px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom,12px))]">
+      <footer className="cm-fixed-bottom z-30 bg-cm-elevated border-t border-cm-border px-5 py-3 pb-[max(12px,env(safe-area-inset-bottom,12px))]">
         <div className="max-w-lg mx-auto">
           <button
             onClick={handleSubmit}

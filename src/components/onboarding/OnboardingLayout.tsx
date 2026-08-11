@@ -98,7 +98,7 @@ export default function OnboardingLayout({
       </main>
 
       {/* Bottom navigation */}
-      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-cm-bg/80 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
+      <footer className="cm-fixed-bottom z-20 bg-cm-bg/80 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-[448px] mx-auto px-4 py-3 flex items-center gap-3">
           {onBack && (
             <button onClick={onBack}

@@ -262,7 +262,7 @@ export default function ProposalDetailScreen({ proposal, onBack, onChoose, loadi
         )}
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-20 bg-cm-elevated/90 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
+      <footer className="cm-fixed-bottom z-20 bg-cm-elevated/90 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-[448px] mx-auto px-5 py-3">
           <div className="flex items-center gap-3">
             <div className="flex-1 min-w-0">

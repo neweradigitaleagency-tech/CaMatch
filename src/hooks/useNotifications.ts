@@ -22,12 +22,13 @@ export function useNotifications() {
   const registerServiceWorker = useCallback(async () => {
     if (!("serviceWorker" in navigator)) return null;
     try {
-      const reg = await navigator.serviceWorker.register("/sw.js");
-      await navigator.serviceWorker.ready;
-      if (reg.active) {
+      const reg =
+        (await navigator.serviceWorker.getRegistration()) ??
+        (await navigator.serviceWorker.ready);
+      if (reg?.active) {
         setSubscribed(true);
       }
-      return reg;
+      return reg ?? null;
     } catch {
       return null;
     }
@@ -35,7 +36,7 @@ export function useNotifications() {
 
   const sendLocalNotification = useCallback((title: string, body: string) => {
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(title, { body, icon: "/vite.svg" });
+      new Notification(title, { body, icon: "/pwa-192x192.png" });
     }
   }, []);
 

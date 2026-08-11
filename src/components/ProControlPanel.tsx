@@ -117,7 +117,7 @@ export default function ProControlPanel({
       onNotification(title, body);
     }
     if ("Notification" in window && Notification.permission === "granted") {
-      new Notification(title, { body, icon: "/vite.svg" });
+      new Notification(title, { body, icon: "/pwa-192x192.png" });
     }
   }, [onNotification]);
 

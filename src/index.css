@@ -256,6 +256,27 @@ body {
   position: relative;
 }
 
+/* Colonne téléphone centrée : barres fixes alignées sur le viewport 448px */
+.cm-fixed-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 448px;
+}
+
+/* FAB sandbox aligné sur le bord droit de la colonne téléphone */
+.cm-fab-right {
+  right: max(16px, calc(50vw - 208px));
+}
+
+/* Panneau sandbox calé sur la largeur de la colonne téléphone */
+.cm-panel-x {
+  left: max(16px, calc(50vw - 208px));
+  right: max(16px, calc(50vw - 208px));
+}
+
 /* ─── Glass icon utilities ─── */
 .glass-icon-light {
   background: rgba(255,255,255,0.15);

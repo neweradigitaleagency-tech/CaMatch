@@ -1,25 +1,39 @@
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
+import { isSupabaseReady } from "../services/supabase";
 import UnifiedOnboardingScreen from "../components/onboarding/UnifiedOnboardingScreen";
 
 export default function OnboardingPage() {
   const nav = useNavigate();
-  const setUser = useAuthStore((s) => s.setUser);
-  const setPro = useAuthStore((s) => s.setPro);
+  const location = useLocation();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const skipRedirect = useRef(false);
+
+  useEffect(() => {
+    if (!skipRedirect.current && isAuthenticated && location.pathname === "/onboarding") {
+      nav("/", { replace: true });
+    }
+  }, [isAuthenticated, location.pathname, nav]);
 
   const goToClient = () => {
-    setUser("demo", "client");
+    skipRedirect.current = true;
+    if (!isSupabaseReady() && !useAuthStore.getState().isAuthenticated) {
+      useAuthStore.getState().setUser("demo", "client");
+    }
     nav("/", { replace: true });
   };
 
   const goToPro = () => {
-    setUser("demo", "client");
-    setPro();
+    skipRedirect.current = true;
+    useAuthStore.getState().setUser("demo", "client");
+    useAuthStore.getState().setPro();
     nav("/pro/dashboard", { replace: true });
   };
 
   const goToSupplier = () => {
-    setUser("supplier-1", "client");
+    skipRedirect.current = true;
+    useAuthStore.getState().setUser("supplier-1", "client");
     nav("/supplier/dashboard", { replace: true });
   };
 

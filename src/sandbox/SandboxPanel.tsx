@@ -143,7 +143,7 @@ export default function SandboxPanel() {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="Panneau sandbox démo"
-        className="fixed bottom-24 right-4 z-[70] flex items-center gap-2 pl-3 pr-4 h-11 rounded-full bg-gradient-to-r from-cm-accent to-cm-forest text-white text-[12px] font-bold shadow-lg shadow-cm-accent/30 cursor-pointer hover:opacity-90 active:scale-[0.96] transition-all"
+        className="fixed bottom-24 cm-fab-right z-[70] flex items-center gap-2 pl-3 pr-4 h-11 rounded-full bg-gradient-to-r from-cm-accent to-cm-forest text-white text-[12px] font-bold shadow-lg shadow-cm-accent/30 cursor-pointer hover:opacity-90 active:scale-[0.96] transition-all"
       >
         <FlaskConical className="w-4 h-4" />
         Démo
@@ -156,7 +156,7 @@ export default function SandboxPanel() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="fixed inset-x-4 bottom-24 z-[70] mx-auto max-w-md bg-cm-elevated border border-cm-border rounded-[20px] shadow-2xl overflow-hidden max-h-[70dvh] flex flex-col"
+            className="fixed bottom-24 cm-panel-x z-[70] mx-auto max-w-md bg-cm-elevated border border-cm-border rounded-[20px] shadow-2xl overflow-hidden max-h-[70dvh] flex flex-col"
           >
             <div className="flex items-start justify-between px-5 pt-4 pb-3 border-b border-cm-border/40 bg-cm-bg/60">
               <div>

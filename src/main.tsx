@@ -13,7 +13,10 @@ import { useAdminAuthStore } from "./stores/adminAuthStore";
 import RequireMode from "./components/auth/RequireMode";
 import { ensureSandboxSeed } from "./sandbox/bootstrap";
 import { isDemoMode } from "./services/supabase";
+import { useRequestSync } from "./hooks/useRequestSync";
+import { useProAlerts } from "./hooks/useProAlerts";
 import { resolveSpace, SPACE_FALLBACK } from "./navigation/navigationGraph";
+import { registerSW } from "virtual:pwa-register";
 import "./index.css";
 import "./styles/admin.css";
 
@@ -310,6 +313,9 @@ function App() {
   const [booted, setBooted] = useState(false);
   const initRef = useRef(false);
 
+  useRequestSync();
+  useProAlerts();
+
   useEffect(() => {
     if (initRef.current) return;
     initRef.current = true;
@@ -318,9 +324,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
+    registerSW({ immediate: true });
   }, []);
 
   if (!booted) return <PageLoader />;

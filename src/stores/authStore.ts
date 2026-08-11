@@ -27,6 +27,8 @@ interface AuthState {
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
+  signInWithGoogle: () => Promise<{ error: string | null }>;
+  signInWithApple: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   setRole: (role: UserRole) => void;
   setUser: (userId: string, role?: UserRole) => void;
@@ -150,6 +152,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       phone,
       token,
       type: "sms",
+    });
+    return { error: error?.message || null };
+  },
+
+  signInWithGoogle: async () => {
+    if (!isSupabaseReady()) {
+      set({ userId: "demo", role: "client", isAuthenticated: true });
+      return { error: null };
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + "/onboarding" },
+    });
+    return { error: error?.message || null };
+  },
+
+  signInWithApple: async () => {
+    if (!isSupabaseReady()) {
+      set({ userId: "demo", role: "client", isAuthenticated: true });
+      return { error: null };
+    }
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "apple",
+      options: { redirectTo: window.location.origin + "/onboarding" },
     });
     return { error: error?.message || null };
   },

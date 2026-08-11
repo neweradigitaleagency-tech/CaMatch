@@ -273,7 +273,7 @@ export default function ShopScreenV2({ seller }: ShopScreenV2Props) {
       </div>
 
       {/* Floating bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 px-4 pb-safe pt-3 bg-cm-elevated/80 backdrop-blur-lg border-t border-cm-border">
+      <div className="cm-fixed-bottom z-20 px-4 pb-safe pt-3 bg-cm-elevated/80 backdrop-blur-lg border-t border-cm-border">
         <div className="flex items-center gap-2">
           <button
             onClick={() => nav(`/messages/new?seller=${seller.id}`)}

@@ -367,7 +367,7 @@ export function ChatScreen({
         <div ref={chatEndRef} />
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 bg-cm-elevated border-t border-cm-border px-4 py-3">
+      <div className="cm-fixed-bottom bg-cm-elevated border-t border-cm-border px-4 py-3">
         <div className="max-w-[448px] mx-auto flex items-center gap-2">
           <button onClick={() => setShowMediaPicker(!showMediaPicker)}
             disabled={isReadOnly || isLocked}

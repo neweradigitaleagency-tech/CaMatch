@@ -76,7 +76,7 @@ export default function RequestWizardScreen({ onBack, onSubmit, loading }: Reque
         </AnimatePresence>
       </main>
 
-      <footer className="fixed bottom-0 left-0 right-0 z-30 bg-cm-bg/90 backdrop-blur-xl border-t border-cm-border/30 pb-[env(safe-area-inset-bottom)]">
+      <footer className="cm-fixed-bottom z-30 bg-cm-bg/90 backdrop-blur-xl border-t border-cm-border/30 pb-[env(safe-area-inset-bottom)]">
         <div className="max-w-[448px] mx-auto px-5 py-3">
           {!isLastStep ? (
             <button

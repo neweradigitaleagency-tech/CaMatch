@@ -1,13 +1,5 @@
-const CACHE_NAME = "ca-match-v1";
-
-self.addEventListener("install", (event) => {
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(clients.claim());
-});
-
+// Gestion des notifications push — importé par le service worker généré
+// par vite-plugin-pwa (voir vite.config.ts → workbox.importScripts).
 self.addEventListener("push", (event) => {
   if (!event.data) return;
   try {
@@ -15,8 +7,8 @@ self.addEventListener("push", (event) => {
     const title = data.title || "Ça Match";
     const options = {
       body: data.body || "",
-      icon: data.icon || "/vite.svg",
-      badge: data.badge || "/vite.svg",
+      icon: data.icon || "/pwa-192x192.png",
+      badge: data.badge || "/pwa-192x192.png",
       vibrate: [200, 100, 200],
       tag: data.tag || "ca-match-notification",
       renotify: true,
@@ -28,7 +20,7 @@ self.addEventListener("push", (event) => {
     const title = "Ça Match";
     const options = {
       body: event.data.text(),
-      icon: "/vite.svg",
+      icon: "/pwa-192x192.png",
     };
     event.waitUntil(self.registration.showNotification(title, options));
   }

@@ -492,7 +492,7 @@ export default function ProductDetail() {
       </div>
 
       {/* Sticky bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 bg-cm-elevated border-t border-cm-border px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))] z-20">
+      <div className="cm-fixed-bottom bg-cm-elevated border-t border-cm-border px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom,0.75rem))] z-20">
         <div className="flex items-center gap-2 max-w-md mx-auto">
           <button onClick={handleAddToCart}
             className="w-11 h-11 rounded-full bg-cm-accent flex items-center justify-center cursor-pointer active:scale-90 transition-transform shrink-0" aria-label="Ajouter au panier">
