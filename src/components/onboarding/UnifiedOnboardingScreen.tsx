@@ -7,12 +7,14 @@ import {
   Lock,
   Eye,
   EyeOff,
-  User,
-  Briefcase,
-  Building2,
+  Check,
+  MapPin,
 } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
 import { isSupabaseReady } from "../../services/supabase";
+import { useClientOnboardingStore } from "../../stores/clientOnboardingStore";
+import { useLocationStore, COMMUNES } from "../../stores/locationStore";
+import { SERVICE_CATEGORIES } from "../../data/serviceCategories";
 import {
   PlumberIllustration,
   TrustIllustration,
@@ -20,7 +22,7 @@ import {
 } from "./OnboardingIllustrations";
 
 type AuthMode = "phone" | "email";
-type Stage = "slides" | "auth";
+type Stage = "auth" | "slides" | "categories" | "location";
 
 interface Slide {
   id: string;
@@ -55,9 +57,6 @@ const SLIDES: Slide[] = [
 
 interface Props {
   onComplete: () => void;
-  onDemoClient?: () => void;
-  onDemoPro?: () => void;
-  onDemoSupplier?: () => void;
 }
 
 function GoogleIcon() {
@@ -79,7 +78,10 @@ function AppleIcon() {
   );
 }
 
-export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDemoPro, onDemoSupplier }: Props) {
+const STEP_LABELS = ["Bienvenue", "Catégories", "Localisation"];
+
+export default function UnifiedOnboardingScreen({ onComplete }: Props) {
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const signInWithPhone = useAuthStore((s) => s.signInWithPhone);
   const verifyOtp = useAuthStore((s) => s.verifyOtp);
   const signInWithEmail = useAuthStore((s) => s.signInWithEmail);
@@ -87,7 +89,10 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
   const signInWithGoogle = useAuthStore((s) => s.signInWithGoogle);
   const signInWithApple = useAuthStore((s) => s.signInWithApple);
 
-  const [stage, setStage] = useState<Stage>("slides");
+  const onboarding = useClientOnboardingStore();
+  const setLocation = useLocationStore((s) => s.setNeighborhood);
+
+  const [stage, setStage] = useState<Stage>(isAuthenticated ? "slides" : "auth");
   const [slideIndex, setSlideIndex] = useState(0);
 
   const [authMode, setAuthMode] = useState<AuthMode>("phone");
@@ -108,18 +113,36 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
 
   const slide = SLIDES[slideIndex]!;
 
-  /** Clôture l'authentification : en mode réel, l'état auth pilotera la navigation. */
-  const finishAuth = () => {
-    if (!isSupabaseReady()) {
-      onComplete();
+  const initialized = onboarding.initialized;
+  if (!initialized) {
+    onboarding.initialize();
+  }
+
+  // Après une connexion réelle (Supabase pilote l'état), on enchaîne sur les étapes.
+  useEffect(() => {
+    if (isAuthenticated && stage === "auth") {
+      setStage("slides");
+      setSlideIndex(0);
     }
-  };
+  }, [isAuthenticated, stage]);
 
   const goToAuth = () => {
     setError("");
     setOtpSent(false);
     setOtp(["", "", "", "", "", ""]);
     setStage("auth");
+  };
+
+  const goToSteps = () => {
+    setError("");
+    setStage("slides");
+    setSlideIndex(0);
+  };
+
+  const finishAuth = () => {
+    if (!isSupabaseReady()) {
+      goToSteps();
+    }
   };
 
   const handlePhoneSubmit = async () => {
@@ -219,100 +242,49 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
     if (slideIndex < SLIDES.length - 1) {
       setSlideIndex((i) => i + 1);
     } else {
-      goToAuth();
+      setStage("categories");
     }
   };
 
-  const skipSlides = () => goToAuth();
+  const toggleCategory = (catId: string) => {
+    const selected = onboarding.selectedCategoryIds;
+    const next = selected.includes(catId)
+      ? selected.filter((id) => id !== catId)
+      : [...selected, catId];
+    onboarding.setCategories(next, onboarding.selectedSubCategories);
+  };
+
+  const toggleSub = (subName: string) => {
+    const selected = onboarding.selectedSubCategories;
+    const next = selected.includes(subName)
+      ? selected.filter((s) => s !== subName)
+      : [...selected, subName];
+    onboarding.setCategories(onboarding.selectedCategoryIds, next);
+  };
+
+  const handleComplete = () => {
+    onboarding.markComplete();
+    onComplete();
+  };
+
+  const goBackFromSteps = () => {
+    if (stage === "slides") {
+      if (slideIndex > 0) setSlideIndex((i) => i - 1);
+      else goToAuth();
+    } else if (stage === "categories") {
+      setStage("slides");
+    } else if (stage === "location") {
+      setStage("categories");
+    }
+  };
+
+  const stepsIndex = stage === "slides" ? 0 : stage === "categories" ? 1 : 2;
 
   return (
     <div className="min-h-dynamic bg-cm-bg text-cm-text font-sans cm-viewport border-x border-cm-border shadow-2xl flex flex-col">
 
       <AnimatePresence mode="wait">
-        {stage === "slides" ? (
-          <motion.div
-            key="slides"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-            className="flex-1 flex flex-col"
-          >
-            {/* Barre supérieure : Skip / Next */}
-            <div className="flex items-center justify-between px-4 pt-3">
-              <img src="/logo.svg" alt="Ça Match" className="h-7" />
-              <div className="flex items-center gap-2">
-                {slideIndex < SLIDES.length - 1 && (
-                  <button
-                    onClick={skipSlides}
-                    className="text-[12px] font-semibold text-cm-text-muted px-3 py-2 rounded-[10px] cursor-pointer hover:text-cm-text hover:bg-cm-border/20 transition-colors"
-                  >
-                    Passer
-                  </button>
-                )}
-                <button
-                  onClick={nextSlide}
-                  className={`flex items-center gap-1 h-9 px-3.5 rounded-[12px] text-[12px] font-bold transition-all active:scale-[0.96] cursor-pointer ${
-                    slideIndex === SLIDES.length - 1
-                      ? "bg-cm-accent text-cm-text-onAccent"
-                      : "bg-cm-forest text-cm-text-onForest"
-                  }`}
-                >
-                  {slideIndex === SLIDES.length - 1 ? "Commencer" : "Suivant"}
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Contenu du slide */}
-            <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={slide.id}
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.25, ease: "easeOut" }}
-                  className="flex flex-col items-center w-full"
-                >
-                  <div className="w-[220px] h-[220px] sm:w-[240px] sm:h-[240px]">
-                    <slide.Illustration className="w-full h-full drop-shadow-[0_10px_18px_rgba(36,51,24,0.14)]" />
-                  </div>
-                  <h1 className="mt-6 text-[22px] font-extrabold leading-tight tracking-tight max-w-[300px]">
-                    {slide.title}
-                  </h1>
-                  <p className="mt-2.5 text-[13px] text-cm-text-soft leading-relaxed max-w-[290px]">
-                    {slide.subtitle}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Points */}
-            <div className="flex justify-center gap-1.5 pb-2">
-              {SLIDES.map((s, i) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSlideIndex(i)}
-                  aria-label={`Étape ${i + 1}`}
-                  className={`h-1.5 rounded-full transition-all cursor-pointer ${
-                    i === slideIndex ? "w-6 bg-cm-accent" : "w-1.5 bg-cm-border"
-                  }`}
-                />
-              ))}
-            </div>
-
-            {/* Mot démo (bas de slide) */}
-            <div className="px-4 pb-5 pt-2">
-              <button
-                onClick={onDemoClient}
-                className="w-full h-10 text-xs font-semibold text-cm-text-soft bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-2"
-              >
-                <User className="w-4 h-4 text-cm-text-muted" /> Mode démo Client
-              </button>
-            </div>
-          </motion.div>
-        ) : (
+        {stage === "auth" ? (
           <motion.div
             key="auth"
             initial={{ opacity: 0, y: 10 }}
@@ -321,15 +293,8 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="flex-1 flex flex-col"
           >
-            {/* Barre : retour + logo */}
+            {/* Barre : logo */}
             <div className="flex items-center gap-2 px-4 pt-3">
-              <button
-                onClick={() => setStage("slides")}
-                aria-label="Retour"
-                className="p-1.5 -ml-1.5 rounded-[10px] text-cm-text-soft cursor-pointer hover:bg-cm-border/20 transition-colors"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
               <img src="/logo.svg" alt="Ça Match" className="h-7" />
             </div>
 
@@ -538,7 +503,7 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                   ) : (
                     <GoogleIcon />
                   )}
-                  Gmail
+                  Google
                 </button>
                 <button
                   onClick={() => handleOAuth("apple")}
@@ -562,31 +527,234 @@ export default function UnifiedOnboardingScreen({ onComplete, onDemoClient, onDe
                 </p>
               </div>
             </div>
-
-            {/* Mot démo (bas d'écran) */}
-            <div className="px-4 pb-5 pt-2 space-y-2 border-t border-cm-border/30">
-              <p className="text-[10px] text-cm-text-soft/40 text-center">Accès rapide — Mode démo</p>
-              <div className="grid grid-cols-3 gap-2">
+          </motion.div>
+        ) : (
+          <motion.div
+            key={stage}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="flex-1 flex flex-col"
+          >
+            {/* Header : retour + logo + stepper */}
+            <div className="px-4 pt-3">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={onDemoClient}
-                  className="h-10 text-xs font-semibold text-cm-text bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  onClick={goBackFromSteps}
+                  aria-label="Retour"
+                  className="p-1.5 -ml-1.5 rounded-[10px] text-cm-text-soft cursor-pointer hover:bg-cm-border/20 transition-colors"
                 >
-                  <User className="w-4 h-4 text-cm-text-muted" /> Client
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
-                <button
-                  onClick={onDemoPro}
-                  className="h-10 text-xs font-semibold text-cm-text bg-cm-elevated rounded-xl border border-cm-border hover:bg-cm-surface transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <Briefcase className="w-4 h-4 text-cm-text-muted" /> Pro
-                </button>
-                <button
-                  onClick={onDemoSupplier}
-                  className="h-10 text-xs font-semibold text-cm-text bg-cm-elevated rounded-xl border border-cm-accent/30 hover:bg-cm-accent/5 transition-all cursor-pointer flex items-center justify-center gap-1.5"
-                >
-                  <Building2 className="w-4 h-4 text-cm-accent" /> Vendeur
-                </button>
+                <img src="/logo.svg" alt="Ça Match" className="h-7" />
+              </div>
+              <div className="flex items-center gap-2 pt-3 pb-1">
+                {STEP_LABELS.map((label, i) => {
+                  const isActive = i === stepsIndex;
+                  const isDone = i < stepsIndex;
+                  return (
+                    <div key={label} className="flex-1 flex flex-col gap-1">
+                      <div
+                        className={`h-1 rounded-full transition-colors ${
+                          isDone ? "bg-cm-accent" : isActive ? "bg-cm-accent/60" : "bg-cm-border-soft"
+                        }`}
+                      />
+                      <span
+                        className={`text-[9px] font-semibold tracking-wide ${
+                          isActive ? "text-cm-accent" : isDone ? "text-cm-text" : "text-cm-text-muted"
+                        }`}
+                      >
+                        {label}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
+
+            {stage === "slides" ? (
+              <div className="flex-1 flex flex-col">
+                {/* Contenu du slide */}
+                <div className="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={slide.id}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ duration: 0.25, ease: "easeOut" }}
+                      className="flex flex-col items-center w-full"
+                    >
+                      <div className="w-[200px] h-[200px] sm:w-[220px] sm:h-[220px]">
+                        <slide.Illustration className="w-full h-full drop-shadow-[0_10px_18px_rgba(36,51,24,0.14)]" />
+                      </div>
+                      <h1 className="mt-6 text-[22px] font-extrabold leading-tight tracking-tight max-w-[300px]">
+                        {slide.title}
+                      </h1>
+                      <p className="mt-2.5 text-[13px] text-cm-text-soft leading-relaxed max-w-[290px]">
+                        {slide.subtitle}
+                      </p>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* Points */}
+                <div className="flex justify-center gap-1.5 pb-2">
+                  {SLIDES.map((s, i) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setSlideIndex(i)}
+                      aria-label={`Étape ${i + 1}`}
+                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                        i === slideIndex ? "w-6 bg-cm-accent" : "w-1.5 bg-cm-border"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                <div className="px-4 pb-5 pt-2 flex items-center gap-3">
+                  <button
+                    onClick={() => setStage("categories")}
+                    className="h-12 px-5 rounded-[14px] text-[13px] font-semibold text-cm-text-soft border border-cm-border bg-cm-elevated cursor-pointer hover:bg-cm-surface transition-all active:scale-[0.97]"
+                  >
+                    Passer
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className="flex-1 h-12 rounded-[14px] text-[13px] font-bold text-white bg-cm-accent hover:opacity-90 transition-all active:scale-[0.97] cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    {slideIndex === SLIDES.length - 1 ? "Continuer" : "Suivant"}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : stage === "categories" ? (
+              <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[max(96px,env(safe-area-inset-bottom,96px))]">
+                <h2 className="text-[18px] font-extrabold text-cm-text mb-1">Vos services préférés</h2>
+                <p className="text-[13px] text-cm-text-soft mb-4">
+                  Choisissez ce qui vous intéresse : on personnalisera vos suggestions.
+                </p>
+
+                <div className="space-y-2.5">
+                  {SERVICE_CATEGORIES.map((cat) => {
+                    const isCatSelected = onboarding.selectedCategoryIds.includes(cat.id);
+                    return (
+                      <div key={cat.id} className="bg-cm-elevated border border-cm-border rounded-[16px] overflow-hidden">
+                        <button
+                          onClick={() => toggleCategory(cat.id)}
+                          className="w-full flex items-center gap-3 px-4 py-3.5 cursor-pointer hover:bg-cm-accent-soft/30 transition-colors"
+                        >
+                          <span
+                            className={`w-9 h-9 rounded-[12px] bg-gradient-to-br ${cat.color} flex items-center justify-center text-[18px] shrink-0`}
+                          >
+                            {cat.icon}
+                          </span>
+                          <span className="flex-1 text-[13px] font-semibold text-cm-text text-left">{cat.name}</span>
+                          <span
+                            className={`w-6 h-6 rounded-full border flex items-center justify-center transition-all ${
+                              isCatSelected
+                                ? "bg-cm-accent border-cm-accent"
+                                : "border-cm-border"
+                            }`}
+                          >
+                            {isCatSelected && <Check className="w-4 h-4 text-white" />}
+                          </span>
+                        </button>
+                        {isCatSelected && (
+                          <div className="px-4 pb-3.5 flex flex-wrap gap-1.5 border-t border-cm-border pt-2.5">
+                            {cat.subcategories.map((sub) => {
+                              const isSelected = onboarding.selectedSubCategories.includes(sub.name);
+                              return (
+                                <button
+                                  key={sub.name}
+                                  onClick={() => toggleSub(sub.name)}
+                                  className={`px-3 py-1.5 rounded-full text-[11px] font-medium cursor-pointer transition-colors ${
+                                    isSelected
+                                      ? "bg-cm-accent text-cm-text-onAccent"
+                                      : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                                  }`}
+                                >
+                                  {sub.name}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 overflow-y-auto px-5 pt-4 pb-[max(96px,env(safe-area-inset-bottom,96px))]">
+                <h2 className="text-[18px] font-extrabold text-cm-text mb-1">Votre commune</h2>
+                <p className="text-[13px] text-cm-text-soft mb-4">
+                  Dites-nous où vous habitez pour trouver les pros près de chez vous.
+                </p>
+
+                <div className="mb-5">
+                  <div className="flex items-center gap-2 p-3.5 bg-cm-accent-soft rounded-[14px] mb-4">
+                    <MapPin className="w-5 h-5 text-cm-accent shrink-0" />
+                    <div>
+                      <p className="text-[12px] font-semibold text-cm-text">Choisissez votre commune</p>
+                      <p className="text-[11px] text-cm-text-muted">Modifiable à tout moment dans vos réglages.</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {COMMUNES.map((name) => {
+                      const isActive = onboarding.neighborhood === name;
+                      return (
+                        <button
+                          key={name}
+                          onClick={() => {
+                            onboarding.setNeighborhood(name);
+                            setLocation(name);
+                          }}
+                          className={`px-4 py-2 rounded-full text-[12px] font-medium cursor-pointer transition-all ${
+                            isActive
+                              ? "bg-cm-accent text-cm-text-onAccent"
+                              : "bg-cm-border-soft text-cm-text-soft hover:bg-cm-accent-soft"
+                          }`}
+                        >
+                          {name}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Footer des étapes */}
+            {(stage === "categories" || stage === "location") && (
+              <footer className="cm-fixed-bottom z-20 bg-cm-bg/80 backdrop-blur-xl border-t border-cm-border/40 pb-[env(safe-area-inset-bottom)]">
+                <div className="max-w-[448px] mx-auto px-4 py-3 flex items-center gap-3">
+                  <button
+                    onClick={goBackFromSteps}
+                    className="h-12 px-5 rounded-[14px] text-[13px] font-medium text-cm-text border border-cm-border bg-cm-elevated cursor-pointer hover:bg-cm-accent-soft transition-colors active:scale-[0.97]"
+                  >
+                    Retour
+                  </button>
+                  <button
+                    onClick={stage === "categories" ? () => setStage("location") : handleComplete}
+                    disabled={
+                      stage === "categories"
+                        ? onboarding.selectedCategoryIds.length === 0
+                        : false
+                    }
+                    className={`flex-1 h-12 rounded-[14px] text-[13px] font-bold text-white cursor-pointer transition-all active:scale-[0.97] flex items-center justify-center gap-2 ${
+                      stage === "categories" && onboarding.selectedCategoryIds.length === 0
+                        ? "bg-cm-border-soft text-cm-text-muted cursor-not-allowed"
+                        : "bg-cm-accent hover:opacity-90"
+                    }`}
+                  >
+                    {stage === "categories" ? "Continuer" : "C'est parti"}
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </footer>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

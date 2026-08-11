@@ -79,6 +79,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           initialized: true,
         });
         void loadIsPro(session.user.id);
+        void syncUserRow(session.user);
       } else {
         set({ isLoading: false, initialized: true });
       }
@@ -97,6 +98,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             isLoading: false,
           });
           void loadIsPro(session.user.id);
+          void syncUserRow(session.user);
         } else {
           set({
             userId: null,
@@ -165,7 +167,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       provider: "google",
       options: { redirectTo: window.location.origin + "/onboarding" },
     });
-    return { error: error?.message || null };
+    return { error: mapOAuthError(error?.message) };
   },
 
   signInWithApple: async () => {
@@ -177,7 +179,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       provider: "apple",
       options: { redirectTo: window.location.origin + "/onboarding" },
     });
-    return { error: error?.message || null };
+    return { error: mapOAuthError(error?.message) };
   },
 
   signOut: async () => {
@@ -305,4 +307,38 @@ async function loadIsPro(userId: string) {
   } catch {
     // Non bloquant : on laisse isPro tel quel si la lecture échoue.
   }
+}
+
+/**
+ * Filet de sécurité : assure que la ligne publique `users` existe pour ce compte
+ * (le trigger DB handle_new_user la crée normalement). Best-effort, jamais bloquant.
+ * Les users OAuth (Google/Apple) n'ont pas de téléphone : colonnes nullables.
+ */
+async function syncUserRow(user: User) {
+  if (!isSupabaseReady()) return;
+  try {
+    await supabase
+      .from("users")
+      .upsert(
+        {
+          id: user.id,
+          email: user.email ?? null,
+          phone_number: user.phone ?? null,
+          last_login_at: new Date().toISOString(),
+        },
+        { onConflict: "id" }
+      );
+  } catch {
+    // Non bloquant : le trigger DB s'en charge.
+  }
+}
+
+/** Traduit les erreurs OAuth courantes en messages compréhensibles. */
+function mapOAuthError(message?: string | null): string | null {
+  if (!message) return null;
+  const lower = message.toLowerCase();
+  if (lower.includes("not enabled") || lower.includes("is not enabled") || lower.includes("provider") && lower.includes("enabled")) {
+    return "Ce mode de connexion n'est pas encore activé. Réessayez avec votre numéro ou votre email.";
+  }
+  return message;
 }

@@ -1443,8 +1443,8 @@ export type Database = {
           language: string | null
           last_login_at: string | null
           password_hash: string | null
-          phone_number: string
-          phone_number_hash: string
+          phone_number: string | null
+          phone_number_hash: string | null
           role: Database["public"]["Enums"]["user_role"]
           timezone: string | null
           updated_at: string | null
@@ -1459,8 +1459,8 @@ export type Database = {
           language?: string | null
           last_login_at?: string | null
           password_hash?: string | null
-          phone_number: string
-          phone_number_hash: string
+          phone_number?: string | null
+          phone_number_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           timezone?: string | null
           updated_at?: string | null
@@ -1475,8 +1475,8 @@ export type Database = {
           language?: string | null
           last_login_at?: string | null
           password_hash?: string | null
-          phone_number?: string
-          phone_number_hash?: string
+          phone_number?: string | null
+          phone_number_hash?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           timezone?: string | null
           updated_at?: string | null
