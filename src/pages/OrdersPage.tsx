@@ -7,6 +7,7 @@ import { useAuthStore } from "../stores/authStore";
 import { useRequestStore } from "../stores/requestStore";
 import { useProStore } from "../stores/proStore";
 import { acceptAlertAsPro } from "../services/missionSync";
+import { isDemoMode, isSupabaseReady } from "../services/supabase";
 import { MOCK_REQUESTS, MOCK_MISSIONS, MOCK_PRO_JOBS, MOCK_PROS } from "../services/mockData";
 import StatusBadge from "../components/ui/StatusBadge";
 import type { Mission, ProAlert, ProDashboardStats, ClientRequest, MissionStatus } from "../types";
@@ -26,15 +27,19 @@ export default function OrdersPage() {
   const isAvailable = useProStore((s) => s.isAvailable);
   const toggleAvailability = useProStore((s) => s.toggleAvailability);
 
+  const sandbox = !isSupabaseReady() || isDemoMode();
+
   useEffect(() => {
-    if (storeRequests.length === 0 && MOCK_REQUESTS.length > 0) setRequests(MOCK_REQUESTS);
-    if (storeMissions.length === 0 && MOCK_MISSIONS.length > 0) setMissions(MOCK_MISSIONS);
-  }, []);
+    if (sandbox && storeRequests.length === 0 && MOCK_REQUESTS.length > 0) setRequests(MOCK_REQUESTS);
+    if (sandbox && storeMissions.length === 0 && MOCK_MISSIONS.length > 0) setMissions(MOCK_MISSIONS);
+  }, [sandbox]);
 
   const currentPro = MOCK_PROS.find((p) => p.id === userId) || MOCK_PROS[0];
-  const alerts: ProAlert[] = rawAlerts.filter((a) => a.category === currentPro?.category).map((a) => ({
-    ...a, clientAvatarUrl: undefined, urgency: a.urgency as ProAlert["urgency"],
-  }));
+  const alerts: ProAlert[] = sandbox
+    ? rawAlerts.filter((a) => a.category === currentPro?.category).map((a) => ({
+        ...a, clientAvatarUrl: undefined, urgency: a.urgency as ProAlert["urgency"],
+      }))
+    : rawAlerts;
 
   const { data: requestsFromDb = [] } = useClientRequests();
   const { data: missionsFromDb = [] } = useClientMissions();
@@ -202,7 +207,7 @@ export default function OrdersPage() {
                       className="flex-1 h-9 text-[11px] font-bold text-cm-accent bg-cm-accent-soft rounded-[10px] flex items-center justify-center gap-1 cursor-pointer">
                       <FileText className="w-3.5 h-3.5" /> Devis
                     </button>
-                    <button type="button" onClick={() => { acceptAlertAsPro(alert, "fixed"); removeAlert(alert.id); }} className="h-9 text-[11px] font-bold text-white bg-green-600 rounded-[10px] px-3 cursor-pointer">Accepter</button>
+                    <button type="button" onClick={() => { void acceptAlertAsPro(alert, "fixed").finally(() => removeAlert(alert.id)); }} className="h-9 text-[11px] font-bold text-white bg-green-600 rounded-[10px] px-3 cursor-pointer">Accepter</button>
                     <button type="button" onClick={() => removeAlert(alert.id)} className="h-9 text-[11px] font-bold text-cm-text bg-cm-border-soft rounded-[10px] px-3 cursor-pointer">Refuser</button>
                   </div>
                 </div>

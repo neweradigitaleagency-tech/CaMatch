@@ -59,8 +59,9 @@ export default function ProMissionsPage() {
 
   const filtered = tab === "active" ? activeJobs : tab === "upcoming" ? pendingJobs : completedJobs;
 
-  const handleAcceptAlert = (alert: ProAlert) => {
-    acceptAlertAsPro(alert, "fixed");
+  const handleAcceptAlert = async (alert: ProAlert) => {
+    const result = await acceptAlertAsPro(alert, "fixed");
+    if (!result) return;
     addNotification({
       type: "mission",
       title: "Mission acceptée",

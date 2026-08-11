@@ -99,7 +99,7 @@ export async function getVerifications(params: {
   const { page = 1, perPage = 20, status, documentType, search } = params
   let query = supabase
     .from("verification_requests" as never)
-    .select("*, user:user_id(email, phone_number, email_verified, phone_verified), pro:user_id(professional_profiles!inner(first_name, last_name, business_name, category))", { count: "exact" }) as never
+    .select("*, user:user_id(email, phone_number, email_verified, phone_verified), pro:user_id(professional_profiles!inner(first_name, last_name, business_name, categories))", { count: "exact" }) as never
 
   let q: any = query
   if (status && status !== "all") q = q.eq("status", status)
@@ -122,7 +122,7 @@ export async function getVerifications(params: {
         user_phone: v.user?.phone_number ?? "",
         phone_verified: v.user?.phone_verified ?? false,
         email_verified: v.user?.email_verified ?? false,
-        category: pro?.category ?? "",
+        category: Array.isArray(pro?.categories) ? pro.categories[0] : "",
       }
     }) as VerificationRequest[],
     total: count ?? 0,

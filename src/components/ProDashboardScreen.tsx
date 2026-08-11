@@ -261,13 +261,16 @@ export default function ProDashboardScreen() {
     setShowPricingChoice(true);
   };
 
-  const handlePricingChoice = (model: "fixed" | "quote") => {
+  const handlePricingChoice = async (model: "fixed" | "quote") => {
     const alert = pricingAlert;
     if (!alert) return;
     setShowPricingChoice(false);
     setPricingAlert(null);
 
-    const { job } = acceptAlertAsPro(alert, model);
+    const result = await acceptAlertAsPro(alert, model);
+    if (!result) return;
+
+    const { job } = result;
 
     if (model === "quote") {
       addNotification({

@@ -845,7 +845,7 @@ export type Database = {
           background_check_verified_at: string | null
           bio: string | null
           business_name: string | null
-          category: string
+          categories: string[]
           cert_document_url: string | null
           cert_document_verified_at: string | null
           created_at: string | null
@@ -881,7 +881,7 @@ export type Database = {
           background_check_verified_at?: string | null
           bio?: string | null
           business_name?: string | null
-          category: string
+          categories: string[]
           cert_document_url?: string | null
           cert_document_verified_at?: string | null
           created_at?: string | null
@@ -917,7 +917,7 @@ export type Database = {
           background_check_verified_at?: string | null
           bio?: string | null
           business_name?: string | null
-          category?: string
+          categories?: string[]
           cert_document_url?: string | null
           cert_document_verified_at?: string | null
           created_at?: string | null
@@ -1126,7 +1126,7 @@ export type Database = {
           ai_extracted_features: Json | null
           cancellation_reason: string | null
           cancelled_at: string | null
-          category: string
+          categories: string[]
           client_id: string
           completed_at: string | null
           created_at: string | null
@@ -1134,6 +1134,7 @@ export type Database = {
           enterprise_site_id: string | null
           estimated_price_max: number | null
           estimated_price_min: number | null
+          expires_at: string
           final_price: number | null
           id: string
           location: unknown
@@ -1142,7 +1143,7 @@ export type Database = {
           scheduled_at: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["request_status"] | null
-          sub_category: string | null
+          sub_categories: string[] | null
           updated_at: string | null
           urgency: string | null
         }
@@ -1153,7 +1154,7 @@ export type Database = {
           ai_extracted_features?: Json | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
-          category: string
+          categories: string[]
           client_id: string
           completed_at?: string | null
           created_at?: string | null
@@ -1161,6 +1162,7 @@ export type Database = {
           enterprise_site_id?: string | null
           estimated_price_max?: number | null
           estimated_price_min?: number | null
+          expires_at?: string
           final_price?: number | null
           id?: string
           location: unknown
@@ -1169,7 +1171,7 @@ export type Database = {
           scheduled_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["request_status"] | null
-          sub_category?: string | null
+          sub_categories?: string[] | null
           updated_at?: string | null
           urgency?: string | null
         }
@@ -1180,7 +1182,7 @@ export type Database = {
           ai_extracted_features?: Json | null
           cancellation_reason?: string | null
           cancelled_at?: string | null
-          category?: string
+          categories?: string[]
           client_id?: string
           completed_at?: string | null
           created_at?: string | null
@@ -1188,6 +1190,7 @@ export type Database = {
           enterprise_site_id?: string | null
           estimated_price_max?: number | null
           estimated_price_min?: number | null
+          expires_at?: string
           final_price?: number | null
           id?: string
           location?: unknown
@@ -1196,7 +1199,7 @@ export type Database = {
           scheduled_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["request_status"] | null
-          sub_category?: string | null
+          sub_categories?: string[] | null
           updated_at?: string | null
           urgency?: string | null
         }

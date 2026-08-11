@@ -38,7 +38,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       supabase.from("service_requests").select("id", { count: "exact", head: true }),
       supabase.from("service_requests").select("status"),
       supabase.from("users").select("created_at, role").gte("created_at", thirtyDaysAgo).order("created_at"),
-      supabase.from("service_requests").select("category"),
+      supabase.from("service_requests").select("categories"),
       (supabase.from("professional_profiles" as never).select("city" as never).not("city" as never, "is", null).is("deleted_at" as never, null) as any),
       supabase.from("verification_requests").select("id", { count: "exact", head: true }).eq("status", "pending"),
       (supabase.from("support_tickets" as never).select("id", { count: "exact", head: true }) as any).eq("status", "pending"),
@@ -47,7 +47,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
       supabase.from("transactions").select("created_at, amount").eq("status", "captured").gte("created_at", sevenDaysAgo).order("created_at"),
       supabase.from("users").select("id, email, created_at").eq("role", "client").order("created_at", { ascending: false }).limit(5),
       supabase.from("users").select("id, email, created_at").eq("role", "professional").order("created_at", { ascending: false }).limit(5),
-      supabase.from("service_requests").select("id, category, estimated_price_min, created_at").order("created_at", { ascending: false }).limit(5),
+      supabase.from("service_requests").select("id, categories, estimated_price_min, created_at").order("created_at", { ascending: false }).limit(5),
       supabase.from("transactions").select("id, amount, created_at").eq("status", "captured").order("created_at", { ascending: false }).limit(5),
       (supabase.from("reports" as never).select("id, created_at").order("created_at" as never, { ascending: false } as never) as any).limit(5),
     ])
@@ -66,8 +66,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
 
     const registrations = buildDailyRegistrations((registrationsRes.data ?? []) as { created_at: string; role: string }[])
     const catMap: Record<string, number> = {}
-    for (const m of (categoryRes.data ?? []) as { category: string }[]) {
-      catMap[m.category] = (catMap[m.category] ?? 0) + 1
+    for (const m of (categoryRes.data ?? []) as { categories: string[] }[]) {
+      for (const cat of m.categories ?? []) {
+        catMap[cat] = (catMap[cat] ?? 0) + 1
+      }
     }
     const categoryData = Object.entries(catMap)
       .map(([category, count]) => ({ category, count }))
@@ -91,7 +93,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     const activity = buildActivityFeed(
       recentClientsRes.data as { id: string; email: string; created_at: string }[] | null,
       recentProsRes.data as { id: string; email: string; created_at: string }[] | null,
-      recentMissionsRes.data as { id: string; category: string; estimated_price_min: number | null; created_at: string }[] | null,
+      recentMissionsRes.data as { id: string; categories: string[]; estimated_price_min: number | null; created_at: string }[] | null,
       recentTxnsRes.data as { id: string; amount: number; created_at: string }[] | null,
       recentReportsRes.data as { id: string; created_at: string }[] | null,
     )
@@ -196,7 +198,7 @@ function computeTrends(users: { created_at: string; role: string }[] | null, rev
 function buildActivityFeed(
   clients: { id: string; email: string; created_at: string }[] | null,
   pros: { id: string; email: string; created_at: string }[] | null,
-  missions: { id: string; category: string; estimated_price_min: number | null; created_at: string }[] | null,
+  missions: { id: string; categories: string[]; estimated_price_min: number | null; created_at: string }[] | null,
   txns: { id: string; amount: number; created_at: string }[] | null,
   reports: { id: string; created_at: string }[] | null,
 ): DashboardStats["activity"] {
@@ -232,7 +234,7 @@ function buildActivityFeed(
         id: `m-${m.id}`,
         time: formatTime(m.created_at),
         type: "new_mission",
-        description: `Nouvelle mission${m.category ? ` de ${m.category}` : ""}${m.estimated_price_min ? ` — ${m.estimated_price_min.toLocaleString()} F` : ""}`,
+        description: `Nouvelle mission${Array.isArray(m.categories) && m.categories[0] ? ` de ${m.categories[0]}` : ""}${m.estimated_price_min ? ` — ${m.estimated_price_min.toLocaleString()} F` : ""}`,
       })
     }
   }

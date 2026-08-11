@@ -92,7 +92,7 @@ export async function getMissions(params: {
 
   let q: any = query
   if (status && status !== "all") q = q.eq("status", status)
-  if (category) q = q.eq("category", category)
+  if (category) q = q.contains("categories", [category])
   if (urgency) q = q.eq("urgency", urgency)
   if (search) {
     q = q.or(`address.ilike.%${search}%,description.ilike.%${search}%`)
@@ -108,6 +108,8 @@ export async function getMissions(params: {
       const pro = m.pro
       return {
         ...m,
+        category: Array.isArray(m.categories) ? m.categories[0] ?? "" : m.category ?? "",
+        sub_category: Array.isArray(m.sub_categories) ? m.sub_categories[0] ?? "" : m.sub_category,
         client_name: client?.email?.split("@")[0] ?? "",
         client_phone: client?.phone_number ?? "",
         client_email: client?.email ?? "",
@@ -137,6 +139,8 @@ export async function getMissionById(id: string): Promise<MissionDetail | null> 
 
   const mission: MissionDetail = {
     ...sr,
+    category: Array.isArray(sr.categories) ? sr.categories[0] ?? "" : sr.category ?? "",
+    sub_category: Array.isArray(sr.sub_categories) ? sr.sub_categories[0] ?? "" : sr.sub_category,
     client_name: client?.email?.split("@")[0] ?? "",
     client_phone: client?.phone_number ?? "",
     client_email: client?.email ?? "",

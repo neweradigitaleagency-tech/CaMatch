@@ -4,8 +4,11 @@ import { useRequestWizardStore } from "../../stores/requestWizardStore";
 import { useRequestStore } from "../../stores/requestStore";
 import { useMatchingStore } from "../../stores/matchingStore";
 import { useProStore } from "../../stores/proStore";
+import { useAuthStore } from "../../stores/authStore";
 import { usePros } from "../../hooks/useDatabase";
 import { seedWorkflowData, generateMockProposals } from "../../data/mockWorkflowData";
+import { persistRequest, mapUrgencyToDb } from "../../services/requestPersistence";
+import { isDemoMode, isSupabaseReady } from "../../services/supabase";
 import type { ClientRequest, ProAlert } from "../../types";
 
 function mapUrgency(u: string): ProAlert["urgency"] {
@@ -27,8 +30,9 @@ export default function RequestWizardPage() {
   const { data: allPros = [] } = usePros();
   const { rankProfessionals, setSearching } = useMatchingStore();
 
-  const handleSubmit = () => {
-    const requestId = "cr_" + Date.now();
+  const handleSubmit = async () => {
+    const realMode = isSupabaseReady() && !isDemoMode();
+    const userId = useAuthStore.getState().userId;
 
     const budgetXOF = draft.budgetMode === "receive_proposals"
       ? 0
@@ -36,9 +40,34 @@ export default function RequestWizardPage() {
         ? draft.budgetMax
         : draft.budgetMax;
 
+    let requestId = "cr_" + Date.now();
+    let persistedId: string | null = null;
+
+    if (realMode && userId) {
+      persistedId = await persistRequest({
+        clientId: userId,
+        category: draft.category || "",
+        subCategory: draft.subCategory || undefined,
+        description: draft.description,
+        photos: draft.photos,
+        address: draft.address,
+        addressDetails: draft.addressComplement || undefined,
+        lat: draft.lat,
+        lng: draft.lng,
+        budgetMin: draft.budgetMin,
+        budgetMax: draft.budgetMax,
+        urgency: mapUrgencyToDb(draft.availability || null),
+        scheduledAt: draft.scheduledDate || undefined,
+        materialsProvided: draft.materialsPreference === "pro_provides",
+      });
+      if (persistedId) requestId = persistedId;
+    }
+
+    const sandboxFallback = !realMode || !persistedId;
+
     const newRequest: ClientRequest = {
       id: requestId,
-      clientId: "client_marie",
+      clientId: userId ?? "client_marie",
       title: draft.subCategory || draft.category || "Demande de service",
       description: draft.description,
       photos: draft.photos,
@@ -61,21 +90,23 @@ export default function RequestWizardPage() {
 
     addRequest(newRequest);
 
-    const newAlert: ProAlert = {
-      id: "alert_" + Date.now(),
-      requestId,
-      clientName: "Marie K.",
-      clientPhone: "+225 01 02 03 04",
-      category: draft.category || "",
-      description: draft.description,
-      urgency: mapUrgency(draft.availability || "flexible"),
-      estimatedPriceMinXOF: budgetXOF || 15000,
-      estimatedPriceMaxXOF: (budgetXOF || 15000) * 2,
-      location: draft.address,
-      sentAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 120000).toISOString(),
-    };
-    setProAlerts([newAlert, ...proAlerts]);
+    if (sandboxFallback) {
+      const newAlert: ProAlert = {
+        id: "alert_" + Date.now(),
+        requestId,
+        clientName: "Marie K.",
+        clientPhone: "+225 01 02 03 04",
+        category: draft.category || "",
+        description: draft.description,
+        urgency: mapUrgency(draft.availability || "flexible"),
+        estimatedPriceMinXOF: budgetXOF || 15000,
+        estimatedPriceMaxXOF: (budgetXOF || 15000) * 2,
+        location: draft.address,
+        sentAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 120000).toISOString(),
+      };
+      setProAlerts([newAlert, ...proAlerts]);
+    }
 
     setSearching(requestId);
     rankProfessionals(requestId, draft, allPros);

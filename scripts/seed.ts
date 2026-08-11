@@ -74,7 +74,7 @@ async function seed() {
     if (!id) continue;
     await supabase.from("professional_profiles").upsert({
       user_id: id, business_name: p.bn, first_name: p.fn, last_name: p.ln,
-      category: p.cat, bio: p.bio, hourly_rate: p.hr, min_job_price: 5000,
+      categories: [p.cat], bio: p.bio, hourly_rate: p.hr, min_job_price: 5000,
       verification_level: p.vl, rating: p.rating, total_jobs: p.jobs,
       total_earned: p.jobs * p.hr * 4, is_available: true, is_online: true,
       service_radius_km: 15, wallet_balance: p.jobs * p.hr * 2, pending_balance: p.jobs * p.hr,
@@ -85,7 +85,7 @@ async function seed() {
   // 5. Service Requests (direct SQL via service_role bypasses RLS)
   if (clientId && proIds[3]) {
     const { error: e1 } = await supabase.from("service_requests").insert({
-      client_id: clientId, professional_id: proIds[3], category: "ac_refrigeration",
+      client_id: clientId, professional_id: proIds[3], categories: ["ac_refrigeration"],
       description: "Le split ne souffle que de l'air chaud, besoin d'un diagnostic et recharge fréon si nécessaire.",
       address: "Cocody Riviera 3, Abidjan", location: "SRID=4326;POINT(-4.0083 5.3221)",
       status: "in_progress", urgency: "high",
@@ -94,7 +94,7 @@ async function seed() {
     if (e1) console.log(`  ❌ req1: ${e1.message}`); else console.log(`  ✅ req: Climatisation`);
 
     const { error: e2 } = await supabase.from("service_requests").insert({
-      client_id: clientId, category: "electrician",
+      client_id: clientId, categories: ["electrician"],
       description: "Prise dans la chambre principale ne fonctionne plus et fait des étincelles.",
       address: "Cocody Riviera 3, Abidjan", location: "SRID=4326;POINT(-4.0083 5.3221)",
       status: "pending", urgency: "emergency",
@@ -103,7 +103,7 @@ async function seed() {
     if (e2) console.log(`  ❌ req2: ${e2.message}`); else console.log(`  ✅ req: Prise grillée`);
 
     const { error: e3 } = await supabase.from("service_requests").insert({
-      client_id: clientId, category: "cleaner",
+      client_id: clientId, categories: ["cleaner"],
       description: "Ménage complet pour appartement 3 pièces à Cocody. Produits inclus.",
       address: "Cocody Angré, Abidjan", location: "SRID=4326;POINT(-4.001 5.315)",
       status: "pending", urgency: "medium",
@@ -117,7 +117,7 @@ async function seed() {
     const { data: reqs, error: reqsErr } = await supabase.from("service_requests").select("id, category").eq("client_id", clientId);
     if (reqsErr) console.log(`  ❌ fetch reqs: ${reqsErr.message}`);
     if (reqs) {
-      const acReq = reqs.find((r) => r.category === "ac_refrigeration");
+      const acReq = reqs.find((r) => (r.categories ?? []).includes("ac_refrigeration"));
       if (acReq) {
         let { data: jobData, error: jobErr } = await supabase.from("jobs").insert({
           request_id: acReq.id,

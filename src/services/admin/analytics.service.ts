@@ -88,7 +88,7 @@ export async function getAnalytics(period: string = "30d"): Promise<AnalyticsDat
       supabase.from("transactions").select("created_at, amount").eq("status", "captured").gte("created_at", periodStart).order("created_at"),
       supabase.from("users").select("created_at, role").gte("created_at", prevPeriodStart).order("created_at"),
       supabase.from("service_requests").select("status"),
-      supabase.from("service_requests").select("category"),
+      supabase.from("service_requests").select("categories"),
     ])
 
     const sumAmount = (res: { data: { amount: number }[] | null }) =>
@@ -155,10 +155,12 @@ export async function getAnalytics(period: string = "30d"): Promise<AnalyticsDat
       .map(([status, count]) => ({ status, count }))
       .sort((a, b) => b.count - a.count)
 
-    const catRows = (categoriesRes?.data ?? []) as { category: string }[]
+    const catRows = (categoriesRes?.data ?? []) as { categories: string[] }[]
     const catMap: Record<string, number> = {}
     for (const c of catRows) {
-      if (c.category) catMap[c.category] = (catMap[c.category] ?? 0) + 1
+      for (const cat of c.categories ?? []) {
+        if (cat) catMap[cat] = (catMap[cat] ?? 0) + 1
+      }
     }
     const topCategories = Object.entries(catMap)
       .map(([category, count]) => ({ category, count, revenue: 0 }))

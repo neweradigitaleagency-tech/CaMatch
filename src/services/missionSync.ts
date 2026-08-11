@@ -3,6 +3,9 @@ import { useRequestStore } from "../stores/requestStore";
 import { useProStore } from "../stores/proStore";
 import { useChatStore } from "../stores/chatStore";
 import { useNotificationStore } from "../stores/notificationStore";
+import { useAuthStore } from "../stores/authStore";
+import { acceptRequestAsPro } from "./requestPersistence";
+import { isDemoMode, isSupabaseReady } from "./supabase";
 import { MOCK_PROS } from "./mockData";
 
 // ─── Identité sandbox (démo mono-utilisateur) ───
@@ -177,15 +180,37 @@ export function acceptProposalToMission(proposal: Proposal, requestId: string): 
   });
 }
 
-/** Côté pro : accepter une alerte (prix fixe ou devis). */
-export function acceptAlertAsPro(alert: ProAlert, model: "fixed" | "quote"): SyncMissionAcceptResult {
+/**
+ * Côté pro : accepter une alerte (prix fixe ou devis).
+ * En mode réel, l'acceptation est d'abord persistée en base de façon atomique
+ * (`acceptRequestAsPro`). Si la demande est déjà prise ou expirée, l'alerte
+ * disparaît de la vue calculée et on retourne null.
+ */
+export async function acceptAlertAsPro(
+  alert: ProAlert,
+  model: "fixed" | "quote"
+): Promise<SyncMissionAcceptResult | null> {
   const pro = getSandboxPro();
+  const realMode = isSupabaseReady() && !isDemoMode();
+  const authUserId = useAuthStore.getState().userId;
+
+  if (realMode) {
+    if (!authUserId) return null;
+    const result = await acceptRequestAsPro(alert.requestId, authUserId);
+    if (result === "expired") {
+      useProStore.getState().removeAlert(alert.id);
+      return null;
+    }
+  }
+
+  const request = useRequestStore.getState().requests.find((r) => r.id === alert.requestId);
   return syncMissionAccept({
     requestId: alert.requestId,
-    proId: pro?.id ?? "pro_mock",
+    proId: realMode && authUserId ? authUserId : pro?.id ?? "pro_mock",
     proName: pro?.name ?? "Vous",
     proAvatar: pro?.avatarUrl ?? "",
     proPhone: pro?.phoneNumber ?? "",
+    clientId: request?.clientId,
     clientName: alert.clientName,
     clientPhone: alert.clientPhone,
     clientLocation: alert.location,

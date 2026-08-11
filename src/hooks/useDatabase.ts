@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase, isDemoMode } from "../services/supabase";
+import { toClientRequest, toMission } from "../services/requestPersistence";
 import { useAuthStore } from "../stores/authStore";
+import { useProStore } from "../stores/proStore";
 import {
   MOCK_PROS, MOCK_REQUESTS, MOCK_MISSIONS, MOCK_PRO_JOBS, MOCK_PRO_ALERTS,
   MOCK_PRO_STATS, MOCK_CONVERSATIONS,
 } from "../services/mockData";
-import type { ProfessionalDetails, ClientRequest, Mission, Conversation, ProJob, ProAlert, ProDashboardStats } from "../types";
+import type { ProfessionalDetails, Conversation, ProJob, ProAlert, ProDashboardStats } from "../types";
 
 function getUserId(): string {
   const state = useAuthStore.getState();
@@ -26,7 +28,7 @@ function mapPro(row: any): ProfessionalDetails {
     avatarUrl: `https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face`,
     category: "maison-reparations" as const,
     categories: row.categories || ["maison-reparations"],
-    subCategory: row.sub_category || "",
+    subCategory: (row.sub_categories || [])[0] || "",
     subCategories: row.sub_categories || [],
     title: row.business_name || "",
     bio: row.bio || "",
@@ -73,37 +75,6 @@ export function usePro(id?: string) {
   });
 }
 
-function mapRequest(row: any): ClientRequest {
-  const urgencyMap: Record<string, "immediate" | "today" | "this_week" | "flexible"> = {
-    emergency: "immediate",
-    high: "today",
-    medium: "this_week",
-    low: "flexible",
-  };
-  return {
-    id: row.id,
-    clientId: row.client_id,
-    title: `Intervention ${row.category === "electrician" ? "électrique" : row.category === "plumber" ? "plomberie" : row.category === "ac_refrigeration" ? "climatisation" : "menuiserie"}`,
-    description: row.description || "",
-    photos: row.media_urls || [],
-    category: row.category === "electrician" ? "électricien"
-      : row.category === "plumber" ? "plombier"
-      : row.category === "ac_refrigeration" ? "climatisation"
-      : row.category === "carpenter" ? "menuisier"
-      : "menuisier",
-    address: row.address || "",
-    budgetXOF: row.estimated_price_max || 0,
-    urgency: urgencyMap[row.urgency] || "flexible",
-    status: row.status === "accepted" ? "accepted" as const
-      : row.status === "in_progress" ? "in_progress" as const
-      : row.status === "completed" ? "completed" as const
-      : "created" as const,
-    proId: row.professional_id || undefined,
-    createdAt: row.created_at || "",
-    updatedAt: row.updated_at || "",
-  };
-}
-
 export function useClientRequests() {
   const userId = getUserId();
   return useQuery({
@@ -115,46 +86,9 @@ export function useClientRequests() {
         .select("*")
         .eq("client_id", userId)
         .order("created_at", { ascending: false });
-      return (data || []).map(mapRequest);
+      return (data || []).map(toClientRequest);
     },
   });
-}
-
-function mapMission(row: any): Mission {
-  const statusMap: Record<string, any> = {
-    created: "created",
-    pending: "created",
-    accepted: "accepted",
-    in_progress: "in_progress",
-    completed: "completed",
-  };
-  return {
-    id: row.id,
-    requestId: row.id,
-    clientId: row.client_id,
-    proId: row.professional_id || "",
-    status: statusMap[row.status] || "created",
-    title: `Intervention ${row.category}`,
-    description: row.description || "",
-    category: row.category === "electrician" ? "électricien"
-      : row.category === "plumber" ? "plombier"
-      : row.category === "ac_refrigeration" ? "climatisation"
-      : row.category === "carpenter" ? "menuisier"
-      : "menuisier",
-    address: row.address || "",
-    budgetXOF: row.estimated_price_max || 0,
-    photos: row.media_urls || [],
-    proName: row.professional_profiles?.first_name
-      ? `${row.professional_profiles.first_name} ${row.professional_profiles.last_name || ""}`.trim()
-      : "Professionnel",
-    proAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
-    proPhone: row.professional_profiles?.users?.phone_number || "",
-    clientName: "",
-    clientPhone: "",
-    createdAt: row.created_at || "",
-    acceptedAt: row.status === "accepted" || row.status === "in_progress" ? row.created_at || undefined : undefined,
-    inProgressAt: row.started_at || undefined,
-  };
 }
 
 export function useClientMissions() {
@@ -169,7 +103,7 @@ export function useClientMissions() {
         .eq("client_id", userId)
         .not("professional_id", "is", null)
         .order("created_at", { ascending: false });
-      return (data || []).map(mapMission);
+      return (data || []).map(toMission);
     },
   });
 }
@@ -185,7 +119,7 @@ export function useProMissions() {
         .select("*, professional_profiles( first_name, last_name, users( phone_number ) )")
         .eq("professional_id", userId)
         .order("created_at", { ascending: false });
-      return (data || []).map(mapMission);
+      return (data || []).map(toMission);
     },
   });
 }
@@ -240,7 +174,7 @@ export function useProDashboard() {
           clientName: "Client",
           clientPhone: "",
           clientLocation: r.address || "",
-          category: r.category,
+          category: Array.isArray(r.categories) ? r.categories[0] : "maison-reparations",
           serviceName: r.description?.slice(0, 50) || "",
           description: r.description || "",
           status: r.status === "in_progress" ? "in_progress" as const
@@ -253,7 +187,8 @@ export function useProDashboard() {
           createdAt: r.created_at || "",
         }));
 
-      const alerts: ProAlert[] = [];
+      // Alertes = vue calculée alimentée par useProAlerts.
+      const alerts: ProAlert[] = useProStore.getState().alerts;
       const stats: ProDashboardStats = {
         todayEarningsXOF: 0,
         weekEarningsXOF: 0,
